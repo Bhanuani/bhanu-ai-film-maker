@@ -3,883 +3,969 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CINEMOTION STUDIO | Master Director's Vault</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts -->
+  <title>CINEMOTION STUDIO - AI Camera Movements</title>
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Great+Vibes&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
-    /* Dark Cinematic Atmosphere & Custom Glows */
+    :root {
+      --bg-dark: #0a0b10;
+      --card-bg: #12141e;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --accent: #6366f1;
+      --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      background-color: #03060a;
-      color: #e2e8f0;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
       overflow-x: hidden;
-      font-family: 'Inter', sans-serif;
+      line-height: 1.5;
     }
 
-    /* 3D Master Scene Banner Container */
-    .cinematic-banner-container {
+    /* Header */
+    header {
+      border-bottom: 1px solid var(--border-color);
+      background: rgba(10, 11, 16, 0.85);
+      backdrop-filter: blur(16px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: 1px;
+    }
+
+    .brand-logo span:last-child {
+      color: #818cf8;
+    }
+
+    .search-box {
       position: relative;
+      width: 320px;
+    }
+
+    .search-box input {
       width: 100%;
-      min-height: 200px;
-      border-radius: 1.25rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      padding: 0.65rem 1rem 0.65rem 2.5rem;
+      border-radius: 9999px;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .search-box input:focus {
+      border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* Hero */
+    .hero-section {
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15) 0%, transparent 60%);
+      border-radius: 24px;
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hero-tag {
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      color: #a855f7;
+      font-weight: 700;
+    }
+
+    .counter-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      font-weight: 700;
+      color: #818cf8;
+      font-size: 0.85rem;
+    }
+
+    .hero-content h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      margin-bottom: 0.75rem;
+      line-height: 1.1;
+    }
+
+    .hero-content p {
+      color: var(--text-muted);
+      max-width: 650px;
+      font-size: 1.05rem;
+    }
+
+    /* Categories / Tabs */
+    .filter-bar {
+      max-width: 1400px;
+      margin: 1.5rem auto;
+      padding: 0 2rem;
+      display: flex;
+      gap: 0.75rem;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.55rem 1.25rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active, .tab-btn:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* Main Grid */
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem 4rem;
+    }
+
+    .movements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 1.75rem;
+    }
+
+    .movement-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.95), 0 0 30px rgba(0, 180, 255, 0.15);
-      transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease-out;
-      transform-style: preserve-3d;
-      perspective: 1200px;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s, border-color 0.25s;
     }
 
-    .cinematic-banner-img {
-      width: 100%;
-      height: auto;
-      display: block;
-      object-fit: cover;
-      object-position: center;
-      filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.8));
+    .movement-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(99, 102, 241, 0.5);
     }
 
-    /* 3D Glossy Category Pill Button Styling */
-    .cat-pill-3d {
+    .video-wrapper {
       position: relative;
-      background: linear-gradient(180deg, #0e1726 0%, #060a12 100%);
-      border: 1px solid rgba(34, 58, 98, 0.7);
-      box-shadow: 0 6px 16px -2px rgba(0, 0, 0, 0.8),
-                  inset 0 1px 1px rgba(255, 255, 255, 0.12),
-                  inset 0 -2px 4px rgba(0, 0, 0, 0.5);
-      transition: all 0.22s cubic-bezier(0.25, 0.8, 0.25, 1);
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      overflow: hidden;
     }
 
-    .cat-pill-3d:hover {
-      border-color: rgba(0, 210, 255, 0.55);
-      transform: translateY(-2px);
-      box-shadow: 0 10px 22px -3px rgba(0, 210, 255, 0.25),
-                  inset 0 1px 2px rgba(255, 255, 255, 0.2);
+    .video-wrapper video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
 
-    .cat-pill-3d.active {
-      background: linear-gradient(180deg, #0090bf 0%, #004d6b 100%);
-      border: 1px solid #00e1ff;
-      box-shadow: 0 0 25px rgba(0, 225, 255, 0.65),
-                  inset 0 2px 2px rgba(255, 255, 255, 0.4),
-                  inset 0 -2px 6px rgba(0, 0, 0, 0.6);
-      transform: translateY(-1px);
+    .card-content {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      gap: 0.6rem;
     }
 
-    /* 3D Icon Render wrapper inside buttons */
-    .icon-render-3d {
-      width: 32px;
-      height: 32px;
+    .category-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #818cf8;
+      background: rgba(99, 102, 241, 0.1);
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      width: fit-content;
+    }
+
+    .movement-card h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .prompt-text {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      flex-grow: 1;
+      line-height: 1.4;
+    }
+
+    .copy-btn {
+      margin-top: 0.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 0.6rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0;
-      filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.8));
+      gap: 0.5rem;
+      transition: background 0.2s;
     }
 
-    /* Glass Cards */
-    .glass-card {
-      background: linear-gradient(145deg, rgba(12, 19, 34, 0.75) 0%, rgba(6, 10, 18, 0.95) 100%);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(28, 52, 92, 0.5);
-      box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-      transition: all 0.25s ease;
+    .copy-btn:hover {
+      background: var(--accent);
+      border-color: var(--accent);
     }
 
-    .glass-card:hover {
-      border-color: rgba(0, 210, 255, 0.6);
-      transform: translateY(-4px);
-      box-shadow: 0 20px 40px -10px rgba(0, 180, 255, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+    /* Toast Notification */
+    #toast {
+      visibility: hidden;
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #10b981;
+      color: #fff;
+      padding: 0.75rem 1.25rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      transform: translateY(20px);
+    }
+
+    #toast.show {
+      visibility: visible;
+      opacity: 1;
+      transform: translateY(0);
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col bg-[#03060a]">
+<body>
 
-  <!-- TOP NAVIGATION BAR -->
-  <header class="sticky top-0 z-50 bg-[#060a12]/90 backdrop-blur-md px-4 md:px-7 py-3 border-b border-slate-800/80">
-    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
-      
-      <!-- Left: Menu & Brand Logo -->
-      <div class="flex items-center space-x-3.5">
-        <button id="menu-toggle" class="p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 transition shadow-inner">
-          <i class="fa-solid fa-bars text-base"></i>
-        </button>
-        <div class="flex items-center space-x-2.5">
-          <span class="text-lg md:text-xl font-bold tracking-widest text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]">
-            CINEMOTION
-          </span>
-          <span class="px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded-full bg-cyan-950/90 text-cyan-400 border border-cyan-400/50 shadow-[0_0_12px_rgba(0,210,255,0.4)]">
-            STUDIO
-          </span>
-        </div>
+  <!-- Header -->
+  <header>
+    <div class="header-inner">
+      <div class="brand-logo">
+        <i class="fa-solid fa-clapperboard" style="color: #6366f1;"></i>
+        <span>CINEMOTION</span><span>STUDIO</span>
       </div>
 
-      <!-- Center: Cinematic Search Bar -->
-      <div class="flex-1 max-w-xl hidden md:block">
-        <div class="relative group">
-          <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400 group-focus-within:text-cyan-400 transition">
-            <i class="fa-solid fa-magnifying-glass text-xs"></i>
-          </span>
-          <input 
-            type="text" 
-            id="searchInput"
-            placeholder="Search camera motion, prompt formula, angle..." 
-            class="w-full pl-9 pr-4 py-2 bg-slate-950/90 border border-slate-800 rounded-xl text-xs md:text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500/80 focus:ring-1 focus:ring-cyan-500/60 shadow-inner transition"
-          />
-        </div>
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Search 44 camera movements..." onkeyup="filterCards()">
       </div>
-
-      <!-- Right: Action Buttons & User Profile -->
-      <div class="flex items-center space-x-3">
-        <button 
-          onclick="openAddMovementModal()"
-          class="flex items-center space-x-2 px-4 py-2 text-xs md:text-sm font-bold rounded-xl bg-gradient-to-r from-cyan-400 to-sky-500 hover:from-cyan-300 hover:to-sky-400 text-slate-950 shadow-[0_0_20px_rgba(0,210,255,0.5)] transition active:scale-95"
-        >
-          <i class="fa-solid fa-plus text-xs"></i>
-          <span>Add Movement</span>
-        </button>
-
-        <!-- User Profile Pill -->
-        <button id="userMenuBtn" class="flex items-center space-x-1.5 p-1 bg-slate-900 border border-slate-800 rounded-xl hover:border-cyan-500/50 transition">
-          <span class="w-7 h-7 rounded-lg bg-gradient-to-tr from-cyan-400 to-blue-500 text-slate-950 font-black text-xs flex items-center justify-center shadow-md">
-            BP
-          </span>
-          <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 pr-1.5"></i>
-        </button>
-      </div>
-
     </div>
   </header>
 
-  <!-- MAIN WRAPPER -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 md:px-6 py-6 space-y-6">
-
-    <!-- HERO SECTION: EXACT ORIGINAL 1ST IMAGE LAYOUT WITH 2ND IMAGE 3D VISUAL -->
-    <section class="relative rounded-3xl bg-[#070d19]/90 border border-sky-950/80 p-5 md:p-7 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.85)]">
-      
-      <!-- Split-Tone Volumetric Background Glows (Blue Left, Amber Right) -->
-      <div class="absolute inset-0 pointer-events-none">
-        <div class="absolute -left-20 top-0 w-80 h-full bg-blue-600/20 blur-[100px]"></div>
-        <div class="absolute -right-20 top-0 w-80 h-full bg-amber-600/20 blur-[100px]"></div>
-      </div>
-
-      <div class="relative z-10 flex flex-col gap-4">
-        
-        <!-- Header Top Row: Vault Pill + 44 Movements Counter -->
-        <div class="flex items-center justify-between gap-4">
-          <!-- Master Directors Vault Pill -->
-          <div class="inline-flex items-center px-3.5 py-1 rounded-full bg-[#0a1829] border border-cyan-800/60 text-cyan-400 text-xs font-semibold tracking-wider uppercase shadow-[0_0_15px_rgba(0,210,255,0.2)]">
-            MASTER DIRECTORS VAULT
-          </div>
-
-          <!-- 44 MOVEMENTS Pill Box (Exact as 1st Image) -->
-          <div class="px-5 py-2.5 rounded-2xl bg-[#091122]/90 border border-sky-900/60 shadow-[0_0_25px_rgba(0,180,255,0.2)] text-center flex items-center space-x-3 backdrop-blur-md">
-            <span id="statCounter" class="text-2xl sm:text-3xl font-extrabold text-cyan-400 tracking-tight leading-none drop-shadow-[0_0_12px_rgba(0,210,255,0.6)]">44</span>
-            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-widest">MOVEMENTS</span>
-          </div>
-        </div>
-
-        <!-- THE 3D SPLIT-TONE CINEMATIC VISUAL SCENE -->
-        <div id="hero3DWrapper" class="cinematic-banner-container bg-[#02050c] border border-slate-800/70">
-          <!-- 3D Banner Image rendered with exact details -->
-          <img 
-            id="heroImageEl"
-            src="bhanu-3d-header_2.png" 
-            alt="Hello, Bhanu Pakala - Cinematic 3D Scene"
-            class="cinematic-banner-img rounded-2xl"
-            onerror="renderDetailed3DVisualFallback(this)"
-          />
-        </div>
-
-        <!-- Subtext (Exact text from 1st screenshot) -->
-        <p class="text-slate-300 text-xs sm:text-sm font-normal leading-relaxed max-w-2xl">
-          Cinematic camera movements and visual prompt formulas. Select, customize, and clone camera motions seamlessly.
-        </p>
-
-      </div>
-    </section>
-
-    <!-- HORIZONTAL CATEGORY FILTER NAVIGATION -->
-    <div class="relative overflow-x-auto pb-2 scrollbar-none border-b border-slate-800/80">
-      <div id="filterPills" class="flex items-center space-x-3 min-w-max p-1">
-        
-        <!-- 1. All Tab (3D Raised Grid Spheres) -->
-        <button onclick="setCategory('All')" data-cat="All" class="cat-pill-3d active flex items-center space-x-3 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold text-white">
-          <div class="icon-render-3d">
-            <svg class="w-6 h-6" viewBox="0 0 32 32" fill="none">
-              <defs>
-                <radialGradient id="sphereAll" cx="35%" cy="35%" r="65%">
-                  <stop offset="0%" stop-color="#ffffff"/>
-                  <stop offset="35%" stop-color="#38bdf8"/>
-                  <stop offset="85%" stop-color="#0284c7"/>
-                  <stop offset="100%" stop-color="#082f49"/>
-                </radialGradient>
-                <filter id="glowAll" x="-20%" y="-20%" width="140%" height="140%">
-                  <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#00e1ff" flood-opacity="0.8"/>
-                </filter>
-              </defs>
-              <g filter="url(#glowAll)">
-                <circle cx="10" cy="10" r="5" fill="url(#sphereAll)" />
-                <circle cx="22" cy="10" r="5" fill="url(#sphereAll)" />
-                <circle cx="10" cy="22" r="5" fill="url(#sphereAll)" />
-                <circle cx="22" cy="22" r="5" fill="url(#sphereAll)" />
-              </g>
-            </svg>
-          </div>
-          <span>All</span>
-          <span class="px-2 py-0.5 rounded-full bg-cyan-950/90 text-[11px] font-extrabold text-cyan-300 border border-cyan-400/50 shadow-inner">44</span>
-        </button>
-
-        <!-- 2. Camera Movements -->
-        <button onclick="setCategory('Camera Movements')" data-cat="Camera Movements" class="cat-pill-3d flex items-center space-x-3 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold text-slate-300">
-          <div class="icon-render-3d">
-            <svg class="w-7 h-7" viewBox="0 0 36 36" fill="none">
-              <defs>
-                <linearGradient id="metalTrack" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#94a3b8"/>
-                  <stop offset="50%" stop-color="#475569"/>
-                  <stop offset="100%" stop-color="#1e293b"/>
-                </linearGradient>
-                <radialGradient id="dollyLens" cx="30%" cy="30%" r="70%">
-                  <stop offset="0%" stop-color="#67e8f9"/>
-                  <stop offset="60%" stop-color="#0284c7"/>
-                  <stop offset="100%" stop-color="#082f49"/>
-                </radialGradient>
-              </defs>
-              <rect x="2" y="30" width="32" height="3" rx="1.5" fill="url(#metalTrack)"/>
-              <line x1="8" y1="29" x2="8" y2="33" stroke="#0ea5e9" stroke-width="1.5"/>
-              <line x1="28" y1="29" x2="28" y2="33" stroke="#0ea5e9" stroke-width="1.5"/>
-              <circle cx="8" cy="28" r="3" fill="#38bdf8" stroke="#082f49" stroke-width="1"/>
-              <circle cx="28" cy="28" r="3" fill="#38bdf8" stroke="#082f49" stroke-width="1"/>
-              <rect x="5" y="24" width="26" height="3" rx="1" fill="#334155" stroke="#64748b" stroke-width="0.8"/>
-              <rect x="16" y="16" width="4" height="8" rx="1" fill="#475569"/>
-              <rect x="11" y="8" width="14" height="9" rx="2" fill="#1e293b" stroke="#38bdf8" stroke-width="1"/>
-              <rect x="7" y="10" width="4" height="5" rx="1" fill="url(#dollyLens)"/>
-              <path d="M13 8 V5 H22 V8" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
-              <circle cx="22" cy="11" r="1.5" fill="#ef4444" />
-            </svg>
-          </div>
-          <span>Camera Movements</span>
-          <span class="px-2 py-0.5 rounded-full bg-slate-950 text-[11px] font-bold text-slate-400">44</span>
-        </button>
-
-        <!-- 3. Camera Angles -->
-        <button onclick="setCategory('Camera Angles')" data-cat="Camera Angles" class="cat-pill-3d flex items-center space-x-3 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold text-slate-300">
-          <div class="icon-render-3d">
-            <svg class="w-7 h-7" viewBox="0 0 36 36" fill="none">
-              <defs>
-                <linearGradient id="tripodLeg" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stop-color="#38bdf8"/>
-                  <stop offset="50%" stop-color="#0284c7"/>
-                  <stop offset="100%" stop-color="#0f172a"/>
-                </linearGradient>
-              </defs>
-              <line x1="18" y1="18" x2="6" y2="33" stroke="url(#tripodLeg)" stroke-width="2" stroke-linecap="round"/>
-              <line x1="18" y1="18" x2="18" y2="34" stroke="url(#tripodLeg)" stroke-width="2.2" stroke-linecap="round"/>
-              <line x1="18" y1="18" x2="30" y2="33" stroke="url(#tripodLeg)" stroke-width="2" stroke-linecap="round"/>
-              <polygon points="12,27 18,25 24,27" fill="none" stroke="#00e1ff" stroke-width="1"/>
-              <circle cx="18" cy="17" r="3" fill="#475569" stroke="#94a3b8" stroke-width="1"/>
-              <rect x="13" y="9" width="13" height="7" rx="1.5" fill="#0f172a" stroke="#38bdf8" stroke-width="1"/>
-              <polygon points="13,9 8,7 8,17 13,15" fill="#1e293b" stroke="#38bdf8" stroke-width="0.8"/>
-              <rect x="22" y="7" width="5" height="3" rx="1" fill="#00d2ff"/>
-            </svg>
-          </div>
-          <span>Camera Angles</span>
-          <span class="px-2 py-0.5 rounded-full bg-slate-950 text-[11px] font-bold text-slate-500">0</span>
-        </button>
-
-        <!-- 4. Camera Shots -->
-        <button onclick="setCategory('Camera Shots')" data-cat="Camera Shots" class="cat-pill-3d flex items-center space-x-3 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold text-slate-300">
-          <div class="icon-render-3d">
-            <svg class="w-7 h-7" viewBox="0 0 36 36" fill="none">
-              <defs>
-                <linearGradient id="clapperBoard" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#1e293b"/>
-                  <stop offset="100%" stop-color="#020617"/>
-                </linearGradient>
-              </defs>
-              <rect x="6" y="15" width="24" height="16" rx="2" fill="url(#clapperBoard)" stroke="#64748b" stroke-width="1"/>
-              <line x1="8" y1="21" x2="28" y2="21" stroke="#334155" stroke-width="1"/>
-              <line x1="16" y1="21" x2="16" y2="29" stroke="#334155" stroke-width="1"/>
-              <circle cx="10" cy="25" r="1.5" fill="#38bdf8"/>
-              <circle cx="14" cy="25" r="1.5" fill="#f43f5e"/>
-              <g transform="rotate(-18 6 14)">
-                <rect x="6" y="10" width="24" height="5" rx="1" fill="#0f172a" stroke="#cbd5e1" stroke-width="0.8"/>
-                <polygon points="10,10 13,10 9,15 6,15" fill="#ffffff"/>
-                <polygon points="16,10 19,10 15,15 12,15" fill="#ffffff"/>
-                <polygon points="22,10 25,10 21,15 18,15" fill="#ffffff"/>
-                <polygon points="28,10 30,10 27,15 24,15" fill="#ffffff"/>
-              </g>
-              <circle cx="6" cy="14" r="2" fill="#94a3b8"/>
-            </svg>
-          </div>
-          <span>Camera Shots</span>
-          <span class="px-2 py-0.5 rounded-full bg-slate-950 text-[11px] font-bold text-slate-500">0</span>
-        </button>
-
-        <!-- 5. Cinematic Lighting -->
-        <button onclick="setCategory('Cinematic Lighting')" data-cat="Cinematic Lighting" class="cat-pill-3d flex items-center space-x-3 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold text-slate-300">
-          <div class="icon-render-3d">
-            <svg class="w-7 h-7" viewBox="0 0 36 36" fill="none">
-              <defs>
-                <radialGradient id="fresnelGlow" cx="40%" cy="50%" r="60%">
-                  <stop offset="0%" stop-color="#fffbeb"/>
-                  <stop offset="35%" stop-color="#f59e0b"/>
-                  <stop offset="85%" stop-color="#d97706"/>
-                  <stop offset="100%" stop-color="transparent"/>
-                </radialGradient>
-              </defs>
-              <polygon points="22,13 34,7 34,27 22,21" fill="url(#fresnelGlow)" opacity="0.6"/>
-              <rect x="10" y="11" width="12" height="12" rx="3" fill="#1e293b" stroke="#f59e0b" stroke-width="1"/>
-              <ellipse cx="22" cy="17" rx="2" ry="5" fill="#fde68a" stroke="#f59e0b" stroke-width="1"/>
-              <polygon points="22,11 26,7 28,8 23,12" fill="#334155" stroke="#f59e0b" stroke-width="0.8"/>
-              <polygon points="22,23 26,27 28,26 23,22" fill="#334155" stroke="#f59e0b" stroke-width="0.8"/>
-              <path d="M16 23 V29 H12 M16 29 H20" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <span>Cinematic Lighting</span>
-          <span class="px-2 py-0.5 rounded-full bg-slate-950 text-[11px] font-bold text-slate-500">0</span>
-        </button>
-
-        <!-- 6. Atmosphere -->
-        <button onclick="setCategory('Atmosphere')" data-cat="Atmosphere" class="cat-pill-3d flex items-center space-x-3 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold text-slate-300">
-          <div class="icon-render-3d">
-            <svg class="w-7 h-7" viewBox="0 0 36 36" fill="none">
-              <defs>
-                <radialGradient id="atmoCore" cx="30%" cy="30%" r="70%">
-                  <stop offset="0%" stop-color="#ffffff"/>
-                  <stop offset="25%" stop-color="#38bdf8"/>
-                  <stop offset="70%" stop-color="#0284c7"/>
-                  <stop offset="100%" stop-color="#082f49"/>
-                </radialGradient>
-                <radialGradient id="atmoOrb" cx="35%" cy="35%" r="65%">
-                  <stop offset="0%" stop-color="#a5f3fc"/>
-                  <stop offset="45%" stop-color="#06b6d4"/>
-                  <stop offset="100%" stop-color="#0e7490"/>
-                </radialGradient>
-                <filter id="atmoGlow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="1.5" result="blur"/>
-                  <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-                </filter>
-              </defs>
-              <g filter="url(#atmoGlow)">
-                <circle cx="18" cy="18" r="13" stroke="#00e1ff" stroke-width="0.8" stroke-dasharray="2 3" opacity="0.6"/>
-                <circle cx="10" cy="14" r="3.5" fill="url(#atmoOrb)"/>
-                <circle cx="26" cy="14" r="3.2" fill="url(#atmoOrb)"/>
-                <circle cx="23" cy="24" r="4" fill="url(#atmoOrb)"/>
-                <circle cx="12" cy="23" r="3" fill="url(#atmoOrb)"/>
-                <circle cx="18" cy="18" r="6" fill="url(#atmoCore)"/>
-              </g>
-            </svg>
-          </div>
-          <span>Atmosphere</span>
-          <span class="px-2 py-0.5 rounded-full bg-slate-950 text-[11px] font-bold text-slate-500">0</span>
-        </button>
-
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-top">
+      <div class="hero-tag">MASTER DIRECTORS VAULT</div>
+      <div class="counter-badge">
+        <span>44</span> MOVEMENTS
       </div>
     </div>
-
-    <!-- CARDS GRID SECTION -->
-    <div id="cardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-2">
-      <!-- Injected dynamically by JS -->
+    <div class="hero-content">
+      <h1>AI Camera Motion Vault</h1>
+      <p>Master cinematic camera movements and visual prompt formulas. Preview video references and copy prompts with one click.</p>
     </div>
+  </section>
 
+  <!-- Category Filter Tabs -->
+  <div class="filter-bar">
+    <button class="tab-btn active">Camera Movement</button>
+  </div>
+
+  <!-- Movements Grid -->
+  <main>
+    <div class="movements-grid" id="gridContainer">
+
+      <!-- 1. Slow Dolly In -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Slow-Dolly-In.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Slow Dolly In</h3>
+          <p class="prompt-text">Slow dolly in, camera moves slowly forward toward the subject.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 2. Slow Dolly Out -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Slow-Dolly-Out.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Slow Dolly Out</h3>
+          <p class="prompt-text">Slow dolly out, camera moves slowly backwards away from the subject.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 3. Fast Dolly In -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Fast-Dolly-In.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Fast Dolly In</h3>
+          <p class="prompt-text">Fast dolly in, camera moves rapidly forward toward the subject, urgent motion.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 4. Vertigo Effect (Zolly) -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Vertigo-Effect-Zolly.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Vertigo Effect (Zolly)</h3>
+          <p class="prompt-text">Vertigo effect, dolly zoom, camera moves backward while zooming in, background expands.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 5. Extreme Macro Zoom -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Extreme-Macro-Zoom.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Extreme Macro Zoom</h3>
+          <p class="prompt-text">Extreme macro zoom, zoom transition from subject to micro details of surface.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 6. Cosmic Hyper Zoom -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Cosmic-Hyper-Zoom.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Cosmic Hyper Zoom</h3>
+          <p class="prompt-text">Cosmic hyper zoom, fast zoom transition from extreme wide view down to macro level.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 7. Over the Shoulder (OTS) Shot -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Over-the-Shoulder-OTS-Shot.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Over the Shoulder (OTS) Shot</h3>
+          <p class="prompt-text">Over the shoulder shot, camera mounted behind subject A framing subject B.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 8. Fisheye or Peephole Lens -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Fisheye-or-Peephole-Lens.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Fisheye or Peephole Lens</h3>
+          <p class="prompt-text">Fisheye lens, extreme wide-angle distortion, circular frame.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 9. Reveal from Behind -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Reveal-from-Behind.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Reveal from Behind</h3>
+          <p class="prompt-text">Wipe movement, camera slides laterally from behind foreground object to reveal the scene.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 10. Through Shot -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Through-Shot.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Through Shot</h3>
+          <p class="prompt-text">Fly through, camera moves through an opening into the scene.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 11. Reveal from Blur -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Reveal-from-Blur.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Reveal from Blur</h3>
+          <p class="prompt-text">Rack focus, start completely out of focus, slowly pull focus until sharp.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 12. Rack Focus -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Rack-Focus.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Rack Focus</h3>
+          <p class="prompt-text">Rack focus, focus shifts from the foreground object to the background subject.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 13. Tilt Up -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Tilt-Up.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Tilt Up</h3>
+          <p class="prompt-text">Tilt up, camera pans vertically up from bottom to top.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 14. Tilt Down -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Tilt-Down.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Tilt Down</h3>
+          <p class="prompt-text">Tilt down, camera pans vertically down from top to bottom.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 15. Camera Truck Left -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Camera-Truck-Left.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Camera Truck Left</h3>
+          <p class="prompt-text">Truck left, camera moves sideways on a track to the left.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 16. Lateral Truck Right -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Lateral-Truck-Right.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Lateral Truck Right</h3>
+          <p class="prompt-text">Truck right, camera moves sideways on a track to the right.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 17. Orbit 180 (Spin) -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Orbit-180-Spin.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Orbit 180 (Spin)</h3>
+          <p class="prompt-text">Orbit 180, camera moves in a half-circle around the subject.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 18. Fast 360 Orbit (Spin) -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Fast-360-Orbit-Spin.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Fast 360 Orbit (Spin)</h3>
+          <p class="prompt-text">Fast 360 orbit, camera spins rapidly 360 degrees around the subject.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 19. True Orbit 180 -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/True-Orbit-180.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>True Orbit 180</h3>
+          <p class="prompt-text">180 orbit, camera orbits 180 degrees around the [subject].</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 20. True Orbit 360 -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/True-Orbit-360.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>True Orbit 360</h3>
+          <p class="prompt-text">Fast 360 orbit, camera orbits 360 degrees around the [subject].</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 21. Slow Cinematic Arc -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Slow-Cinematic-Arc.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Slow Cinematic Arc</h3>
+          <p class="prompt-text">Slow cinematic arc, camera moves in a wide curve to reveal side profile.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 22. Pedestal Down -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Pedestal-Down.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Pedestal Down</h3>
+          <p class="prompt-text">Pedestal down, camera lowers vertically straight down.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 23. Pedestal Up -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Pedestal-Up.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Pedestal Up</h3>
+          <p class="prompt-text">Pedestal up, camera rises vertically straight up from waist to eye level.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 24. Crane Up (High Angle Reveal) -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Crane-Up-High-Angle-Reveal.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Crane Up (High Angle Reveal)</h3>
+          <p class="prompt-text">Crane up, camera lifts high into the air.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 25. Crane Down (Landing) -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Crane-Down-Landing.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Crane Down (Landing)</h3>
+          <p class="prompt-text">Crane down, camera descends slowly to the subject.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 26. Smooth Optical Zoom In -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Smooth-Optical-Zoom-In.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Smooth Optical Zoom In</h3>
+          <p class="prompt-text">Smooth optical zoom in, lens magnifies subject, camera stays stationary.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 27. Smooth Optical Zoom Out -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Smooth-Optical-Zoom-Out.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Smooth Optical Zoom Out</h3>
+          <p class="prompt-text">Smooth optical zoom out, lens widens, background becomes blurry.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 28. Snap Zoom (Crash Zoom) -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Snap-Zoom-Crash-Zoom.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Snap Zoom (Crash Zoom)</h3>
+          <p class="prompt-text">Snap zoom, crash zoom, rapid zoom directly into the eyes.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 29. Drone Fly Over -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Drone-Fly-Over.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Drone Fly Over</h3>
+          <p class="prompt-text">Drone fly over, high altitude flight moving forward over the landscape.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 30. Epic Drone Reveal -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Epic-Drone-Reveal.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Epic Drone Reveal</h3>
+          <p class="prompt-text">Epic drone reveal, rising and tilting down to reveal the scene.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 31. Large Scale Drone Orbit -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Large-Scale-Drone-Orbit.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Large Scale Drone Orbit</h3>
+          <p class="prompt-text">Large scale drone orbit, massive sweeping circle around the landscape.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 32. Top Down (God's Eye View) -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Top-Down-Gods-Eye-View.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Top Down (God's Eye View)</h3>
+          <p class="prompt-text">Top down shot, camera pointing straight down, slow twist.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 33. FPV Drone Aggressive (Drone Dive) -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/FPV-Drone-Aggressive-Drone-Dive.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>FPV Drone Aggressive (Drone Dive)</h3>
+          <p class="prompt-text">FPV drone dive, aggressive diving motion down a vertical structure.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 34. Handheld Documentary Style -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Handheld-Documentary-Style.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Handheld Documentary Style</h3>
+          <p class="prompt-text">Handheld camera, shaky motion, natural movement, documentary style.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 35. Whip Pan -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Whip-Pan.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Whip Pan</h3>
+          <p class="prompt-text">Whip pan, camera whips violently to the side with extreme directional motion blur.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 36. Dutch Angle (Roll) -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Dutch-Angle-Roll.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Dutch Angle (Roll)</h3>
+          <p class="prompt-text">Dutch angle, camera roll, tilted sideways on Z-axis.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 37. Leading Shot (Backward Tracking) -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Leading-Shot-Backward-Tracking.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Leading Shot (Backward Tracking)</h3>
+          <p class="prompt-text">Leading shot, camera moves backward matching the subject's speed.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 38. Following Shot (Forward Tracking) -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Following-Shot-Forward-Tracking.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Following Shot (Forward Tracking)</h3>
+          <p class="prompt-text">Following shot, camera follows behind the subject matching speed.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 39. Side Tracking (Parallel) -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Side-Tracking-Parallel.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Side Tracking (Parallel)</h3>
+          <p class="prompt-text">Side tracking, camera trucks alongside the subject.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 40. POV Walk (First Person Walk) -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/POV-Walk-First-Person-Walk.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>POV Walk (First Person Walk)</h3>
+          <p class="prompt-text">POV walk, first person camera moving forward with bobbing motion.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 41. Hyperlapse (Moving Time-Lapse) -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Hyperlapse-Moving-Time-Lapse.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Hyperlapse (Moving Time-Lapse)</h3>
+          <p class="prompt-text">Hyperlapse, camera moves forward rapidly, time accelerated, fast motion, light trails.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 42. Barrel Roll (Vortex Inception Shot) -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Barrel-Roll-Vortex-Inception-Shot.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Barrel Roll (Vortex Inception Shot)</h3>
+          <p class="prompt-text">Barrel roll, camera spins 360 degrees clockwise while moving forward, disorienting.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 43. Bullet Time (Frozen Moment) -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Bullet-Time-Frozen-Moment.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Bullet Time (Frozen Moment)</h3>
+          <p class="prompt-text">Bullet time, frozen moment, ultra slow motion, camera orbit right.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+      <!-- 44. Worm's Eye Tracking (Ground Level) -->
+      <div class="movement-card" data-category="Camera Movement">
+        <div class="video-wrapper">
+          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Worms-Eye-Tracking-Ground-Level.mp4" autoplay loop muted playsinline loading="lazy"></video>
+        </div>
+        <div class="card-content">
+          <span class="category-tag">Camera Movement</span>
+          <h3>Worm's Eye Tracking (Ground Level)</h3>
+          <p class="prompt-text">Worm's eye view, low angle tracking, camera moves along the ground looking up.</p>
+          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
+        </div>
+      </div>
+
+    </div>
   </main>
 
-  <!-- ADD MOVEMENT MODAL -->
-  <div id="addModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl p-6 shadow-[0_20px_50px_rgba(0,0,0,0.9)] space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="text-lg font-bold text-white flex items-center space-x-2">
-          <i class="fa-solid fa-circle-plus text-cyan-400"></i>
-          <span>Add Cinematic Movement</span>
-        </h3>
-        <button onclick="closeAddMovementModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-
-      <form id="movementForm" onsubmit="handleCreateMovement(event)" class="space-y-4 text-xs md:text-sm">
-        <div>
-          <label class="block text-slate-300 font-medium mb-1">Movement Name</label>
-          <input type="text" id="mvName" required placeholder="e.g. Orbital Dolly Zoom (Vertigo Effect)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500">
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-slate-300 font-medium mb-1">Category</label>
-            <select id="mvCategory" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500">
-              <option value="Camera Movements">Camera Movements</option>
-              <option value="Camera Angles">Camera Angles</option>
-              <option value="Camera Shots">Camera Shots</option>
-              <option value="Cinematic Lighting">Cinematic Lighting</option>
-              <option value="Atmosphere">Atmosphere</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-slate-300 font-medium mb-1">Speed / Motion Tag</label>
-            <input type="text" id="mvSpeed" placeholder="e.g. Slow Fluid Drift" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500" value="Slow Fluid Drift">
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-slate-300 font-medium mb-1">Prompt Formula / Cinematography Syntax</label>
-          <textarea id="mvPrompt" rows="3" required placeholder="--ar 16:9 --style raw cinematic 35mm lens, smooth counter-clockwise arc rotation..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500"></textarea>
-        </div>
-
-        <div class="flex justify-end space-x-3 pt-2">
-          <button type="button" onclick="closeAddMovementModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700">Cancel</button>
-          <button type="submit" class="px-5 py-2 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 font-bold text-slate-950 hover:brightness-110">Save Movement</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- TOAST NOTIFICATION CONTAINER -->
-  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-2xl bg-cyan-950/95 border border-cyan-400 text-cyan-200 text-xs md:text-sm font-bold shadow-[0_0_25px_rgba(0,210,255,0.5)] pointer-events-none opacity-0 transition-opacity duration-300 flex items-center space-x-2.5">
-    <i class="fa-solid fa-circle-check text-cyan-400 text-sm"></i>
-    <span id="toastMsg">Prompt copied to clipboard!</span>
-  </div>
-
-  <!-- POWERED BY NETLIFY FLOATING BADGE -->
-  <div class="fixed bottom-4 right-4 z-40">
-    <a href="https://bhanu-ai-film-maker.netlify.app/" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-slate-950/90 border border-slate-800/90 hover:border-teal-400/60 text-slate-300 hover:text-white shadow-xl transition backdrop-blur-md">
-      <svg class="w-3.5 h-3.5 text-teal-400" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2L2 19.5h20L12 2zm0 3.8l6.5 11.4H5.5L12 5.8z"/>
-      </svg>
-      <span class="text-[11px] font-medium tracking-wide">Powered by <strong class="text-white font-bold">Netlify</strong></span>
-    </a>
+  <!-- Toast Notification -->
+  <div id="toast">
+    <i class="fa-solid fa-circle-check"></i>
+    <span>Prompt copied to clipboard!</span>
   </div>
 
   <script>
-    // CINEMOTION DATA VAULT
-    const DEFAULT_MOVEMENTS = [
-      {
-        id: 1,
-        title: "Slow Fluid Drift",
-        category: "Camera Movements",
-        speed: "Slow Fluid Drift",
-        speedType: "amber",
-        prompt: "Smooth optical push-in toward protagonist eyes, locked 50mm anamorphic prime lens, ultra-shallow depth of field, subtle film grain, 24fps cinema look.",
-        sceneType: "Drama / Character Focus",
-        elevation: "Eye Level"
-      },
-      {
-        id: 2,
-        title: "Slow Fluid Drift",
-        category: "Camera Movements",
-        speed: "Slow Fluid Drift",
-        speedType: "amber",
-        prompt: "Simultaneous backward dolly camera track while zooming in optical focal length, background expanding while subject remains fixed size, optical distortion.",
-        sceneType: "Psychological / Reveal",
-        elevation: "Chest Height"
-      },
-      {
-        id: 3,
-        title: "Kinetic & Fast",
-        category: "Camera Movements",
-        speed: "Kinetic & Fast",
-        speedType: "gold",
-        prompt: "Rapid directional whip pan matching fast protagonist movement, motion-blurred transition, sharp refocusing on target object, dynamic shutter angle.",
-        sceneType: "Action / Pursuit",
-        elevation: "Low Angle"
-      },
-      {
-        id: 4,
-        title: "360 Orbital Master Arc",
-        category: "Camera Movements",
-        speed: "Slow Fluid Drift",
-        speedType: "amber",
-        prompt: "Continuous 360-degree orbital rotation around the central character, steady circular jib motion, background neon lights streaking bokeh rim highlights.",
-        sceneType: "Hero Entrance / Sci-Fi",
-        elevation: "Neutral Orbit"
-      },
-      {
-        id: 5,
-        title: "Low-Angle Steadicam Sprint",
-        category: "Camera Movements",
-        speed: "Kinetic & Fast",
-        speedType: "gold",
-        prompt: "Gimbal-stabilized sprint 1 foot above wet asphalt, tracking trailing boots, reflective street puddle water splashes, neon reflection flare, anamorphic.",
-        sceneType: "Cyberpunk / Chase",
-        elevation: "Ground Skid"
-      },
-      {
-        id: 6,
-        title: "Drone Crane Descending Reveal",
-        category: "Camera Movements",
-        speed: "Slow Fluid Drift",
-        speedType: "amber",
-        prompt: "High aerial bird-eye vantage plummeting smoothly down through city clouds, tilting up at terminal height to face the monolithic tower entryway.",
-        sceneType: "Establishing / Epics",
-        elevation: "Top-Down to Level"
-      }
-    ];
-
-    let movementsList = [...DEFAULT_MOVEMENTS];
-    let activeCategory = 'All';
-
-    // RENDER MOVEMENTS
-    function renderCards() {
-      const grid = document.getElementById('cardsGrid');
-      const searchInput = document.getElementById('searchInput');
-      const searchVal = searchInput ? searchInput.value.toLowerCase().trim() : '';
-
-      const filtered = movementsList.filter(item => {
-        const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
-        const matchesSearch = item.title.toLowerCase().includes(searchVal) || 
-                              item.prompt.toLowerCase().includes(searchVal) ||
-                              item.speed.toLowerCase().includes(searchVal);
-        return matchesCategory && matchesSearch;
-      });
-
-      if (filtered.length === 0) {
-        grid.innerHTML = `
-          <div class="col-span-full py-16 text-center text-slate-500">
-            <i class="fa-solid fa-film text-4xl mb-3 text-slate-700"></i>
-            <p class="text-sm">No movements found matching the active criteria.</p>
-          </div>
-        `;
-        return;
-      }
-
-      grid.innerHTML = filtered.map(card => `
-        <div class="glass-card rounded-2xl p-5 flex flex-col justify-between relative group">
-          <div>
-            <div class="flex items-center justify-between gap-2 mb-3">
-              <div class="flex items-center space-x-2">
-                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider bg-cyan-950/80 text-cyan-400 border border-cyan-500/30">
-                  ${card.category.toUpperCase()}
-                </span>
-                <span class="px-2.5 py-0.5 rounded-md text-[10px] font-semibold flex items-center space-x-1 ${card.speedType === 'gold' ? 'bg-amber-950/70 text-amber-300 border border-amber-500/30' : 'bg-yellow-950/60 text-yellow-300 border border-yellow-500/30'}">
-                  <i class="fa-solid ${card.speedType === 'gold' ? 'fa-bolt' : 'fa-video'} text-[9px] mr-1"></i>
-                  <span>${card.speed}</span>
-                </span>
-              </div>
-
-              <div class="flex items-center space-x-2 text-slate-400">
-                <button onclick="cloneMovement(${card.id})" title="Edit / Clone" class="hover:text-cyan-400 transition p-1">
-                  <i class="fa-regular fa-pen-to-square text-xs"></i>
-                </button>
-                <button onclick="deleteMovement(${card.id})" title="Delete" class="hover:text-red-400 transition p-1">
-                  <i class="fa-regular fa-trash-can text-xs"></i>
-                </button>
-              </div>
-            </div>
-
-            <div class="relative w-full h-36 rounded-xl bg-slate-950/95 border border-slate-800/80 mb-3 overflow-hidden flex items-center justify-center">
-              <div class="absolute inset-0 bg-gradient-to-r from-cyan-950/20 via-transparent to-amber-950/20"></div>
-              <div class="absolute inset-0 opacity-15" style="background-image: linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px); background-size: 20px 20px;"></div>
-              
-              <div class="relative z-10 flex flex-col items-center group-hover:scale-105 transition duration-300">
-                <div class="w-12 h-12 rounded-2xl bg-slate-900 border border-cyan-500/50 flex items-center justify-center text-cyan-400 shadow-[0_0_20px_rgba(0,210,255,0.35)]">
-                  <i class="fa-solid fa-camera-movie text-lg"></i>
-                </div>
-                <span class="text-[10px] font-mono text-slate-400 mt-2">${card.elevation}</span>
-              </div>
-            </div>
-
-            <div class="bg-black/60 border border-slate-800/80 rounded-xl p-3 text-[11px] font-mono text-slate-300 line-clamp-3 select-all leading-relaxed mb-4">
-              ${card.prompt}
-            </div>
-          </div>
-
-          <div class="flex items-center justify-between pt-2 border-t border-slate-800/60">
-            <span class="text-[10px] text-slate-500 font-medium">Format: RAW 4K 24P</span>
-            <button 
-              onclick="copyPrompt('${card.prompt.replace(/'/g, "\\'")}')"
-              class="px-3.5 py-1.5 rounded-xl bg-slate-800/90 hover:bg-cyan-500 hover:text-slate-950 text-slate-200 text-xs font-bold flex items-center space-x-1.5 transition active:scale-95 shadow-sm"
-            >
-              <i class="fa-regular fa-copy text-xs"></i>
-              <span>Copy Prompt</span>
-            </button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // SAFE INTERACTIVE 3D PERSPECTIVE TILT ON BANNER
-    function initHeroTilt() {
-      const bannerContainer = document.getElementById('hero3DWrapper');
-      if (!bannerContainer) return;
-
-      bannerContainer.addEventListener('mousemove', (e) => {
-        const rect = bannerContainer.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        
-        const rotateX = ((y - centerY) / centerY) * -4;
-        const rotateY = ((x - centerX) / centerX) * 5;
-
-        bannerContainer.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-      });
-
-      bannerContainer.addEventListener('mouseleave', () => {
-        bannerContainer.style.transform = 'rotateX(0deg) rotateY(0deg)';
+    // Copy Prompt functionality
+    function copyPrompt(button) {
+      const card = button.closest('.movement-card');
+      const text = card.querySelector('.prompt-text').innerText;
+      
+      navigator.clipboard.writeText(text).then(() => {
+        showToast();
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
       });
     }
 
-    // CATEGORY SWITCHING
-    function setCategory(cat) {
-      activeCategory = cat;
-      const buttons = document.querySelectorAll('.cat-pill-3d');
-      buttons.forEach(btn => {
-        if (btn.getAttribute('data-cat') === cat) {
-          btn.classList.add('active');
-          btn.classList.remove('text-slate-300');
-          btn.classList.add('text-white');
+    function showToast() {
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    // Live Search Filter
+    function filterCards() {
+      const input = document.getElementById('searchInput').value.toLowerCase();
+      const cards = document.querySelectorAll('.movement-card');
+
+      cards.forEach(card => {
+        const title = card.querySelector('h3').innerText.toLowerCase();
+        const prompt = card.querySelector('.prompt-text').innerText.toLowerCase();
+
+        if (title.includes(input) || prompt.includes(input)) {
+          card.style.display = 'flex';
         } else {
-          btn.classList.remove('active');
-          btn.classList.remove('text-white');
-          btn.classList.add('text-slate-300');
+          card.style.display = 'none';
         }
       });
-      renderCards();
     }
-
-    // TOAST NOTIFIER
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      const toastMsg = document.getElementById('toastMsg');
-      if (!toast || !toastMsg) return;
-      toastMsg.innerText = msg;
-      toast.style.opacity = '1';
-      setTimeout(() => {
-        toast.style.opacity = '0';
-      }, 2400);
-    }
-
-    // CLIPBOARD COPY
-    function copyPrompt(text) {
-      const tempInput = document.createElement('textarea');
-      tempInput.value = text;
-      document.body.appendChild(tempInput);
-      tempInput.select();
-      document.execCommand('copy');
-      document.body.removeChild(tempInput);
-      showToast('Prompt formula copied to clipboard!');
-    }
-
-    // MODAL HANDLERS
-    function openAddMovementModal() {
-      const modal = document.getElementById('addModal');
-      if (!modal) return;
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-    }
-
-    function closeAddMovementModal() {
-      const modal = document.getElementById('addModal');
-      if (!modal) return;
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-      const form = document.getElementById('movementForm');
-      if (form) form.reset();
-    }
-
-    function handleCreateMovement(e) {
-      e.preventDefault();
-      const title = document.getElementById('mvName').value;
-      const category = document.getElementById('mvCategory').value;
-      const speed = document.getElementById('mvSpeed').value || "Fluid Motion";
-      const prompt = document.getElementById('mvPrompt').value;
-
-      const newId = Date.now();
-      const isFast = speed.toLowerCase().includes('fast') || speed.toLowerCase().includes('kinetic');
-
-      movementsList.unshift({
-        id: newId,
-        title,
-        category,
-        speed,
-        speedType: isFast ? 'gold' : 'amber',
-        prompt,
-        sceneType: "Director Cut",
-        elevation: "Eye Level 35mm"
-      });
-
-      const counter = document.getElementById('statCounter');
-      if (counter) counter.innerText = movementsList.length;
-
-      closeAddMovementModal();
-      renderCards();
-      showToast('New cinematic movement added to vault!');
-    }
-
-    function cloneMovement(id) {
-      const target = movementsList.find(m => m.id === id);
-      if (target) {
-        const cloned = { ...target, id: Date.now(), title: target.title + " (Clone)" };
-        movementsList.unshift(cloned);
-        const counter = document.getElementById('statCounter');
-        if (counter) counter.innerText = movementsList.length;
-        renderCards();
-        showToast('Movement cloned successfully!');
-      }
-    }
-
-    function deleteMovement(id) {
-      movementsList = movementsList.filter(m => m.id !== id);
-      const counter = document.getElementById('statCounter');
-      if (counter) counter.innerText = movementsList.length;
-      renderCards();
-      showToast('Movement removed from vault.');
-    }
-
-    // HIGH FIDELITY 3D VISUAL FALLBACK
-    function renderDetailed3DVisualFallback(imgElement) {
-      const container = document.getElementById('hero3DWrapper');
-      if (!container) return;
-
-      container.innerHTML = `
-        <div class="relative w-full overflow-hidden rounded-2xl bg-gradient-to-b from-[#02050c] to-[#010206] p-2">
-          <svg class="w-full h-auto max-h-[220px]" viewBox="0 0 1200 320" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <radialGradient id="leftCyanSpot" cx="12%" cy="30%" r="55%">
-                <stop offset="0%" stop-color="#00d2ff" stop-opacity="0.9"/>
-                <stop offset="45%" stop-color="#0066cc" stop-opacity="0.35"/>
-                <stop offset="100%" stop-color="transparent" stop-opacity="0"/>
-              </radialGradient>
-              <radialGradient id="rightAmberSpot" cx="80%" cy="35%" r="60%">
-                <stop offset="0%" stop-color="#ffb703" stop-opacity="0.95"/>
-                <stop offset="45%" stop-color="#fb8500" stop-opacity="0.45"/>
-                <stop offset="100%" stop-color="transparent" stop-opacity="0"/>
-              </radialGradient>
-
-              <linearGradient id="chiseledChrome" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#ffffff"/>
-                <stop offset="22%" stop-color="#f8fafc"/>
-                <stop offset="46%" stop-color="#94a3b8"/>
-                <stop offset="50%" stop-color="#ffffff"/>
-                <stop offset="68%" stop-color="#cbd5e1"/>
-                <stop offset="88%" stop-color="#475569"/>
-                <stop offset="100%" stop-color="#1e293b"/>
-              </linearGradient>
-
-              <linearGradient id="neonGold" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#ffffff"/>
-                <stop offset="30%" stop-color="#fef08a"/>
-                <stop offset="70%" stop-color="#f59e0b"/>
-                <stop offset="100%" stop-color="#d97706"/>
-              </linearGradient>
-
-              <linearGradient id="filmGlowGrad" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stop-color="#00e5ff"/>
-                <stop offset="40%" stop-color="#0284c7"/>
-                <stop offset="70%" stop-color="#f59e0b"/>
-                <stop offset="100%" stop-color="#ffb703"/>
-              </linearGradient>
-
-              <radialGradient id="lensCore" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#ffffff"/>
-                <stop offset="25%" stop-color="#fef08a"/>
-                <stop offset="65%" stop-color="#f59e0b"/>
-                <stop offset="100%" stop-color="transparent"/>
-              </radialGradient>
-
-              <filter id="ultraGlow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="8" result="blur"/>
-                <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-              </filter>
-              <filter id="chiseledDropShadow" x="-10%" y="-10%" width="120%" height="120%">
-                <feDropShadow dx="0" dy="12" stdDeviation="8" flood-color="#000000" flood-opacity="0.95"/>
-              </filter>
-            </defs>
-
-            <rect x="0" y="0" width="550" height="320" fill="url(#leftCyanSpot)" opacity="0.65"/>
-            <rect x="600" y="0" width="600" height="320" fill="url(#rightAmberSpot)" opacity="0.6"/>
-
-            <!-- Clapperboard -->
-            <g transform="translate(390, 30) rotate(-10)" filter="url(#chiseledDropShadow)">
-              <rect x="0" y="38" width="160" height="105" rx="6" fill="#080d16" stroke="#334155" stroke-width="2.5"/>
-              <line x1="12" y1="72" x2="148" y2="72" stroke="#1e293b" stroke-width="2.5"/>
-              <line x1="80" y1="72" x2="80" y2="130" stroke="#1e293b" stroke-width="2"/>
-              <g transform="rotate(-20 0 38)">
-                <rect x="0" y="14" width="165" height="26" rx="4" fill="#0b111e" stroke="#475569" stroke-width="2"/>
-                <polygon points="15,14 35,14 20,40 0,40" fill="#f8fafc"/>
-                <polygon points="52,14 72,14 57,40 37,40" fill="#f8fafc"/>
-                <polygon points="89,14 109,14 94,40 74,40" fill="#f8fafc"/>
-                <polygon points="126,14 146,14 131,40 111,40" fill="#f8fafc"/>
-              </g>
-              <circle cx="6" cy="38" r="5" fill="#94a3b8" stroke="#00e1ff" stroke-width="1.5"/>
-            </g>
-
-            <!-- 35mm Gold Film Reel -->
-            <g transform="translate(890, 45) rotate(18)" filter="url(#chiseledDropShadow)">
-              <circle cx="75" cy="75" r="70" fill="#1b1103" stroke="#f59e0b" stroke-width="6"/>
-              <circle cx="75" cy="75" r="62" fill="none" stroke="#78350f" stroke-width="3"/>
-              <circle cx="75" cy="75" r="22" fill="#d97706" stroke="#fef3c7" stroke-width="3"/>
-              <circle cx="75" cy="75" r="9" fill="#03060a"/>
-              <circle cx="75" cy="32" r="13" fill="#03060a" stroke="#f59e0b" stroke-width="2.5"/>
-              <circle cx="75" cy="118" r="13" fill="#03060a" stroke="#f59e0b" stroke-width="2.5"/>
-              <circle cx="37" cy="53" r="13" fill="#03060a" stroke="#f59e0b" stroke-width="2.5"/>
-              <circle cx="113" cy="53" r="13" fill="#03060a" stroke="#f59e0b" stroke-width="2.5"/>
-              <circle cx="37" cy="97" r="13" fill="#03060a" stroke="#f59e0b" stroke-width="2.5"/>
-              <circle cx="113" cy="97" r="13" fill="#03060a" stroke="#f59e0b" stroke-width="2.5"/>
-            </g>
-
-            <!-- Production Camera with Optical Flare -->
-            <g transform="translate(620, 15)" filter="url(#chiseledDropShadow)">
-              <circle cx="120" cy="100" r="70" fill="url(#lensCore)" opacity="0.85" style="mix-blend-mode: screen;"/>
-              <rect x="170" y="55" width="95" height="90" rx="8" fill="#0f172a" stroke="#475569" stroke-width="2.5"/>
-              <path d="M 175 55 L 175 30 L 245 30 L 245 55" stroke="#64748b" stroke-width="6" stroke-linecap="round"/>
-              <rect x="185" y="16" width="45" height="15" rx="4" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
-              <circle cx="245" cy="72" r="4.5" fill="#ef4444"/>
-              <polygon points="80,35 170,55 170,145 80,165" fill="#050811" stroke="#f59e0b" stroke-width="2.5"/>
-              <polygon points="70,22 170,32 165,55 80,35" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5"/>
-              <ellipse cx="125" cy="100" rx="18" ry="34" fill="#0b1329" stroke="#f59e0b" stroke-width="2.5"/>
-              <ellipse cx="120" cy="100" rx="11" ry="24" fill="#ffd166" opacity="0.9"/>
-              <ellipse cx="116" cy="98" rx="5" ry="10" fill="#ffffff" opacity="0.95"/>
-            </g>
-
-            <!-- Film Ribbon Strip -->
-            <g filter="url(#chiseledDropShadow)">
-              <path d="M 140 240 Q 340 290 600 215 T 1020 220" stroke="url(#filmGlowGrad)" stroke-width="24" fill="none" opacity="0.4"/>
-              <path d="M 140 240 Q 340 290 600 215 T 1020 220" stroke="#020611" stroke-width="20" fill="none"/>
-              <path d="M 140 240 Q 340 290 600 215 T 1020 220" stroke="url(#filmGlowGrad)" stroke-width="2.5" stroke-dasharray="8 6" fill="none"/>
-              <path d="M 140 248 Q 340 298 600 223 T 1020 228" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="3 5" fill="none"/>
-              <path d="M 140 232 Q 340 282 600 207 T 1020 212" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="3 5" fill="none"/>
-            </g>
-
-            <!-- "Hello," Script -->
-            <g transform="translate(50, 140) rotate(-7)" filter="url(#ultraGlow)">
-              <text x="0" y="0" font-family="'Great Vibes', cursive" font-size="105" font-weight="bold" fill="none" stroke="#f59e0b" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">Hello,</text>
-              <text x="0" y="0" font-family="'Great Vibes', cursive" font-size="105" font-weight="bold" fill="url(#neonGold)">Hello,</text>
-              <text x="0" y="0" font-family="'Great Vibes', cursive" font-size="105" font-weight="bold" fill="#ffffff" opacity="0.8">Hello,</text>
-            </g>
-
-            <!-- "BHANU PAKALA" 3D Chrome Text -->
-            <g transform="translate(310, 205)" filter="url(#chiseledDropShadow)">
-              <text x="4" y="4" font-family="'Cinzel', serif" font-size="96" font-weight="900" letter-spacing="5" fill="#1e293b">BHANU PAKALA</text>
-              <text x="7" y="7" font-family="'Cinzel', serif" font-size="96" font-weight="900" letter-spacing="5" fill="#0f172a">BHANU PAKALA</text>
-              <text x="10" y="10" font-family="'Cinzel', serif" font-size="96" font-weight="900" letter-spacing="5" fill="#020617">BHANU PAKALA</text>
-              <text x="0" y="0" font-family="'Cinzel', serif" font-size="96" font-weight="900" letter-spacing="5" fill="url(#chiseledChrome)" stroke="#ffffff" stroke-width="1.6">BHANU PAKALA</text>
-            </g>
-
-            <line x1="100" y1="260" x2="1100" y2="260" stroke="url(#filmGlowGrad)" stroke-width="2" opacity="0.6"/>
-          </svg>
-        </div>
-      `;
-    }
-
-    // INITIALIZATION & EVENT BINDINGS
-    window.addEventListener('DOMContentLoaded', () => {
-      renderCards();
-      initHeroTilt();
-
-      const searchInput = document.getElementById('searchInput');
-      if (searchInput) {
-        searchInput.addEventListener('input', renderCards);
-      }
-    });
   </script>
+
 </body>
 </html>
