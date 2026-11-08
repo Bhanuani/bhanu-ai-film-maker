@@ -7,7 +7,7 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
@@ -16,7 +16,7 @@
       --card-bg: #0d121f;
       --border-color: rgba(255, 255, 255, 0.08);
       --accent-cyan: #00d2ff;
-      --accent-glow: rgba(0, 210, 255, 0.25);
+      --accent-glow: rgba(0, 210, 255, 0.35);
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
     }
@@ -31,251 +31,7 @@
       overflow-x: hidden;
     }
 
-    /* ============================================================
-       1. CINEMATIC LOGIN & SIGNUP SCREEN (FULLSCREEN GATEWAY)
-       ============================================================ */
-    #authOverlay {
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(circle at center, #0a1122 0%, #02050e 100%);
-      z-index: 9999999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-    }
-
-    .auth-card {
-      background: rgba(13, 18, 31, 0.85);
-      border: 1px solid rgba(0, 210, 255, 0.35);
-      box-shadow: 0 0 60px rgba(0, 210, 255, 0.2), inset 0 0 20px rgba(0, 210, 255, 0.05);
-      border-radius: 20px;
-      width: 100%;
-      max-width: 440px;
-      padding: 2.5rem 2rem;
-      backdrop-filter: blur(16px);
-      text-align: center;
-      position: relative;
-    }
-
-    .auth-brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: #fff;
-      margin-bottom: 0.5rem;
-    }
-
-    .auth-brand .pill {
-      background: rgba(0, 210, 255, 0.15);
-      border: 1px solid #00d2ff;
-      color: #00d2ff;
-      font-size: 0.7rem;
-      padding: 0.15rem 0.55rem;
-      border-radius: 999px;
-    }
-
-    .auth-subtitle {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 2rem;
-    }
-
-    .auth-form {
-      display: flex;
-      flex-direction: column;
-      gap: 1.1rem;
-      text-align: left;
-    }
-
-    .auth-field label {
-      display: block;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #cbd5e1;
-      margin-bottom: 0.4rem;
-    }
-
-    .auth-field input {
-      width: 100%;
-      background: #070c17;
-      border: 1px solid #1e293b;
-      padding: 0.75rem 1rem;
-      border-radius: 10px;
-      color: #fff;
-      font-size: 0.9rem;
-      outline: none;
-      transition: all 0.2s;
-    }
-
-    .auth-field input:focus {
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 12px var(--accent-glow);
-    }
-
-    .auth-submit-btn {
-      width: 100%;
-      background: linear-gradient(135deg, #00d2ff 0%, #0088cc 100%);
-      color: #040711;
-      font-weight: 800;
-      border: none;
-      padding: 0.85rem;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      cursor: pointer;
-      margin-top: 0.5rem;
-      transition: all 0.2s;
-      box-shadow: 0 4px 20px rgba(0, 210, 255, 0.35);
-    }
-
-    .auth-submit-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 25px rgba(0, 210, 255, 0.55);
-    }
-
-    .auth-toggle-link {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      margin-top: 1.25rem;
-      text-align: center;
-    }
-
-    .auth-toggle-link a {
-      color: var(--accent-cyan);
-      text-decoration: none;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .auth-toggle-link a:hover {
-      text-decoration: underline;
-    }
-
-    /* ============================================================
-       2. WOW 3D CINEMATIC WELCOME SPLASH ANIMATION
-       ============================================================ */
-    #welcomeCinemaStage {
-      position: fixed;
-      inset: 0;
-      background: #000;
-      z-index: 99999999;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      perspective: 1400px;
-      overflow: hidden;
-    }
-
-    .cinema-light-beam {
-      position: absolute;
-      width: 100vw;
-      height: 100vh;
-      background: radial-gradient(circle at center, rgba(0, 210, 255, 0.25) 0%, rgba(251, 191, 36, 0.15) 40%, transparent 75%);
-      mix-blend-mode: screen;
-      filter: blur(40px);
-      animation: pulseLight 3s ease-out forwards;
-    }
-
-    @keyframes pulseLight {
-      0% { opacity: 0; transform: scale(0.6); }
-      40% { opacity: 1; transform: scale(1.2); }
-      80% { opacity: 0.8; }
-      100% { opacity: 0; transform: scale(1.5); }
-    }
-
-    .cinema-scene-3d {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      transform-style: preserve-3d;
-      animation: scene3dEntrance 3.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    @keyframes scene3dEntrance {
-      0% {
-        opacity: 0;
-        transform: scale(0.2) translateZ(-600px) rotateX(25deg);
-        filter: blur(15px);
-      }
-      25% {
-        opacity: 1;
-        filter: blur(0px);
-      }
-      70% {
-        opacity: 1;
-        transform: scale(1.05) translateZ(50px) rotateX(0deg);
-      }
-      100% {
-        opacity: 0;
-        transform: scale(1.6) translateZ(300px);
-        filter: blur(10px);
-      }
-    }
-
-    .cinema-floating-props {
-      display: flex;
-      align-items: center;
-      gap: 2rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .prop-3d {
-      width: 90px;
-      height: 90px;
-      object-fit: contain;
-      filter: drop-shadow(0 0 25px rgba(0, 210, 255, 0.8));
-      animation: propSpinFloat 3s ease-in-out infinite alternate;
-    }
-
-    @keyframes propSpinFloat {
-      0% { transform: translateY(0px) rotate(-6deg) scale(0.95); }
-      100% { transform: translateY(-12px) rotate(8deg) scale(1.1); }
-    }
-
-    .cinema-text-gold {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 3.5rem;
-      font-weight: 900;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      background: linear-gradient(135deg, #fff 0%, #00d2ff 50%, #3a7bd5 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 40px rgba(0, 210, 255, 0.7);
-      text-align: center;
-      line-height: 1.2;
-    }
-
-    .cinema-text-admin {
-      font-family: 'Cinzel', serif;
-      font-size: 3.8rem;
-      font-weight: 900;
-      letter-spacing: 4px;
-      background: linear-gradient(135deg, #fff275 0%, #e6af2e 50%, #b8860b 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 50px rgba(230, 175, 46, 0.8);
-      text-align: center;
-    }
-
-    .cinema-tagline {
-      font-size: 1.1rem;
-      letter-spacing: 4px;
-      color: #94a3b8;
-      text-transform: uppercase;
-      margin-top: 0.8rem;
-      font-weight: 700;
-      text-shadow: 0 0 15px rgba(255,255,255,0.4);
-    }
-
-    /* ============================================================
-       3. MAIN STUDIO INTERFACE
-       ============================================================ */
+    /* HEADER */
     header {
       background: rgba(4, 7, 17, 0.95);
       border-bottom: 1px solid var(--border-color);
@@ -308,10 +64,7 @@
       transition: all 0.2s;
     }
 
-    .menu-btn:hover {
-      background: rgba(0, 210, 255, 0.1);
-      border-color: var(--accent-cyan);
-    }
+    .menu-btn:hover { background: rgba(0, 210, 255, 0.1); border-color: var(--accent-cyan); }
 
     .brand-logo {
       display: flex;
@@ -380,10 +133,13 @@
       font-weight: 700;
       font-size: 0.85rem;
       cursor: pointer;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 0.4rem;
+      transition: opacity 0.2s, transform 0.2s;
     }
+
+    .add-btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
     .profile-pill {
       background: rgba(255, 255, 255, 0.05);
@@ -418,7 +174,7 @@
       background: #0b1120;
       border: 1px solid rgba(0, 210, 255, 0.3);
       border-radius: 14px;
-      width: 270px;
+      width: 280px;
       padding: 16px;
       box-shadow: 0 12px 35px rgba(0,0,0,0.8);
       display: none;
@@ -451,264 +207,115 @@
     }
 
     .profile-info h4 { font-size: 0.95rem; color: #fff; margin-bottom: 2px; }
-    .profile-info p { font-size: 0.78rem; color: var(--accent-cyan); word-break: break-all; }
+    .profile-info p { font-size: 0.76rem; color: var(--accent-cyan); word-break: break-all; }
 
-    .logout-btn {
-      background: rgba(239, 68, 68, 0.15);
-      border: 1px solid rgba(239, 68, 68, 0.4);
-      color: #f87171;
-      padding: 0.5rem;
-      border-radius: 8px;
-      font-weight: 700;
-      cursor: pointer;
-      font-size: 0.85rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
-      transition: all 0.2s;
-    }
-
-    .logout-btn:hover {
-      background: #ef4444;
-      color: #fff;
-    }
-
-    /* SIDEBAR DRAWER */
+    /* SIDEBAR */
     .sidebar-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(6px);
-      z-index: 99998;
-      display: none;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); z-index: 99998; display: none;
     }
     .sidebar-overlay.active { display: block; }
 
     .sidebar-drawer {
-      position: fixed;
-      top: 0;
-      left: -320px;
-      width: 310px;
-      height: 100vh;
-      background: #090e1a;
-      border-right: 1px solid rgba(0, 210, 255, 0.25);
-      z-index: 99999;
-      display: flex;
-      flex-direction: column;
-      transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 10px 0 40px rgba(0,0,0,0.8);
+      position: fixed; top: 0; left: -320px; width: 310px; height: 100vh; background: #090e1a;
+      border-right: 1px solid rgba(0, 210, 255, 0.25); z-index: 99999; display: flex; flex-direction: column;
+      transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 10px 0 40px rgba(0,0,0,0.8);
     }
     .sidebar-drawer.active { left: 0; }
 
     .sidebar-header {
-      padding: 1.25rem 1.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border-color);
+      padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color);
     }
 
-    .sidebar-menu {
-      padding: 1.5rem 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.6rem;
-    }
+    .sidebar-menu { padding: 1.5rem 1rem; display: flex; flex-direction: column; gap: 0.6rem; }
 
     .sidebar-item {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 0.85rem 1.25rem;
-      color: #cbd5e1;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      transition: all 0.2s;
-      cursor: pointer;
-      background: transparent;
-      border: 1px solid transparent;
-      width: 100%;
-      text-align: left;
+      display: flex; align-items: center; gap: 1rem; padding: 0.85rem 1.25rem; color: #cbd5e1; border-radius: 10px;
+      font-size: 0.95rem; font-weight: 600; transition: all 0.2s; cursor: pointer; background: transparent; border: 1px solid transparent; width: 100%; text-align: left;
     }
 
     .sidebar-item i { font-size: 1.15rem; color: var(--accent-cyan); width: 24px; }
-    .sidebar-item:hover {
-      background: rgba(0, 210, 255, 0.08);
-      border-color: rgba(0, 210, 255, 0.3);
-      color: #fff;
-    }
+    .sidebar-item:hover { background: rgba(0, 210, 255, 0.08); border-color: rgba(0, 210, 255, 0.3); color: #fff; }
 
     .sidebar-badge {
-      margin-left: auto;
-      background: var(--accent-cyan);
-      color: #000;
-      font-size: 0.72rem;
-      font-weight: 800;
-      padding: 0.15rem 0.5rem;
-      border-radius: 999px;
+      margin-left: auto; background: var(--accent-cyan); color: #000; font-size: 0.72rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 999px;
     }
 
     /* VAULT LAYOUT */
-    .vault-container {
-      max-width: 1440px;
-      margin: 0 auto;
-      padding: 1.5rem 2rem 5rem;
-    }
+    .vault-container { max-width: 1440px; margin: 0 auto; padding: 1.5rem 2rem 5rem; }
 
-    /* HERO 3D BANNER */
     .hero-banner-wrapper {
-      position: relative;
-      background: #000;
-      border: 1px solid rgba(0, 210, 255, 0.25);
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 0 45px rgba(0, 150, 255, 0.12);
-      margin-bottom: 2rem;
-      cursor: pointer;
-      transition: border-color 0.4s ease, box-shadow 0.4s ease;
+      position: relative; background: #000; border: 1px solid rgba(0, 210, 255, 0.25); border-radius: 20px;
+      overflow: hidden; box-shadow: 0 0 45px rgba(0, 150, 255, 0.12); margin-bottom: 2rem; cursor: pointer; transition: all 0.4s ease;
     }
 
     .hero-banner-wrapper:hover {
-      border-color: rgba(0, 210, 255, 0.6);
-      box-shadow: 0 0 55px rgba(0, 210, 255, 0.25);
+      border-color: rgba(0, 210, 255, 0.6); box-shadow: 0 0 55px rgba(0, 210, 255, 0.25);
     }
 
     .hero-top-bar {
-      position: absolute;
-      top: 1.25rem;
-      left: 1.5rem;
-      right: 1.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 5;
-      pointer-events: none;
+      position: absolute; top: 1.25rem; left: 1.5rem; right: 1.5rem; display: flex; justify-content: space-between; align-items: center; z-index: 5; pointer-events: none;
     }
 
     .vault-badge {
-      font-size: 0.72rem;
-      font-weight: 800;
-      letter-spacing: 1.5px;
-      background: rgba(0, 210, 255, 0.12);
-      border: 1px solid rgba(0, 210, 255, 0.3);
-      color: var(--accent-cyan);
-      padding: 0.35rem 0.85rem;
-      border-radius: 999px;
+      font-size: 0.72rem; font-weight: 800; letter-spacing: 1.5px; background: rgba(0, 210, 255, 0.12);
+      border: 1px solid rgba(0, 210, 255, 0.3); color: var(--accent-cyan); padding: 0.35rem 0.85rem; border-radius: 999px;
     }
 
     .counter-pill {
-      background: rgba(0, 0, 0, 0.65);
-      border: 1px solid rgba(0, 210, 255, 0.3);
-      padding: 0.35rem 0.85rem;
-      border-radius: 999px;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.75rem;
-      font-weight: 800;
-      color: #fff;
+      background: rgba(0, 0, 0, 0.65); border: 1px solid rgba(0, 210, 255, 0.3); padding: 0.35rem 0.85rem;
+      border-radius: 999px; display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; font-weight: 800; color: #fff;
     }
 
     .counter-pill span.num { color: var(--accent-cyan); font-size: 1.1rem; }
 
     .hero-img-box {
-      width: 100%;
-      min-height: 380px;
-      max-height: 480px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
+      width: 100%; min-height: 380px; max-height: 480px; display: flex; align-items: center; justify-content: center; overflow: hidden;
     }
 
     .hero-img-box img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), filter 0.6s ease;
+      width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), filter 0.6s ease;
     }
 
     .hero-banner-wrapper:hover .hero-img-box img {
-      transform: scale(1.045);
-      filter: brightness(1.08) drop-shadow(0 0 25px rgba(0, 210, 255, 0.25));
+      transform: scale(1.045); filter: brightness(1.08) drop-shadow(0 0 25px rgba(0, 210, 255, 0.25));
     }
 
     .hero-bottom-caption {
-      padding: 1.25rem 1.75rem;
-      background: rgba(8, 12, 22, 0.95);
-      border-top: 1px solid var(--border-color);
-      font-size: 0.92rem;
-      color: var(--text-muted);
+      padding: 1.25rem 1.75rem; background: rgba(8, 12, 22, 0.95); border-top: 1px solid var(--border-color); font-size: 0.92rem; color: var(--text-muted);
     }
 
-    /* 3D REALISTIC ICONS CATEGORIES BAR */
+    /* CATEGORIES BAR */
     .categories-bar {
-      display: flex;
-      align-items: center;
-      gap: 0.85rem;
-      overflow-x: auto;
-      padding-bottom: 0.85rem;
-      margin-bottom: 2rem;
-      scrollbar-width: none;
+      display: flex; align-items: center; gap: 0.85rem; overflow-x: auto; padding-bottom: 0.85rem; margin-bottom: 2rem; scrollbar-width: none;
     }
     .categories-bar::-webkit-scrollbar { display: none; }
 
     .cat-tab {
-      background: rgba(10, 16, 28, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--text-muted);
-      padding: 0.55rem 1.15rem;
-      border-radius: 999px;
-      font-size: 0.88rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.25s ease;
-      backdrop-filter: blur(10px);
+      background: rgba(10, 16, 28, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); color: var(--text-muted);
+      padding: 0.55rem 1.15rem; border-radius: 999px; font-size: 0.88rem; font-weight: 600; display: flex;
+      align-items: center; gap: 0.75rem; cursor: pointer; white-space: nowrap; transition: all 0.25s ease; backdrop-filter: blur(10px);
     }
 
-    .cat-tab:hover {
-      border-color: rgba(0, 210, 255, 0.4);
-      background: rgba(0, 210, 255, 0.05);
-      color: #fff;
-    }
+    .cat-tab:hover { border-color: rgba(0, 210, 255, 0.4); background: rgba(0, 210, 255, 0.05); color: #fff; }
 
     .cat-tab.active {
       background: linear-gradient(135deg, rgba(0, 210, 255, 0.2) 0%, rgba(13, 18, 31, 0.95) 100%);
-      border-color: var(--accent-cyan);
-      color: #fff;
-      box-shadow: 0 0 20px rgba(0, 210, 255, 0.25);
+      border-color: var(--accent-cyan); color: #fff; box-shadow: 0 0 20px rgba(0, 210, 255, 0.25);
     }
 
     .cat-tab span.count {
-      background: rgba(255, 255, 255, 0.08);
-      padding: 0.15rem 0.5rem;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      font-weight: 700;
+      background: rgba(255, 255, 255, 0.08); padding: 0.15rem 0.5rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700;
     }
 
     .cat-tab.active span.count { background: var(--accent-cyan); color: #000; }
 
     .cat-3d-img {
-      width: 36px;
-      height: 36px;
-      object-fit: contain;
-      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.8));
-      animation: iconFloatContinuous 3s ease-in-out infinite alternate;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.8));
+      animation: iconFloatContinuous 3s ease-in-out infinite alternate; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    .cat-tab:hover .cat-3d-img,
-    .cat-tab.active .cat-3d-img {
-      transform: scale(1.22) rotate(-4deg);
-      filter: drop-shadow(0 0 12px rgba(0, 210, 255, 0.7));
+    .cat-tab:hover .cat-3d-img, .cat-tab.active .cat-3d-img {
+      transform: scale(1.22) rotate(-4deg); filter: drop-shadow(0 0 12px rgba(0, 210, 255, 0.7));
     }
 
     @keyframes iconFloatContinuous {
@@ -717,184 +324,78 @@
     }
 
     /* GRID & CARDS */
-    .movements-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-      gap: 1.5rem;
-    }
+    .movements-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 1.5rem; }
 
     .movement-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 14px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.2s ease, border-color 0.2s ease;
+      background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden;
+      display: flex; flex-direction: column; transition: transform 0.2s ease, border-color 0.2s ease;
     }
 
     .movement-card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(0, 210, 255, 0.4);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      transform: translateY(-4px); border-color: rgba(0, 210, 255, 0.4); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     }
 
     .card-video-box {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      background: #000;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      border-bottom: 1px solid var(--border-color);
+      width: 100%; aspect-ratio: 16 / 9; background: #000; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; border-bottom: 1px solid var(--border-color);
     }
 
-    .card-video-box video, .card-video-box img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: none;
-    }
-
+    .card-video-box video, .card-video-box img { width: 100%; height: 100%; object-fit: cover; display: none; }
     .card-video-box video.active-video, .card-video-box img.active-video { display: block; }
 
     .upload-overlay {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
-      background: rgba(0, 0, 0, 0.65);
-      cursor: pointer;
-      transition: all 0.2s;
+      position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 0.4rem; background: rgba(0, 0, 0, 0.65); cursor: pointer; transition: all 0.2s;
     }
-
     .card-video-box:hover .upload-overlay { background: rgba(0, 0, 0, 0.45); }
     .upload-overlay i { font-size: 1.6rem; color: var(--accent-cyan); }
     .upload-overlay span { font-size: 0.78rem; color: #cbd5e1; font-weight: 500; }
     .file-input { display: none; }
 
-    .card-details {
-      padding: 1.25rem;
-      display: flex;
-      flex-direction: column;
-      flex-grow: 1;
-      justify-content: space-between;
-      gap: 1rem;
-    }
-
-    .card-meta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.25rem;
-    }
+    .card-details { padding: 1.25rem; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; gap: 1rem; }
+    .card-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.25rem; }
 
     .tag-badge {
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: var(--accent-cyan);
-      background: rgba(0, 210, 255, 0.08);
-      padding: 0.2rem 0.5rem;
-      border-radius: 6px;
-      border: 1px solid rgba(0, 210, 255, 0.2);
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--accent-cyan);
+      background: rgba(0, 210, 255, 0.08); padding: 0.2rem 0.5rem; border-radius: 6px; border: 1px solid rgba(0, 210, 255, 0.2);
     }
 
     .card-details h3 { font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; }
 
     .prompt-box {
-      font-size: 0.86rem;
-      color: var(--text-muted);
-      line-height: 1.45;
-      background: rgba(0, 0, 0, 0.35);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      padding: 0.75rem;
-      border-radius: 8px;
+      font-size: 0.86rem; color: var(--text-muted); line-height: 1.45; background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.04); padding: 0.75rem; border-radius: 8px;
     }
 
     .copy-btn {
-      background: linear-gradient(135deg, #00d2ff 0%, #0099cc 100%);
-      color: #040711;
-      border: none;
-      padding: 0.75rem 1rem;
-      border-radius: 8px;
-      font-size: 0.88rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      transition: all 0.2s;
-      width: 100%;
+      background: linear-gradient(135deg, #00d2ff 0%, #0099cc 100%); color: #040711; border: none; padding: 0.75rem 1rem;
+      border-radius: 8px; font-size: 0.88rem; font-weight: 700; cursor: pointer; display: flex; align-items: center;
+      justify-content: center; gap: 0.5rem; transition: all 0.2s; width: 100%;
     }
 
-    .copy-btn:hover {
-      box-shadow: 0 0 15px rgba(0, 210, 255, 0.5);
-      transform: translateY(-2px);
-      filter: brightness(1.1);
-    }
+    .copy-btn:hover { box-shadow: 0 0 15px rgba(0, 210, 255, 0.5); transform: translateY(-2px); filter: brightness(1.1); }
 
     /* TOAST */
     #toast {
-      visibility: hidden;
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      background: #00d2ff;
-      color: #040711;
-      padding: 0.75rem 1.4rem;
-      border-radius: 999px;
-      font-weight: 700;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      box-shadow: 0 10px 30px rgba(0, 210, 255, 0.4);
-      z-index: 100000;
-      opacity: 0;
-      transition: opacity 0.3s, transform 0.3s;
-      transform: translateY(20px);
+      visibility: hidden; position: fixed; bottom: 2rem; right: 2rem; background: #00d2ff; color: #040711;
+      padding: 0.75rem 1.4rem; border-radius: 999px; font-weight: 700; font-size: 0.9rem; display: flex;
+      align-items: center; gap: 0.5rem; box-shadow: 0 10px 30px rgba(0, 210, 255, 0.4); z-index: 100000;
+      opacity: 0; transition: opacity 0.3s, transform 0.3s; transform: translateY(20px);
     }
     #toast.show { visibility: visible; opacity: 1; transform: translateY(0); }
 
     /* MODAL POPUPS */
     .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.82);
-      backdrop-filter: blur(10px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 99999;
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.82); backdrop-filter: blur(10px);
+      display: flex; align-items: center; justify-content: center; z-index: 99999;
     }
 
     .modal-box {
-      background: #0d121f;
-      border: 1px solid rgba(0, 210, 255, 0.3);
-      border-radius: 16px;
-      width: 90%;
-      max-width: 520px;
-      padding: 24px;
-      color: #fff;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-      max-height: 85vh;
-      overflow-y: auto;
+      background: #0d121f; border: 1px solid rgba(0, 210, 255, 0.3); border-radius: 16px; width: 90%;
+      max-width: 520px; padding: 24px; color: #fff; box-shadow: 0 10px 40px rgba(0,0,0,0.8); max-height: 85vh; overflow-y: auto;
     }
 
     .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 12px;
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;
     }
 
     .close-btn { background: none; border: none; color: #94a3b8; font-size: 26px; cursor: pointer; }
@@ -903,97 +404,46 @@
     .form-group label { font-size: 13px; color: #94a3b8; font-weight: 600; }
 
     .form-group input, .form-group select, .form-group textarea {
-      background: #161e2e;
-      border: 1px solid #334155;
-      color: #f8fafc;
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 14px;
-      outline: none;
-      font-family: inherit;
+      background: #161e2e; border: 1px solid #334155; color: #f8fafc; padding: 10px 14px; border-radius: 8px; font-size: 14px; outline: none; font-family: inherit;
     }
 
     .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent-cyan); }
 
     .submit-btn {
-      width: 100%;
-      padding: 12px;
-      background: var(--accent-cyan);
-      border: none;
-      border-radius: 8px;
-      color: #040711;
-      font-weight: 700;
-      cursor: pointer;
-      font-size: 0.95rem;
+      width: 100%; padding: 12px; background: var(--accent-cyan); border: none; border-radius: 8px; color: #040711; font-weight: 700; cursor: pointer; font-size: 0.95rem;
     }
 
     .themes-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
 
     .theme-chip {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border-color);
-      padding: 12px 16px;
-      border-radius: 10px;
-      font-size: 14px;
-      color: #cbd5e1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      cursor: pointer;
-      transition: all 0.2s;
+      background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); padding: 12px 16px;
+      border-radius: 10px; font-size: 14px; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.2s;
     }
 
     .theme-chip:hover {
-      background: rgba(0, 210, 255, 0.15);
-      border-color: var(--accent-cyan);
-      color: #fff;
-      transform: translateX(4px);
+      background: rgba(0, 210, 255, 0.15); border-color: var(--accent-cyan); color: #fff; transform: translateX(4px);
     }
 
-    /* 2-SEC CINEMATIC CATEGORY ANIMATIONS */
+    /* FULLSCREEN CATEGORY ANIMATION STAGE */
     #cinematicStage {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 999999;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      perspective: 1200px;
-      overflow: hidden;
+      position: fixed; inset: 0; pointer-events: none; z-index: 999999; display: none; align-items: center; justify-content: center; perspective: 1200px; overflow: hidden;
     }
 
     .stage-backdrop {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at center, rgba(0, 210, 255, 0.15) 0%, rgba(2, 6, 18, 0.92) 80%);
-      backdrop-filter: blur(8px);
-      animation: stageFade 2s ease forwards;
+      position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(0, 210, 255, 0.15) 0%, rgba(2, 6, 18, 0.92) 80%);
+      backdrop-filter: blur(8px); animation: stageFade 2s ease forwards;
     }
 
     @keyframes stageFade {
-      0% { opacity: 0; }
-      12% { opacity: 1; }
-      85% { opacity: 1; }
-      100% { opacity: 0; }
+      0% { opacity: 0; } 12% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; }
     }
 
     .cinematic-scene {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
+      position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 10;
     }
 
     .dolly-real-rig {
-      position: absolute;
-      bottom: 22%;
-      left: -500px;
-      animation: realDollyTrack 2s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
-      filter: drop-shadow(0 25px 45px rgba(0,0,0,0.9));
+      position: absolute; bottom: 22%; left: -500px; animation: realDollyTrack 2s cubic-bezier(0.2, 0.9, 0.3, 1) forwards; filter: drop-shadow(0 25px 45px rgba(0,0,0,0.9));
     }
     .dolly-real-rig img { width: 440px; height: auto; }
 
@@ -1004,11 +454,7 @@
     }
 
     .angles-real-rig { position: relative; width: 100vw; height: 100vh; }
-    .angle-fast-cam {
-      position: absolute;
-      width: 280px;
-      animation: cornerHop 2s steps(1) forwards;
-    }
+    .angle-fast-cam { position: absolute; width: 280px; animation: cornerHop 2s steps(1) forwards; }
     .angle-fast-cam img { width: 100%; filter: drop-shadow(0 0 35px rgba(0, 210, 255, 0.7)); }
 
     @keyframes cornerHop {
@@ -1019,12 +465,7 @@
       100% { top: 50%; left: 50%; transform: translate(-50%, -50%) scale(1.3); }
     }
 
-    .clapper-real-rig {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      animation: clapHit 2s ease-out forwards;
-    }
+    .clapper-real-rig { display: flex; flex-direction: column; align-items: center; animation: clapHit 2s ease-out forwards; }
     .clapper-real-rig img { width: 360px; filter: drop-shadow(0 20px 50px rgba(0, 210, 255, 0.6)); }
 
     @keyframes clapHit {
@@ -1035,20 +476,12 @@
       100% { transform: scale(2.2) rotate(45deg); opacity: 0; }
     }
 
-    .light-real-rig {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      animation: studioFlash 2s ease forwards;
-    }
+    .light-real-rig { display: flex; flex-direction: column; align-items: center; animation: studioFlash 2s ease forwards; }
     .light-real-rig img { width: 380px; filter: drop-shadow(0 0 65px rgba(251, 191, 36, 0.85)); }
 
     .light-glare {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at center, rgba(251, 191, 36, 0.6) 0%, rgba(245, 158, 11, 0.15) 50%, transparent 80%);
-      mix-blend-mode: screen;
-      animation: glarePuff 2s ease forwards;
+      position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(251, 191, 36, 0.6) 0%, rgba(245, 158, 11, 0.15) 50%, transparent 80%);
+      mix-blend-mode: screen; animation: glarePuff 2s ease forwards;
     }
 
     @keyframes studioFlash {
@@ -1058,18 +491,9 @@
       100% { transform: scale(1.4); opacity: 0; }
     }
 
-    @keyframes glarePuff {
-      0% { opacity: 0; }
-      25% { opacity: 1; }
-      80% { opacity: 0.8; }
-      100% { opacity: 0; }
-    }
+    @keyframes glarePuff { 0% { opacity: 0; } 25% { opacity: 1; } 80% { opacity: 0.8; } 100% { opacity: 0; } }
 
-    .sky-transition-real {
-      position: absolute;
-      inset: 0;
-      animation: dayNightCycle 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    }
+    .sky-transition-real { position: absolute; inset: 0; animation: dayNightCycle 2s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
 
     @keyframes dayNightCycle {
       0% { background: linear-gradient(180deg, #f59e0b 0%, #38bdf8 60%, #0369a1 100%); opacity: 0.8; }
@@ -1078,24 +502,13 @@
     }
 
     .rain-real {
-      position: absolute;
-      inset: 0;
-      background: repeating-linear-gradient(105deg, transparent, transparent 15px, rgba(255, 255, 255, 0.45) 16px, transparent 18px);
+      position: absolute; inset: 0; background: repeating-linear-gradient(105deg, transparent, transparent 15px, rgba(255, 255, 255, 0.45) 16px, transparent 18px);
       animation: rainFallFast 0.2s linear infinite;
     }
 
-    @keyframes rainFallFast {
-      0% { background-position: 0 0; }
-      100% { background-position: -90px 220px; }
-    }
+    @keyframes rainFallFast { 0% { background-position: 0 0; } 100% { background-position: -90px 220px; } }
 
-    .smoke-rig-real {
-      position: absolute;
-      bottom: 15%;
-      display: flex;
-      align-items: center;
-      animation: mistDrift 2s ease forwards;
-    }
+    .smoke-rig-real { position: absolute; bottom: 15%; display: flex; align-items: center; animation: mistDrift 2s ease forwards; }
     .smoke-rig-real img { width: 440px; filter: drop-shadow(0 0 45px rgba(56, 189, 248, 0.7)); }
 
     @keyframes mistDrift {
@@ -1105,12 +518,7 @@
       100% { transform: translateX(60px) scale(1.3); opacity: 0; }
     }
 
-    .lens-real-rig {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      animation: lensRealZoom 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
+    .lens-real-rig { display: flex; flex-direction: column; align-items: center; animation: lensRealZoom 2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .lens-real-rig img { width: 420px; filter: drop-shadow(0 0 60px rgba(0, 210, 255, 0.9)); }
 
     @keyframes lensRealZoom {
@@ -1121,91 +529,23 @@
     }
 
     .stage-title {
-      position: absolute;
-      bottom: 12%;
-      font-size: 1.5rem;
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 800;
-      letter-spacing: 2px;
-      color: #fff;
-      text-transform: uppercase;
-      text-shadow: 0 0 25px rgba(0, 210, 255, 0.8);
-      background: rgba(4, 7, 17, 0.75);
-      padding: 0.6rem 2rem;
-      border-radius: 999px;
-      border: 1px solid var(--accent-cyan);
-      animation: stageFade 2s ease forwards;
-      z-index: 20;
+      position: absolute; bottom: 12%; font-size: 1.5rem; font-family: 'Space Grotesk', sans-serif; font-weight: 800;
+      letter-spacing: 2px; color: #fff; text-transform: uppercase; text-shadow: 0 0 25px rgba(0, 210, 255, 0.8);
+      background: rgba(4, 7, 17, 0.75); padding: 0.6rem 2rem; border-radius: 999px; border: 1px solid var(--accent-cyan);
+      animation: stageFade 2s ease forwards; z-index: 20;
     }
   </style>
 </head>
 <body>
 
-  <!-- ============================================================
-       AUTH MODAL / LOGIN GATEWAY SCREEN
-       ============================================================ -->
-  <div id="authOverlay">
-    <div class="auth-card">
-      <div class="auth-brand">
-        <span>CINEMOTION</span>
-        <span class="pill">STUDIO</span>
-      </div>
-      <p class="auth-subtitle" id="authSubtitle">Sign in to access Master Directors Vault</p>
-
-      <!-- LOGIN FORM -->
-      <form id="loginForm" class="auth-form">
-        <div class="auth-field">
-          <label>Mail Id</label>
-          <input type="email" id="loginEmail" placeholder="Enter your email" required />
-        </div>
-        <div class="auth-field">
-          <label>Password</label>
-          <input type="password" id="loginPassword" placeholder="Enter your password" required />
-        </div>
-        <button type="submit" class="auth-submit-btn">ENTER CINEMOTION</button>
-        <div class="auth-toggle-link">
-          New here? <a onclick="toggleAuthMode('signup')">Create an account</a>
-        </div>
-      </form>
-
-      <!-- SIGN UP FORM -->
-      <form id="signupForm" class="auth-form" style="display: none;">
-        <div class="auth-field">
-          <label>Mail Id</label>
-          <input type="email" id="signupEmail" placeholder="e.g. director@studio.com" required />
-        </div>
-        <div class="auth-field">
-          <label>Password</label>
-          <input type="password" id="signupPassword" placeholder="Create strong password" required />
-        </div>
-        <div class="auth-field">
-          <label>Re-Enter Password</label>
-          <input type="password" id="signupConfirmPassword" placeholder="Confirm your password" required />
-        </div>
-        <button type="submit" class="auth-submit-btn">CREATE VAULT ACCOUNT</button>
-        <div class="auth-toggle-link">
-          Already registered? <a onclick="toggleAuthMode('login')">Sign In here</a>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- ============================================================
-       3D CINEMATIC WELCOME SPLASH ANIMATION
-       ============================================================ -->
-  <div id="welcomeCinemaStage">
-    <div class="cinema-light-beam"></div>
-    <div class="cinema-scene-3d" id="welcomeSceneContent"></div>
-  </div>
-
-  <!-- FULLSCREEN 2-SECOND CINEMATIC CATEGORY ANIMATION STAGE -->
+  <!-- FULLSCREEN CATEGORY ANIMATION STAGE -->
   <div id="cinematicStage">
     <div class="stage-backdrop"></div>
     <div class="cinematic-scene" id="cinematicScene"></div>
     <div class="stage-title" id="stageTitle">Cinematic View</div>
   </div>
 
-  <!-- LEFT SIDEBAR OVERLAY & DRAWER -->
+  <!-- LEFT SIDEBAR -->
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <aside class="sidebar-drawer" id="sidebarDrawer">
     <div class="sidebar-header">
@@ -1256,26 +596,28 @@
       </div>
 
       <div class="header-actions">
-        <button class="add-btn" id="addMovementBtn"><i class="fa-solid fa-plus"></i> Add Movement</button>
+        <!-- + Add Movement is directly accessible -->
+        <button class="add-btn" id="addMovementBtn">
+          <i class="fa-solid fa-plus"></i> Add Movement
+        </button>
         
         <div class="profile-pill" id="profilePillBtn">
-          <div class="avatar" id="headerAvatar">BP</div>
+          <div class="avatar">BP</div>
           <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; color: #94a3b8;"></i>
         </div>
 
         <div class="profile-dropdown" id="profileDropdown">
           <div class="profile-dropdown-header">
-            <div class="profile-avatar-large" id="dropdownAvatar">BP</div>
+            <div class="profile-avatar-large">BP</div>
             <div class="profile-info">
-              <h4 id="dropdownName">Bhanu Pakala</h4>
-              <p id="dropdownEmail">bhanu.pakala03@gmail.com</p>
+              <h4>BHANU PAKALA</h4>
+              <p>bhanu.pakala03@gmail.com</p>
             </div>
           </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <span class="tag-badge" id="dropdownBadge">PRO DIRECTOR</span>
-            <span style="font-size: 11px; color: #94a3b8;">Cinemotion Vault</span>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="profile-badge" style="font-size: 11px; color: var(--accent-cyan); font-weight: 700;">MASTER DIRECTOR</span>
+            <span style="font-size: 11px; color: #94a3b8;">Cinemotion AI</span>
           </div>
-          <button class="logout-btn" onclick="handleLogout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
         </div>
       </div>
     </div>
@@ -1304,7 +646,6 @@
     <!-- 3D REALISTIC ICONS CATEGORIES BAR -->
     <div class="categories-bar">
       
-      <!-- All Tab -->
       <button class="cat-tab active" onclick="triggerCinematicCategory('All', this)">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="#00d2ff">
           <rect x="3" y="3" width="7" height="7" rx="2"/>
@@ -1316,42 +657,36 @@
         <span class="count" id="count_All">44</span>
       </button>
 
-      <!-- Camera Movement -->
       <button class="cat-tab" onclick="triggerCinematicCategory('Camera Movement', this)">
         <img src="Camera-Movement.png" class="cat-3d-img" alt="Camera Movement">
         <span>Camera Movements</span>
         <span class="count" id="count_Camera_Movement">44</span>
       </button>
 
-      <!-- Camera Angles -->
       <button class="cat-tab" onclick="triggerCinematicCategory('Camera Angles', this)">
         <img src="Camera-Angles.png" class="cat-3d-img" alt="Camera Angles">
         <span>Camera Angles</span>
         <span class="count" id="count_Camera_Angles">0</span>
       </button>
 
-      <!-- Camera Shots -->
       <button class="cat-tab" onclick="triggerCinematicCategory('Camera Shots', this)">
         <img src="Camera-Shots.png" class="cat-3d-img" alt="Camera Shots">
         <span>Camera Shots</span>
         <span class="count" id="count_Camera_Shots">0</span>
       </button>
 
-      <!-- Cinematic Lighting -->
       <button class="cat-tab" onclick="triggerCinematicCategory('Cinematic Lighting', this)">
         <img src="Cinematic -lighting.png" class="cat-3d-img" alt="Cinematic Lighting">
         <span>Cinematic Lighting</span>
         <span class="count" id="count_Cinematic_Lighting">0</span>
       </button>
 
-      <!-- Atmosphere -->
       <button class="cat-tab" onclick="triggerCinematicCategory('Atmosphere', this)">
         <img src="Atmosphere.png" class="cat-3d-img" alt="Atmosphere">
         <span>Atmosphere</span>
         <span class="count" id="count_Atmosphere">0</span>
       </button>
 
-      <!-- Camera Lens -->
       <button class="cat-tab" onclick="triggerCinematicCategory('Camera Lens', this)">
         <img src="Camera-lens.png" class="cat-3d-img" alt="Camera Lens">
         <span>Camera Lens</span>
@@ -1428,179 +763,8 @@
     <span>Prompt copied to clipboard!</span>
   </div>
 
-  <!-- CORE LOGIC & AUTH SYSTEM -->
+  <!-- JAVASCRIPT LOGIC -->
   <script>
-    // ============================================================
-    // AUTHENTICATION LOGIC (ADMIN & USER MANAGEMENT)
-    // ============================================================
-    const ADMIN_CREDENTIALS = {
-      email: "bhanu.pakala03@gmail.com",
-      pass: "Bhanu@338",
-      name: "BHANU PAKALA",
-      role: "ADMIN"
-    };
-
-    function toggleAuthMode(mode) {
-      const loginForm = document.getElementById("loginForm");
-      const signupForm = document.getElementById("signupForm");
-      const authSubtitle = document.getElementById("authSubtitle");
-
-      if (mode === "signup") {
-        loginForm.style.display = "none";
-        signupForm.style.display = "flex";
-        authSubtitle.innerText = "Register your Director Account with Email & Password";
-      } else {
-        signupForm.style.display = "none";
-        loginForm.style.display = "flex";
-        authSubtitle.innerText = "Sign in to access Master Directors Vault";
-      }
-    }
-
-    // SIGN UP EVENT
-    document.getElementById("signupForm").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const email = document.getElementById("signupEmail").value.trim().toLowerCase();
-      const pass = document.getElementById("signupPassword").value;
-      const confirmPass = document.getElementById("signupConfirmPassword").value;
-
-      if (pass !== confirmPass) {
-        alert("Passwords do not match! Please check again.");
-        return;
-      }
-
-      if (email === ADMIN_CREDENTIALS.email.toLowerCase()) {
-        alert("This email is reserved for Admin.");
-        return;
-      }
-
-      // Store in LocalStorage users list
-      const users = JSON.parse(localStorage.getItem("cinemotionUsers") || "[]");
-      if (users.find(u => u.email === email)) {
-        alert("An account with this email already exists. Please Sign In.");
-        toggleAuthMode("login");
-        return;
-      }
-
-      users.push({ email, pass });
-      localStorage.setItem("cinemotionUsers", JSON.stringify(users));
-
-      alert("Account created successfully! Now enter your Mail ID and Password to Log In.");
-      document.getElementById("signupForm").reset();
-      toggleAuthMode("login");
-      document.getElementById("loginEmail").value = email;
-    });
-
-    // LOGIN EVENT
-    document.getElementById("loginForm").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const email = document.getElementById("loginEmail").value.trim();
-      const pass = document.getElementById("loginPassword").value;
-
-      // Check Admin
-      if (email.toLowerCase() === ADMIN_CREDENTIALS.email.toLowerCase() && pass === ADMIN_CREDENTIALS.pass) {
-        const sessionUser = {
-          name: "Bhanu Pakala",
-          displayName: ADMIN_CREDENTIALS.name,
-          email: ADMIN_CREDENTIALS.email,
-          role: "ADMIN"
-        };
-        localStorage.setItem("cinemotionSession", JSON.stringify(sessionUser));
-        applyUserProfile(sessionUser);
-        launchCinematicSplash(sessionUser);
-        return;
-      }
-
-      // Check Users
-      const users = JSON.parse(localStorage.getItem("cinemotionUsers") || "[]");
-      const matchedUser = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.pass === pass);
-
-      if (matchedUser) {
-        const sessionUser = {
-          name: email.split("@")[0].toUpperCase(),
-          displayName: email.split("@")[0].toUpperCase(),
-          email: matchedUser.email,
-          role: "CREATOR"
-        };
-        localStorage.setItem("cinemotionSession", JSON.stringify(sessionUser));
-        applyUserProfile(sessionUser);
-        launchCinematicSplash(sessionUser);
-      } else {
-        alert("Invalid Email or Password! Please check your credentials.");
-      }
-    });
-
-    function applyUserProfile(user) {
-      document.getElementById("authOverlay").style.display = "none";
-      const initials = user.role === "ADMIN" ? "BP" : user.name.substring(0, 2).toUpperCase();
-      
-      document.getElementById("headerAvatar").innerText = initials;
-      document.getElementById("dropdownAvatar").innerText = initials;
-      document.getElementById("dropdownName").innerText = user.name;
-      document.getElementById("dropdownEmail").innerText = user.email;
-      document.getElementById("dropdownBadge").innerText = user.role === "ADMIN" ? "MASTER ADMIN" : "AI CREATOR";
-    }
-
-    function handleLogout() {
-      localStorage.removeItem("cinemotionSession");
-      document.getElementById("loginForm").reset();
-      document.getElementById("authOverlay").style.display = "flex";
-      document.getElementById("profileDropdown").classList.remove("show");
-      toggleAuthMode("login");
-    }
-
-    // Check existing active session on load
-    window.addEventListener("DOMContentLoaded", () => {
-      const activeSession = JSON.parse(localStorage.getItem("cinemotionSession") || "null");
-      if (activeSession) {
-        applyUserProfile(activeSession);
-      } else {
-        document.getElementById("authOverlay").style.display = "flex";
-      }
-    });
-
-    // ============================================================
-    // WOW 3D CINEMATIC WELCOME SPLASH ANIMATION
-    // ============================================================
-    function launchCinematicSplash(user) {
-      const stage = document.getElementById("welcomeCinemaStage");
-      const content = document.getElementById("welcomeSceneContent");
-
-      content.innerHTML = "";
-      stage.style.display = "flex";
-
-      if (user.role === "ADMIN") {
-        // ADMIN ANIMATION: Hi, BHANU PAKALA with 3D Cinematic Elements
-        content.innerHTML = `
-          <div class="cinema-floating-props">
-            <img src="Camera-Movement.png" class="prop-3d" alt="Camera">
-            <img src="Camera-Shots.png" class="prop-3d" alt="Clapperboard">
-            <img src="Cinematic -lighting.png" class="prop-3d" alt="Studio Light">
-          </div>
-          <h1 class="cinema-text-admin">HI, BHANU PAKALA</h1>
-          <p class="cinema-tagline">MASTER DIRECTORS VAULT ACTIVATED</p>
-        `;
-      } else {
-        // USER ANIMATION: Welcome to Ai World
-        content.innerHTML = `
-          <div class="cinema-floating-props">
-            <img src="Camera-lens.png" class="prop-3d" alt="Lens">
-            <img src="Atmosphere.png" class="prop-3d" alt="Atmosphere">
-          </div>
-          <h1 class="cinema-text-gold">WELCOME TO AI WORLD</h1>
-          <p class="cinema-tagline">CINEMATIC CREATOR SUITE UNLOCKED</p>
-        `;
-      }
-
-      // Auto-disappear after 3.2 seconds
-      setTimeout(() => {
-        stage.style.display = "none";
-        content.innerHTML = "";
-      }, 3200);
-    }
-
-    // ============================================================
-    // VAULT BASE DATA & ACTIONS
-    // ============================================================
     const defaultMovements = [
       { id: "mov_1", name: "Slow Dolly In", category: "Camera Movement", prompt: "Slow dolly in, camera moves slowly forward toward the subject." },
       { id: "mov_2", name: "Slow Dolly Out", category: "Camera Movement", prompt: "Slow dolly out, camera moves slowly backwards away from the subject." },
@@ -1651,7 +815,6 @@
     window.allVaultItems = [...defaultMovements];
     let currentCategory = "All";
 
-    // 10 BEST CLASSIC MASTER THEMES
     const classicThemes = [
       { name: "1. Film Noir Monochrome", tag: "35mm black and white film noir, high contrast, hard shadows, dramatic silhouette" },
       { name: "2. Cyberpunk Neon Dusk", tag: "Blade runner cyberpunk style, cyan and magenta neon rim light, rainy reflections, 8k" },
@@ -1666,18 +829,19 @@
     ];
 
     const themesGrid = document.getElementById("themesGrid");
-    classicThemes.forEach((item) => {
-      const chip = document.createElement("div");
-      chip.className = "theme-chip";
-      chip.innerHTML = `<strong>${item.name}</strong> <i class="fa-solid fa-copy" style="color: var(--accent-cyan);"></i>`;
-      chip.onclick = () => {
-        copyPromptText(`[Theme: ${item.tag}]`);
-        document.getElementById("themesModal").style.display = "none";
-      };
-      themesGrid.appendChild(chip);
-    });
+    if (themesGrid) {
+      classicThemes.forEach((item) => {
+        const chip = document.createElement("div");
+        chip.className = "theme-chip";
+        chip.innerHTML = `<strong>${item.name}</strong> <i class="fa-solid fa-copy" style="color: var(--accent-cyan);"></i>`;
+        chip.onclick = () => {
+          copyPromptText(`[Theme: ${item.tag}]`);
+          document.getElementById("themesModal").style.display = "none";
+        };
+        themesGrid.appendChild(chip);
+      });
+    }
 
-    // 2-SEC REAL 3D ANIMATION SYSTEM ON CATEGORY CLICK
     let animTimeout;
     function triggerCinematicCategory(category, btnElement) {
       filterCategory(category, btnElement);
@@ -1702,11 +866,11 @@
       } else if (category === 'Cinematic Lighting') {
         scene.innerHTML = `<div class="light-glare"></div><div class="light-real-rig"><img src="Cinematic -lighting.png" alt="Studio Light"></div>`;
       } else if (category === 'Atmosphere') {
-        scene.innerHTML = `<div class="sky-transition-real"></div><div class="rain-real"></div><div class="smoke-rig-real"><img src="Atmosphere.png" alt="Atmosphere Fan"></div>`;
+        scene.innerHTML = `<div class="sky-transition-real"></div><div class="rain-real"></div><div class="smoke-rig-real"><img src="Atmosphere.png" alt="Atmosphere Smoke Fan"></div>`;
       } else if (category === 'Camera Lens') {
         scene.innerHTML = `<div class="lens-real-rig"><img src="Camera-lens.png" alt="Cinema Lens"></div>`;
       } else {
-        scene.innerHTML = `<div class="clapper-real-rig"><img src="Camera-Shots.png" alt="Vault Active"></div>`;
+        scene.innerHTML = `<div class="clapper-real-rig"><img src="Camera-Shots.png" alt="Cinemotion Vault"></div>`;
       }
 
       animTimeout = setTimeout(() => {
@@ -1715,7 +879,6 @@
       }, 2000);
     }
 
-    // CONTROLS FOR SIDEBAR & PROFILE
     const sidebarToggleBtn = document.getElementById("sidebarToggleBtn");
     const sidebarDrawer = document.getElementById("sidebarDrawer");
     const sidebarOverlay = document.getElementById("sidebarOverlay");
@@ -1724,31 +887,18 @@
     const themesModal = document.getElementById("themesModal");
     const closeThemesModalBtn = document.getElementById("closeThemesModalBtn");
 
-    function openSidebar() {
-      sidebarDrawer.classList.add("active");
-      sidebarOverlay.classList.add("active");
-    }
-
-    function closeSidebar() {
-      sidebarDrawer.classList.remove("active");
-      sidebarOverlay.classList.remove("active");
-    }
+    function openSidebar() { if (sidebarDrawer) sidebarDrawer.classList.add("active"); if (sidebarOverlay) sidebarOverlay.classList.add("active"); }
+    function closeSidebar() { if (sidebarDrawer) sidebarDrawer.classList.remove("active"); if (sidebarOverlay) sidebarOverlay.classList.remove("active"); }
 
     if (sidebarToggleBtn) sidebarToggleBtn.onclick = openSidebar;
     if (closeSidebarBtn) closeSidebarBtn.onclick = closeSidebar;
     if (sidebarOverlay) sidebarOverlay.onclick = closeSidebar;
 
     if (openThemesBtn) {
-      openThemesBtn.onclick = () => {
-        closeSidebar();
-        themesModal.style.display = "flex";
-      };
+      openThemesBtn.onclick = () => { closeSidebar(); if (themesModal) themesModal.style.display = "flex"; };
     }
-
     if (closeThemesModalBtn) {
-      closeThemesModalBtn.onclick = () => {
-        themesModal.style.display = "none";
-      };
+      closeThemesModalBtn.onclick = () => { if (themesModal) themesModal.style.display = "none"; };
     }
 
     const profilePillBtn = document.getElementById("profilePillBtn");
@@ -1757,7 +907,7 @@
     if (profilePillBtn) {
       profilePillBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-        profileDropdown.classList.toggle("show");
+        if (profileDropdown) profileDropdown.classList.toggle("show");
       });
     }
 
@@ -1765,42 +915,26 @@
       if (profileDropdown && !profileDropdown.contains(e.target) && e.target !== profilePillBtn) {
         profileDropdown.classList.remove("show");
       }
-      if (e.target === themesModal) {
-        themesModal.style.display = "none";
-      }
+      if (themesModal && e.target === themesModal) themesModal.style.display = "none";
     });
-
-    // INDEXEDDB LOCAL STORAGE FOR MANUAL VIDEO UPLOADS
-    let dbLocal;
-    const request = indexedDB.open("CinemotionPersistDB", 1);
-    request.onupgradeneeded = (e) => {
-      dbLocal = e.target.result;
-      if (!dbLocal.objectStoreNames.contains("uploadedVideos")) {
-        dbLocal.createObjectStore("uploadedVideos", { keyPath: "id" });
-      }
-    };
-    request.onsuccess = (e) => {
-      dbLocal = e.target.result;
-      renderCards(window.allVaultItems);
-    };
 
     const grid = document.getElementById('movementsGrid');
 
     function renderCards(list) {
+      if (!grid) return;
       grid.innerHTML = list.map(item => `
         <div class="movement-card" id="card_${item.id}">
-          <div class="card-video-box" onclick="triggerUpload('${item.id}')">
+          <div class="card-video-box">
             ${item.mediaURL ? (
               item.mediaType === 'video' 
                 ? `<video src="${item.mediaURL}" class="active-video" controls playsinline></video>`
                 : `<img src="${item.mediaURL}" class="active-video" alt="${item.name}">`
             ) : `
               <video id="video_${item.id}" autoplay loop muted playsinline></video>
-              <div class="upload-overlay" id="overlay_${item.id}">
-                <i class="fa-solid fa-cloud-arrow-up"></i>
-                <span>Upload Video</span>
+              <div class="upload-overlay">
+                <i class="fa-solid fa-film"></i>
+                <span>Vault Motion</span>
               </div>
-              <input type="file" class="file-input" id="input_${item.id}" accept="video/*" onchange="processVideoUpload(event, '${item.id}')">
             `}
           </div>
           <div class="card-details">
@@ -1818,21 +952,6 @@
         </div>
       `).join('');
 
-      if (dbLocal) {
-        const tx = dbLocal.transaction("uploadedVideos", "readonly");
-        const store = tx.objectStore("uploadedVideos");
-        list.forEach(item => {
-          if (!item.mediaURL) {
-            const r = store.get(item.id);
-            r.onsuccess = () => {
-              if (r.result && r.result.blob) {
-                setVideoSrc(item.id, r.result.blob);
-              }
-            };
-          }
-        });
-      }
-
       updateCounts();
     }
 
@@ -1841,18 +960,11 @@
       if (hero) hero.innerText = window.allVaultItems.length;
 
       const catCounts = {
-        'Camera Movement': 0,
-        'Camera Angles': 0,
-        'Camera Shots': 0,
-        'Cinematic Lighting': 0,
-        'Atmosphere': 0,
-        'Camera Lens': 0
+        'Camera Movement': 0, 'Camera Angles': 0, 'Camera Shots': 0, 'Cinematic Lighting': 0, 'Atmosphere': 0, 'Camera Lens': 0
       };
 
       window.allVaultItems.forEach(item => {
-        if (catCounts[item.category] !== undefined) {
-          catCounts[item.category]++;
-        }
+        if (catCounts[item.category] !== undefined) catCounts[item.category]++;
       });
 
       const countAll = document.getElementById('count_All');
@@ -1865,40 +977,14 @@
       }
     }
 
-    function triggerUpload(id) {
-      const input = document.getElementById(`input_${id}`);
-      if (input) input.click();
-    }
-
-    function processVideoUpload(e, id) {
-      const file = e.target.files[0];
-      if (file) {
-        setVideoSrc(id, file);
-        if (dbLocal) {
-          const tx = dbLocal.transaction("uploadedVideos", "readwrite");
-          tx.objectStore("uploadedVideos").put({ id: id, blob: file });
-        }
-      }
-    }
-
-    function setVideoSrc(id, blobOrFile) {
-      const vid = document.getElementById(`video_${id}`);
-      const overlay = document.getElementById(`overlay_${id}`);
-      if (vid && overlay) {
-        vid.src = URL.createObjectURL(blobOrFile);
-        vid.classList.add('active-video');
-        overlay.style.opacity = '0';
-        overlay.onmouseenter = () => overlay.style.opacity = '1';
-        overlay.onmouseleave = () => overlay.style.opacity = '0';
-      }
-    }
-
     function copyPromptText(text) {
       navigator.clipboard.writeText(text).then(() => {
         const toast = document.getElementById('toast');
-        toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Copied: "${text.substring(0, 30)}..."</span>`;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 2200);
+        if (toast) {
+          toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Copied: "${text.substring(0, 30)}..."</span>`;
+          toast.classList.add('show');
+          setTimeout(() => toast.classList.remove('show'), 2200);
+        }
       });
     }
 
@@ -1912,13 +998,10 @@
     }
 
     function filterCards() {
-      const q = document.getElementById('searchInput').value.toLowerCase();
+      const searchEl = document.getElementById('searchInput');
+      const q = searchEl ? searchEl.value.toLowerCase() : '';
       let filtered = window.allVaultItems;
-
-      if (currentCategory !== "All") {
-        filtered = filtered.filter(m => m.category === currentCategory);
-      }
-
+      if (currentCategory !== "All") filtered = filtered.filter(m => m.category === currentCategory);
       filtered = filtered.filter(m => m.name.toLowerCase().includes(q) || m.prompt.toLowerCase().includes(q));
       renderCards(filtered);
     }
@@ -1926,9 +1009,12 @@
     function openPromptLibrary() {
       alert("Opening Visual Prompts Library: 44 Camera Movements Loaded.");
     }
+
+    // Direct render on page load
+    renderCards(window.allVaultItems);
   </script>
 
-  <!-- FIREBASE INTEGRATION LOGIC -->
+  <!-- FIREBASE DATA INTEGRATION -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
@@ -1948,84 +1034,78 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
 
-    const addBtn = document.getElementById("addMovementBtn");
-    const modal = document.getElementById("movementModal");
-    const closeBtn = document.getElementById("closeModalBtn");
+    // Modal controls for Add Movement
+    const addMovementBtn = document.getElementById("addMovementBtn");
+    const movementModal = document.getElementById("movementModal");
+    const closeModalBtn = document.getElementById("closeModalBtn");
     const movementForm = document.getElementById("movementForm");
     const uploadStatus = document.getElementById("uploadStatus");
     const saveBtn = document.getElementById("saveBtn");
 
-    if (addBtn) {
-      addBtn.addEventListener("click", () => {
-        modal.style.display = "flex";
-      });
+    if (addMovementBtn && movementModal) {
+      addMovementBtn.onclick = () => { movementModal.style.display = "flex"; };
     }
-
-    if (closeBtn) {
-      closeBtn.addEventListener("click", () => {
-        modal.style.display = "none";
-      });
+    if (closeModalBtn && movementModal) {
+      closeModalBtn.onclick = () => { movementModal.style.display = "none"; };
     }
-
     window.addEventListener("click", (e) => {
-      if (e.target === modal) modal.style.display = "none";
+      if (e.target === movementModal) movementModal.style.display = "none";
     });
 
-    movementForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
+    if (movementForm) {
+      movementForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const fileInput = document.getElementById("itemMedia");
+        const file = fileInput.files[0];
+        if (!file) return alert("Please choose a video or image file.");
 
-      const fileInput = document.getElementById("itemMedia");
-      const file = fileInput.files[0];
-      if (!file) {
-        alert("దయచేసి ఒక ఇమేజ్ లేదా వీడియో ఫైల్‌ను సెలెక్ట్ చేయండి.");
-        return;
-      }
+        const category = document.getElementById("itemCategory").value;
+        const title = document.getElementById("itemTitle").value;
+        const prompt = document.getElementById("itemPrompt").value;
+        const mediaType = file.type.startsWith("video") ? "video" : "image";
 
-      const category = document.getElementById("itemCategory").value;
-      const title = document.getElementById("itemTitle").value;
-      const prompt = document.getElementById("itemPrompt").value;
-      const mediaType = file.type.startsWith("video") ? "video" : "image";
+        try {
+          if (saveBtn) saveBtn.disabled = true;
+          if (uploadStatus) {
+            uploadStatus.style.display = "block";
+            uploadStatus.innerText = "Uploading media to Firebase Storage...";
+          }
 
-      try {
-        saveBtn.disabled = true;
-        uploadStatus.style.display = "block";
-        uploadStatus.innerText = "Firebase Storage లో ఫైల్ అప్‌లోడ్ అవుతోంది...";
+          const fileRef = ref(storage, `vault_media/${Date.now()}_${file.name}`);
+          const snapshot = await uploadBytes(fileRef, file);
+          const downloadURL = await getDownloadURL(snapshot.ref);
 
-        const fileRef = ref(storage, `vault_media/${Date.now()}_${file.name}`);
-        const snapshot = await uploadBytes(fileRef, file);
-        const downloadURL = await getDownloadURL(snapshot.ref);
+          if (uploadStatus) uploadStatus.innerText = "Saving to Firestore Database...";
 
-        uploadStatus.innerText = "Firestore లో సేవ్ అవుతోంది...";
+          const movementData = {
+            name: title,
+            category: category,
+            prompt: prompt,
+            mediaURL: downloadURL,
+            mediaType: mediaType,
+            createdAt: new Date().toISOString()
+          };
 
-        const movementData = {
-          name: title,
-          category: category,
-          prompt: prompt,
-          mediaURL: downloadURL,
-          mediaType: mediaType,
-          createdAt: new Date().toISOString()
-        };
+          const docRef = await addDoc(collection(db, "movements"), movementData);
+          movementData.id = docRef.id;
 
-        const docRef = await addDoc(collection(db, "movements"), movementData);
-        movementData.id = docRef.id;
+          window.allVaultItems.unshift(movementData);
+          filterCards();
 
-        window.allVaultItems.unshift(movementData);
-        filterCards();
+          if (uploadStatus) uploadStatus.style.display = "none";
+          movementForm.reset();
+          if (saveBtn) saveBtn.disabled = false;
+          if (movementModal) movementModal.style.display = "none";
+          alert("New Movement saved successfully!");
+        } catch (err) {
+          alert("Upload error: " + err.message);
+          if (uploadStatus) uploadStatus.style.display = "none";
+          if (saveBtn) saveBtn.disabled = false;
+        }
+      });
+    }
 
-        uploadStatus.style.display = "none";
-        movementForm.reset();
-        saveBtn.disabled = false;
-        modal.style.display = "none";
-        alert("కొత్త మూవ్‌మెంట్ విజయవంతంగా సేవ్ అయ్యింది!");
-
-      } catch (error) {
-        console.error("Firebase Error:", error);
-        alert("Upload Failed: " + error.message);
-        uploadStatus.style.display = "none";
-        saveBtn.disabled = false;
-      }
-    });
-
+    // Load any saved movements from Firebase
     async function loadFirebaseMovements() {
       try {
         const q = query(collection(db, "movements"), orderBy("createdAt", "desc"));
@@ -2036,10 +1116,10 @@
         });
         if (firebaseItems.length > 0) {
           window.allVaultItems = [...firebaseItems, ...defaultMovements];
-          filterCards();
         }
+        renderCards(window.allVaultItems);
       } catch (err) {
-        console.error("Error loading movements from Firebase:", err);
+        console.error("Load Error:", err);
       }
     }
 
