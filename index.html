@@ -7,7 +7,7 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
@@ -65,6 +65,12 @@
       border-radius: 8px;
       cursor: pointer;
       font-size: 1rem;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .menu-btn:hover {
+      background: rgba(0, 210, 255, 0.1);
+      border-color: var(--accent-cyan);
     }
 
     .brand-logo {
@@ -123,6 +129,7 @@
       display: flex;
       align-items: center;
       gap: 0.75rem;
+      position: relative;
     }
 
     .add-btn {
@@ -155,6 +162,12 @@
       font-size: 0.82rem;
       font-weight: 700;
       cursor: pointer;
+      user-select: none;
+      transition: border-color 0.2s;
+    }
+
+    .profile-pill:hover {
+      border-color: var(--accent-cyan);
     }
 
     .profile-pill .avatar {
@@ -166,6 +179,161 @@
       display: grid;
       place-items: center;
       font-size: 0.75rem;
+      font-weight: 800;
+    }
+
+    /* USER PROFILE POPUP DROPDOWN */
+    .profile-dropdown {
+      position: absolute;
+      top: 120%;
+      right: 0;
+      background: #0b1120;
+      border: 1px solid rgba(0, 210, 255, 0.3);
+      border-radius: 14px;
+      width: 270px;
+      padding: 16px;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.8);
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 1000;
+      backdrop-filter: blur(12px);
+    }
+
+    .profile-dropdown.show {
+      display: flex;
+    }
+
+    .profile-dropdown-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .profile-avatar-large {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      color: #000;
+      font-weight: 800;
+      display: grid;
+      place-items: center;
+      font-size: 1.1rem;
+    }
+
+    .profile-info h4 {
+      font-size: 0.95rem;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    .profile-info p {
+      font-size: 0.78rem;
+      color: var(--accent-cyan);
+      word-break: break-all;
+    }
+
+    .profile-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      background: rgba(0, 210, 255, 0.12);
+      border: 1px solid rgba(0, 210, 255, 0.3);
+      color: #00d2ff;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 600;
+      width: fit-content;
+    }
+
+    /* LEFT SLIDE-OUT SIDEBAR */
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(6px);
+      z-index: 99998;
+      display: none;
+    }
+
+    .sidebar-overlay.active {
+      display: block;
+    }
+
+    .sidebar-drawer {
+      position: fixed;
+      top: 0;
+      left: -320px;
+      width: 310px;
+      height: 100vh;
+      background: #090e1a;
+      border-right: 1px solid rgba(0, 210, 255, 0.25);
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 10px 0 40px rgba(0,0,0,0.8);
+    }
+
+    .sidebar-drawer.active {
+      left: 0;
+    }
+
+    .sidebar-header {
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .sidebar-menu {
+      padding: 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.85rem 1.25rem;
+      color: #cbd5e1;
+      text-decoration: none;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: 1px solid transparent;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+    }
+
+    .sidebar-item i {
+      font-size: 1.15rem;
+      color: var(--accent-cyan);
+      width: 24px;
+    }
+
+    .sidebar-item:hover {
+      background: rgba(0, 210, 255, 0.08);
+      border-color: rgba(0, 210, 255, 0.3);
+      color: #fff;
+    }
+
+    .sidebar-badge {
+      margin-left: auto;
+      background: var(--accent-cyan);
+      color: #000;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
     }
 
     /* MAIN CONTAINER */
@@ -175,7 +343,7 @@
       padding: 1.5rem 2rem 5rem;
     }
 
-    /* HERO 3D BANNER */
+    /* HERO 3D BANNER - SMOOTH 3D ZOOM ANIMATION WITHOUT CHANGING CONTAINER SIZE */
     .hero-banner-wrapper {
       position: relative;
       background: #000;
@@ -184,6 +352,14 @@
       overflow: hidden;
       box-shadow: 0 0 45px rgba(0, 150, 255, 0.12);
       margin-bottom: 2rem;
+      perspective: 1200px;
+      cursor: pointer;
+      transition: border-color 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .hero-banner-wrapper:hover {
+      border-color: rgba(0, 210, 255, 0.6);
+      box-shadow: 0 0 55px rgba(0, 210, 255, 0.25);
     }
 
     .hero-top-bar {
@@ -195,6 +371,7 @@
       justify-content: space-between;
       align-items: center;
       z-index: 5;
+      pointer-events: none;
     }
 
     .vault-badge {
@@ -234,13 +411,22 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
     }
 
+    /* 3D Smooth Zoom and lighting effect */
     .hero-img-box img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
+      transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), filter 0.6s ease;
+      will-change: transform;
+    }
+
+    .hero-banner-wrapper:hover .hero-img-box img {
+      transform: scale(1.045);
+      filter: brightness(1.08) drop-shadow(0 0 25px rgba(0, 210, 255, 0.25));
     }
 
     .hero-bottom-caption {
@@ -422,11 +608,12 @@
       border-radius: 8px;
     }
 
-    .generate-btn {
-      background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
-      color: #000;
+    /* UPDATED: "COPY" BUTTON INSTEAD OF "GENERATE" */
+    .copy-btn {
+      background: linear-gradient(135deg, #00d2ff 0%, #0099cc 100%);
+      color: #040711;
       border: none;
-      padding: 0.7rem 1rem;
+      padding: 0.75rem 1rem;
       border-radius: 8px;
       font-size: 0.88rem;
       font-weight: 700;
@@ -439,28 +626,29 @@
       width: 100%;
     }
 
-    .generate-btn:hover {
-      box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
-      transform: translateY(-1px);
+    .copy-btn:hover {
+      box-shadow: 0 0 15px rgba(0, 210, 255, 0.5);
+      transform: translateY(-2px);
+      filter: brightness(1.1);
     }
 
-    /* Toast */
+    /* Toast Notification */
     #toast {
       visibility: hidden;
       position: fixed;
       bottom: 2rem;
       right: 2rem;
-      background: #10b981;
-      color: #fff;
-      padding: 0.75rem 1.25rem;
+      background: #00d2ff;
+      color: #040711;
+      padding: 0.75rem 1.4rem;
       border-radius: 999px;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 0.9rem;
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      z-index: 1000;
+      box-shadow: 0 10px 30px rgba(0, 210, 255, 0.4);
+      z-index: 100000;
       opacity: 0;
       transition: opacity 0.3s, transform 0.3s;
       transform: translateY(20px);
@@ -472,7 +660,7 @@
       transform: translateY(0);
     }
 
-    /* MODAL POPUP STYLING */
+    /* MODAL POPUPS */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -481,7 +669,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 9999;
+      z-index: 99999;
     }
 
     .modal-box {
@@ -493,6 +681,8 @@
       padding: 24px;
       color: #fff;
       box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+      max-height: 85vh;
+      overflow-y: auto;
     }
 
     .modal-header {
@@ -557,19 +747,76 @@
       transition: opacity 0.2s;
     }
 
-    .submit-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+    /* 100 THEMES GRID IN MODAL */
+    .themes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .theme-chip {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #cbd5e1;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .theme-chip:hover {
+      background: rgba(0, 210, 255, 0.15);
+      border-color: var(--accent-cyan);
+      color: #fff;
     }
   </style>
 </head>
 <body>
 
+  <!-- LEFT SIDEBAR OVERLAY & DRAWER -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="sidebar-drawer" id="sidebarDrawer">
+    <div class="sidebar-header">
+      <div class="brand-logo" style="font-size: 1.15rem;">
+        <span>CINEMOTION</span>
+        <span class="studio-pill">STUDIO</span>
+      </div>
+      <button class="close-btn" id="closeSidebarBtn">&times;</button>
+    </div>
+    <div class="sidebar-menu">
+      <!-- 4 Sidebar Options -->
+      <button class="sidebar-item" id="openThemesBtn">
+        <i class="fa-solid fa-palette"></i>
+        <span>Themes</span>
+        <span class="sidebar-badge">100</span>
+      </button>
+
+      <button class="sidebar-item" onclick="filterCategory('Camera Movement'); closeSidebar();">
+        <i class="fa-solid fa-film"></i>
+        <span>Directors Vault</span>
+      </button>
+
+      <button class="sidebar-item" onclick="openPromptLibrary(); closeSidebar();">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <span>Visual Prompts Library</span>
+      </button>
+
+      <button class="sidebar-item" onclick="alert('Studio Settings: Resolution 4K, 24fps Standard Enabled.'); closeSidebar();">
+        <i class="fa-solid fa-sliders"></i>
+        <span>Studio Settings</span>
+      </button>
+    </div>
+  </aside>
+
   <!-- HEADER -->
   <header>
     <div class="header-inner">
       <div class="brand-group">
-        <button class="menu-btn"><i class="fa-solid fa-bars"></i></button>
+        <!-- 3 Lines Button for Sidebar -->
+        <button class="menu-btn" id="sidebarToggleBtn"><i class="fa-solid fa-bars"></i></button>
         <div class="brand-logo">
           <span>CINEMOTION</span>
           <span class="studio-pill">STUDIO</span>
@@ -582,11 +829,27 @@
       </div>
 
       <div class="header-actions">
-        <!-- Added ID here -->
         <button class="add-btn" id="addMovementBtn"><i class="fa-solid fa-plus"></i> Add Movement</button>
-        <div class="profile-pill">
+        
+        <!-- Profile Pill with Dropdown -->
+        <div class="profile-pill" id="profilePillBtn">
           <div class="avatar">BP</div>
           <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; color: #94a3b8;"></i>
+        </div>
+
+        <!-- Profile Card Modal Dropdown -->
+        <div class="profile-dropdown" id="profileDropdown">
+          <div class="profile-dropdown-header">
+            <div class="profile-avatar-large">BP</div>
+            <div class="profile-info">
+              <h4>Bhanu Pakala</h4>
+              <p>bhanupakala@gmail.com</p>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="profile-badge">PRO DIRECTOR</span>
+            <span style="font-size: 11px; color: #94a3b8;">Cinemotion AI</span>
+          </div>
         </div>
       </div>
     </div>
@@ -594,8 +857,8 @@
 
   <div class="vault-container">
 
-    <!-- HERO SECTION -->
-    <section class="hero-banner-wrapper">
+    <!-- HERO SECTION - HELLO BHANU PAKALA 3D IMAGE WITH SMOOTH 3D ZOOM HOVER -->
+    <section class="hero-banner-wrapper" id="heroBanner">
       <div class="hero-top-bar">
         <div class="vault-badge">MASTER DIRECTORS VAULT</div>
         <div class="counter-pill">
@@ -681,6 +944,21 @@
     </div>
   </div>
 
+  <!-- 100 THEMES MODAL -->
+  <div id="themesModal" class="modal-overlay" style="display: none;">
+    <div class="modal-box" style="max-width: 700px;">
+      <div class="modal-header">
+        <div>
+          <h3 style="margin: 0; font-size: 18px; color: var(--accent-cyan);"><i class="fa-solid fa-palette"></i> 100 Cinematic Themes</h3>
+          <p style="font-size: 12px; color: #94a3b8; margin-top: 4px;">Click any theme to copy and apply to prompt</p>
+        </div>
+        <button type="button" id="closeThemesModalBtn" class="close-btn">&times;</button>
+      </div>
+      
+      <div class="themes-grid" id="themesGrid"></div>
+    </div>
+  </div>
+
   <div id="toast">
     <i class="fa-solid fa-circle-check"></i>
     <span>Prompt copied to clipboard!</span>
@@ -707,8 +985,8 @@
       { id: "mov_16", name: "Lateral Truck Right", category: "Camera Movement", prompt: "Truck right, camera moves sideways on a track to the right." },
       { id: "mov_17", name: "Orbit 180 (Spin)", category: "Camera Movement", prompt: "Orbit 180, camera moves in a half-circle around the subject." },
       { id: "mov_18", name: "Fast 360 Orbit (Spin)", category: "Camera Movement", prompt: "Fast 360 orbit, camera spins rapidly 360 degrees around the subject." },
-      { id: "mov_19", name: "True Orbit 180", category: "Camera Movement", prompt: "180 orbit, camera orbits 180 degrees around the [subject]." },
-      { id: "mov_20", name: "True Orbit 360", category: "Camera Movement", prompt: "Fast 360 orbit, camera orbits 360 degrees around the [subject]." },
+      { id: "mov_19", name: "True Orbit 180", category: "Camera Movement", prompt: "180 orbit, camera orbits 180 degrees around the subject." },
+      { id: "mov_20", name: "True Orbit 360", category: "Camera Movement", prompt: "Fast 360 orbit, camera orbits 360 degrees around the subject." },
       { id: "mov_21", name: "Slow Cinematic Arc", category: "Camera Movement", prompt: "Slow cinematic arc, camera moves in a wide curve to reveal side profile." },
       { id: "mov_22", name: "Pedestal Down", category: "Camera Movement", prompt: "Pedestal down, camera lowers vertically straight down." },
       { id: "mov_23", name: "Pedestal Up", category: "Camera Movement", prompt: "Pedestal up, camera rises vertically straight up from waist to eye level." },
@@ -738,6 +1016,99 @@
     window.allVaultItems = [...defaultMovements];
     let currentCategory = "All";
 
+    // 100 CINEMATIC THEMES LIST
+    const cinematicThemes = [
+      "Cyberpunk Neon", "Blade Runner Noir", "Vintage 1970s Film", "Golden Hour Glow", "Moody Scifi Thriller",
+      "Gothic Dark Fantasy", "Solarpunk Utopian", "Anamorphic Cinematic", "Hyper-Realistic 8K", "Retro Synthwave",
+      "Wes Anderson Pastel", "Film Noir Monochrome", "Christopher Nolan Imax", "Studio Ghibli Anime", "Denis Villeneuve Desert",
+      "David Fincher Green Tint", "Quentin Tarantino Punchy", "Vaporwave Aesthetic", "Steampunk Brass", "Biopunk Organic",
+      "Post-Apocalyptic Dust", "Nordic Minimalist", "Tokyo Alley Midnight", "Cybernetic Android", "Glitch Distortion",
+      "Kodak Portra 400", "Fuji Pro 400H", "Ektachrome 100", "Ilford HP5 B&W", "Polaroid Soft Glow",
+      "Ethereal Dreamscape", "Underwater Caustics", "Deep Space Nebula", "Volcanic Ash Ember", "Rain-slicked Asphalt",
+      "High-Key Commercial", "Low-Key Chiaroscuro", "Rembrandt Warm Light", "Volumetric Fog", "Prismatic Rainbow Flare",
+      "Surrealist Dali Style", "Baroque Oil Painting", "Renaissance Fresco", "Art Deco Luxury", "Brutalist Concrete",
+      "Cyber Dystopia", "Mythological Ancient", "Medieval Kingdom", "Wild West Frontier", "Victorian London Fog",
+      "Matrix Green Terminal", "Tron Grid Neon", "Space Odyssey Kubrick", "Neon Noir Miami", "Mad Max Desert Dust",
+      "Anime Shonen Glow", "Cinematic Dark Ambient", "Cozy Coffee Bokeh", "Cold Arctic Blizzard", "Autumn Leaves Sunset",
+      "Spring Cherry Blossom", "Summer Golden Sunburst", "Haunted Victorian Mansion", "Cosmic Horror Lovecraft", "Futuristic Laboratory",
+      "Vintage Technicolor", "Classic Silent Film", "Old VHS Tape 1990", "CCTV Surveillance Camera", "Night Vision Infrared",
+      "Thermal Heatmap Vision", "Claymation Stop Motion", "Papercraft Origami", "Ink Wash Watercolor", "Charcoal Sketch",
+      "Holographic Glitch", "Iridescent Crystal Glow", "Bio-luminescent Forest", "Magical Realism", "Alien Planet Surface",
+      "Midnight Blue Hour", "Silhouetted Sunrise", "Candlelit Intimate", "Studio Portrait Flash", "Split-Tone Teal & Orange",
+      "Cinestill 800T Halation", "Vintage Polaroid 600", "Lomography Color Shift", "Cross Process E-6", "Monochrome High Contrast",
+      "Warm Tungsten Interior", "Cold Moonlight Exterior", "God Rays Forest", "Smoke & Strobe Party", "Laser Grid Concert",
+      "Microscopic Cell Glow", "Interstellar Black Hole", "Subway Platform Noir", "Rooftop Rain Storm", "Desert Mirage Heatwave"
+    ];
+
+    // Populate 100 Themes Grid
+    const themesGrid = document.getElementById("themesGrid");
+    cinematicThemes.forEach((theme, index) => {
+      const chip = document.createElement("div");
+      chip.className = "theme-chip";
+      chip.innerText = `${index + 1}. ${theme}`;
+      chip.onclick = () => {
+        copyPromptText(`[Theme: ${theme}]`);
+        document.getElementById("themesModal").style.display = "none";
+      };
+      themesGrid.appendChild(chip);
+    });
+
+    // SIDEBAR DRAWER CONTROLS
+    const sidebarToggleBtn = document.getElementById("sidebarToggleBtn");
+    const sidebarDrawer = document.getElementById("sidebarDrawer");
+    const sidebarOverlay = document.getElementById("sidebarOverlay");
+    const closeSidebarBtn = document.getElementById("closeSidebarBtn");
+    const openThemesBtn = document.getElementById("openThemesBtn");
+    const themesModal = document.getElementById("themesModal");
+    const closeThemesModalBtn = document.getElementById("closeThemesModalBtn");
+
+    function openSidebar() {
+      sidebarDrawer.classList.add("active");
+      sidebarOverlay.classList.add("active");
+    }
+
+    function closeSidebar() {
+      sidebarDrawer.classList.remove("active");
+      sidebarOverlay.classList.remove("active");
+    }
+
+    if (sidebarToggleBtn) sidebarToggleBtn.onclick = openSidebar;
+    if (closeSidebarBtn) closeSidebarBtn.onclick = closeSidebar;
+    if (sidebarOverlay) sidebarOverlay.onclick = closeSidebar;
+
+    if (openThemesBtn) {
+      openThemesBtn.onclick = () => {
+        closeSidebar();
+        themesModal.style.display = "flex";
+      };
+    }
+
+    if (closeThemesModalBtn) {
+      closeThemesModalBtn.onclick = () => {
+        themesModal.style.display = "none";
+      };
+    }
+
+    // USER PROFILE DROPDOWN CONTROLS
+    const profilePillBtn = document.getElementById("profilePillBtn");
+    const profileDropdown = document.getElementById("profileDropdown");
+
+    if (profilePillBtn) {
+      profilePillBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        profileDropdown.classList.toggle("show");
+      });
+    }
+
+    window.addEventListener("click", (e) => {
+      if (profileDropdown && !profileDropdown.contains(e.target) && e.target !== profilePillBtn) {
+        profileDropdown.classList.remove("show");
+      }
+      if (e.target === themesModal) {
+        themesModal.style.display = "none";
+      }
+    });
+
     /* IndexedDB for persisting manual video clips in browser */
     let dbLocal;
     const request = indexedDB.open("CinemotionPersistDB", 1);
@@ -754,6 +1125,7 @@
 
     const grid = document.getElementById('movementsGrid');
 
+    // RENDER CARDS (With COPY button)
     function renderCards(list) {
       grid.innerHTML = list.map(item => `
         <div class="movement-card" id="card_${item.id}">
@@ -779,8 +1151,9 @@
               <h3>${item.name}</h3>
               <p class="prompt-box">${item.prompt}</p>
             </div>
-            <button class="generate-btn" onclick="copyPromptText('${item.prompt.replace(/'/g, "\\'")}')">
-              <i class="fa-solid fa-bolt"></i> Generate
+            <!-- COPY BUTTON ADDED HERE INSTEAD OF GENERATE -->
+            <button class="copy-btn" onclick="copyPromptText('${item.prompt.replace(/'/g, "\\'")}')">
+              <i class="fa-solid fa-copy"></i> Copy Prompt
             </button>
           </div>
         </div>
@@ -864,14 +1237,17 @@
     function copyPromptText(text) {
       navigator.clipboard.writeText(text).then(() => {
         const toast = document.getElementById('toast');
+        toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Copied: "${text.substring(0, 30)}..."</span>`;
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 2200);
       });
     }
 
     function filterCategory(cat, btn) {
-      document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      if (btn) {
+        document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
       currentCategory = cat;
       filterCards();
     }
@@ -886,6 +1262,10 @@
 
       filtered = filtered.filter(m => m.name.toLowerCase().includes(q) || m.prompt.toLowerCase().includes(q));
       renderCards(filtered);
+    }
+
+    function openPromptLibrary() {
+      alert("Opening Visual Prompts Library: 44 Camera Movements Loaded.");
     }
   </script>
 
@@ -970,7 +1350,6 @@
         const docRef = await addDoc(collection(db, "movements"), movementData);
         movementData.id = docRef.id;
 
-        // UI లో కొత్త కార్డును పైభాగంలో చేర్చడం
         window.allVaultItems.unshift(movementData);
         filterCards();
 
@@ -988,7 +1367,6 @@
       }
     });
 
-    // Firestore నుండి మునుపటి డేటాను లోడ్ చేయడం
     async function loadFirebaseMovements() {
       try {
         const q = query(collection(db, "movements"), orderBy("createdAt", "desc"));
