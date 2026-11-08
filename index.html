@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CINEMOTION STUDIO - AI Film Maker</title>
+  <title>CINEMOTION STUDIO - Master Directors Vault</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,13 +13,14 @@
   <style>
     :root {
       --bg-dark: #07090e;
-      --card-bg: #0f131c;
+      --panel-bg: #0f121d;
+      --card-bg: #141724;
       --border-color: rgba(255, 255, 255, 0.08);
       --accent-cyan: #00e5ff;
-      --accent-purple: #6366f1;
-      --accent-purple-hover: #4f46e5;
+      --accent-blue: #3b82f6;
+      --accent-glow: rgba(0, 229, 255, 0.25);
       --text-main: #f8fafc;
-      --text-muted: #94a3b8;
+      --text-muted: #8e9bb0;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -34,12 +35,12 @@
 
     /* Top Navigation Header */
     header {
-      background: rgba(7, 9, 14, 0.9);
-      backdrop-filter: blur(16px);
+      background: rgba(11, 14, 23, 0.95);
       border-bottom: 1px solid var(--border-color);
+      backdrop-filter: blur(12px);
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 1000;
     }
 
     .header-inner {
@@ -52,15 +53,22 @@
       gap: 1.5rem;
     }
 
-    .header-left {
+    .brand-left {
       display: flex;
       align-items: center;
-      gap: 1.25rem;
+      gap: 1rem;
     }
 
-    .menu-icon {
-      font-size: 1.25rem;
-      color: var(--text-muted);
+    .menu-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
     }
 
@@ -70,27 +78,28 @@
       gap: 0.5rem;
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
-      font-size: 1.25rem;
+      font-size: 1.3rem;
       letter-spacing: 0.5px;
     }
 
-    .brand-logo .studio-pill {
+    .studio-pill {
       background: rgba(0, 229, 255, 0.12);
-      border: 1px solid rgba(0, 229, 255, 0.4);
+      border: 1px solid var(--accent-cyan);
       color: var(--accent-cyan);
       font-size: 0.7rem;
       font-weight: 700;
-      padding: 0.2rem 0.55rem;
+      padding: 0.15rem 0.55rem;
       border-radius: 999px;
+      letter-spacing: 0.5px;
     }
 
-    .search-bar {
+    .search-container {
       flex: 1;
-      max-width: 580px;
+      max-width: 600px;
       position: relative;
     }
 
-    .search-bar i {
+    .search-container i {
       position: absolute;
       left: 1.1rem;
       top: 50%;
@@ -99,10 +108,10 @@
       font-size: 0.9rem;
     }
 
-    .search-bar input {
+    .search-container input {
       width: 100%;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
       padding: 0.65rem 1rem 0.65rem 2.6rem;
       border-radius: 999px;
       color: #fff;
@@ -111,149 +120,144 @@
       transition: all 0.2s;
     }
 
-    .search-bar input:focus {
-      border-color: rgba(0, 229, 255, 0.4);
-      background: rgba(255, 255, 255, 0.05);
+    .search-container input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px var(--accent-glow);
     }
 
     .header-right {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 0.75rem;
     }
 
-    .btn-add {
+    .add-btn {
       background: var(--accent-cyan);
-      color: #040810;
+      color: #05070b;
+      border: none;
+      padding: 0.6rem 1.1rem;
+      border-radius: 999px;
       font-weight: 700;
       font-size: 0.85rem;
-      padding: 0.6rem 1.15rem;
-      border-radius: 999px;
-      border: none;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 0.4rem;
-      transition: transform 0.15s, opacity 0.2s;
     }
-
-    .btn-add:hover { opacity: 0.9; transform: scale(1.02); }
 
     .user-profile {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.08);
       border: 1px solid var(--border-color);
-      padding: 0.35rem 0.65rem;
       border-radius: 999px;
+      padding: 0.35rem 0.65rem 0.35rem 0.4rem;
       display: flex;
       align-items: center;
-      gap: 0.4rem;
-      font-size: 0.85rem;
-      font-weight: 700;
+      gap: 0.5rem;
       cursor: pointer;
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
     }
 
     /* Main Container */
     main {
       max-width: 1440px;
       margin: 0 auto;
-      padding: 1.5rem 1.5rem 5rem;
+      padding: 1.5rem;
     }
 
-    /* Hero Banner matching image */
-    .hero-card {
-      position: relative;
-      background: radial-gradient(circle at 80% 20%, rgba(0, 229, 255, 0.12) 0%, transparent 60%),
-                  radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 60%),
-                  #0c101a;
-      border: 1px solid rgba(0, 229, 255, 0.2);
+    /* Hero Banner Area */
+    .hero-banner {
+      background: #0b0e18;
+      border: 1px solid var(--border-color);
       border-radius: 20px;
-      padding: 2.25rem 2.5rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      position: relative;
       overflow: hidden;
+      margin-bottom: 2rem;
     }
 
-    .hero-top-row {
+    .hero-top-badges {
+      padding: 1.25rem 1.5rem 0.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1.5rem;
     }
 
     .vault-tag {
-      background: rgba(0, 229, 255, 0.08);
-      border: 1px solid rgba(0, 229, 255, 0.3);
-      color: var(--accent-cyan);
-      font-size: 0.72rem;
+      font-size: 0.75rem;
       font-weight: 800;
       letter-spacing: 1.5px;
-      padding: 0.35rem 0.85rem;
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      background: rgba(56, 189, 248, 0.08);
+      padding: 0.3rem 0.8rem;
       border-radius: 999px;
     }
 
-    .counter-pill {
-      background: rgba(0, 229, 255, 0.12);
+    .counter-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(0, 229, 255, 0.1);
       border: 1px solid rgba(0, 229, 255, 0.3);
-      padding: 0.4rem 0.9rem;
+      padding: 0.3rem 0.8rem;
       border-radius: 999px;
-      display: flex;
-      align-items: center;
-      gap: 0.45rem;
-    }
-
-    .counter-pill .num {
       color: var(--accent-cyan);
+      font-size: 0.8rem;
       font-weight: 800;
-      font-size: 1.1rem;
     }
 
-    .counter-pill .label {
-      color: var(--text-muted);
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-    }
-
-    .hero-graphic-wrap {
+    .hero-image-box {
+      width: 100%;
+      height: 260px;
       display: flex;
-      justify-content: center;
       align-items: center;
-      padding: 1.5rem 0;
+      justify-content: center;
+      position: relative;
+      background: radial-gradient(circle at center, rgba(14, 165, 233, 0.15) 0%, transparent 70%);
     }
 
-    .hero-graphic-wrap img {
+    .hero-image-box img {
       max-width: 100%;
-      height: auto;
-      max-height: 240px;
-      filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6));
+      max-height: 100%;
+      object-fit: contain;
     }
 
-    .hero-bottom-text {
+    .hero-caption {
+      padding: 1rem 1.5rem 1.25rem;
       color: var(--text-muted);
-      font-size: 0.95rem;
-      max-width: 700px;
-      line-height: 1.5;
+      font-size: 0.88rem;
     }
 
-    /* Category Tabs Filter */
+    /* Category Filter Tabs Bar */
     .categories-bar {
       display: flex;
       gap: 0.75rem;
       overflow-x: auto;
-      padding-bottom: 1.25rem;
-      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
       scrollbar-width: none;
     }
 
     .categories-bar::-webkit-scrollbar { display: none; }
 
-    .cat-tab {
+    .cat-btn {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--border-color);
       color: var(--text-muted);
-      padding: 0.65rem 1.25rem;
+      padding: 0.55rem 1.1rem;
       border-radius: 999px;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       font-weight: 600;
       display: flex;
       align-items: center;
@@ -263,22 +267,23 @@
       transition: all 0.2s;
     }
 
-    .cat-tab.active {
-      background: rgba(0, 229, 255, 0.12);
+    .cat-btn.active {
+      background: rgba(0, 229, 255, 0.1);
       border-color: var(--accent-cyan);
       color: #fff;
+      box-shadow: 0 0 14px var(--accent-glow);
     }
 
-    .cat-tab .tab-badge {
-      background: rgba(255, 255, 255, 0.08);
-      padding: 0.15rem 0.5rem;
+    .cat-btn .badge {
+      background: rgba(255, 255, 255, 0.1);
+      font-size: 0.72rem;
+      padding: 0.1rem 0.45rem;
       border-radius: 999px;
-      font-size: 0.75rem;
     }
 
-    .cat-tab.active .tab-badge {
+    .cat-btn.active .badge {
       background: var(--accent-cyan);
-      color: #040810;
+      color: #000;
       font-weight: 700;
     }
 
@@ -301,34 +306,32 @@
 
     .card:hover {
       transform: translateY(-4px);
-      border-color: rgba(99, 102, 241, 0.5);
+      border-color: rgba(0, 229, 255, 0.4);
     }
 
-    /* 16:9 Video Box with Direct Upload */
-    .video-wrapper {
+    .video-viewport {
       width: 100%;
       aspect-ratio: 16 / 9;
-      background: #000;
+      background: #090b12;
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
       overflow: hidden;
     }
 
-    .video-wrapper video {
+    .video-viewport video {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: none;
     }
 
-    .video-wrapper video.active-video {
+    .video-viewport video.active-video {
       display: block;
     }
 
-    .upload-overlay {
+    .video-overlay {
       position: absolute;
       inset: 0;
       display: flex;
@@ -337,1174 +340,294 @@
       justify-content: center;
       gap: 0.4rem;
       background: rgba(0, 0, 0, 0.65);
-      transition: background 0.2s;
+      cursor: pointer;
+      transition: all 0.2s;
     }
 
-    .video-wrapper:hover .upload-overlay {
+    .video-viewport:hover .video-overlay {
       background: rgba(0, 0, 0, 0.4);
     }
 
-    .upload-overlay i {
-      font-size: 1.6rem;
-      color: var(--accent-purple);
+    .video-overlay i {
+      font-size: 1.5rem;
+      color: var(--accent-cyan);
     }
 
-    .upload-overlay span {
+    .video-overlay span {
       font-size: 0.75rem;
       color: #cbd5e1;
-      font-weight: 600;
+      font-weight: 500;
     }
 
     .file-input { display: none; }
 
-    /* Card Details */
-    .card-content {
-      padding: 1.25rem;
+    .card-body {
+      padding: 1.15rem;
       display: flex;
       flex-direction: column;
       flex-grow: 1;
       justify-content: space-between;
-      gap: 1.1rem;
+      gap: 0.9rem;
     }
 
-    .card-meta h3 {
-      font-size: 1.15rem;
+    .card-info h3 {
+      font-size: 1.05rem;
       font-weight: 700;
+      margin-bottom: 0.4rem;
       color: #fff;
-      margin-bottom: 0.45rem;
     }
 
-    .card-meta p {
-      font-size: 0.85rem;
+    .card-info p {
+      font-size: 0.83rem;
       color: var(--text-muted);
       line-height: 1.45;
-    }
-
-    /* AIShotStudio Style Action Button */
-    .btn-generate {
-      background: var(--accent-purple);
-      color: #fff;
-      border: none;
-      padding: 0.65rem 1rem;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 0.6rem;
       border-radius: 8px;
-      font-size: 0.9rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.45rem;
-      transition: background 0.2s;
-      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.03);
     }
 
-    .btn-generate:hover {
-      background: var(--accent-purple-hover);
-    }
-
-    /* Fixed Floating Right Icons */
-    .floating-bar {
-      position: fixed;
-      right: 1.25rem;
-      bottom: 2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      z-index: 90;
-    }
-
-    .floating-btn {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: #181c27;
-      border: 1px solid var(--border-color);
+    .copy-action-btn {
+      background: rgba(255, 255, 255, 0.04);
       color: #fff;
+      border: 1px solid var(--border-color);
+      padding: 0.6rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      gap: 0.5rem;
+      transition: all 0.2s;
     }
 
-    /* Toast Notification */
+    .copy-action-btn:hover {
+      background: var(--accent-cyan);
+      color: #000;
+      border-color: var(--accent-cyan);
+    }
+
+    /* Notification Toast */
     #toast {
       visibility: hidden;
       position: fixed;
       bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
+      right: 2rem;
       background: #10b981;
       color: #fff;
-      padding: 0.75rem 1.4rem;
+      padding: 0.7rem 1.2rem;
       border-radius: 999px;
-      font-weight: 700;
-      font-size: 0.9rem;
+      font-weight: 600;
+      font-size: 0.85rem;
       display: flex;
       align-items: center;
       gap: 0.5rem;
       box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      z-index: 1000;
+      z-index: 2000;
       opacity: 0;
-      transition: opacity 0.3s, transform 0.3s;
+      transition: all 0.3s;
+      transform: translateY(15px);
     }
 
     #toast.show {
       visibility: visible;
       opacity: 1;
-      transform: translateX(-50%) translateY(0);
+      transform: translateY(0);
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Header Navigation -->
+  <!-- Header -->
   <header>
     <div class="header-inner">
-      <div class="header-left">
-        <i class="fa-solid fa-bars menu-icon"></i>
+      <div class="brand-left">
+        <button class="menu-btn"><i class="fa-solid fa-bars"></i></button>
         <div class="brand-logo">
           <span>CINEMOTION</span>
           <span class="studio-pill">STUDIO</span>
         </div>
       </div>
 
-      <div class="search-bar">
+      <div class="search-container">
         <i class="fa-solid fa-magnifying-glass"></i>
         <input type="text" id="searchInput" placeholder="Search camera motion, prompt formula, angle..." onkeyup="filterMovements()">
       </div>
 
       <div class="header-right">
-        <button class="btn-add"><i class="fa-solid fa-plus"></i> Add Movement</button>
+        <button class="add-btn"><i class="fa-solid fa-plus"></i> Add Movement</button>
         <div class="user-profile">
-          <span>BP</span>
-          <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem;"></i>
+          <div class="user-avatar">BP</div>
+          <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; color: var(--text-muted);"></i>
         </div>
       </div>
     </div>
   </header>
 
   <main>
-    <!-- Master Directors Vault Hero Banner -->
-    <div class="hero-card">
-      <div class="hero-top-row">
-        <div class="vault-tag">MASTER DIRECTORS VAULT</div>
-        <div class="counter-pill">
-          <span class="num">44</span>
-          <span class="label">MOVEMENTS</span>
+    <!-- Hello BHANU PAKALA 3D Hero Banner -->
+    <section class="hero-banner">
+      <div class="hero-top-badges">
+        <span class="vault-tag">MASTER DIRECTORS VAULT</span>
+        <div class="counter-badge">
+          <span id="counterNum">44</span> MOVEMENTS
         </div>
       </div>
 
-      <div class="hero-graphic-wrap">
-        <img src="bhanu-3d-header_2.png" alt="Hello, Bhanu Pakala" onerror="this.src='https://raw.githubusercontent.com/bhanuani/bhanu-ai-film-maker/main/bhanu-3d-header_2.png'">
+      <div class="hero-image-box">
+        <img src="bhanu-3d-header_2.png" alt="Hello, BHANU PAKALA - Cinematic 3D Scene">
       </div>
 
-      <div class="hero-bottom-text">
+      <div class="hero-caption">
         Cinematic camera movements and visual prompt formulas. Select, customize, and clone camera motions seamlessly.
       </div>
-    </div>
+    </section>
 
-    <!-- Category Tabs Filter -->
+    <!-- Categories Tabs Filter Bar -->
     <div class="categories-bar">
-      <div class="cat-tab" onclick="switchCategory('all', this)">
-        <i class="fa-solid fa-border-all"></i>
-        <span>All</span>
-        <span class="tab-badge">44</span>
-      </div>
-      <div class="cat-tab active" onclick="switchCategory('Camera Movement', this)">
-        <i class="fa-solid fa-video"></i>
-        <span>Camera Movements</span>
-        <span class="tab-badge">44</span>
-      </div>
-      <div class="cat-tab" onclick="switchCategory('Camera Angles', this)">
-        <i class="fa-solid fa-arrows-to-dot"></i>
-        <span>Camera Angles</span>
-        <span class="tab-badge">0</span>
-      </div>
-      <div class="cat-tab" onclick="switchCategory('Camera Shots', this)">
-        <i class="fa-solid fa-film"></i>
-        <span>Camera Shots</span>
-        <span class="tab-badge">0</span>
-      </div>
-      <div class="cat-tab" onclick="switchCategory('Cinematic Lighting', this)">
-        <i class="fa-solid fa-lightbulb"></i>
-        <span>Cinematic Lighting</span>
-        <span class="tab-badge">0</span>
-      </div>
-      <div class="cat-tab" onclick="switchCategory('Atmosphere', this)">
-        <i class="fa-solid fa-smog"></i>
-        <span>Atmosphere</span>
-        <span class="tab-badge">0</span>
-      </div>
+      <button class="cat-btn" onclick="selectCategory('all', this)"><i class="fa-solid fa-border-all"></i> All <span class="badge">44</span></button>
+      <button class="cat-btn active" onclick="selectCategory('Camera Movement', this)"><i class="fa-solid fa-video"></i> Camera Movements <span class="badge">44</span></button>
+      <button class="cat-btn" onclick="selectCategory('Camera Angles', this)"><i class="fa-solid fa-compass"></i> Camera Angles <span class="badge">0</span></button>
+      <button class="cat-btn" onclick="selectCategory('Camera Shots', this)"><i class="fa-solid fa-film"></i> Camera Shots <span class="badge">0</span></button>
+      <button class="cat-btn" onclick="selectCategory('Cinematic Lighting', this)"><i class="fa-solid fa-lightbulb"></i> Cinematic Lighting <span class="badge">0</span></button>
+      <button class="cat-btn" onclick="selectCategory('Atmosphere', this)"><i class="fa-solid fa-smog"></i> Atmosphere <span class="badge">0</span></button>
     </div>
 
-    <!-- 44 Camera Movements Cards Grid -->
-    <div class="movements-grid" id="gridContainer">
-
-      <!-- 1. Slow Dolly In -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_1')">
-          <video id="vid_mov_1" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_1">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_1" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_1')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Slow Dolly In</h3>
-            <p>Slow dolly in, camera moves slowly forward toward the subject.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Slow dolly in, camera moves slowly forward toward the subject.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 2. Slow Dolly Out -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_2')">
-          <video id="vid_mov_2" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_2">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_2" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_2')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Slow Dolly Out</h3>
-            <p>Slow dolly out, camera moves slowly backwards away from the subject.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Slow dolly out, camera moves slowly backwards away from the subject.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 3. Fast Dolly In -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_3')">
-          <video id="vid_mov_3" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_3">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_3" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_3')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Fast Dolly In</h3>
-            <p>Fast dolly in, camera moves rapidly forward toward the subject, urgent motion.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Fast dolly in, camera moves rapidly forward toward the subject, urgent motion.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 4. Vertigo Effect (Zolly) -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_4')">
-          <video id="vid_mov_4" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_4">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_4" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_4')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Vertigo Effect (Zolly)</h3>
-            <p>Vertigo effect, dolly zoom, camera moves backward while zooming in, background expands.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Vertigo effect, dolly zoom, camera moves backward while zooming in, background expands.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 5. Extreme Macro Zoom -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_5')">
-          <video id="vid_mov_5" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_5">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_5" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_5')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Extreme Macro Zoom</h3>
-            <p>Extreme macro zoom, zoom transition from subject to micro details of surface.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Extreme macro zoom, zoom transition from subject to micro details of surface.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 6. Cosmic Hyper Zoom -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_6')">
-          <video id="vid_mov_6" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_6">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_6" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_6')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Cosmic Hyper Zoom</h3>
-            <p>Cosmic hyper zoom, fast zoom transition from extreme wide view down to macro level.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Cosmic hyper zoom, fast zoom transition from extreme wide view down to macro level.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 7. Over the Shoulder (OTS) Shot -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_7')">
-          <video id="vid_mov_7" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_7">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_7" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_7')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Over the Shoulder (OTS) Shot</h3>
-            <p>Over the shoulder shot, camera mounted behind subject A framing subject B.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Over the shoulder shot, camera mounted behind subject A framing subject B.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 8. Fisheye or Peephole Lens -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_8')">
-          <video id="vid_mov_8" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_8">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_8" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_8')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Fisheye or Peephole Lens</h3>
-            <p>Fisheye lens, extreme wide-angle distortion, circular frame.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Fisheye lens, extreme wide-angle distortion, circular frame.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 9. Reveal from Behind -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_9')">
-          <video id="vid_mov_9" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_9">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_9" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_9')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Reveal from Behind</h3>
-            <p>Wipe movement, camera slides laterally from behind foreground object to reveal the scene.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Wipe movement, camera slides laterally from behind foreground object to reveal the scene.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 10. Through Shot -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_10')">
-          <video id="vid_mov_10" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_10">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_10" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_10')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Through Shot</h3>
-            <p>Fly through, camera moves through an opening into the scene.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Fly through, camera moves through an opening into the scene.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 11. Reveal from Blur -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_11')">
-          <video id="vid_mov_11" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_11">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_11" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_11')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Reveal from Blur</h3>
-            <p>Rack focus, start completely out of focus, slowly pull focus until sharp.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Rack focus, start completely out of focus, slowly pull focus until sharp.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 12. Rack Focus -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_12')">
-          <video id="vid_mov_12" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_12">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_12" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_12')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Rack Focus</h3>
-            <p>Rack focus, focus shifts from the foreground object to the background subject.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Rack focus, focus shifts from the foreground object to the background subject.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 13. Tilt Up -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_13')">
-          <video id="vid_mov_13" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_13">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_13" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_13')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Tilt Up</h3>
-            <p>Tilt up, camera pans vertically up from bottom to top.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Tilt up, camera pans vertically up from bottom to top.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 14. Tilt Down -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_14')">
-          <video id="vid_mov_14" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_14">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_14" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_14')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Tilt Down</h3>
-            <p>Tilt down, camera pans vertically down from top to bottom.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Tilt down, camera pans vertically down from top to bottom.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 15. Camera Truck Left -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_15')">
-          <video id="vid_mov_15" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_15">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_15" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_15')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Camera Truck Left</h3>
-            <p>Truck left, camera moves sideways on a track to the left.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Truck left, camera moves sideways on a track to the left.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 16. Lateral Truck Right -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_16')">
-          <video id="vid_mov_16" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_16">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_16" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_16')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Lateral Truck Right</h3>
-            <p>Truck right, camera moves sideways on a track to the right.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Truck right, camera moves sideways on a track to the right.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 17. Orbit 180 (Spin) -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_17')">
-          <video id="vid_mov_17" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_17">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_17" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_17')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Orbit 180 (Spin)</h3>
-            <p>Orbit 180, camera moves in a half-circle around the subject.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Orbit 180, camera moves in a half-circle around the subject.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 18. Fast 360 Orbit (Spin) -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_18')">
-          <video id="vid_mov_18" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_18">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_18" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_18')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Fast 360 Orbit (Spin)</h3>
-            <p>Fast 360 orbit, camera spins rapidly 360 degrees around the subject.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Fast 360 orbit, camera spins rapidly 360 degrees around the subject.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 19. True Orbit 180 -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_19')">
-          <video id="vid_mov_19" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_19">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_19" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_19')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>True Orbit 180</h3>
-            <p>180 orbit, camera orbits 180 degrees around the [subject].</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('180 orbit, camera orbits 180 degrees around the [subject].')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 20. True Orbit 360 -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_20')">
-          <video id="vid_mov_20" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_20">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_20" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_20')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>True Orbit 360</h3>
-            <p>Fast 360 orbit, camera orbits 360 degrees around the [subject].</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Fast 360 orbit, camera orbits 360 degrees around the [subject].')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 21. Slow Cinematic Arc -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_21')">
-          <video id="vid_mov_21" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_21">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_21" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_21')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Slow Cinematic Arc</h3>
-            <p>Slow cinematic arc, camera moves in a wide curve to reveal side profile.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Slow cinematic arc, camera moves in a wide curve to reveal side profile.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 22. Pedestal Down -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_22')">
-          <video id="vid_mov_22" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_22">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_22" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_22')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Pedestal Down</h3>
-            <p>Pedestal down, camera lowers vertically straight down.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Pedestal down, camera lowers vertically straight down.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 23. Pedestal Up -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_23')">
-          <video id="vid_mov_23" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_23">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_23" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_23')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Pedestal Up</h3>
-            <p>Pedestal up, camera rises vertically straight up from waist to eye level.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Pedestal up, camera rises vertically straight up from waist to eye level.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 24. Crane Up (High Angle Reveal) -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_24')">
-          <video id="vid_mov_24" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_24">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_24" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_24')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Crane Up (High Angle Reveal)</h3>
-            <p>Crane up, camera lifts high into the air.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Crane up, camera lifts high into the air.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 25. Crane Down (Landing) -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_25')">
-          <video id="vid_mov_25" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_25">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_25" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_25')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Crane Down (Landing)</h3>
-            <p>Crane down, camera descends slowly to the subject.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Crane down, camera descends slowly to the subject.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 26. Smooth Optical Zoom In -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_26')">
-          <video id="vid_mov_26" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_26">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_26" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_26')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Smooth Optical Zoom In</h3>
-            <p>Smooth optical zoom in, lens magnifies subject, camera stays stationary.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Smooth optical zoom in, lens magnifies subject, camera stays stationary.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 27. Smooth Optical Zoom Out -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_27')">
-          <video id="vid_mov_27" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_27">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_27" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_27')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Smooth Optical Zoom Out</h3>
-            <p>Smooth optical zoom out, lens widens, background becomes blurry.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Smooth optical zoom out, lens widens, background becomes blurry.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 28. Snap Zoom (Crash Zoom) -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_28')">
-          <video id="vid_mov_28" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_28">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_28" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_28')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Snap Zoom (Crash Zoom)</h3>
-            <p>Snap zoom, crash zoom, rapid zoom directly into the eyes.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Snap zoom, crash zoom, rapid zoom directly into the eyes.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 29. Drone Fly Over -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_29')">
-          <video id="vid_mov_29" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_29">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_29" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_29')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Drone Fly Over</h3>
-            <p>Drone fly over, high altitude flight moving forward over the landscape.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Drone fly over, high altitude flight moving forward over the landscape.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 30. Epic Drone Reveal -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_30')">
-          <video id="vid_mov_30" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_30">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_30" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_30')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Epic Drone Reveal</h3>
-            <p>Epic drone reveal, rising and tilting down to reveal the scene.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Epic drone reveal, rising and tilting down to reveal the scene.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 31. Large Scale Drone Orbit -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_31')">
-          <video id="vid_mov_31" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_31">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_31" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_31')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Large Scale Drone Orbit</h3>
-            <p>Large scale drone orbit, massive sweeping circle around the landscape.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Large scale drone orbit, massive sweeping circle around the landscape.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 32. Top Down (God's Eye View) -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_32')">
-          <video id="vid_mov_32" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_32">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_32" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_32')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Top Down (God's Eye View)</h3>
-            <p>Top down shot, camera pointing straight down, slow twist.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Top down shot, camera pointing straight down, slow twist.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 33. FPV Drone Aggressive (Drone Dive) -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_33')">
-          <video id="vid_mov_33" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_33">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_33" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_33')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>FPV Drone Aggressive (Drone Dive)</h3>
-            <p>FPV drone dive, aggressive diving motion down a vertical structure.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('FPV drone dive, aggressive diving motion down a vertical structure.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 34. Handheld Documentary Style -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_34')">
-          <video id="vid_mov_34" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_34">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_34" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_34')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Handheld Documentary Style</h3>
-            <p>Handheld camera, shaky motion, natural movement, documentary style.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Handheld camera, shaky motion, natural movement, documentary style.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 35. Whip Pan -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_35')">
-          <video id="vid_mov_35" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_35">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_35" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_35')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Whip Pan</h3>
-            <p>Whip pan, camera whips violently to the side with extreme directional motion blur.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Whip pan, camera whips violently to the side with extreme directional motion blur.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 36. Dutch Angle (Roll) -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_36')">
-          <video id="vid_mov_36" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_36">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_36" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_36')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Dutch Angle (Roll)</h3>
-            <p>Dutch angle, camera roll, tilted sideways on Z-axis.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Dutch angle, camera roll, tilted sideways on Z-axis.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 37. Leading Shot (Backward Tracking) -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_37')">
-          <video id="vid_mov_37" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_37">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_37" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_37')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Leading Shot (Backward Tracking)</h3>
-            <p>Leading shot, camera moves backward matching the subject's speed.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Leading shot, camera moves backward matching the subject\'s speed.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 38. Following Shot (Forward Tracking) -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_38')">
-          <video id="vid_mov_38" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_38">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_38" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_38')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Following Shot (Forward Tracking)</h3>
-            <p>Following shot, camera follows behind the subject matching speed.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Following shot, camera follows behind the subject matching speed.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 39. Side Tracking (Parallel) -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_39')">
-          <video id="vid_mov_39" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_39">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_39" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_39')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Side Tracking (Parallel)</h3>
-            <p>Side tracking, camera trucks alongside the subject.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Side tracking, camera trucks alongside the subject.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 40. POV Walk (First Person Walk) -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_40')">
-          <video id="vid_mov_40" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_40">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_40" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_40')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>POV Walk (First Person Walk)</h3>
-            <p>POV walk, first person camera moving forward with bobbing motion.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('POV walk, first person camera moving forward with bobbing motion.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 41. Hyperlapse (Moving Time-Lapse) -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_41')">
-          <video id="vid_mov_41" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_41">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_41" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_41')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Hyperlapse (Moving Time-Lapse)</h3>
-            <p>Hyperlapse, camera moves forward rapidly, time accelerated, fast motion, light trails.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Hyperlapse, camera moves forward rapidly, time accelerated, fast motion, light trails.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 42. Barrel Roll (Vortex Inception Shot) -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_42')">
-          <video id="vid_mov_42" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_42">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_42" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_42')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Barrel Roll (Vortex Inception Shot)</h3>
-            <p>Barrel roll, camera spins 360 degrees clockwise while moving forward, disorienting.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Barrel roll, camera spins 360 degrees clockwise while moving forward, disorienting.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 43. Bullet Time (Frozen Moment) -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_43')">
-          <video id="vid_mov_43" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_43">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_43" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_43')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Bullet Time (Frozen Moment)</h3>
-            <p>Bullet time, frozen moment, ultra slow motion, camera orbit right.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Bullet time, frozen moment, ultra slow motion, camera orbit right.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-      <!-- 44. Worm's Eye Tracking (Ground Level) -->
-      <div class="card" data-category="Camera Movement">
-        <div class="video-wrapper" onclick="triggerUpload('mov_44')">
-          <video id="vid_mov_44" autoplay loop muted playsinline></video>
-          <div class="upload-overlay" id="overlay_mov_44">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Video</span>
-          </div>
-          <input type="file" class="file-input" id="input_mov_44" accept="video/*" onchange="saveAndPlayVideo(event, 'mov_44')">
-        </div>
-        <div class="card-content">
-          <div class="card-meta">
-            <h3>Worm's Eye Tracking (Ground Level)</h3>
-            <p>Worm's eye view, low angle tracking, camera moves along the ground looking up.</p>
-          </div>
-          <button class="btn-generate" onclick="copyPromptText('Worm\'s eye view, low angle tracking, camera moves along the ground looking up.')">
-            <i class="fa-solid fa-bolt"></i> Generate
-          </button>
-        </div>
-      </div>
-
-    </div>
+    <!-- AIShotStudio 44 Movements Grid -->
+    <div class="movements-grid" id="movementsGrid"></div>
   </main>
 
-  <!-- Right Floating Utilities -->
-  <div class="floating-bar">
-    <div class="floating-btn"><i class="fa-solid fa-book-open"></i></div>
-    <div class="floating-btn"><i class="fa-solid fa-tower-broadcast"></i></div>
-    <div class="floating-btn"><i class="fa-solid fa-shapes"></i></div>
-    <div class="floating-btn"><i class="fa-solid fa-circle-half-stroke"></i></div>
-  </div>
-
-  <!-- Toast Notification -->
   <div id="toast">
-    <i class="fa-solid fa-check"></i>
+    <i class="fa-solid fa-circle-check"></i>
     <span>Prompt copied to clipboard!</span>
   </div>
 
   <script>
-    // IndexedDB for local video persistence
+    const cameraMovements = [
+      { id: "cm_1", name: "Slow Dolly In", category: "Camera Movement", prompt: "Slow dolly in, camera moves slowly forward toward the subject." },
+      { id: "cm_2", name: "Slow Dolly Out", category: "Camera Movement", prompt: "Slow dolly out, camera moves slowly backwards away from the subject." },
+      { id: "cm_3", name: "Fast Dolly In", category: "Camera Movement", prompt: "Fast dolly in, camera moves rapidly forward toward the subject, urgent motion." },
+      { id: "cm_4", name: "Vertigo Effect (Zolly)", category: "Camera Movement", prompt: "Vertigo effect, dolly zoom, camera moves backward while zooming in, background expands." },
+      { id: "cm_5", name: "Extreme Macro Zoom", category: "Camera Movement", prompt: "Extreme macro zoom, zoom transition from subject to micro details of surface." },
+      { id: "cm_6", name: "Cosmic Hyper Zoom", category: "Camera Movement", prompt: "Cosmic hyper zoom, fast zoom transition from extreme wide view down to macro level." },
+      { id: "cm_7", name: "Over the Shoulder (OTS) Shot", category: "Camera Movement", prompt: "Over the shoulder shot, camera mounted behind subject A framing subject B." },
+      { id: "cm_8", name: "Fisheye or Peephole Lens", category: "Camera Movement", prompt: "Fisheye lens, extreme wide-angle distortion, circular frame." },
+      { id: "cm_9", name: "Reveal from Behind", category: "Camera Movement", prompt: "Wipe movement, camera slides laterally from behind foreground object to reveal the scene." },
+      { id: "cm_10", name: "Through Shot", category: "Camera Movement", prompt: "Fly through, camera moves through an opening into the scene." },
+      { id: "cm_11", name: "Reveal from Blur", category: "Camera Movement", prompt: "Rack focus, start completely out of focus, slowly pull focus until sharp." },
+      { id: "cm_12", name: "Rack Focus", category: "Camera Movement", prompt: "Rack focus, focus shifts from the foreground object to the background subject." },
+      { id: "cm_13", name: "Tilt Up", category: "Camera Movement", prompt: "Tilt up, camera pans vertically up from bottom to top." },
+      { id: "cm_14", name: "Tilt Down", category: "Camera Movement", prompt: "Tilt down, camera pans vertically down from top to bottom." },
+      { id: "cm_15", name: "Camera Truck Left", category: "Camera Movement", prompt: "Truck left, camera moves sideways on a track to the left." },
+      { id: "cm_16", name: "Lateral Truck Right", category: "Camera Movement", prompt: "Truck right, camera moves sideways on a track to the right." },
+      { id: "cm_17", name: "Orbit 180 (Spin)", category: "Camera Movement", prompt: "Orbit 180, camera moves in a half-circle around the subject." },
+      { id: "cm_18", name: "Fast 360 Orbit (Spin)", category: "Camera Movement", prompt: "Fast 360 orbit, camera spins rapidly 360 degrees around the subject." },
+      { id: "cm_19", name: "True Orbit 180", category: "Camera Movement", prompt: "180 orbit, camera orbits 180 degrees around the [subject]." },
+      { id: "cm_20", name: "True Orbit 360", category: "Camera Movement", prompt: "Fast 360 orbit, camera orbits 360 degrees around the [subject]." },
+      { id: "cm_21", name: "Slow Cinematic Arc", category: "Camera Movement", prompt: "Slow cinematic arc, camera moves in a wide curve to reveal side profile." },
+      { id: "cm_22", name: "Pedestal Down", category: "Camera Movement", prompt: "Pedestal down, camera lowers vertically straight down." },
+      { id: "cm_23", name: "Pedestal Up", category: "Camera Movement", prompt: "Pedestal up, camera rises vertically straight up from waist to eye level." },
+      { id: "cm_24", name: "Crane Up (High Angle Reveal)", category: "Camera Movement", prompt: "Crane up, camera lifts high into the air." },
+      { id: "cm_25", name: "Crane Down (Landing)", category: "Camera Movement", prompt: "Crane down, camera descends slowly to the subject." },
+      { id: "cm_26", name: "Smooth Optical Zoom In", category: "Camera Movement", prompt: "Smooth optical zoom in, lens magnifies subject, camera stays stationary." },
+      { id: "cm_27", name: "Smooth Optical Zoom Out", category: "Camera Movement", prompt: "Smooth optical zoom out, lens widens, background becomes blurry." },
+      { id: "cm_28", name: "Snap Zoom (Crash Zoom)", category: "Camera Movement", prompt: "Snap zoom, crash zoom, rapid zoom directly into the eyes." },
+      { id: "cm_29", name: "Drone Fly Over", category: "Camera Movement", prompt: "Drone fly over, high altitude flight moving forward over the landscape." },
+      { id: "cm_30", name: "Epic Drone Reveal", category: "Camera Movement", prompt: "Epic drone reveal, rising and tilting down to reveal the scene." },
+      { id: "cm_31", name: "Large Scale Drone Orbit", category: "Camera Movement", prompt: "Large scale drone orbit, massive sweeping circle around the landscape." },
+      { id: "cm_32", name: "Top Down (God's Eye View)", category: "Camera Movement", prompt: "Top down shot, camera pointing straight down, slow twist." },
+      { id: "cm_33", name: "FPV Drone Aggressive (Drone Dive)", category: "Camera Movement", prompt: "FPV drone dive, aggressive diving motion down a vertical structure." },
+      { id: "cm_34", name: "Handheld Documentary Style", category: "Camera Movement", prompt: "Handheld camera, shaky motion, natural movement, documentary style." },
+      { id: "cm_35", name: "Whip Pan", category: "Camera Movement", prompt: "Whip pan, camera whips violently to the side with extreme directional motion blur." },
+      { id: "cm_36", name: "Dutch Angle (Roll)", category: "Camera Movement", prompt: "Dutch angle, camera roll, tilted sideways on Z-axis." },
+      { id: "cm_37", name: "Leading Shot (Backward Tracking)", category: "Camera Movement", prompt: "Leading shot, camera moves backward matching the subject's speed." },
+      { id: "cm_38", name: "Following Shot (Forward Tracking)", category: "Camera Movement", prompt: "Following shot, camera follows behind the subject matching speed." },
+      { id: "cm_39", name: "Side Tracking (Parallel)", category: "Camera Movement", prompt: "Side tracking, camera trucks alongside the subject." },
+      { id: "cm_40", name: "POV Walk (First Person Walk)", category: "Camera Movement", prompt: "POV walk, first person camera moving forward with bobbing motion." },
+      { id: "cm_41", name: "Hyperlapse (Moving Time-Lapse)", category: "Camera Movement", prompt: "Hyperlapse, camera moves forward rapidly, time accelerated, fast motion, light trails." },
+      { id: "cm_42", name: "Barrel Roll (Vortex Inception Shot)", category: "Camera Movement", prompt: "Barrel roll, camera spins 360 degrees clockwise while moving forward, disorienting." },
+      { id: "cm_43", name: "Bullet Time (Frozen Moment)", category: "Camera Movement", prompt: "Bullet time, frozen moment, ultra slow motion, camera orbit right." },
+      { id: "cm_44", name: "Worm's Eye Tracking (Ground Level)", category: "Camera Movement", prompt: "Worm's eye view, low angle tracking, camera moves along the ground looking up." }
+    ];
+
+    let currentCategory = "Camera Movement";
+    const grid = document.getElementById('movementsGrid');
+
+    /* IndexedDB for persisting uploaded videos */
     let db;
-    const req = indexedDB.open("CinemotionVaultDB", 1);
-    req.onupgradeneeded = (e) => {
+    const dbReq = indexedDB.open("CinemotionLocalDB", 1);
+    dbReq.onupgradeneeded = (e) => {
       db = e.target.result;
       if (!db.objectStoreNames.contains("videos")) {
         db.createObjectStore("videos", { keyPath: "id" });
       }
     };
-    req.onsuccess = (e) => {
+    dbReq.onsuccess = (e) => {
       db = e.target.result;
-      loadSavedVideos();
+      renderCards();
     };
 
-    function triggerUpload(id) {
+    function renderCards() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      
+      const filtered = cameraMovements.filter(item => {
+        const matchesCategory = (currentCategory === 'all' || item.category === currentCategory);
+        const matchesQuery = item.name.toLowerCase().includes(q) || item.prompt.toLowerCase().includes(q);
+        return matchesCategory && matchesQuery;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted);">No camera movements found.</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(item => `
+        <div class="card" id="card_${item.id}">
+          <div class="video-viewport" onclick="openUploader('${item.id}')">
+            <video id="vid_${item.id}" autoplay loop muted playsinline></video>
+            <div class="video-overlay" id="overlay_${item.id}">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span>Upload Video</span>
+            </div>
+            <input type="file" class="file-input" id="input_${item.id}" accept="video/*" onchange="saveVideo(event, '${item.id}')">
+          </div>
+          <div class="card-body">
+            <div class="card-info">
+              <h3>${item.name}</h3>
+              <p>${item.prompt}</p>
+            </div>
+            <button class="copy-action-btn" onclick="copyPrompt('${item.prompt.replace(/'/g, "\\'")}')">
+              <i class="fa-regular fa-copy"></i> Copy Prompt
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      // Restore saved video streams
+      if (db) {
+        const tx = db.transaction("videos", "readonly");
+        const store = tx.objectStore("videos");
+        filtered.forEach(item => {
+          const req = store.get(item.id);
+          req.onsuccess = () => {
+            if (req.result && req.result.file) {
+              applyVideoSource(item.id, req.result.file);
+            }
+          };
+        });
+      }
+    }
+
+    function openUploader(id) {
       document.getElementById(`input_${id}`).click();
     }
 
-    function saveAndPlayVideo(event, id) {
+    function saveVideo(event, id) {
       const file = event.target.files[0];
       if (file) {
-        setVideoSource(id, file);
+        applyVideoSource(id, file);
         if (db) {
           const tx = db.transaction("videos", "readwrite");
           tx.objectStore("videos").put({ id: id, file: file });
@@ -1512,11 +635,11 @@
       }
     }
 
-    function setVideoSource(id, blobOrFile) {
+    function applyVideoSource(id, fileBlob) {
       const vid = document.getElementById(`vid_${id}`);
       const overlay = document.getElementById(`overlay_${id}`);
       if (vid && overlay) {
-        vid.src = URL.createObjectURL(blobOrFile);
+        vid.src = URL.createObjectURL(fileBlob);
         vid.classList.add('active-video');
         overlay.style.opacity = '0';
         overlay.onmouseenter = () => overlay.style.opacity = '1';
@@ -1524,54 +647,22 @@
       }
     }
 
-    function loadSavedVideos() {
-      if (!db) return;
-      const tx = db.transaction("videos", "readonly");
-      const store = tx.objectStore("videos");
-      for (let i = 1; i <= 44; i++) {
-        const id = `mov_${i}`;
-        const request = store.get(id);
-        request.onsuccess = () => {
-          if (request.result && request.result.file) {
-            setVideoSource(id, request.result.file);
-          }
-        };
-      }
+    function selectCategory(cat, btn) {
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentCategory = cat;
+      renderCards();
     }
 
-    function copyPromptText(text) {
+    function filterMovements() {
+      renderCards();
+    }
+
+    function copyPrompt(text) {
       navigator.clipboard.writeText(text).then(() => {
         const toast = document.getElementById('toast');
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 2000);
-      });
-    }
-
-    function switchCategory(cat, tabElement) {
-      document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
-      tabElement.classList.add('active');
-
-      const cards = document.querySelectorAll('.card');
-      cards.forEach(card => {
-        if (cat === 'all' || cat === 'Camera Movement') {
-          card.style.display = 'flex';
-        } else {
-          card.style.display = 'none';
-        }
-      });
-    }
-
-    function filterMovements() {
-      const q = document.getElementById('searchInput').value.toLowerCase();
-      const cards = document.querySelectorAll('.card');
-      cards.forEach(card => {
-        const title = card.querySelector('h3').innerText.toLowerCase();
-        const prompt = card.querySelector('.card-meta p').innerText.toLowerCase();
-        if (title.includes(q) || prompt.includes(q)) {
-          card.style.display = 'flex';
-        } else {
-          card.style.display = 'none';
-        }
       });
     }
   </script>
