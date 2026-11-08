@@ -3,267 +3,168 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CINEMOTION STUDIO - AI Camera Movements</title>
+  <title>42 Camera Movements for AI Video Prompts</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
     :root {
-      --bg-dark: #0a0b10;
-      --card-bg: #12141e;
-      --border-color: rgba(255, 255, 255, 0.08);
+      --bg-color: #0b0d14;
+      --card-bg: #131722;
+      --card-border: rgba(255, 255, 255, 0.08);
       --accent: #6366f1;
-      --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
+      --accent-hover: #4f46e5;
+      --text-main: #f3f4f6;
+      --text-sub: #9ca3af;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background-color: var(--bg-dark);
+      background-color: var(--bg-color);
       color: var(--text-main);
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      overflow-x: hidden;
+      font-family: 'Inter', sans-serif;
       line-height: 1.5;
     }
 
-    /* Header */
-    header {
-      border-bottom: 1px solid var(--border-color);
-      background: rgba(10, 11, 16, 0.85);
-      backdrop-filter: blur(16px);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .header-inner {
-      max-width: 1400px;
+    /* Container */
+    .container {
+      max-width: 1280px;
       margin: 0 auto;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      padding: 2.5rem 1.5rem;
     }
 
-    .brand-logo {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      font-size: 1.25rem;
-      letter-spacing: 1px;
+    /* Page Header */
+    .header-section {
+      text-align: center;
+      margin-bottom: 2.5rem;
     }
 
-    .brand-logo span:last-child {
-      color: #818cf8;
-    }
-
-    .search-box {
-      position: relative;
-      width: 320px;
-    }
-
-    .search-box input {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border-color);
-      padding: 0.65rem 1rem 0.65rem 2.5rem;
-      border-radius: 9999px;
-      color: #fff;
-      font-size: 0.9rem;
-      outline: none;
-      transition: all 0.2s;
-    }
-
-    .search-box input:focus {
-      border-color: var(--accent);
-      background: rgba(255, 255, 255, 0.08);
-    }
-
-    .search-box i {
-      position: absolute;
-      left: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-      font-size: 0.85rem;
-    }
-
-    /* Hero */
-    .hero-section {
-      max-width: 1400px;
-      margin: 2rem auto;
-      padding: 2rem;
-      background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15) 0%, transparent 60%);
-      border-radius: 24px;
-      border: 1px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-
-    .hero-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .hero-tag {
-      font-size: 0.8rem;
-      letter-spacing: 2px;
-      color: #a855f7;
-      font-weight: 700;
-    }
-
-    .counter-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: rgba(99, 102, 241, 0.15);
-      border: 1px solid rgba(99, 102, 241, 0.3);
-      padding: 0.35rem 0.85rem;
-      border-radius: 9999px;
-      font-weight: 700;
-      color: #818cf8;
-      font-size: 0.85rem;
-    }
-
-    .hero-content h1 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: clamp(2rem, 4vw, 3rem);
+    .header-section h1 {
+      font-size: clamp(1.8rem, 4vw, 2.75rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
       margin-bottom: 0.75rem;
-      line-height: 1.1;
     }
 
-    .hero-content p {
-      color: var(--text-muted);
-      max-width: 650px;
-      font-size: 1.05rem;
+    .header-section p {
+      color: var(--text-sub);
+      font-size: 1rem;
+      max-width: 600px;
+      margin: 0 auto;
     }
 
-    /* Categories / Tabs */
-    .filter-bar {
-      max-width: 1400px;
-      margin: 1.5rem auto;
-      padding: 0 2rem;
+    /* Filter Buttons */
+    .filter-wrapper {
       display: flex;
-      gap: 0.75rem;
-      overflow-x: auto;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
     }
 
-    .tab-btn {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border-color);
-      color: var(--text-muted);
-      padding: 0.55rem 1.25rem;
+    .filter-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-sub);
+      padding: 0.5rem 1.25rem;
       border-radius: 9999px;
-      font-weight: 600;
       font-size: 0.9rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
-      white-space: nowrap;
+      transition: all 0.2s ease;
     }
 
-    .tab-btn.active, .tab-btn:hover {
+    .filter-btn.active, .filter-btn:hover {
       background: var(--accent);
       color: #fff;
       border-color: var(--accent);
     }
 
-    /* Main Grid */
-    main {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 2rem 4rem;
-    }
-
+    /* Movements Grid */
     .movements-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-      gap: 1.75rem;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
     }
 
-    .movement-card {
+    .card {
       background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      transition: transform 0.25s, border-color 0.25s;
+      transition: transform 0.2s ease, border-color 0.2s ease;
     }
 
-    .movement-card:hover {
+    .card:hover {
       transform: translateY(-4px);
-      border-color: rgba(99, 102, 241, 0.5);
+      border-color: rgba(99, 102, 241, 0.4);
     }
 
-    .video-wrapper {
-      position: relative;
+    .video-area {
       width: 100%;
       aspect-ratio: 16 / 9;
       background: #000;
-      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
     }
 
-    .video-wrapper video {
+    .video-area video {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      display: block;
     }
 
-    .card-content {
+    .video-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      color: #4b5563;
+      font-size: 0.8rem;
+    }
+
+    .video-placeholder i {
+      font-size: 2rem;
+    }
+
+    .card-body {
       padding: 1.25rem;
       display: flex;
       flex-direction: column;
       flex-grow: 1;
-      gap: 0.6rem;
+      justify-content: space-between;
+      gap: 1rem;
     }
 
-    .category-tag {
-      font-size: 0.75rem;
+    .card-info h3 {
+      font-size: 1.1rem;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #818cf8;
-      background: rgba(99, 102, 241, 0.1);
-      padding: 0.2rem 0.5rem;
-      border-radius: 6px;
-      width: fit-content;
-    }
-
-    .movement-card h3 {
-      font-size: 1.15rem;
-      font-weight: 700;
+      margin-bottom: 0.5rem;
       color: #fff;
     }
 
-    .prompt-text {
-      color: var(--text-muted);
-      font-size: 0.88rem;
-      flex-grow: 1;
+    .card-info p {
+      font-size: 0.85rem;
+      color: var(--text-sub);
       line-height: 1.4;
     }
 
-    .copy-btn {
-      margin-top: 0.5rem;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-color);
+    /* Generate / Action Button */
+    .action-btn {
+      background: var(--accent);
       color: #fff;
-      padding: 0.6rem;
+      border: none;
+      padding: 0.65rem 1rem;
       border-radius: 8px;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       font-weight: 600;
       cursor: pointer;
       display: flex;
@@ -271,11 +172,11 @@
       justify-content: center;
       gap: 0.5rem;
       transition: background 0.2s;
+      width: 100%;
     }
 
-    .copy-btn:hover {
-      background: var(--accent);
-      border-color: var(--accent);
+    .action-btn:hover {
+      background: var(--accent-hover);
     }
 
     /* Toast Notification */
@@ -289,15 +190,15 @@
       padding: 0.75rem 1.25rem;
       border-radius: 9999px;
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.4);
       z-index: 1000;
       opacity: 0;
       transition: opacity 0.3s, transform 0.3s;
-      transform: translateY(20px);
+      transform: translateY(15px);
     }
 
     #toast.show {
@@ -309,663 +210,123 @@
 </head>
 <body>
 
-  <!-- Header -->
-  <header>
-    <div class="header-inner">
-      <div class="brand-logo">
-        <i class="fa-solid fa-clapperboard" style="color: #6366f1;"></i>
-        <span>CINEMOTION</span><span>STUDIO</span>
-      </div>
+  <div class="container">
+    <header class="header-section">
+      <h1>42 Camera Movements for AI Video Prompts</h1>
+      <p>The ultimate reference list of cinematic camera motions for your AI video generations.</p>
+    </header>
 
-      <div class="search-box">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="searchInput" placeholder="Search 44 camera movements..." onkeyup="filterCards()">
-      </div>
+    <!-- Filter Buttons (Same as AIShotStudio) -->
+    <div class="filter-wrapper">
+      <button class="filter-btn active" onclick="applyFilter('all', this)">All</button>
+      <button class="filter-btn" onclick="applyFilter('Dolly/Track', this)">Dolly/Track</button>
+      <button class="filter-btn" onclick="applyFilter('Zoom/Lens', this)">Zoom/Lens</button>
+      <button class="filter-btn" onclick="applyFilter('Drone/Crane', this)">Drone/Crane</button>
+      <button class="filter-btn" onclick="applyFilter('Pan/Tilt', this)">Pan/Tilt</button>
     </div>
-  </header>
 
-  <!-- Hero Section -->
-  <section class="hero-section">
-    <div class="hero-top">
-      <div class="hero-tag">MASTER DIRECTORS VAULT</div>
-      <div class="counter-badge">
-        <span>44</span> MOVEMENTS
-      </div>
-    </div>
-    <div class="hero-content">
-      <h1>AI Camera Motion Vault</h1>
-      <p>Master cinematic camera movements and visual prompt formulas. Preview video references and copy prompts with one click.</p>
-    </div>
-  </section>
-
-  <!-- Category Filter Tabs -->
-  <div class="filter-bar">
-    <button class="tab-btn active">Camera Movement</button>
+    <!-- Cards Grid -->
+    <main class="movements-grid" id="itemsGrid"></main>
   </div>
 
-  <!-- Movements Grid -->
-  <main>
-    <div class="movements-grid" id="gridContainer">
-
-      <!-- 1. Slow Dolly In -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Slow-Dolly-In.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Slow Dolly In</h3>
-          <p class="prompt-text">Slow dolly in, camera moves slowly forward toward the subject.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 2. Slow Dolly Out -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Slow-Dolly-Out.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Slow Dolly Out</h3>
-          <p class="prompt-text">Slow dolly out, camera moves slowly backwards away from the subject.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 3. Fast Dolly In -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Fast-Dolly-In.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Fast Dolly In</h3>
-          <p class="prompt-text">Fast dolly in, camera moves rapidly forward toward the subject, urgent motion.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 4. Vertigo Effect (Zolly) -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Vertigo-Effect-Zolly.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Vertigo Effect (Zolly)</h3>
-          <p class="prompt-text">Vertigo effect, dolly zoom, camera moves backward while zooming in, background expands.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 5. Extreme Macro Zoom -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Extreme-Macro-Zoom.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Extreme Macro Zoom</h3>
-          <p class="prompt-text">Extreme macro zoom, zoom transition from subject to micro details of surface.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 6. Cosmic Hyper Zoom -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Cosmic-Hyper-Zoom.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Cosmic Hyper Zoom</h3>
-          <p class="prompt-text">Cosmic hyper zoom, fast zoom transition from extreme wide view down to macro level.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 7. Over the Shoulder (OTS) Shot -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Over-the-Shoulder-OTS-Shot.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Over the Shoulder (OTS) Shot</h3>
-          <p class="prompt-text">Over the shoulder shot, camera mounted behind subject A framing subject B.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 8. Fisheye or Peephole Lens -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Fisheye-or-Peephole-Lens.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Fisheye or Peephole Lens</h3>
-          <p class="prompt-text">Fisheye lens, extreme wide-angle distortion, circular frame.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 9. Reveal from Behind -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Reveal-from-Behind.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Reveal from Behind</h3>
-          <p class="prompt-text">Wipe movement, camera slides laterally from behind foreground object to reveal the scene.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 10. Through Shot -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Through-Shot.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Through Shot</h3>
-          <p class="prompt-text">Fly through, camera moves through an opening into the scene.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 11. Reveal from Blur -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Reveal-from-Blur.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Reveal from Blur</h3>
-          <p class="prompt-text">Rack focus, start completely out of focus, slowly pull focus until sharp.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 12. Rack Focus -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Rack-Focus.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Rack Focus</h3>
-          <p class="prompt-text">Rack focus, focus shifts from the foreground object to the background subject.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 13. Tilt Up -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Tilt-Up.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Tilt Up</h3>
-          <p class="prompt-text">Tilt up, camera pans vertically up from bottom to top.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 14. Tilt Down -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Tilt-Down.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Tilt Down</h3>
-          <p class="prompt-text">Tilt down, camera pans vertically down from top to bottom.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 15. Camera Truck Left -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Camera-Truck-Left.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Camera Truck Left</h3>
-          <p class="prompt-text">Truck left, camera moves sideways on a track to the left.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 16. Lateral Truck Right -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Lateral-Truck-Right.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Lateral Truck Right</h3>
-          <p class="prompt-text">Truck right, camera moves sideways on a track to the right.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 17. Orbit 180 (Spin) -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Orbit-180-Spin.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Orbit 180 (Spin)</h3>
-          <p class="prompt-text">Orbit 180, camera moves in a half-circle around the subject.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 18. Fast 360 Orbit (Spin) -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Fast-360-Orbit-Spin.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Fast 360 Orbit (Spin)</h3>
-          <p class="prompt-text">Fast 360 orbit, camera spins rapidly 360 degrees around the subject.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 19. True Orbit 180 -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/True-Orbit-180.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>True Orbit 180</h3>
-          <p class="prompt-text">180 orbit, camera orbits 180 degrees around the [subject].</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 20. True Orbit 360 -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/True-Orbit-360.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>True Orbit 360</h3>
-          <p class="prompt-text">Fast 360 orbit, camera orbits 360 degrees around the [subject].</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 21. Slow Cinematic Arc -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Slow-Cinematic-Arc.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Slow Cinematic Arc</h3>
-          <p class="prompt-text">Slow cinematic arc, camera moves in a wide curve to reveal side profile.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 22. Pedestal Down -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Pedestal-Down.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Pedestal Down</h3>
-          <p class="prompt-text">Pedestal down, camera lowers vertically straight down.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 23. Pedestal Up -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Pedestal-Up.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Pedestal Up</h3>
-          <p class="prompt-text">Pedestal up, camera rises vertically straight up from waist to eye level.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 24. Crane Up (High Angle Reveal) -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Crane-Up-High-Angle-Reveal.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Crane Up (High Angle Reveal)</h3>
-          <p class="prompt-text">Crane up, camera lifts high into the air.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 25. Crane Down (Landing) -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Crane-Down-Landing.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Crane Down (Landing)</h3>
-          <p class="prompt-text">Crane down, camera descends slowly to the subject.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 26. Smooth Optical Zoom In -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Smooth-Optical-Zoom-In.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Smooth Optical Zoom In</h3>
-          <p class="prompt-text">Smooth optical zoom in, lens magnifies subject, camera stays stationary.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 27. Smooth Optical Zoom Out -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Smooth-Optical-Zoom-Out.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Smooth Optical Zoom Out</h3>
-          <p class="prompt-text">Smooth optical zoom out, lens widens, background becomes blurry.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 28. Snap Zoom (Crash Zoom) -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Snap-Zoom-Crash-Zoom.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Snap Zoom (Crash Zoom)</h3>
-          <p class="prompt-text">Snap zoom, crash zoom, rapid zoom directly into the eyes.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 29. Drone Fly Over -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Drone-Fly-Over.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Drone Fly Over</h3>
-          <p class="prompt-text">Drone fly over, high altitude flight moving forward over the landscape.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 30. Epic Drone Reveal -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Epic-Drone-Reveal.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Epic Drone Reveal</h3>
-          <p class="prompt-text">Epic drone reveal, rising and tilting down to reveal the scene.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 31. Large Scale Drone Orbit -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Large-Scale-Drone-Orbit.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Large Scale Drone Orbit</h3>
-          <p class="prompt-text">Large scale drone orbit, massive sweeping circle around the landscape.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 32. Top Down (God's Eye View) -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Top-Down-Gods-Eye-View.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Top Down (God's Eye View)</h3>
-          <p class="prompt-text">Top down shot, camera pointing straight down, slow twist.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 33. FPV Drone Aggressive (Drone Dive) -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/FPV-Drone-Aggressive-Drone-Dive.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>FPV Drone Aggressive (Drone Dive)</h3>
-          <p class="prompt-text">FPV drone dive, aggressive diving motion down a vertical structure.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 34. Handheld Documentary Style -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Handheld-Documentary-Style.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Handheld Documentary Style</h3>
-          <p class="prompt-text">Handheld camera, shaky motion, natural movement, documentary style.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 35. Whip Pan -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Whip-Pan.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Whip Pan</h3>
-          <p class="prompt-text">Whip pan, camera whips violently to the side with extreme directional motion blur.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 36. Dutch Angle (Roll) -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Dutch-Angle-Roll.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Dutch Angle (Roll)</h3>
-          <p class="prompt-text">Dutch angle, camera roll, tilted sideways on Z-axis.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 37. Leading Shot (Backward Tracking) -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Leading-Shot-Backward-Tracking.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Leading Shot (Backward Tracking)</h3>
-          <p class="prompt-text">Leading shot, camera moves backward matching the subject's speed.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 38. Following Shot (Forward Tracking) -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Following-Shot-Forward-Tracking.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Following Shot (Forward Tracking)</h3>
-          <p class="prompt-text">Following shot, camera follows behind the subject matching speed.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 39. Side Tracking (Parallel) -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Side-Tracking-Parallel.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Side Tracking (Parallel)</h3>
-          <p class="prompt-text">Side tracking, camera trucks alongside the subject.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 40. POV Walk (First Person Walk) -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/POV-Walk-First-Person-Walk.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>POV Walk (First Person Walk)</h3>
-          <p class="prompt-text">POV walk, first person camera moving forward with bobbing motion.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 41. Hyperlapse (Moving Time-Lapse) -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Hyperlapse-Moving-Time-Lapse.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Hyperlapse (Moving Time-Lapse)</h3>
-          <p class="prompt-text">Hyperlapse, camera moves forward rapidly, time accelerated, fast motion, light trails.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 42. Barrel Roll (Vortex Inception Shot) -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Barrel-Roll-Vortex-Inception-Shot.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Barrel Roll (Vortex Inception Shot)</h3>
-          <p class="prompt-text">Barrel roll, camera spins 360 degrees clockwise while moving forward, disorienting.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 43. Bullet Time (Frozen Moment) -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Bullet-Time-Frozen-Moment.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Bullet Time (Frozen Moment)</h3>
-          <p class="prompt-text">Bullet time, frozen moment, ultra slow motion, camera orbit right.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-      <!-- 44. Worm's Eye Tracking (Ground Level) -->
-      <div class="movement-card" data-category="Camera Movement">
-        <div class="video-wrapper">
-          <video src="https://aishotstudio.com/wp-content/uploads/2024/09/Worms-Eye-Tracking-Ground-Level.mp4" autoplay loop muted playsinline loading="lazy"></video>
-        </div>
-        <div class="card-content">
-          <span class="category-tag">Camera Movement</span>
-          <h3>Worm's Eye Tracking (Ground Level)</h3>
-          <p class="prompt-text">Worm's eye view, low angle tracking, camera moves along the ground looking up.</p>
-          <button class="copy-btn" onclick="copyPrompt(this)"><i class="fa-regular fa-copy"></i> Copy Prompt</button>
-        </div>
-      </div>
-
-    </div>
-  </main>
-
-  <!-- Toast Notification -->
   <div id="toast">
-    <i class="fa-solid fa-circle-check"></i>
+    <i class="fa-solid fa-check"></i>
     <span>Prompt copied to clipboard!</span>
   </div>
 
   <script>
-    // Copy Prompt functionality
-    function copyPrompt(button) {
-      const card = button.closest('.movement-card');
-      const text = card.querySelector('.prompt-text').innerText;
-      
+    const items = [
+      { name: "Slow Dolly In", type: "Dolly/Track", prompt: "Slow dolly in, camera moves slowly forward toward the subject." },
+      { name: "Slow Dolly Out", type: "Dolly/Track", prompt: "Slow dolly out, camera moves slowly backwards away from the subject." },
+      { name: "Fast Dolly In", type: "Dolly/Track", prompt: "Fast dolly in, camera moves rapidly forward toward the subject, urgent motion." },
+      { name: "Vertigo Effect (Zolly)", type: "Zoom/Lens", prompt: "Vertigo effect, dolly zoom, camera moves backward while zooming in, background expands." },
+      { name: "Extreme Macro Zoom", type: "Zoom/Lens", prompt: "Extreme macro zoom, zoom transition from subject to micro details of surface." },
+      { name: "Cosmic Hyper Zoom", type: "Zoom/Lens", prompt: "Cosmic hyper zoom, fast zoom transition from extreme wide view down to macro level." },
+      { name: "Over the Shoulder (OTS) Shot", type: "Dolly/Track", prompt: "Over the shoulder shot, camera mounted behind subject A framing subject B." },
+      { name: "Fisheye or Peephole Lens", type: "Zoom/Lens", prompt: "Fisheye lens, extreme wide-angle distortion, circular frame." },
+      { name: "Reveal from Behind", type: "Pan/Tilt", prompt: "Wipe movement, camera slides laterally from behind foreground object to reveal the scene." },
+      { name: "Through Shot", type: "Drone/Crane", prompt: "Fly through, camera moves through an opening into the scene." },
+      { name: "Reveal from Blur", type: "Zoom/Lens", prompt: "Rack focus, start completely out of focus, slowly pull focus until sharp." },
+      { name: "Rack Focus", type: "Zoom/Lens", prompt: "Rack focus, focus shifts from the foreground object to the background subject." },
+      { name: "Tilt Up", type: "Pan/Tilt", prompt: "Tilt up, camera pans vertically up from bottom to top." },
+      { name: "Tilt Down", type: "Pan/Tilt", prompt: "Tilt down, camera pans vertically down from top to bottom." },
+      { name: "Camera Truck Left", type: "Dolly/Track", prompt: "Truck left, camera moves sideways on a track to the left." },
+      { name: "Lateral Truck Right", type: "Dolly/Track", prompt: "Truck right, camera moves sideways on a track to the right." },
+      { name: "Orbit 180 (Spin)", type: "Dolly/Track", prompt: "Orbit 180, camera moves in a half-circle around the subject." },
+      { name: "Fast 360 Orbit (Spin)", type: "Dolly/Track", prompt: "Fast 360 orbit, camera spins rapidly 360 degrees around the subject." },
+      { name: "True Orbit 180", type: "Dolly/Track", prompt: "180 orbit, camera orbits 180 degrees around the [subject]." },
+      { name: "True Orbit 360", type: "Dolly/Track", prompt: "Fast 360 orbit, camera orbits 360 degrees around the [subject]." },
+      { name: "Slow Cinematic Arc", type: "Dolly/Track", prompt: "Slow cinematic arc, camera moves in a wide curve to reveal side profile." },
+      { name: "Pedestal Down", type: "Drone/Crane", prompt: "Pedestal down, camera lowers vertically straight down." },
+      { name: "Pedestal Up", type: "Drone/Crane", prompt: "Pedestal up, camera rises vertically straight up from waist to eye level." },
+      { name: "Crane Up (High Angle Reveal)", type: "Drone/Crane", prompt: "Crane up, camera lifts high into the air." },
+      { name: "Crane Down (Landing)", type: "Drone/Crane", prompt: "Crane down, camera descends slowly to the subject." },
+      { name: "Smooth Optical Zoom In", type: "Zoom/Lens", prompt: "Smooth optical zoom in, lens magnifies subject, camera stays stationary." },
+      { name: "Smooth Optical Zoom Out", type: "Zoom/Lens", prompt: "Smooth optical zoom out, lens widens, background becomes blurry." },
+      { name: "Snap Zoom (Crash Zoom)", type: "Zoom/Lens", prompt: "Snap zoom, crash zoom, rapid zoom directly into the eyes." },
+      { name: "Drone Fly Over", type: "Drone/Crane", prompt: "Drone fly over, high altitude flight moving forward over the landscape." },
+      { name: "Epic Drone Reveal", type: "Drone/Crane", prompt: "Epic drone reveal, rising and tilting down to reveal the scene." },
+      { name: "Large Scale Drone Orbit", type: "Drone/Crane", prompt: "Large scale drone orbit, massive sweeping circle around the landscape." },
+      { name: "Top Down (God's Eye View)", type: "Drone/Crane", prompt: "Top down shot, camera pointing straight down, slow twist." },
+      { name: "FPV Drone Aggressive (Drone Dive)", type: "Drone/Crane", prompt: "FPV drone dive, aggressive diving motion down a vertical structure." },
+      { name: "Handheld Documentary Style", type: "Pan/Tilt", prompt: "Handheld camera, shaky motion, natural movement, documentary style." },
+      { name: "Whip Pan", type: "Pan/Tilt", prompt: "Whip pan, camera whips violently to the side with extreme directional motion blur." },
+      { name: "Dutch Angle (Roll)", type: "Pan/Tilt", prompt: "Dutch angle, camera roll, tilted sideways on Z-axis." },
+      { name: "Leading Shot (Backward Tracking)", type: "Dolly/Track", prompt: "Leading shot, camera moves backward matching the subject's speed." },
+      { name: "Following Shot (Forward Tracking)", type: "Dolly/Track", prompt: "Following shot, camera follows behind the subject matching speed." },
+      { name: "Side Tracking (Parallel)", type: "Dolly/Track", prompt: "Side tracking, camera trucks alongside the subject." },
+      { name: "POV Walk (First Person Walk)", type: "Dolly/Track", prompt: "POV walk, first person camera moving forward with bobbing motion." },
+      { name: "Hyperlapse (Moving Time-Lapse)", type: "Drone/Crane", prompt: "Hyperlapse, camera moves forward rapidly, time accelerated, fast motion, light trails." },
+      { name: "Barrel Roll (Vortex Inception Shot)", type: "Pan/Tilt", prompt: "Barrel roll, camera spins 360 degrees clockwise while moving forward, disorienting." },
+      { name: "Bullet Time (Frozen Moment)", type: "Dolly/Track", prompt: "Bullet time, frozen moment, ultra slow motion, camera orbit right." },
+      { name: "Worm's Eye Tracking (Ground Level)", type: "Dolly/Track", prompt: "Worm's eye view, low angle tracking, camera moves along the ground looking up." }
+    ];
+
+    const container = document.getElementById('itemsGrid');
+
+    function renderGrid(list) {
+      container.innerHTML = list.map(item => `
+        <div class="card">
+          <div class="video-area">
+            <div class="video-placeholder">
+              <i class="fa-solid fa-play"></i>
+              <span>Preview</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-info">
+              <h3>${item.name}</h3>
+              <p>${item.prompt}</p>
+            </div>
+            <button class="action-btn" onclick="copyPromptText('${item.prompt.replace(/'/g, "\\'")}')">
+              <i class="fa-solid fa-bolt"></i> Generate
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function applyFilter(category, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      if (category === 'all') {
+        renderGrid(items);
+      } else {
+        const filtered = items.filter(i => i.type === category);
+        renderGrid(filtered);
+      }
+    }
+
+    function copyPromptText(text) {
       navigator.clipboard.writeText(text).then(() => {
-        showToast();
-      }).catch(err => {
-        console.error('Failed to copy text: ', err);
+        const toast = document.getElementById('toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
       });
     }
 
-    function showToast() {
-      const toast = document.getElementById('toast');
-      toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 2500);
-    }
-
-    // Live Search Filter
-    function filterCards() {
-      const input = document.getElementById('searchInput').value.toLowerCase();
-      const cards = document.querySelectorAll('.movement-card');
-
-      cards.forEach(card => {
-        const title = card.querySelector('h3').innerText.toLowerCase();
-        const prompt = card.querySelector('.prompt-text').innerText.toLowerCase();
-
-        if (title.includes(input) || prompt.includes(input)) {
-          card.style.display = 'flex';
-        } else {
-          card.style.display = 'none';
-        }
-      });
-    }
+    renderGrid(items);
   </script>
-
 </body>
 </html>
