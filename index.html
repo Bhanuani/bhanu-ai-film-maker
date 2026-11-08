@@ -712,48 +712,152 @@
       renderCards(filtered);
     }
   </script>
-  <!-- Add Movement Modal -->
-<div id="movementModal" class="modal-overlay" style="display: none;">
-  <div class="modal-box">
-    <div class="modal-header">
-      <h3 style="margin: 0; font-size: 18px;">Add New Movement</h3>
-      <button type="button" id="closeModalBtn" class="close-btn">&times;</button>
-    </div>
-    
-    <form id="movementForm">
-      <div class="form-group">
-        <label for="itemCategory">Category</label>
-        <select id="itemCategory" required>
-          <option value="Camera Movements">Camera Movements</option>
-          <option value="Camera Angles">Camera Angles</option>
-          <option value="Lighting">Lighting</option>
-          <option value="Lenses">Lenses</option>
-        </select>
-      </div>
+  <!-- Firebase SDKs & Logic -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js";
 
-      <div class="form-group">
-        <label for="itemTitle">Movement Name</label>
-        <input type="text" id="itemTitle" placeholder="e.g. Dolly Zoom, Dutch Angle" required />
-      </div>
+  // Your Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyCbF3oQKFz0pFVZ5EdOzFbfrqhiWfKsqHk",
+    authDomain: "ai-film-making-7d66f.firebaseapp.com",
+    projectId: "ai-film-making-7d66f",
+    storageBucket: "ai-film-making-7d66f.firebasestorage.app",
+    messagingSenderId: "690131375276",
+    appId: "1:690131375276:web:baae8d4bb47874e5e4bb09",
+    measurementId: "G-MFLLSFB155"
+  };
 
-      <div class="form-group">
-        <label for="itemPrompt">Prompt Formula / Description</label>
-        <textarea id="itemPrompt" rows="3" placeholder="Enter prompt formula..."></textarea>
-      </div>
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
 
-      <div class="form-group">
-        <label for="itemMedia">Upload Media (Image / Video)</label>
-        <input type="file" id="itemMedia" accept="image/*,video/*" required />
-      </div>
+  // DOM Elements
+  const addBtn = document.getElementById("addMovementBtn");
+  const modal = document.getElementById("movementModal");
+  const closeBtn = document.getElementById("closeModalBtn");
+  const movementForm = document.getElementById("movementForm");
+  const uploadStatus = document.getElementById("uploadStatus");
+  const saveBtn = document.getElementById("saveBtn");
 
-      <div id="mediaPreviewContainer" style="margin-top: 10px; display: none;">
-        <label>Preview:</label>
-        <div id="mediaPreview"></div>
-      </div>
+  // Open / Close Modal
+  if (addBtn) {
+    addBtn.addEventListener("click", () => {
+      if (modal) modal.style.display = "flex";
+    });
+  }
 
-      <button type="submit" class="submit-btn" style="margin-top: 15px;">+ Save to Vault</button>
-    </form>
-  </div>
-</div>
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      if (modal) modal.style.display = "none";
+    });
+  }
+
+  window.addEventListener("click", (e) => {
+    if (e.target === modal) modal.style.display = "none";
+  });
+
+  // Handle Form Submission & Upload to Firebase
+  if (movementForm) {
+    movementForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const fileInput = document.getElementById("itemMedia");
+      const file = fileInput.files[0];
+      if (!file) {
+        alert("దయచేసి ఒక ఇమేజ్ లేదా వీడియో ఫైల్‌ను సెలెక్ట్ చేయండి.");
+        return;
+      }
+
+      const category = document.getElementById("itemCategory").value;
+      const title = document.getElementById("itemTitle").value;
+      const prompt = document.getElementById("itemPrompt").value;
+      const mediaType = file.type.startsWith("video") ? "video" : "image";
+
+      try {
+        if (saveBtn) saveBtn.disabled = true;
+        if (uploadStatus) {
+          uploadStatus.style.display = "block";
+          uploadStatus.innerText = "ఫైల్ అప్‌లోడ్ అవుతోంది...";
+        }
+
+        // 1. Upload to Firebase Storage
+        const fileRef = ref(storage, `vault_media/${Date.now()}_${file.name}`);
+        const snapshot = await uploadBytes(fileRef, file);
+        const downloadURL = await getDownloadURL(snapshot.ref);
+
+        if (uploadStatus) uploadStatus.innerText = "డేటాబేస్‌లో సేవ్ అవుతోంది...";
+
+        // 2. Save details to Firestore Database
+        const movementData = {
+          title,
+          category,
+          prompt,
+          mediaURL: downloadURL,
+          mediaType,
+          createdAt: new Date().toISOString()
+        };
+
+        await addDoc(collection(db, "movements"), movementData);
+
+        // Display on screen
+        renderCard(movementData);
+
+        // Reset
+        if (uploadStatus) uploadStatus.style.display = "none";
+        movementForm.reset();
+        if (saveBtn) saveBtn.disabled = false;
+        if (modal) modal.style.display = "none";
+        alert("విజయవంతంగా సేవ్ చేయబడింది!");
+
+      } catch (error) {
+        console.error("Firebase Error:", error);
+        alert("Upload failed: " + error.message);
+        if (uploadStatus) uploadStatus.style.display = "none";
+        if (saveBtn) saveBtn.disabled = false;
+      }
+    });
+  }
+
+  // Display card function
+  function renderCard(item) {
+    const container = document.querySelector("#vaultGrid") || document.querySelector(".cards-container") || document.querySelector(".grid") || document.querySelector("main");
+    if (!container) return;
+
+    const card = document.createElement("div");
+    card.className = "movement-card";
+    card.style.cssText = "background: #111827; border: 1px solid #1f2937; border-radius: 10px; overflow: hidden; margin-bottom: 20px;";
+    card.innerHTML = `
+      <div style="width: 100%; max-height: 250px; overflow: hidden; background: #000;">
+        ${item.mediaType === "video" 
+          ? `<video src="${item.mediaURL}" controls style="width: 100%; display: block;"></video>` 
+          : `<img src="${item.mediaURL}" alt="${item.title}" style="width: 100%; display: block; object-fit: cover;" />`}
+      </div>
+      <div style="padding: 16px;">
+        <span style="font-size: 11px; text-transform: uppercase; color: #00d2ff; font-weight: bold;">${item.category}</span>
+        <h4 style="margin: 6px 0 10px 0; color: #fff; font-size: 16px;">${item.title}</h4>
+        <p style="font-size: 13px; color: #9ca3af; margin: 0; line-height: 1.5;">${item.prompt}</p>
+      </div>
+    `;
+    container.prepend(card);
+  }
+
+  // Load existing cards on page start
+  async function loadMovements() {
+    try {
+      const q = query(collection(db, "movements"), orderBy("createdAt", "desc"));
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((doc) => {
+        renderCard(doc.data());
+      });
+    } catch (err) {
+      console.error("Fetch Error:", err);
+    }
+  }
+
+  loadMovements();
+</script>
 </body>
 </html>
