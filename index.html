@@ -7,7 +7,7 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
@@ -31,7 +31,251 @@
       overflow-x: hidden;
     }
 
-    /* HEADER */
+    /* ============================================================
+       1. CINEMATIC LOGIN & SIGNUP SCREEN (FULLSCREEN GATEWAY)
+       ============================================================ */
+    #authOverlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, #0a1122 0%, #02050e 100%);
+      z-index: 9999999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .auth-card {
+      background: rgba(13, 18, 31, 0.85);
+      border: 1px solid rgba(0, 210, 255, 0.35);
+      box-shadow: 0 0 60px rgba(0, 210, 255, 0.2), inset 0 0 20px rgba(0, 210, 255, 0.05);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 440px;
+      padding: 2.5rem 2rem;
+      backdrop-filter: blur(16px);
+      text-align: center;
+      position: relative;
+    }
+
+    .auth-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .auth-brand .pill {
+      background: rgba(0, 210, 255, 0.15);
+      border: 1px solid #00d2ff;
+      color: #00d2ff;
+      font-size: 0.7rem;
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+    }
+
+    .auth-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+      text-align: left;
+    }
+
+    .auth-field label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 0.4rem;
+    }
+
+    .auth-field input {
+      width: 100%;
+      background: #070c17;
+      border: 1px solid #1e293b;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .auth-field input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .auth-submit-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #00d2ff 0%, #0088cc 100%);
+      color: #040711;
+      font-weight: 800;
+      border: none;
+      padding: 0.85rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: all 0.2s;
+      box-shadow: 0 4px 20px rgba(0, 210, 255, 0.35);
+    }
+
+    .auth-submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(0, 210, 255, 0.55);
+    }
+
+    .auth-toggle-link {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 1.25rem;
+      text-align: center;
+    }
+
+    .auth-toggle-link a {
+      color: var(--accent-cyan);
+      text-decoration: none;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .auth-toggle-link a:hover {
+      text-decoration: underline;
+    }
+
+    /* ============================================================
+       2. WOW 3D CINEMATIC WELCOME SPLASH ANIMATION
+       ============================================================ */
+    #welcomeCinemaStage {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 99999999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      perspective: 1400px;
+      overflow: hidden;
+    }
+
+    .cinema-light-beam {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at center, rgba(0, 210, 255, 0.25) 0%, rgba(251, 191, 36, 0.15) 40%, transparent 75%);
+      mix-blend-mode: screen;
+      filter: blur(40px);
+      animation: pulseLight 3s ease-out forwards;
+    }
+
+    @keyframes pulseLight {
+      0% { opacity: 0; transform: scale(0.6); }
+      40% { opacity: 1; transform: scale(1.2); }
+      80% { opacity: 0.8; }
+      100% { opacity: 0; transform: scale(1.5); }
+    }
+
+    .cinema-scene-3d {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transform-style: preserve-3d;
+      animation: scene3dEntrance 3.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes scene3dEntrance {
+      0% {
+        opacity: 0;
+        transform: scale(0.2) translateZ(-600px) rotateX(25deg);
+        filter: blur(15px);
+      }
+      25% {
+        opacity: 1;
+        filter: blur(0px);
+      }
+      70% {
+        opacity: 1;
+        transform: scale(1.05) translateZ(50px) rotateX(0deg);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(1.6) translateZ(300px);
+        filter: blur(10px);
+      }
+    }
+
+    .cinema-floating-props {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .prop-3d {
+      width: 90px;
+      height: 90px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 25px rgba(0, 210, 255, 0.8));
+      animation: propSpinFloat 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes propSpinFloat {
+      0% { transform: translateY(0px) rotate(-6deg) scale(0.95); }
+      100% { transform: translateY(-12px) rotate(8deg) scale(1.1); }
+    }
+
+    .cinema-text-gold {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 900;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #fff 0%, #00d2ff 50%, #3a7bd5 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 40px rgba(0, 210, 255, 0.7);
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .cinema-text-admin {
+      font-family: 'Cinzel', serif;
+      font-size: 3.8rem;
+      font-weight: 900;
+      letter-spacing: 4px;
+      background: linear-gradient(135deg, #fff275 0%, #e6af2e 50%, #b8860b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 50px rgba(230, 175, 46, 0.8);
+      text-align: center;
+    }
+
+    .cinema-tagline {
+      font-size: 1.1rem;
+      letter-spacing: 4px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      margin-top: 0.8rem;
+      font-weight: 700;
+      text-shadow: 0 0 15px rgba(255,255,255,0.4);
+    }
+
+    /* ============================================================
+       3. MAIN STUDIO INTERFACE
+       ============================================================ */
     header {
       background: rgba(4, 7, 17, 0.95);
       border-bottom: 1px solid var(--border-color);
@@ -51,11 +295,7 @@
       gap: 1.5rem;
     }
 
-    .brand-group {
-      display: flex;
-      align-items: center;
-      gap: 1.25rem;
-    }
+    .brand-group { display: flex; align-items: center; gap: 1.25rem; }
 
     .menu-btn {
       background: transparent;
@@ -212,6 +452,27 @@
 
     .profile-info h4 { font-size: 0.95rem; color: #fff; margin-bottom: 2px; }
     .profile-info p { font-size: 0.78rem; color: var(--accent-cyan); word-break: break-all; }
+
+    .logout-btn {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #f87171;
+      padding: 0.5rem;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover {
+      background: #ef4444;
+      color: #fff;
+    }
 
     /* SIDEBAR DRAWER */
     .sidebar-overlay {
@@ -435,7 +696,6 @@
 
     .cat-tab.active span.count { background: var(--accent-cyan); color: #000; }
 
-    /* REAL 3D PNG ICON THUMBNAIL ANIMATION */
     .cat-3d-img {
       width: 36px;
       height: 36px;
@@ -545,12 +805,7 @@
       border: 1px solid rgba(0, 210, 255, 0.2);
     }
 
-    .card-details h3 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 0.5rem;
-    }
+    .card-details h3 { font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; }
 
     .prompt-box {
       font-size: 0.86rem;
@@ -608,7 +863,7 @@
     }
     #toast.show { visibility: visible; opacity: 1; transform: translateY(0); }
 
-    /* MODAL POPUP */
+    /* MODAL POPUPS */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -644,13 +899,7 @@
 
     .close-btn { background: none; border: none; color: #94a3b8; font-size: 26px; cursor: pointer; }
 
-    .form-group {
-      margin-bottom: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
+    .form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
     .form-group label { font-size: 13px; color: #94a3b8; font-weight: 600; }
 
     .form-group input, .form-group select, .form-group textarea {
@@ -664,9 +913,7 @@
       font-family: inherit;
     }
 
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-      border-color: var(--accent-cyan);
-    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent-cyan); }
 
     .submit-btn {
       width: 100%;
@@ -680,13 +927,7 @@
       font-size: 0.95rem;
     }
 
-    /* 10 CLASSIC THEMES LIST IN MODAL */
-    .themes-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-      margin-top: 15px;
-    }
+    .themes-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
 
     .theme-chip {
       background: rgba(255, 255, 255, 0.04);
@@ -709,9 +950,7 @@
       transform: translateX(4px);
     }
 
-    /* ============================================================
-       CINEMATIC 2-SECOND FULLSCREEN 3D ANIMATION STYLES
-       ============================================================ */
+    /* 2-SEC CINEMATIC CATEGORY ANIMATIONS */
     #cinematicStage {
       position: fixed;
       inset: 0;
@@ -749,7 +988,6 @@
       z-index: 10;
     }
 
-    /* 1. Camera Movement Animation: Trolley Left to Right */
     .dolly-real-rig {
       position: absolute;
       bottom: 22%;
@@ -757,7 +995,6 @@
       animation: realDollyTrack 2s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
       filter: drop-shadow(0 25px 45px rgba(0,0,0,0.9));
     }
-
     .dolly-real-rig img { width: 440px; height: auto; }
 
     @keyframes realDollyTrack {
@@ -766,19 +1003,12 @@
       100% { left: 105vw; transform: scale(0.9); }
     }
 
-    /* 2. Camera Angles Animation: 4 Corners Fast Switch */
-    .angles-real-rig {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-    }
-
+    .angles-real-rig { position: relative; width: 100vw; height: 100vh; }
     .angle-fast-cam {
       position: absolute;
       width: 280px;
       animation: cornerHop 2s steps(1) forwards;
     }
-
     .angle-fast-cam img { width: 100%; filter: drop-shadow(0 0 35px rgba(0, 210, 255, 0.7)); }
 
     @keyframes cornerHop {
@@ -789,18 +1019,13 @@
       100% { top: 50%; left: 50%; transform: translate(-50%, -50%) scale(1.3); }
     }
 
-    /* 3. Camera Shots Animation: Clapper Clap + Reel Spin */
     .clapper-real-rig {
       display: flex;
       flex-direction: column;
       align-items: center;
       animation: clapHit 2s ease-out forwards;
     }
-
-    .clapper-real-rig img {
-      width: 360px;
-      filter: drop-shadow(0 20px 50px rgba(0, 210, 255, 0.6));
-    }
+    .clapper-real-rig img { width: 360px; filter: drop-shadow(0 20px 50px rgba(0, 210, 255, 0.6)); }
 
     @keyframes clapHit {
       0% { transform: scale(0.3) rotate(-25deg); opacity: 0; }
@@ -810,18 +1035,13 @@
       100% { transform: scale(2.2) rotate(45deg); opacity: 0; }
     }
 
-    /* 4. Cinematic Lighting Animation: Barn-door Flash */
     .light-real-rig {
       display: flex;
       flex-direction: column;
       align-items: center;
       animation: studioFlash 2s ease forwards;
     }
-
-    .light-real-rig img {
-      width: 380px;
-      filter: drop-shadow(0 0 65px rgba(251, 191, 36, 0.85));
-    }
+    .light-real-rig img { width: 380px; filter: drop-shadow(0 0 65px rgba(251, 191, 36, 0.85)); }
 
     .light-glare {
       position: absolute;
@@ -845,7 +1065,6 @@
       100% { opacity: 0; }
     }
 
-    /* 5. Atmosphere Animation: Fan Mist Smoke + Day-to-Night + Rain */
     .sky-transition-real {
       position: absolute;
       inset: 0;
@@ -877,7 +1096,6 @@
       align-items: center;
       animation: mistDrift 2s ease forwards;
     }
-
     .smoke-rig-real img { width: 440px; filter: drop-shadow(0 0 45px rgba(56, 189, 248, 0.7)); }
 
     @keyframes mistDrift {
@@ -887,18 +1105,13 @@
       100% { transform: translateX(60px) scale(1.3); opacity: 0; }
     }
 
-    /* 6. Camera Lens Animation: Realtime Zoom-in */
     .lens-real-rig {
       display: flex;
       flex-direction: column;
       align-items: center;
       animation: lensRealZoom 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
-
-    .lens-real-rig img {
-      width: 420px;
-      filter: drop-shadow(0 0 60px rgba(0, 210, 255, 0.9));
-    }
+    .lens-real-rig img { width: 420px; filter: drop-shadow(0 0 60px rgba(0, 210, 255, 0.9)); }
 
     @keyframes lensRealZoom {
       0% { transform: scale(0.3) rotate(-30deg); opacity: 0; }
@@ -928,7 +1141,64 @@
 </head>
 <body>
 
-  <!-- FULLSCREEN 2-SECOND CINEMATIC 3D ANIMATION STAGE -->
+  <!-- ============================================================
+       AUTH MODAL / LOGIN GATEWAY SCREEN
+       ============================================================ -->
+  <div id="authOverlay">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <span>CINEMOTION</span>
+        <span class="pill">STUDIO</span>
+      </div>
+      <p class="auth-subtitle" id="authSubtitle">Sign in to access Master Directors Vault</p>
+
+      <!-- LOGIN FORM -->
+      <form id="loginForm" class="auth-form">
+        <div class="auth-field">
+          <label>Mail Id</label>
+          <input type="email" id="loginEmail" placeholder="Enter your email" required />
+        </div>
+        <div class="auth-field">
+          <label>Password</label>
+          <input type="password" id="loginPassword" placeholder="Enter your password" required />
+        </div>
+        <button type="submit" class="auth-submit-btn">ENTER CINEMOTION</button>
+        <div class="auth-toggle-link">
+          New here? <a onclick="toggleAuthMode('signup')">Create an account</a>
+        </div>
+      </form>
+
+      <!-- SIGN UP FORM -->
+      <form id="signupForm" class="auth-form" style="display: none;">
+        <div class="auth-field">
+          <label>Mail Id</label>
+          <input type="email" id="signupEmail" placeholder="e.g. director@studio.com" required />
+        </div>
+        <div class="auth-field">
+          <label>Password</label>
+          <input type="password" id="signupPassword" placeholder="Create strong password" required />
+        </div>
+        <div class="auth-field">
+          <label>Re-Enter Password</label>
+          <input type="password" id="signupConfirmPassword" placeholder="Confirm your password" required />
+        </div>
+        <button type="submit" class="auth-submit-btn">CREATE VAULT ACCOUNT</button>
+        <div class="auth-toggle-link">
+          Already registered? <a onclick="toggleAuthMode('login')">Sign In here</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       3D CINEMATIC WELCOME SPLASH ANIMATION
+       ============================================================ -->
+  <div id="welcomeCinemaStage">
+    <div class="cinema-light-beam"></div>
+    <div class="cinema-scene-3d" id="welcomeSceneContent"></div>
+  </div>
+
+  <!-- FULLSCREEN 2-SECOND CINEMATIC CATEGORY ANIMATION STAGE -->
   <div id="cinematicStage">
     <div class="stage-backdrop"></div>
     <div class="cinematic-scene" id="cinematicScene"></div>
@@ -946,7 +1216,6 @@
       <button class="close-btn" id="closeSidebarBtn">&times;</button>
     </div>
     <div class="sidebar-menu">
-      <!-- Best 10 Classic Themes Button -->
       <button class="sidebar-item" id="openThemesBtn">
         <i class="fa-solid fa-palette"></i>
         <span>10 Classic Themes</span>
@@ -990,22 +1259,23 @@
         <button class="add-btn" id="addMovementBtn"><i class="fa-solid fa-plus"></i> Add Movement</button>
         
         <div class="profile-pill" id="profilePillBtn">
-          <div class="avatar">BP</div>
+          <div class="avatar" id="headerAvatar">BP</div>
           <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; color: #94a3b8;"></i>
         </div>
 
         <div class="profile-dropdown" id="profileDropdown">
           <div class="profile-dropdown-header">
-            <div class="profile-avatar-large">BP</div>
+            <div class="profile-avatar-large" id="dropdownAvatar">BP</div>
             <div class="profile-info">
-              <h4>Bhanu Pakala</h4>
-              <p>bhanupakala@gmail.com</p>
+              <h4 id="dropdownName">Bhanu Pakala</h4>
+              <p id="dropdownEmail">bhanu.pakala03@gmail.com</p>
             </div>
           </div>
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span class="profile-badge">PRO DIRECTOR</span>
-            <span style="font-size: 11px; color: #94a3b8;">Cinemotion AI</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <span class="tag-badge" id="dropdownBadge">PRO DIRECTOR</span>
+            <span style="font-size: 11px; color: #94a3b8;">Cinemotion Vault</span>
           </div>
+          <button class="logout-btn" onclick="handleLogout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
         </div>
       </div>
     </div>
@@ -1031,7 +1301,7 @@
       </div>
     </section>
 
-    <!-- 3D REALISTIC ICONS CATEGORIES BAR (EXACT PNG IMAGES) -->
+    <!-- 3D REALISTIC ICONS CATEGORIES BAR -->
     <div class="categories-bar">
       
       <!-- All Tab -->
@@ -1158,8 +1428,179 @@
     <span>Prompt copied to clipboard!</span>
   </div>
 
-  <!-- BASE JAVASCRIPT LOGIC -->
+  <!-- CORE LOGIC & AUTH SYSTEM -->
   <script>
+    // ============================================================
+    // AUTHENTICATION LOGIC (ADMIN & USER MANAGEMENT)
+    // ============================================================
+    const ADMIN_CREDENTIALS = {
+      email: "bhanu.pakala03@gmail.com",
+      pass: "Bhanu@338",
+      name: "BHANU PAKALA",
+      role: "ADMIN"
+    };
+
+    function toggleAuthMode(mode) {
+      const loginForm = document.getElementById("loginForm");
+      const signupForm = document.getElementById("signupForm");
+      const authSubtitle = document.getElementById("authSubtitle");
+
+      if (mode === "signup") {
+        loginForm.style.display = "none";
+        signupForm.style.display = "flex";
+        authSubtitle.innerText = "Register your Director Account with Email & Password";
+      } else {
+        signupForm.style.display = "none";
+        loginForm.style.display = "flex";
+        authSubtitle.innerText = "Sign in to access Master Directors Vault";
+      }
+    }
+
+    // SIGN UP EVENT
+    document.getElementById("signupForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("signupEmail").value.trim().toLowerCase();
+      const pass = document.getElementById("signupPassword").value;
+      const confirmPass = document.getElementById("signupConfirmPassword").value;
+
+      if (pass !== confirmPass) {
+        alert("Passwords do not match! Please check again.");
+        return;
+      }
+
+      if (email === ADMIN_CREDENTIALS.email.toLowerCase()) {
+        alert("This email is reserved for Admin.");
+        return;
+      }
+
+      // Store in LocalStorage users list
+      const users = JSON.parse(localStorage.getItem("cinemotionUsers") || "[]");
+      if (users.find(u => u.email === email)) {
+        alert("An account with this email already exists. Please Sign In.");
+        toggleAuthMode("login");
+        return;
+      }
+
+      users.push({ email, pass });
+      localStorage.setItem("cinemotionUsers", JSON.stringify(users));
+
+      alert("Account created successfully! Now enter your Mail ID and Password to Log In.");
+      document.getElementById("signupForm").reset();
+      toggleAuthMode("login");
+      document.getElementById("loginEmail").value = email;
+    });
+
+    // LOGIN EVENT
+    document.getElementById("loginForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("loginEmail").value.trim();
+      const pass = document.getElementById("loginPassword").value;
+
+      // Check Admin
+      if (email.toLowerCase() === ADMIN_CREDENTIALS.email.toLowerCase() && pass === ADMIN_CREDENTIALS.pass) {
+        const sessionUser = {
+          name: "Bhanu Pakala",
+          displayName: ADMIN_CREDENTIALS.name,
+          email: ADMIN_CREDENTIALS.email,
+          role: "ADMIN"
+        };
+        localStorage.setItem("cinemotionSession", JSON.stringify(sessionUser));
+        applyUserProfile(sessionUser);
+        launchCinematicSplash(sessionUser);
+        return;
+      }
+
+      // Check Users
+      const users = JSON.parse(localStorage.getItem("cinemotionUsers") || "[]");
+      const matchedUser = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.pass === pass);
+
+      if (matchedUser) {
+        const sessionUser = {
+          name: email.split("@")[0].toUpperCase(),
+          displayName: email.split("@")[0].toUpperCase(),
+          email: matchedUser.email,
+          role: "CREATOR"
+        };
+        localStorage.setItem("cinemotionSession", JSON.stringify(sessionUser));
+        applyUserProfile(sessionUser);
+        launchCinematicSplash(sessionUser);
+      } else {
+        alert("Invalid Email or Password! Please check your credentials.");
+      }
+    });
+
+    function applyUserProfile(user) {
+      document.getElementById("authOverlay").style.display = "none";
+      const initials = user.role === "ADMIN" ? "BP" : user.name.substring(0, 2).toUpperCase();
+      
+      document.getElementById("headerAvatar").innerText = initials;
+      document.getElementById("dropdownAvatar").innerText = initials;
+      document.getElementById("dropdownName").innerText = user.name;
+      document.getElementById("dropdownEmail").innerText = user.email;
+      document.getElementById("dropdownBadge").innerText = user.role === "ADMIN" ? "MASTER ADMIN" : "AI CREATOR";
+    }
+
+    function handleLogout() {
+      localStorage.removeItem("cinemotionSession");
+      document.getElementById("loginForm").reset();
+      document.getElementById("authOverlay").style.display = "flex";
+      document.getElementById("profileDropdown").classList.remove("show");
+      toggleAuthMode("login");
+    }
+
+    // Check existing active session on load
+    window.addEventListener("DOMContentLoaded", () => {
+      const activeSession = JSON.parse(localStorage.getItem("cinemotionSession") || "null");
+      if (activeSession) {
+        applyUserProfile(activeSession);
+      } else {
+        document.getElementById("authOverlay").style.display = "flex";
+      }
+    });
+
+    // ============================================================
+    // WOW 3D CINEMATIC WELCOME SPLASH ANIMATION
+    // ============================================================
+    function launchCinematicSplash(user) {
+      const stage = document.getElementById("welcomeCinemaStage");
+      const content = document.getElementById("welcomeSceneContent");
+
+      content.innerHTML = "";
+      stage.style.display = "flex";
+
+      if (user.role === "ADMIN") {
+        // ADMIN ANIMATION: Hi, BHANU PAKALA with 3D Cinematic Elements
+        content.innerHTML = `
+          <div class="cinema-floating-props">
+            <img src="Camera-Movement.png" class="prop-3d" alt="Camera">
+            <img src="Camera-Shots.png" class="prop-3d" alt="Clapperboard">
+            <img src="Cinematic -lighting.png" class="prop-3d" alt="Studio Light">
+          </div>
+          <h1 class="cinema-text-admin">HI, BHANU PAKALA</h1>
+          <p class="cinema-tagline">MASTER DIRECTORS VAULT ACTIVATED</p>
+        `;
+      } else {
+        // USER ANIMATION: Welcome to Ai World
+        content.innerHTML = `
+          <div class="cinema-floating-props">
+            <img src="Camera-lens.png" class="prop-3d" alt="Lens">
+            <img src="Atmosphere.png" class="prop-3d" alt="Atmosphere">
+          </div>
+          <h1 class="cinema-text-gold">WELCOME TO AI WORLD</h1>
+          <p class="cinema-tagline">CINEMATIC CREATOR SUITE UNLOCKED</p>
+        `;
+      }
+
+      // Auto-disappear after 3.2 seconds
+      setTimeout(() => {
+        stage.style.display = "none";
+        content.innerHTML = "";
+      }, 3200);
+    }
+
+    // ============================================================
+    // VAULT BASE DATA & ACTIONS
+    // ============================================================
     const defaultMovements = [
       { id: "mov_1", name: "Slow Dolly In", category: "Camera Movement", prompt: "Slow dolly in, camera moves slowly forward toward the subject." },
       { id: "mov_2", name: "Slow Dolly Out", category: "Camera Movement", prompt: "Slow dolly out, camera moves slowly backwards away from the subject." },
@@ -1210,7 +1651,7 @@
     window.allVaultItems = [...defaultMovements];
     let currentCategory = "All";
 
-    // 10 BEST CLASSIC MASTER THEMES ONLY
+    // 10 BEST CLASSIC MASTER THEMES
     const classicThemes = [
       { name: "1. Film Noir Monochrome", tag: "35mm black and white film noir, high contrast, hard shadows, dramatic silhouette" },
       { name: "2. Cyberpunk Neon Dusk", tag: "Blade runner cyberpunk style, cyan and magenta neon rim light, rainy reflections, 8k" },
@@ -1236,7 +1677,7 @@
       themesGrid.appendChild(chip);
     });
 
-    // 2-SECOND FULLSCREEN REAL 3D ANIMATION SYSTEM
+    // 2-SEC REAL 3D ANIMATION SYSTEM ON CATEGORY CLICK
     let animTimeout;
     function triggerCinematicCategory(category, btnElement) {
       filterCategory(category, btnElement);
@@ -1252,66 +1693,20 @@
       stage.style.display = 'flex';
       title.innerText = category;
 
-      // 1. Camera Movement: Trolley Left to Right
       if (category === 'Camera Movement') {
-        scene.innerHTML = `
-          <div class="dolly-real-rig">
-            <img src="Camera-Movement.png" alt="Dolly Camera">
-          </div>
-        `;
-      } 
-      // 2. Camera Angles: Fast 4-Corners Jump
-      else if (category === 'Camera Angles') {
-        scene.innerHTML = `
-          <div class="angles-real-rig">
-            <div class="angle-fast-cam">
-              <img src="Camera-Angles.png" alt="Angle Camera">
-            </div>
-          </div>
-        `;
-      } 
-      // 3. Camera Shots: Clapper Clap & Spin
-      else if (category === 'Camera Shots') {
-        scene.innerHTML = `
-          <div class="clapper-real-rig">
-            <img src="Camera-Shots.png" alt="Clapperboard Slate">
-          </div>
-        `;
-      } 
-      // 4. Cinematic Lighting: Studio Flash & Light Glare
-      else if (category === 'Cinematic Lighting') {
-        scene.innerHTML = `
-          <div class="light-glare"></div>
-          <div class="light-real-rig">
-            <img src="Cinematic -lighting.png" alt="Studio Light">
-          </div>
-        `;
-      } 
-      // 5. Atmosphere: Day to Night + Heavy Rain + Smoke Machine
-      else if (category === 'Atmosphere') {
-        scene.innerHTML = `
-          <div class="sky-transition-real"></div>
-          <div class="rain-real"></div>
-          <div class="smoke-rig-real">
-            <img src="Atmosphere.png" alt="Atmosphere Smoke Fan">
-          </div>
-        `;
-      } 
-      // 6. Camera Lens: Realtime Optical Zoom-In
-      else if (category === 'Camera Lens') {
-        scene.innerHTML = `
-          <div class="lens-real-rig">
-            <img src="Camera-lens.png" alt="Cinema Lens">
-          </div>
-        `;
-      } 
-      else {
-        // "All" Tab: Clapperboard Intro
-        scene.innerHTML = `
-          <div class="clapper-real-rig">
-            <img src="Camera-Shots.png" alt="Cinemotion Vault">
-          </div>
-        `;
+        scene.innerHTML = `<div class="dolly-real-rig"><img src="Camera-Movement.png" alt="Dolly Camera"></div>`;
+      } else if (category === 'Camera Angles') {
+        scene.innerHTML = `<div class="angles-real-rig"><div class="angle-fast-cam"><img src="Camera-Angles.png" alt="Angle Camera"></div></div>`;
+      } else if (category === 'Camera Shots') {
+        scene.innerHTML = `<div class="clapper-real-rig"><img src="Camera-Shots.png" alt="Clapperboard Slate"></div>`;
+      } else if (category === 'Cinematic Lighting') {
+        scene.innerHTML = `<div class="light-glare"></div><div class="light-real-rig"><img src="Cinematic -lighting.png" alt="Studio Light"></div>`;
+      } else if (category === 'Atmosphere') {
+        scene.innerHTML = `<div class="sky-transition-real"></div><div class="rain-real"></div><div class="smoke-rig-real"><img src="Atmosphere.png" alt="Atmosphere Fan"></div>`;
+      } else if (category === 'Camera Lens') {
+        scene.innerHTML = `<div class="lens-real-rig"><img src="Camera-lens.png" alt="Cinema Lens"></div>`;
+      } else {
+        scene.innerHTML = `<div class="clapper-real-rig"><img src="Camera-Shots.png" alt="Vault Active"></div>`;
       }
 
       animTimeout = setTimeout(() => {
@@ -1320,7 +1715,7 @@
       }, 2000);
     }
 
-    // SIDEBAR & MODAL CONTROLS
+    // CONTROLS FOR SIDEBAR & PROFILE
     const sidebarToggleBtn = document.getElementById("sidebarToggleBtn");
     const sidebarDrawer = document.getElementById("sidebarDrawer");
     const sidebarOverlay = document.getElementById("sidebarOverlay");
@@ -1356,7 +1751,6 @@
       };
     }
 
-    // PROFILE DROPDOWN
     const profilePillBtn = document.getElementById("profilePillBtn");
     const profileDropdown = document.getElementById("profileDropdown");
 
@@ -1376,7 +1770,7 @@
       }
     });
 
-    /* IndexedDB for persisting manual video clips in browser */
+    // INDEXEDDB LOCAL STORAGE FOR MANUAL VIDEO UPLOADS
     let dbLocal;
     const request = indexedDB.open("CinemotionPersistDB", 1);
     request.onupgradeneeded = (e) => {
