@@ -831,7 +831,7 @@
     <main class="movements-grid" id="movementsGrid"></main>
   </div>
 
-  <!-- LIGHTBOX (POPS UP WITH EMBEDDED YOUTUBE/VIDEO/IMAGE) -->
+  <!-- LIGHTBOX -->
   <div id="mediaLightbox">
     <div class="lightbox-box">
       <div class="lightbox-header">
@@ -952,7 +952,6 @@
 
   <!-- SCRIPT -->
   <script>
-    // 44 Core Movements (YouTube link removed from 'Slow Dolly In', option remains preserved)
     const defaultMovements = [
       { 
         id: "mov_1", 
@@ -1005,7 +1004,6 @@
       { id: "mov_44", name: "Worm's Eye Tracking (Ground Level)", category: "Camera Movement", prompt: "Worm's eye view, low angle tracking, camera moves along the ground looking up." }
     ];
 
-    // 12 Camera Angles
     const cameraAnglesFromPdf = [
       { id: "ang_1", name: "Eye-level Angle", category: "Camera Angles", prompt: "Eye-level angle, camera positioned at subject eye height, natural, neutral, realistic perspective, 8k" },
       { id: "ang_2", name: "Low Angle", category: "Camera Angles", prompt: "Low angle shot, camera looking upward at the subject, commanding power, dominance, grandeur, cinematic" },
@@ -1021,7 +1019,6 @@
       { id: "ang_12", name: "Point-Of-View (POV)", category: "Camera Angles", prompt: "Point-of-view POV shot, camera represents first-person character vision, immersive perspective, subjective participation" }
     ];
 
-    // 15 Camera Shots
     const cameraShotsFromPdf = [
       { id: "sht_1", name: "Extreme Long Shot (ELS) / Extreme Wide Shot (EWS)", category: "Camera Shots", prompt: "Extreme long shot ELS, extreme wide shot EWS, vast expansive landscape, subject appearing very small in distance, establish scale, atmosphere, and location, 8k" },
       { id: "sht_2", name: "Long Shot (LS) / Wide Shot (WS)", category: "Camera Shots", prompt: "Long shot LS, wide shot WS, full body of the subject in modern geometric architectural hall, substantial surroundings, movement and body language, cinematic" },
@@ -1040,7 +1037,6 @@
       { id: "sht_15", name: "Tight Close-Up (TCU)", category: "Camera Shots", prompt: "Tight close-up TCU, tightly framed around eyes, nose, and lips, emotional vulnerability, intimacy and intense dramatic cinematic impact" }
     ];
 
-    // 60 Atmosphere Themes
     const atmosphereThemesFromPdf = [
       { id: "atm_1", name: "Golden Hour Glow", category: "Atmosphere", prompt: "Golden Hour Glow, soft warm golden sunlight at sunrise or sunset, cinematic lighting, 8k" },
       { id: "atm_2", name: "Blue Hour Twilight", category: "Atmosphere", prompt: "Blue Hour Twilight, cool deep blue atmospheric tones, early dawn or late dusk, moody ambience" },
@@ -1104,7 +1100,6 @@
       { id: "atm_60", name: "Cinematic Drone Landscape", category: "Atmosphere", prompt: "Cinematic Drone Landscape, high-altitude aerial view of winding coastal cliff road at sunrise" }
     ];
 
-    // 5 Master Prompts
     const masterPromptsList = [
       {
         id: "mst_1",
@@ -1194,7 +1189,7 @@
       });
     }
 
-    /* INDEXED-DB PERSISTENCE (FOR MEDIA & CUSTOM PROMPT EDITS) */
+    /* INDEXED-DB PERSISTENCE */
     let localDB;
     const dbReq = indexedDB.open("CinemotionMediaDB", 12);
     dbReq.onupgradeneeded = (e) => {
@@ -1240,7 +1235,6 @@
       'Master Prompts': 'Master-prompt.png'
     };
 
-    // Helper: extract YouTube Embed URL
     function getYoutubeEmbedUrl(url) {
       if (!url) return null;
       let videoId = null;
@@ -1280,7 +1274,6 @@
                 <i class="fa-solid fa-cloud-arrow-up cloud-icon"></i>
                 <span class="upload-txt">Click, Drag & Drop or Paste Media (Ctrl+V)</span>
               </div>
-              <!-- Social Media Link Button In Red Circle Area -->
               <div class="link-upload-pill" onclick="openLinkModal('${item.id}', event)">
                 <i class="fa-solid fa-link"></i>
                 <span>Paste Link (YT / Insta / FB)</span>
@@ -1312,7 +1305,6 @@
 
               <h3 id="title_${item.id}">${item.name}</h3>
               
-              <!-- PROMPT WRAPPER WITH IN-PLACE 3D CATEGORY ICON ANIMATION -->
               <div class="prompt-wrapper" id="prompt_wrap_${item.id}">
                 <div class="prompt-content" id="content_${item.id}">
                   <p class="prompt-box" id="text_${item.id}">${item.prompt}</p>
@@ -1321,7 +1313,6 @@
                   </button>
                 </div>
                 
-                <!-- In-Place 3D Category Icon Animated Banner -->
                 <div class="copied-cinematic-badge" id="copied_badge_${item.id}">
                   <img src="${iconSrc}" class="copied-cat-3d-img" alt="${item.category}" onerror="this.src='Camera-Movement.png'">
                   <span>COPIED!</span>
@@ -1509,7 +1500,6 @@
 
     // CLIPBOARD PASTE SUPPORT (IMAGE / VIDEO)
     window.addEventListener('paste', (e) => {
-      // Input/Textarea లో టైప్ చేస్తున్నప్పుడు పేస్ట్‌ను అడ్డుకోకూడదు
       const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
       if (activeTag === 'input' || activeTag === 'textarea') return;
 
@@ -1522,7 +1512,6 @@
           const pastedFile = item.getAsFile();
           if (pastedFile) {
             e.preventDefault();
-            // ఒకవేళ మౌస్ ఏదైనా కార్డు పైన ఉంటే దానికి, లేదా మొదటి కార్డుకు అసైన్ చేస్తుంది
             const targetId = window.hoveredCardId || (window.allVaultItems && window.allVaultItems[0] ? window.allVaultItems[0].id : null);
             if (targetId) {
               processUploadedFile(targetId, pastedFile);
@@ -1535,17 +1524,25 @@
 
     function processUploadedFile(id, file) {
       const type = file.type.startsWith('video') ? 'video' : 'image';
+      
+      // 1. UI Display
       applyMediaToCard(id, file, type);
 
+      // 2. Local Cache (IndexedDB)
       if (localDB) {
         const tx = localDB.transaction("cardMedia", "readwrite");
         tx.objectStore("cardMedia").put({ id: id, fileBlob: file, fileType: type, fileName: file.name });
       }
 
-      const toast = document.getElementById('toast');
-      toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Media Attached Successfully!</span>`;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2000);
+      // 3. Cloud Database (Firebase)
+      if (window.uploadPastedMediaToFirebase) {
+        window.uploadPastedMediaToFirebase(id, file, type);
+      } else {
+        const toast = document.getElementById('toast');
+        toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Media Uploaded Locally!</span>`;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+      }
     }
 
     window.cardActiveBlobs = {};
@@ -1698,7 +1695,7 @@
       }
     };
 
-    // LIGHTBOX POPUP PLAYER (PLAYS YOUTUBE EMBED OR UPLOADED VIDEO ON SCREEN)
+    // LIGHTBOX POPUP PLAYER
     const mediaLightbox = document.getElementById("mediaLightbox");
     const lightboxStage = document.getElementById("lightboxStage");
     const lightboxTitle = document.getElementById("lightboxTitle");
@@ -1781,7 +1778,6 @@
       };
     }
 
-    // COUNTS & FILTER
     function updateCounts() {
       const catCounts = {
         'Camera Movement': 0, 'Camera Angles': 0, 'Camera Shots': 0, 'Cinematic Lighting': 0, 'Atmosphere': 0, 'Camera Lens': 0, 'Master Prompts': 0
@@ -1837,7 +1833,6 @@
       alert("Opening Visual Prompts Library: 136 Director Prompts Loaded.");
     }
 
-    // 2-SECOND FULLSCREEN CATEGORY ANIMATION
     let animTimeout;
     function triggerCinematicCategory(category, btnElement) {
       filterCategory(category, btnElement);
@@ -1905,7 +1900,6 @@
       }, 2000);
     }
 
-    // SIDEBAR & PROFILE CONTROLS
     const sidebarToggleBtn = document.getElementById("sidebarToggleBtn");
     const sidebarDrawer = document.getElementById("sidebarDrawer");
     const sidebarOverlay = document.getElementById("sidebarOverlay");
@@ -1967,6 +1961,34 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const storage = getStorage(app);
+
+    // Direct Paste/Drop Media Firebase Cloud Sync
+    window.uploadPastedMediaToFirebase = async function(cardId, file, type) {
+      const toast = document.getElementById('toast');
+      toast.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Saving to Cloud Database...</span>`;
+      toast.classList.add('show');
+
+      try {
+        const fileRef = ref(storage, `vault_media/${cardId}_${Date.now()}_${file.name || 'pasted-media'}`);
+        const snapshot = await uploadBytes(fileRef, file);
+        const downloadURL = await getDownloadURL(snapshot.ref);
+
+        await addDoc(collection(db, "movements"), {
+          linkedCardId: cardId,
+          mediaURL: downloadURL,
+          mediaType: type,
+          fileName: file.name || 'clipboard-media',
+          updatedAt: new Date().toISOString()
+        });
+
+        toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Saved to Firebase Database!</span>`;
+        setTimeout(() => toast.classList.remove('show'), 2500);
+      } catch (err) {
+        console.error("Firebase upload error:", err);
+        toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Saved Locally (Cloud sync failed)</span>`;
+        setTimeout(() => toast.classList.remove('show'), 3000);
+      }
+    };
 
     const addMovementBtn = document.getElementById("addMovementBtn");
     const movementModal = document.getElementById("movementModal");
@@ -2044,7 +2066,16 @@
         const snapshot = await getDocs(q);
         const firebaseItems = [];
         snapshot.forEach(doc => {
-          firebaseItems.push({ id: doc.id, ...doc.data() });
+          const data = doc.data();
+          if (data.name) {
+            firebaseItems.push({ id: doc.id, ...data });
+          } else if (data.linkedCardId && data.mediaURL) {
+            const existing = window.allVaultItems.find(m => m.id === data.linkedCardId);
+            if (existing) {
+              existing.mediaURL = data.mediaURL;
+              existing.mediaType = data.mediaType;
+            }
+          }
         });
         if (firebaseItems.length > 0) {
           window.allVaultItems = [...firebaseItems, ...defaultMovements, ...cameraAnglesFromPdf, ...cameraShotsFromPdf, ...atmosphereThemesFromPdf, ...masterPromptsList];
