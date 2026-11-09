@@ -352,17 +352,22 @@
       transform: scale(1.04);
     }
 
+    /* UPLOAD OVERLAY (HIDDEN COMPLETELY ONCE MEDIA LOADED) */
     .upload-overlay {
       position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
       gap: 0.5rem; background: rgba(8, 12, 22, 0.75); border: 2px dashed rgba(0, 210, 255, 0.3); border-radius: 10px;
       margin: 8px; transition: all 0.25s ease;
     }
+    .card-video-box.has-media .upload-overlay {
+      display: none !important;
+    }
     .card-video-box.drag-over .upload-overlay {
+      display: flex !important;
       background: rgba(0, 210, 255, 0.18);
       border-color: var(--accent-cyan);
       box-shadow: 0 0 18px var(--accent-glow);
     }
-    .card-video-box:hover .upload-overlay { 
+    .card-video-box:not(.has-media):hover .upload-overlay { 
       background: rgba(0, 0, 0, 0.55); 
       border-color: rgba(0, 210, 255, 0.8);
     }
@@ -371,7 +376,7 @@
     .upload-overlay .drag-sub { font-size: 0.7rem; color: var(--text-muted); font-weight: 400; }
     .file-input { display: none; }
 
-    /* CARD DETAILS & ACTION BUTTONS IN CARD META */
+    /* CARD DETAILS & ACTION BUTTONS */
     .card-details { padding: 1.25rem; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; gap: 1rem; }
     
     .card-meta { 
@@ -386,7 +391,7 @@
       background: rgba(0, 210, 255, 0.08); padding: 0.2rem 0.5rem; border-radius: 6px; border: 1px solid rgba(0, 210, 255, 0.2);
     }
 
-    /* 1ST BOX (DOWNLOAD) & 2ND BOX (DELETE) IN CARD META ROW */
+    /* 3 ACTION BOXES IN CARD META: EDIT (PENCIL) + DOWNLOAD + DELETE */
     .card-meta-actions {
       display: flex;
       align-items: center;
@@ -394,8 +399,8 @@
     }
 
     .meta-action-btn {
-      width: 32px;
-      height: 32px;
+      width: 30px;
+      height: 30px;
       border-radius: 8px;
       border: 1px solid rgba(255, 255, 255, 0.12);
       background: rgba(255, 255, 255, 0.04);
@@ -412,7 +417,15 @@
       transform: translateY(-2px);
     }
 
-    /* 1st box: Download button styling */
+    /* Edit (Pencil) Button */
+    .meta-action-btn.edit-btn:hover {
+      border-color: #f59e0b;
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.15);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+    }
+
+    /* Download Button */
     .meta-action-btn.dl-btn:hover {
       border-color: var(--accent-cyan);
       color: var(--accent-cyan);
@@ -420,7 +433,7 @@
       box-shadow: 0 0 12px rgba(0, 210, 255, 0.35);
     }
 
-    /* 2nd box: Delete button styling */
+    /* Delete Button */
     .meta-action-btn.del-btn:hover {
       border-color: #ef4444;
       color: #ef4444;
@@ -435,7 +448,7 @@
       border: 1px solid rgba(255, 255, 255, 0.04); padding: 0.75rem; border-radius: 8px;
     }
 
-    /* FULL-WIDTH COPY PROMPT BUTTON (DOWNLOAD REMOVED FROM HERE) */
+    /* FULL-WIDTH COPY PROMPT BUTTON */
     .copy-btn {
       width: 100%;
       background: linear-gradient(135deg, #00d2ff 0%, #0099cc 100%); 
@@ -881,7 +894,6 @@
         <span class="count" id="count_Cinematic_Lighting">0</span>
       </button>
 
-      <!-- Atmosphere Category with 60 PDF Themes -->
       <button class="cat-tab" onclick="triggerCinematicCategory('Atmosphere', this)">
         <img src="Atmosphere.png" class="cat-3d-img" alt="Atmosphere">
         <span>Atmosphere</span>
@@ -901,9 +913,7 @@
 
   </div>
 
-  <!-- ============================================================
-       CINEMATIC LIGHTBOX MODAL (EXPANDED PREVIEW + DOWNLOAD)
-       ============================================================ -->
+  <!-- CINEMATIC LIGHTBOX MODAL -->
   <div id="mediaLightbox">
     <div class="lightbox-box">
       <div class="lightbox-header">
@@ -1149,9 +1159,9 @@
       });
     }
 
-    /* INDEXED-DB PERSISTENCE FOR LOCAL DRAG & DROP MEDIA */
+    /* INDEXED-DB PERSISTENCE */
     let localDB;
-    const dbReq = indexedDB.open("CinemotionMediaDB", 2);
+    const dbReq = indexedDB.open("CinemotionMediaDB", 3);
     dbReq.onupgradeneeded = (e) => {
       localDB = e.target.result;
       if (!localDB.objectStoreNames.contains("cardMedia")) {
@@ -1165,7 +1175,7 @@
 
     const grid = document.getElementById('movementsGrid');
 
-    // RENDER MOVEMENTS GRID (DOWNLOAD & DELETE IN CARD META ROW)
+    // RENDER MOVEMENTS GRID (WITH EDIT/PENCIL, DOWNLOAD, AND DELETE IN META ROW)
     function renderCards(list) {
       if (!grid) return;
       grid.innerHTML = list.map(item => `
@@ -1179,6 +1189,7 @@
             <video id="vid_${item.id}" autoplay loop muted playsinline></video>
             <img id="img_${item.id}" alt="${item.name}">
 
+            <!-- Upload Box (Hidden when media is active) -->
             <div class="upload-overlay" id="overlay_${item.id}" onclick="triggerFileInput(event, '${item.id}')">
               <i class="fa-solid fa-cloud-arrow-up"></i>
               <span>Click or Drag & Drop Media</span>
@@ -1190,11 +1201,15 @@
 
           <div class="card-details">
             <div>
-              <!-- CARD META ROW: CATEGORY + 1ST BOX (DOWNLOAD) + 2ND BOX (DELETE) -->
               <div class="card-meta">
                 <span class="tag-badge">${item.category || 'Movement'}</span>
                 
                 <div class="card-meta-actions">
+                  <!-- Edit (Pencil) Button -->
+                  <button type="button" class="meta-action-btn edit-btn" title="Change/Upload Media" onclick="editCardMedia('${item.id}', event)">
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+
                   <!-- 1st Box: Download Button -->
                   <button type="button" class="meta-action-btn dl-btn" title="Download Media" onclick="downloadCardMedia('${item.id}', '${item.name.replace(/'/g, "\\'")}', event)">
                     <i class="fa-solid fa-download"></i>
@@ -1211,7 +1226,6 @@
               <p class="prompt-box">${item.prompt}</p>
             </div>
             
-            <!-- FULL-WIDTH COPY PROMPT BUTTON -->
             <button class="copy-btn" onclick="copyPromptText('${item.prompt.replace(/'/g, "\\'")}')">
               <i class="fa-solid fa-copy"></i> Copy Prompt
             </button>
@@ -1299,9 +1313,11 @@
       const url = URL.createObjectURL(blobOrFile);
       window.cardActiveBlobs[id] = { url: url, type: type, raw: blobOrFile };
 
+      const box = document.getElementById(`box_${id}`);
       const vid = document.getElementById(`vid_${id}`);
       const img = document.getElementById(`img_${id}`);
-      const overlay = document.getElementById(`overlay_${id}`);
+
+      if (box) box.classList.add('has-media');
 
       if (type === 'video') {
         if (img) img.classList.remove('active-media');
@@ -1317,19 +1333,15 @@
           img.classList.add('active-media');
         }
       }
-
-      if (overlay) {
-        overlay.style.opacity = '0';
-        overlay.onmouseenter = () => overlay.style.opacity = '1';
-        overlay.onmouseleave = () => overlay.style.opacity = '0';
-      }
     }
 
     function applyMediaUrlToCard(id, mediaURL, type) {
       window.cardActiveBlobs[id] = { url: mediaURL, type: type };
+      const box = document.getElementById(`box_${id}`);
       const vid = document.getElementById(`vid_${id}`);
       const img = document.getElementById(`img_${id}`);
-      const overlay = document.getElementById(`overlay_${id}`);
+
+      if (box) box.classList.add('has-media');
 
       if (type === 'video') {
         if (img) img.classList.remove('active-media');
@@ -1345,13 +1357,16 @@
           img.classList.add('active-media');
         }
       }
-
-      if (overlay) {
-        overlay.style.opacity = '0';
-        overlay.onmouseenter = () => overlay.style.opacity = '1';
-        overlay.onmouseleave = () => overlay.style.opacity = '0';
-      }
     }
+
+    // ============================================================
+    // EDIT (PENCIL) BUTTON ACTION
+    // ============================================================
+    window.editCardMedia = function(id, event) {
+      if (event) event.stopPropagation();
+      const input = document.getElementById(`input_${id}`);
+      if (input) input.click();
+    };
 
     // ============================================================
     // 1ST BOX: DOWNLOAD ACTION
@@ -1398,16 +1413,16 @@
       if (confirm("Are you sure you want to delete this media?")) {
         delete window.cardActiveBlobs[id];
 
-        // Remove from IndexedDB
         if (localDB) {
           const tx = localDB.transaction("cardMedia", "readwrite");
           tx.objectStore("cardMedia").delete(id);
         }
 
-        // Reset visual elements
+        const box = document.getElementById(`box_${id}`);
         const vid = document.getElementById(`vid_${id}`);
         const img = document.getElementById(`img_${id}`);
-        const overlay = document.getElementById(`overlay_${id}`);
+
+        if (box) box.classList.remove('has-media');
 
         if (vid) {
           vid.pause();
@@ -1419,11 +1434,6 @@
           img.removeAttribute('src');
           img.classList.remove('active-media');
         }
-        if (overlay) {
-          overlay.style.opacity = '1';
-          overlay.onmouseenter = null;
-          overlay.onmouseleave = null;
-        }
 
         const toast = document.getElementById('toast');
         toast.innerHTML = `<i class="fa-solid fa-trash"></i> <span>Media Deleted!</span>`;
@@ -1433,7 +1443,7 @@
     };
 
     // ============================================================
-    // LIGHTBOX EXPANDED POPUP SYSTEM
+    // LIGHTBOX EXPANDED POPUP SYSTEM (ONLY TRIGGERS IF MEDIA EXISTS)
     // ============================================================
     const mediaLightbox = document.getElementById("mediaLightbox");
     const lightboxStage = document.getElementById("lightboxStage");
@@ -1450,6 +1460,7 @@
       const item = window.allVaultItems.find(m => m.id === id);
 
       if (!media || !media.url) {
+        // If empty card, click opens file picker directly
         const input = document.getElementById(`input_${id}`);
         if (input) input.click();
         return;
