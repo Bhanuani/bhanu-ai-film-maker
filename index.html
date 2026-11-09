@@ -1216,12 +1216,12 @@
       return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0` : null;
     }
 
-    // Google Drive Direct Stream URL (HTML5 Continuous Loop)
-    function getDriveDirectStreamUrl(url) {
+    // Google Drive Iframe Preview URL
+    function getDriveEmbedUrl(url) {
       if (!url) return null;
       const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
       if (match && match[1]) {
-        return `https://drive.google.com/uc?export=download&id=${match[1]}`;
+        return `https://drive.google.com/file/d/${match[1]}/preview`;
       }
       return null;
     }
@@ -1573,16 +1573,12 @@
           yt.classList.add('active-media');
         }
       } else if (isDrive) {
-        // Google Drive Continuous Loop Video
+        // Google Drive Iframe Preview Player (100% Works without CORS issue)
         if (img) img.classList.remove('active-media');
-        if (yt) yt.classList.remove('active-media');
-        if (vid) {
-          vid.src = getDriveDirectStreamUrl(mediaURL);
-          vid.loop = true;
-          vid.muted = true;
-          vid.playsInline = true;
-          vid.classList.add('active-media');
-          vid.play().catch(e => console.log("Drive direct stream play:", e));
+        if (vid) vid.classList.remove('active-media');
+        if (yt) {
+          yt.src = getDriveEmbedUrl(mediaURL);
+          yt.classList.add('active-media');
         }
       } else if (type === 'video') {
         if (img) img.classList.remove('active-media');
@@ -1725,13 +1721,11 @@
         iframe.allowFullscreen = true;
         lightboxStage.appendChild(iframe);
       } else if (isDrive) {
-        const v = document.createElement('video');
-        v.src = getDriveDirectStreamUrl(media.url);
-        v.controls = true;
-        v.autoplay = true;
-        v.loop = true;
-        v.playsInline = true;
-        lightboxStage.appendChild(v);
+        const iframe = document.createElement('iframe');
+        iframe.src = getDriveEmbedUrl(media.url);
+        iframe.allow = "autoplay";
+        iframe.allowFullscreen = true;
+        lightboxStage.appendChild(iframe);
       } else if (media.type === 'video') {
         const v = document.createElement('video');
         v.src = media.url;
