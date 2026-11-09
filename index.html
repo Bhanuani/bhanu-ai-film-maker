@@ -243,7 +243,7 @@
     /* VAULT LAYOUT */
     .vault-container { max-width: 1440px; margin: 0 auto; padding: 1.5rem 2rem 5rem; }
 
-    /* EXPANDED HERO BANNER (NO TEXT, CLEAN VIDEO FIT) */
+    /* EXPANDED HERO BANNER (NO TEXT) */
     .hero-banner-wrapper {
       position: relative;
       background: #000;
@@ -356,9 +356,8 @@
       100% { transform: translateY(-4px) rotate(3deg); }
     }
 
-    /* MASTER PROMPTS SPECIFIC ANIMATION ON HOVER & TAB */
+    /* MASTER PROMPTS ICON ANIMATION (CIRCLE REMOVED, ICON ONLY) */
     .master-icon-wrap {
-      position: relative;
       width: 36px;
       height: 36px;
       display: inline-flex;
@@ -366,38 +365,17 @@
       justify-content: center;
     }
 
-    .master-icon-wrap .neon-ring {
-      position: absolute;
-      inset: -4px;
-      border-radius: 50%;
-      border: 2px dashed #00d2ff;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
-    }
-
-    .cat-tab:hover .master-icon-wrap .neon-ring,
-    .cat-tab.active .master-icon-wrap .neon-ring {
-      opacity: 1;
-      animation: neonRingSpin 2s linear infinite;
-      box-shadow: 0 0 12px var(--accent-cyan);
-    }
-
     .cat-tab:hover .master-icon-wrap img,
     .cat-tab.active .master-icon-wrap img {
       animation: penWriteTilt 1.2s ease-in-out infinite alternate;
-    }
-
-    @keyframes neonRingSpin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      filter: drop-shadow(0 0 14px rgba(0, 210, 255, 0.85));
     }
 
     @keyframes penWriteTilt {
-      0% { transform: rotate(0deg) translate(0, 0); }
-      30% { transform: rotate(-8deg) translate(-2px, -1px); }
-      70% { transform: rotate(6deg) translate(2px, 1px); }
-      100% { transform: rotate(-4deg) translate(-1px, 2px); }
+      0% { transform: scale(1.2) rotate(0deg) translate(0, 0); }
+      30% { transform: scale(1.25) rotate(-9deg) translate(-2px, -1px); }
+      70% { transform: scale(1.22) rotate(7deg) translate(2px, 1px); }
+      100% { transform: scale(1.25) rotate(-4deg) translate(-1px, 2px); }
     }
 
     /* GRID & CARDS */
@@ -427,7 +405,6 @@
       transform: scale(1.04);
     }
 
-    /* UPLOAD OVERLAY - HIDDEN COMPLETELY ONCE MEDIA LOADED */
     .upload-overlay {
       position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
       gap: 0.5rem; background: rgba(8, 12, 22, 0.75); border: 2px dashed rgba(0, 210, 255, 0.3); border-radius: 10px;
@@ -740,7 +717,7 @@
       100% { transform: scale(1.8) rotate(15deg); opacity: 0; }
     }
 
-    /* MASTER PROMPTS 2-SECOND FULLSCREEN ANIMATION */
+    /* MASTER PROMPTS SCREEN ANIMATION (ICON ONLY WRITING) */
     .master-screen-rig {
       display: flex;
       flex-direction: column;
@@ -748,22 +725,11 @@
       animation: masterWriteAction 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    .master-screen-rig .screen-ring-outer {
-      position: absolute;
-      width: 320px;
-      height: 320px;
-      border-radius: 50%;
-      border: 4px dashed #00d2ff;
-      animation: neonRingSpin 2s linear infinite;
-      box-shadow: 0 0 50px rgba(0, 210, 255, 0.6);
-    }
-
     .master-screen-rig img {
-      width: 240px;
-      height: 240px;
+      width: 250px;
+      height: 250px;
       object-fit: contain;
-      z-index: 2;
-      filter: drop-shadow(0 0 35px rgba(0, 210, 255, 0.9));
+      filter: drop-shadow(0 0 40px rgba(0, 210, 255, 0.95));
       animation: penWriteTilt 1.2s ease-in-out infinite alternate;
     }
 
@@ -825,7 +791,7 @@
 
     @keyframes glarePuff { 0% { opacity: 0; } 25% { opacity: 1; } 80% { opacity: 0.8; } 100% { opacity: 0; } }
 
-    /* SEASON LAPSE ANIMATION (REPLACED RAIN EFFECT) */
+    /* SEASON LAPSE ANIMATION */
     .season-sky-lapse {
       position: absolute;
       inset: 0;
@@ -991,7 +957,7 @@
       </div>
     </section>
 
-    <!-- 3D REALISTIC ICONS CATEGORIES BAR (CAPITALIZED FIRST LETTERS) -->
+    <!-- 3D REALISTIC ICONS CATEGORIES BAR -->
     <div class="categories-bar">
       
       <!-- All Tab -->
@@ -1048,10 +1014,9 @@
         <span class="count" id="count_Camera_Lens">0</span>
       </button>
 
-      <!-- NEW: Master Prompts -->
+      <!-- Master Prompts (Icon Only Writing Motion) -->
       <button class="cat-tab" onclick="triggerCinematicCategory('Master Prompts', this)">
         <span class="master-icon-wrap">
-          <span class="neon-ring"></span>
           <img src="Master-prompt.png" class="cat-3d-img" alt="Master Prompts">
         </span>
         <span>Master Prompts</span>
@@ -1200,7 +1165,7 @@
       { id: "mov_44", name: "Worm's Eye Tracking (Ground Level)", category: "Camera Movement", prompt: "Worm's eye view, low angle tracking, camera moves along the ground looking up." }
     ];
 
-    // 12 CAMERA ANGLES (FROM CAMERA ANGLES.PDF)
+    // 12 CAMERA ANGLES (FROM CAMERA ANGLES.PDF)[cite: 47, 48, 49, 50, 51]
     const cameraAnglesFromPdf = [
       { id: "ang_1", name: "Eye-level Angle", category: "Camera Angles", prompt: "Eye-level angle, camera positioned at subject eye height, natural, neutral, realistic perspective, 8k" },
       { id: "ang_2", name: "Low Angle", category: "Camera Angles", prompt: "Low angle shot, camera looking upward at the subject, commanding power, dominance, grandeur, cinematic" },
@@ -1216,7 +1181,7 @@
       { id: "ang_12", name: "Point-Of-View (POV)", category: "Camera Angles", prompt: "Point-of-view POV shot, camera represents first-person character vision, immersive perspective, subjective participation" }
     ];
 
-    // 60 ATMOSPHERE THEMES FROM PDF
+    // 60 ATMOSPHERE THEMES FROM PDF[cite: 15]
     const atmosphereThemesFromPdf = [
       { id: "atm_1", name: "Golden Hour Glow", category: "Atmosphere", prompt: "Golden Hour Glow, soft warm golden sunlight at sunrise or sunset, cinematic lighting, 8k" },
       { id: "atm_2", name: "Blue Hour Twilight", category: "Atmosphere", prompt: "Blue Hour Twilight, cool deep blue atmospheric tones, early dawn or late dusk, moody ambience" },
@@ -1356,6 +1321,7 @@
             <video id="vid_${item.id}" autoplay loop muted playsinline></video>
             <img id="img_${item.id}" alt="${item.name}">
 
+            <!-- Upload Box (Hidden when media is active) -->
             <div class="upload-overlay" id="overlay_${item.id}" onclick="triggerFileInput(event, '${item.id}')">
               <i class="fa-solid fa-cloud-arrow-up"></i>
               <span>Click or Drag & Drop Media</span>
@@ -1726,7 +1692,7 @@
       alert("Opening Visual Prompts Library: 116 Director Prompts Loaded.");
     }
 
-    // 2-SECOND CATEGORY ANIMATION STAGE (ALL ICONS ON ALL TAB, MASTER PROMPTS WRITE & SPIN)
+    // 2-SECOND CATEGORY ANIMATION STAGE
     let animTimeout;
     function triggerCinematicCategory(category, btnElement) {
       filterCategory(category, btnElement);
@@ -1743,7 +1709,6 @@
       title.innerText = category;
 
       if (category === 'All') {
-        // BURST ALL 3D ICONS ACROSS SCREEN
         scene.innerHTML = `
           <div class="all-icons-grid">
             <img src="Camera-Movement.png" alt="Movement">
@@ -1756,10 +1721,8 @@
           </div>
         `;
       } else if (category === 'Master Prompts') {
-        // MASTER PROMPTS BLUE RING SPIN & WRITING PEN
         scene.innerHTML = `
           <div class="master-screen-rig">
-            <div class="screen-ring-outer"></div>
             <img src="Master-prompt.png" alt="Master Prompts Writing">
           </div>
         `;
@@ -1772,7 +1735,6 @@
       } else if (category === 'Cinematic Lighting') {
         scene.innerHTML = `<div class="light-glare"></div><div class="light-real-rig"><img src="Cinematic -lighting.png" alt="Studio Light"></div>`;
       } else if (category === 'Atmosphere') {
-        // Season Lapse Animation (Spring -> Summer -> Autumn -> Winter)
         scene.innerHTML = `
           <div class="season-sky-lapse"></div>
           <div class="smoke-rig-real"><img src="Atmosphere.png" alt="Atmosphere Fan"></div>
