@@ -241,18 +241,13 @@
       margin-left: auto; background: var(--accent-cyan); color: #000; font-size: 0.72rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 999px;
     }
 
-    /* FULL-WIDTH RESPONSIVE VAULT CONTAINER */
+    /* VAULT LAYOUT */
     .vault-container { 
       max-width: 98%; 
       margin: 0 auto; 
       padding: 1.5rem 1rem 5rem; 
     }
 
-    /* ============================================================
-       SOLUTION 2: CINEMATIC AMBIENT GLOW BANNER
-       Background = 100% blurred video glow filling left & right gaps
-       Foreground = Sharp 100% uncropped video with full details
-       ============================================================ */
     .hero-banner-wrapper {
       position: relative; 
       background: #000; 
@@ -275,10 +270,9 @@
       box-shadow: 0 0 70px rgba(0, 210, 255, 0.4);
     }
 
-    /* 1. Ambient Background Glow Video (Stretches across all empty spaces) */
     .hero-ambient-backdrop {
       position: absolute;
-      inset: -25px; /* extends past borders for smooth edge glow */
+      inset: -25px;
       width: calc(100% + 50px);
       height: calc(100% + 50px);
       object-fit: cover;
@@ -289,7 +283,6 @@
       transform: scale(1.1);
     }
 
-    /* 2. Main Foreground Video (Zero Cropping, Fully Centered & Crisp) */
     .hero-foreground-video {
       position: relative;
       width: 100%;
@@ -306,7 +299,7 @@
       transform: scale(1.02);
     }
 
-    /* CATEGORIES BAR WITH SIDE SCROLLBAR */
+    /* CATEGORIES BAR */
     .categories-bar-wrapper {
       position: relative;
       margin-bottom: 2.2rem;
@@ -325,21 +318,9 @@
       width: 100%;
     }
 
-    .categories-bar::-webkit-scrollbar {
-      height: 6px;
-    }
-
-    .categories-bar::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.04);
-      border-radius: 999px;
-      margin: 0 4px;
-    }
-
-    .categories-bar::-webkit-scrollbar-thumb {
-      background: linear-gradient(90deg, #00d2ff 0%, #0088cc 100%);
-      border-radius: 999px;
-      box-shadow: 0 0 10px rgba(0, 210, 255, 0.6);
-    }
+    .categories-bar::-webkit-scrollbar { height: 6px; }
+    .categories-bar::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.04); border-radius: 999px; }
+    .categories-bar::-webkit-scrollbar-thumb { background: linear-gradient(90deg, #00d2ff 0%, #0088cc 100%); border-radius: 999px; }
 
     .cat-tab {
       background: rgba(10, 16, 28, 0.85); 
@@ -359,562 +340,151 @@
       user-select: none;
     }
 
-    .cat-tab:hover { 
-      border-color: rgba(0, 210, 255, 0.4); 
-      background: rgba(0, 210, 255, 0.05); 
-      color: #fff; 
-    }
-
+    .cat-tab:hover { border-color: rgba(0, 210, 255, 0.4); background: rgba(0, 210, 255, 0.05); color: #fff; }
     .cat-tab.active {
       background: linear-gradient(135deg, rgba(0, 210, 255, 0.2) 0%, rgba(13, 18, 31, 0.95) 100%);
-      border-color: var(--accent-cyan); 
-      color: #fff; 
-      box-shadow: 0 0 20px rgba(0, 210, 255, 0.25);
+      border-color: var(--accent-cyan); color: #fff; box-shadow: 0 0 20px rgba(0, 210, 255, 0.25);
     }
-
-    .cat-tab span.count {
-      background: rgba(255, 255, 255, 0.08); 
-      padding: 0.15rem 0.5rem; 
-      border-radius: 999px; 
-      font-size: 0.75rem; 
-      font-weight: 700;
-    }
-
+    .cat-tab span.count { background: rgba(255, 255, 255, 0.08); padding: 0.15rem 0.5rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
     .cat-tab.active span.count { background: var(--accent-cyan); color: #000; }
 
     .cat-3d-img {
-      width: 36px; 
-      height: 36px; 
-      object-fit: contain; 
-      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.8));
-      animation: iconFloatContinuous 3s ease-in-out infinite alternate; 
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.8));
+      animation: iconFloatContinuous 3s ease-in-out infinite alternate; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
+    .cat-tab:hover .cat-3d-img, .cat-tab.active .cat-3d-img { transform: scale(1.22) rotate(-4deg); filter: drop-shadow(0 0 12px rgba(0, 210, 255, 0.7)); }
 
-    .cat-tab:hover .cat-3d-img, .cat-tab.active .cat-3d-img {
-      transform: scale(1.22) rotate(-4deg); 
-      filter: drop-shadow(0 0 12px rgba(0, 210, 255, 0.7));
-    }
+    @keyframes iconFloatContinuous { 0% { transform: translateY(0px) rotate(0deg); } 100% { transform: translateY(-4px) rotate(3deg); } }
 
-    @keyframes iconFloatContinuous {
-      0% { transform: translateY(0px) rotate(0deg); }
-      100% { transform: translateY(-4px) rotate(3deg); }
-    }
-
-    /* FULL-WIDTH RESPONSIVE CARD GRID */
-    .movements-grid { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); 
-      gap: 1.5rem; 
-      width: 100%;
-    }
+    /* CARD GRID */
+    .movements-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 1.5rem; width: 100%; }
 
     .movement-card {
-      background: var(--card-bg); 
-      border: 1px solid var(--border-color); 
-      border-radius: 14px; 
-      overflow: hidden;
-      display: flex; 
-      flex-direction: column; 
-      transition: transform 0.2s ease, border-color 0.2s ease;
-      position: relative;
+      background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden;
+      display: flex; flex-direction: column; transition: transform 0.2s ease, border-color 0.2s ease; position: relative;
     }
-
-    .movement-card:hover {
-      transform: translateY(-4px); border-color: rgba(0, 210, 255, 0.4); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    }
+    .movement-card:hover { transform: translateY(-4px); border-color: rgba(0, 210, 255, 0.4); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); }
 
     .card-video-box {
-      width: 100%; aspect-ratio: 16 / 9; background: #000; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; border-bottom: 1px solid var(--border-color);
-      cursor: pointer;
+      width: 100%; aspect-ratio: 16 / 9; background: #000; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; border-bottom: 1px solid var(--border-color); cursor: pointer;
     }
-
-    .card-video-box video, .card-video-box img { 
-      width: 100%; height: 100%; object-fit: cover; display: none; 
-      transition: transform 0.3s ease;
-    }
+    .card-video-box video, .card-video-box img { width: 100%; height: 100%; object-fit: cover; display: none; transition: transform 0.3s ease; }
     .card-video-box video.active-media, .card-video-box img.active-media { display: block; }
-    .card-video-box:hover video.active-media, .card-video-box:hover img.active-media {
-      transform: scale(1.04);
-    }
+    .card-video-box:hover video.active-media, .card-video-box:hover img.active-media { transform: scale(1.04); }
 
     .upload-overlay {
       position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 0.5rem; background: rgba(8, 12, 22, 0.75); border: 2px dashed rgba(0, 210, 255, 0.3); border-radius: 10px;
-      margin: 8px; transition: all 0.25s ease;
+      gap: 0.5rem; background: rgba(8, 12, 22, 0.75); border: 2px dashed rgba(0, 210, 255, 0.3); border-radius: 10px; margin: 8px; transition: all 0.25s ease;
     }
-    .card-video-box.has-media .upload-overlay {
-      display: none !important;
-    }
-    .card-video-box.drag-over .upload-overlay {
-      display: flex !important;
-      background: rgba(0, 210, 255, 0.18);
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 18px var(--accent-glow);
-    }
-    .card-video-box:not(.has-media):hover .upload-overlay { 
-      background: rgba(0, 0, 0, 0.55); 
-      border-color: rgba(0, 210, 255, 0.8);
-    }
+    .card-video-box.has-media .upload-overlay { display: none !important; }
+    .card-video-box.drag-over .upload-overlay { display: flex !important; background: rgba(0, 210, 255, 0.18); border-color: var(--accent-cyan); }
     .upload-overlay i { font-size: 1.8rem; color: var(--accent-cyan); }
     .upload-overlay span { font-size: 0.82rem; color: #cbd5e1; font-weight: 600; text-align: center; padding: 0 10px; }
     .upload-overlay .drag-sub { font-size: 0.7rem; color: var(--text-muted); font-weight: 400; }
     .file-input { display: none; }
 
-    /* CARD DETAILS & ACTION BUTTONS */
     .card-details { padding: 1.25rem; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; gap: 1rem; }
-    
-    .card-meta { 
-      display: flex; 
-      align-items: center; 
-      justify-content: space-between; 
-      margin-bottom: 0.25rem; 
-    }
+    .card-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.25rem; }
+    .tag-badge { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--accent-cyan); background: rgba(0, 210, 255, 0.08); padding: 0.2rem 0.5rem; border-radius: 6px; border: 1px solid rgba(0, 210, 255, 0.2); }
 
-    .tag-badge {
-      font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--accent-cyan);
-      background: rgba(0, 210, 255, 0.08); padding: 0.2rem 0.5rem; border-radius: 6px; border: 1px solid rgba(0, 210, 255, 0.2);
-    }
-
-    .card-meta-actions {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .meta-action-btn {
-      width: 30px;
-      height: 30px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.04);
-      color: #94a3b8;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 0.82rem;
-      transition: all 0.2s ease;
-    }
-
-    .meta-action-btn:hover {
-      transform: translateY(-2px);
-    }
-
-    .meta-action-btn.edit-btn:hover {
-      border-color: #f59e0b;
-      color: #f59e0b;
-      background: rgba(245, 158, 11, 0.15);
-      box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
-    }
-
-    .meta-action-btn.dl-btn:hover {
-      border-color: var(--accent-cyan);
-      color: var(--accent-cyan);
-      background: rgba(0, 210, 255, 0.15);
-      box-shadow: 0 0 12px rgba(0, 210, 255, 0.35);
-    }
-
-    .meta-action-btn.del-btn:hover {
-      border-color: #ef4444;
-      color: #ef4444;
-      background: rgba(239, 68, 68, 0.15);
-      box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
-    }
+    .card-meta-actions { display: flex; align-items: center; gap: 7px; }
+    .meta-action-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.04); color: #94a3b8; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.82rem; transition: all 0.2s ease; }
+    .meta-action-btn:hover { transform: translateY(-2px); }
+    .meta-action-btn.edit-btn:hover { border-color: #f59e0b; color: #f59e0b; background: rgba(245, 158, 11, 0.15); }
+    .meta-action-btn.dl-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(0, 210, 255, 0.15); }
+    .meta-action-btn.del-btn:hover { border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.15); }
 
     .card-details h3 { font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; }
-
-    .prompt-box {
-      font-size: 0.86rem; color: var(--text-muted); line-height: 1.45; background: rgba(0, 0, 0, 0.35);
-      border: 1px solid rgba(255, 255, 255, 0.04); padding: 0.75rem; border-radius: 8px;
-    }
+    .prompt-box { font-size: 0.86rem; color: var(--text-muted); line-height: 1.45; background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.04); padding: 0.75rem; border-radius: 8px; max-height: 120px; overflow-y: auto; }
 
     .copy-btn {
-      width: 100%;
-      background: linear-gradient(135deg, #00d2ff 0%, #0099cc 100%); 
-      color: #040711; 
-      border: none; 
-      padding: 0.75rem 1rem;
-      border-radius: 8px; 
-      font-size: 0.88rem; 
-      font-weight: 700; 
-      cursor: pointer; 
-      display: flex; 
-      align-items: center;
-      justify-content: center; 
-      gap: 0.5rem; 
-      transition: all 0.2s;
+      width: 100%; background: linear-gradient(135deg, #00d2ff 0%, #0099cc 100%); color: #040711; border: none; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.88rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s;
     }
-    .copy-btn:hover { 
-      box-shadow: 0 0 18px rgba(0, 210, 255, 0.5); 
-      transform: translateY(-2px); 
-      filter: brightness(1.1); 
-    }
+    .copy-btn:hover { box-shadow: 0 0 18px rgba(0, 210, 255, 0.5); transform: translateY(-2px); }
 
-    /* CINEMATIC LIGHTBOX MODAL */
-    #mediaLightbox {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.92);
-      backdrop-filter: blur(16px);
-      z-index: 1000000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-    }
+    /* LIGHTBOX */
+    #mediaLightbox { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.92); backdrop-filter: blur(16px); z-index: 1000000; display: none; align-items: center; justify-content: center; padding: 2rem; }
+    .lightbox-box { background: #090e1a; border: 1px solid rgba(0, 210, 255, 0.4); border-radius: 20px; max-width: 960px; width: 100%; overflow: hidden; display: flex; flex-direction: column; }
+    .lightbox-header { padding: 1.2rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+    .lightbox-header h3 { font-size: 1.25rem; font-weight: 700; color: #fff; }
+    .lightbox-stage { width: 100%; max-height: 60vh; background: #000; display: flex; align-items: center; justify-content: center; }
+    .lightbox-stage video, .lightbox-stage img { width: 100%; max-height: 60vh; object-fit: contain; }
+    .lightbox-footer { padding: 1.2rem 1.5rem; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-color); gap: 1rem; }
+    .lightbox-prompt { font-size: 0.88rem; color: var(--text-muted); flex: 1; max-height: 80px; overflow-y: auto; }
+    .lightbox-dl-btn { background: linear-gradient(135deg, #00d2ff 0%, #0099cc 100%); color: #040711; border: none; padding: 0.75rem 1.5rem; border-radius: 999px; font-weight: 800; cursor: pointer; }
 
-    .lightbox-box {
-      background: #090e1a;
-      border: 1px solid rgba(0, 210, 255, 0.4);
-      border-radius: 20px;
-      max-width: 960px;
-      width: 100%;
-      overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 210, 255, 0.2);
-      display: flex;
-      flex-direction: column;
-      animation: modalZoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    @keyframes modalZoomIn {
-      0% { transform: scale(0.85); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    .lightbox-header {
-      padding: 1.2rem 1.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border-color);
-    }
-    .lightbox-header h3 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-
-    .lightbox-stage {
-      width: 100%;
-      max-height: 60vh;
-      background: #000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .lightbox-stage video, .lightbox-stage img {
-      width: 100%;
-      max-height: 60vh;
-      object-fit: contain;
-      display: block;
-    }
-
-    .lightbox-footer {
-      padding: 1.2rem 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-top: 1px solid var(--border-color);
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .lightbox-prompt {
-      font-size: 0.88rem;
-      color: var(--text-muted);
-      flex: 1;
-      min-width: 280px;
-    }
-
-    .lightbox-actions {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .lightbox-dl-btn {
-      background: linear-gradient(135deg, #00d2ff 0%, #0099cc 100%);
-      color: #040711;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 999px;
-      font-weight: 800;
-      font-size: 0.9rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      transition: all 0.2s;
-    }
-    .lightbox-dl-btn:hover {
-      box-shadow: 0 0 20px rgba(0, 210, 255, 0.6);
-      transform: translateY(-2px);
-    }
-
-    /* TOAST */
-    #toast {
-      visibility: hidden; position: fixed; bottom: 2rem; right: 2rem; background: #00d2ff; color: #040711;
-      padding: 0.75rem 1.4rem; border-radius: 999px; font-weight: 700; font-size: 0.9rem; display: flex;
-      align-items: center; gap: 0.5rem; box-shadow: 0 10px 30px rgba(0, 210, 255, 0.4); z-index: 100000;
-      opacity: 0; transition: opacity 0.3s, transform 0.3s; transform: translateY(20px);
-    }
+    #toast { visibility: hidden; position: fixed; bottom: 2rem; right: 2rem; background: #00d2ff; color: #040711; padding: 0.75rem 1.4rem; border-radius: 999px; font-weight: 700; z-index: 100000; opacity: 0; transition: opacity 0.3s, transform 0.3s; transform: translateY(20px); }
     #toast.show { visibility: visible; opacity: 1; transform: translateY(0); }
 
-    /* MODAL POPUPS */
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.82); backdrop-filter: blur(10px);
-      display: flex; align-items: center; justify-content: center; z-index: 99999;
-    }
-
-    .modal-box {
-      background: #0d121f; border: 1px solid rgba(0, 210, 255, 0.3); border-radius: 16px; width: 90%;
-      max-width: 520px; padding: 24px; color: #fff; box-shadow: 0 10px 40px rgba(0,0,0,0.8); max-height: 85vh; overflow-y: auto;
-    }
-
-    .modal-header {
-      display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;
-    }
-
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.82); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 99999; }
+    .modal-box { background: #0d121f; border: 1px solid rgba(0, 210, 255, 0.3); border-radius: 16px; width: 90%; max-width: 520px; padding: 24px; color: #fff; max-height: 85vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
     .close-btn { background: none; border: none; color: #94a3b8; font-size: 26px; cursor: pointer; }
-
     .form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
     .form-group label { font-size: 13px; color: #94a3b8; font-weight: 600; }
-
-    .form-group input, .form-group select, .form-group textarea {
-      background: #161e2e; border: 1px solid #334155; color: #f8fafc; padding: 10px 14px; border-radius: 8px; font-size: 14px; outline: none; font-family: inherit;
-    }
-
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent-cyan); }
-
-    .submit-btn {
-      width: 100%; padding: 12px; background: var(--accent-cyan); border: none; border-radius: 8px; color: #040711; font-weight: 700; cursor: pointer; font-size: 0.95rem;
-    }
+    .form-group input, .form-group select, .form-group textarea { background: #161e2e; border: 1px solid #334155; color: #f8fafc; padding: 10px 14px; border-radius: 8px; font-size: 14px; outline: none; }
+    .submit-btn { width: 100%; padding: 12px; background: var(--accent-cyan); border: none; border-radius: 8px; color: #040711; font-weight: 700; cursor: pointer; }
 
     .themes-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
+    .theme-chip { background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: 10px; color: #cbd5e1; display: flex; justify-content: space-between; cursor: pointer; }
+    .theme-chip:hover { background: rgba(0, 210, 255, 0.15); border-color: var(--accent-cyan); color: #fff; }
 
-    .theme-chip {
-      background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); padding: 12px 16px;
-      border-radius: 10px; font-size: 14px; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.2s;
-    }
+    #cinematicStage { position: fixed; inset: 0; pointer-events: none; z-index: 999999; display: none; align-items: center; justify-content: center; perspective: 1200px; overflow: hidden; }
+    .stage-backdrop { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(0, 210, 255, 0.15) 0%, rgba(2, 6, 18, 0.92) 80%); backdrop-filter: blur(8px); animation: stageFade 2s ease forwards; }
+    @keyframes stageFade { 0% { opacity: 0; } 12% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; } }
+    .cinematic-scene { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 10; }
 
-    .theme-chip:hover {
-      background: rgba(0, 210, 255, 0.15); border-color: var(--accent-cyan); color: #fff; transform: translateX(4px);
-    }
+    .all-orbit-scene { display: flex; align-items: center; justify-content: center; position: relative; width: 500px; height: 500px; animation: grandOrbitSpin 2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .all-orbit-icon { position: absolute; width: 75px; height: 75px; object-fit: contain; filter: drop-shadow(0 0 20px rgba(0, 210, 255, 0.8)); }
+    @keyframes grandOrbitSpin { 0% { transform: scale(0.2) rotate(-90deg); opacity: 0; } 40% { transform: scale(1.1) rotate(20deg); opacity: 1; } 80% { transform: scale(1) rotate(0deg); opacity: 1; } 100% { transform: scale(1.4) rotate(45deg); opacity: 0; } }
 
-    /* FULLSCREEN CATEGORY ANIMATION STAGE */
-    #cinematicStage {
-      position: fixed; inset: 0; pointer-events: none; z-index: 999999; display: none; align-items: center; justify-content: center; perspective: 1200px; overflow: hidden;
-    }
-
-    .stage-backdrop {
-      position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(0, 210, 255, 0.15) 0%, rgba(2, 6, 18, 0.92) 80%);
-      backdrop-filter: blur(8px); animation: stageFade 2s ease forwards;
-    }
-
-    @keyframes stageFade {
-      0% { opacity: 0; } 12% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; }
-    }
-
-    .cinematic-scene {
-      position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 10;
-    }
-
-    .all-orbit-scene {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      width: 500px;
-      height: 500px;
-      animation: grandOrbitSpin 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    .all-orbit-icon {
-      position: absolute;
-      width: 75px;
-      height: 75px;
-      object-fit: contain;
-      filter: drop-shadow(0 0 20px rgba(0, 210, 255, 0.8));
-    }
-
-    @keyframes grandOrbitSpin {
-      0% { transform: scale(0.2) rotate(-90deg); opacity: 0; }
-      40% { transform: scale(1.1) rotate(20deg); opacity: 1; }
-      80% { transform: scale(1) rotate(0deg); opacity: 1; }
-      100% { transform: scale(1.4) rotate(45deg); opacity: 0; }
-    }
-
-    .dolly-real-rig {
-      position: absolute; bottom: 22%; left: -500px; animation: realDollyTrack 2s cubic-bezier(0.2, 0.9, 0.3, 1) forwards; filter: drop-shadow(0 25px 45px rgba(0,0,0,0.9));
-    }
-    .dolly-real-rig img { width: 440px; height: auto; }
-
-    @keyframes realDollyTrack {
-      0% { left: -500px; transform: scale(0.85); }
-      50% { left: calc(50vw - 220px); transform: scale(1.15); filter: drop-shadow(0 30px 60px rgba(0,210,255,0.5)); }
-      100% { left: 105vw; transform: scale(0.9); }
-    }
+    .dolly-real-rig { position: absolute; bottom: 22%; left: -500px; animation: realDollyTrack 2s cubic-bezier(0.2, 0.9, 0.3, 1) forwards; }
+    .dolly-real-rig img { width: 440px; }
+    @keyframes realDollyTrack { 0% { left: -500px; } 50% { left: calc(50vw - 220px); transform: scale(1.15); } 100% { left: 105vw; } }
 
     .angles-real-rig { position: relative; width: 100vw; height: 100vh; }
     .angle-fast-cam { position: absolute; width: 280px; animation: cornerHop 2s steps(1) forwards; }
     .angle-fast-cam img { width: 100%; filter: drop-shadow(0 0 35px rgba(0, 210, 255, 0.7)); }
-
-    @keyframes cornerHop {
-      0% { top: 12%; left: 10%; transform: rotate(-8deg) scale(0.9); }
-      25% { top: 12%; left: auto; right: 10%; transform: rotate(8deg) scale(1.1); }
-      50% { top: auto; bottom: 15%; right: 10%; transform: rotate(-6deg) scale(1.2); }
-      75% { top: auto; bottom: 15%; left: 10%; transform: rotate(6deg) scale(1.05); }
-      100% { top: 50%; left: 50%; transform: translate(-50%, -50%) scale(1.3); }
-    }
+    @keyframes cornerHop { 0% { top: 12%; left: 10%; } 25% { top: 12%; right: 10%; left: auto; } 50% { bottom: 15%; right: 10%; top: auto; } 75% { bottom: 15%; left: 10%; top: auto; } 100% { top: 50%; left: 50%; transform: translate(-50%, -50%) scale(1.3); } }
 
     .clapper-real-rig { display: flex; flex-direction: column; align-items: center; animation: clapHit 2s ease-out forwards; }
     .clapper-real-rig img { width: 360px; filter: drop-shadow(0 20px 50px rgba(0, 210, 255, 0.6)); }
-
-    @keyframes clapHit {
-      0% { transform: scale(0.3) rotate(-25deg); opacity: 0; }
-      20% { transform: scale(1.15) rotate(0deg); opacity: 1; }
-      35% { transform: scale(1.0) rotate(-6deg); }
-      70% { transform: scale(1.2) rotate(15deg); }
-      100% { transform: scale(2.2) rotate(45deg); opacity: 0; }
-    }
+    @keyframes clapHit { 0% { transform: scale(0.3); opacity: 0; } 35% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.2); opacity: 0; } }
 
     .light-real-rig { display: flex; flex-direction: column; align-items: center; animation: studioFlash 2s ease forwards; }
     .light-real-rig img { width: 380px; filter: drop-shadow(0 0 65px rgba(251, 191, 36, 0.85)); }
+    .light-glare { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(251, 191, 36, 0.6) 0%, transparent 80%); mix-blend-mode: screen; }
+    @keyframes studioFlash { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
 
-    .light-glare {
-      position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(251, 191, 36, 0.6) 0%, rgba(245, 158, 11, 0.15) 50%, transparent 80%);
-      mix-blend-mode: screen; animation: glarePuff 2s ease forwards;
-    }
-
-    @keyframes studioFlash {
-      0% { transform: scale(0.4); opacity: 0; }
-      25% { transform: scale(1.1); opacity: 1; }
-      75% { transform: scale(1.05); opacity: 1; }
-      100% { transform: scale(1.4); opacity: 0; }
-    }
-
-    @keyframes glarePuff { 0% { opacity: 0; } 25% { opacity: 1; } 80% { opacity: 0.8; } 100% { opacity: 0; } }
-
-    /* SEASON LAPSE ANIMATION (ATMOSPHERE) */
-    .season-sky-lapse {
-      position: absolute;
-      inset: 0;
-      animation: seasonLapseCycle 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    }
-
-    @keyframes seasonLapseCycle {
-      0% { background: linear-gradient(180deg, #ec4899 0%, #38bdf8 50%, #10b981 100%); opacity: 0.85; }
-      30% { background: linear-gradient(180deg, #f59e0b 0%, #0ea5e9 40%, #0284c7 100%); opacity: 0.9; }
-      65% { background: linear-gradient(180deg, #d97706 0%, #b45309 45%, #78350f 100%); opacity: 0.9; }
-      100% { background: linear-gradient(180deg, #1e293b 0%, #334155 50%, #94a3b8 100%); opacity: 0.95; }
-    }
-
-    .season-particles {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.2rem;
-      gap: 30px;
-      animation: seasonElementsPop 2s ease-in-out forwards;
-    }
-
-    @keyframes seasonElementsPop {
-      0% { opacity: 0; transform: scale(0.5); }
-      20% { opacity: 1; transform: scale(1.1); }
-      80% { opacity: 1; transform: scale(1); }
-      100% { opacity: 0; transform: scale(1.4); }
-    }
+    .season-sky-lapse { position: absolute; inset: 0; animation: seasonLapseCycle 2s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+    @keyframes seasonLapseCycle { 0% { background: linear-gradient(180deg, #ec4899 0%, #10b981 100%); } 50% { background: linear-gradient(180deg, #f59e0b 0%, #0284c7 100%); } 100% { background: linear-gradient(180deg, #1e293b 0%, #94a3b8 100%); } }
+    .season-particles { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; gap: 30px; }
 
     .smoke-rig-real { position: absolute; bottom: 15%; display: flex; align-items: center; animation: mistDrift 2s ease forwards; }
-    .smoke-rig-real img { width: 440px; filter: drop-shadow(0 0 45px rgba(56, 189, 248, 0.7)); }
-
-    @keyframes mistDrift {
-      0% { transform: translateX(-80px) scale(0.6); opacity: 0; }
-      30% { opacity: 1; transform: translateX(0) scale(1.1); }
-      80% { opacity: 0.9; }
-      100% { transform: translateX(60px) scale(1.3); opacity: 0; }
-    }
+    .smoke-rig-real img { width: 440px; }
+    @keyframes mistDrift { 0% { transform: translateX(-80px); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateX(60px); opacity: 0; } }
 
     .lens-real-rig { display: flex; flex-direction: column; align-items: center; animation: lensRealZoom 2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .lens-real-rig img { width: 420px; filter: drop-shadow(0 0 60px rgba(0, 210, 255, 0.9)); }
+    @keyframes lensRealZoom { 0% { transform: scale(0.3); opacity: 0; } 50% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(3.0); opacity: 0; } }
 
-    @keyframes lensRealZoom {
-      0% { transform: scale(0.3) rotate(-30deg); opacity: 0; }
-      35% { transform: scale(1.15) rotate(0deg); opacity: 1; }
-      75% { transform: scale(1.35) rotate(15deg); }
-      100% { transform: scale(3.0) rotate(45deg); opacity: 0; }
-    }
+    .master-writing-rig { position: relative; display: flex; align-items: center; justify-content: center; width: 480px; height: 320px; animation: masterRigPop 2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .master-logo-canvas { width: 280px; filter: drop-shadow(0 0 40px rgba(0, 210, 255, 0.8)); }
+    .neon-quill-pen { position: absolute; top: 15%; left: 15%; font-size: 3.5rem; color: #00d2ff; filter: drop-shadow(0 0 25px #00d2ff); animation: penWritingMotion 2s ease-in-out forwards; }
+    @keyframes penWritingMotion { 0% { transform: translate(0, 0) scale(0.6); opacity: 0; } 50% { transform: translate(120px, 15px); opacity: 1; } 100% { transform: translate(320px, 0px) scale(1.4); opacity: 0; } }
+    @keyframes masterRigPop { 0% { transform: scale(0.4); opacity: 0; } 50% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.35); opacity: 0; } }
 
-    /* MASTER PROMPT WRITING PEN ANIMATION */
-    .master-writing-rig {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 480px;
-      height: 320px;
-      animation: masterRigPop 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    .master-logo-canvas {
-      width: 280px;
-      height: auto;
-      filter: drop-shadow(0 0 40px rgba(0, 210, 255, 0.8));
-    }
-
-    .neon-quill-pen {
-      position: absolute;
-      top: 15%;
-      left: 15%;
-      font-size: 3.5rem;
-      color: #00d2ff;
-      filter: drop-shadow(0 0 25px #00d2ff);
-      animation: penWritingMotion 2s ease-in-out forwards;
-      pointer-events: none;
-    }
-
-    @keyframes penWritingMotion {
-      0% { transform: translate(0, 0) rotate(-20deg) scale(0.6); opacity: 0; }
-      20% { transform: translate(40px, 30px) rotate(10deg) scale(1.1); opacity: 1; }
-      40% { transform: translate(120px, 15px) rotate(-15deg); }
-      60% { transform: translate(190px, 50px) rotate(5deg); }
-      80% { transform: translate(250px, 20px) rotate(-10deg); opacity: 1; }
-      100% { transform: translate(320px, 0px) rotate(30deg) scale(1.4); opacity: 0; }
-    }
-
-    @keyframes masterRigPop {
-      0% { transform: scale(0.4); opacity: 0; }
-      30% { transform: scale(1.1); opacity: 1; }
-      75% { transform: scale(1); opacity: 1; }
-      100% { transform: scale(1.35); opacity: 0; }
-    }
-
-    .stage-title {
-      position: absolute; bottom: 12%; font-size: 1.5rem; font-family: 'Space Grotesk', sans-serif; font-weight: 800;
-      letter-spacing: 2px; color: #fff; text-transform: uppercase; text-shadow: 0 0 25px rgba(0, 210, 255, 0.8);
-      background: rgba(4, 7, 17, 0.75); padding: 0.6rem 2rem; border-radius: 999px; border: 1px solid var(--accent-cyan);
-      animation: stageFade 2s ease forwards; z-index: 20;
-    }
+    .stage-title { position: absolute; bottom: 12%; font-size: 1.5rem; font-family: 'Space Grotesk', sans-serif; font-weight: 800; color: #fff; text-transform: uppercase; background: rgba(4, 7, 17, 0.75); padding: 0.6rem 2rem; border-radius: 999px; border: 1px solid var(--accent-cyan); z-index: 20; }
   </style>
 </head>
 <body>
 
-  <!-- FULLSCREEN CATEGORY ANIMATION STAGE -->
   <div id="cinematicStage">
     <div class="stage-backdrop"></div>
     <div class="cinematic-scene" id="cinematicScene"></div>
     <div class="stage-title" id="stageTitle">Cinematic View</div>
   </div>
 
-  <!-- LEFT SIDEBAR -->
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <aside class="sidebar-drawer" id="sidebarDrawer">
     <div class="sidebar-header">
@@ -948,7 +518,6 @@
     </div>
   </aside>
 
-  <!-- HEADER -->
   <header>
     <div class="header-inner">
       <div class="brand-group">
@@ -995,108 +564,67 @@
 
     <!-- HERO SECTION (CINEMATIC AMBIENT GLOW BACKDROP + CRISP UNTOUCHED FOREGROUND VIDEO) -->
     <section class="hero-banner-wrapper" id="heroBanner">
-      <!-- 1. Ambient blurred video filling the left & right black bars -->
-      <video 
-        id="heroVideoBg" 
-        class="hero-ambient-backdrop" 
-        autoplay 
-        muted 
-        playsinline 
-        webkit-playsinline
-        preload="auto"
-        src="hero-banner-1.mp4"
-      ></video>
-
-      <!-- 2. Crisp centered video with 100% details intact -->
-      <video 
-        id="heroVideo" 
-        class="hero-foreground-video" 
-        autoplay 
-        muted 
-        playsinline 
-        webkit-playsinline
-        preload="auto"
-        poster="bhanu-3d-header_2.png"
-        src="hero-banner-1.mp4"
-      >
-        Your browser does not support HTML5 video.
-      </video>
+      <video id="heroVideoBg" class="hero-ambient-backdrop" autoplay muted playsinline webkit-playsinline preload="auto" src="hero-banner-1.mp4"></video>
+      <video id="heroVideo" class="hero-foreground-video" autoplay muted playsinline webkit-playsinline preload="auto" poster="bhanu-3d-header_2.png" src="hero-banner-1.mp4"></video>
     </section>
 
-    <!-- 3D REALISTIC ICONS CATEGORIES BAR (WITH SIDE SCROLLBAR) -->
+    <!-- CATEGORIES BAR -->
     <div class="categories-bar-wrapper">
       <div class="categories-bar">
-        
-        <!-- All -->
         <button class="cat-tab active" onclick="triggerCinematicCategory('All', this)">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="#00d2ff">
-            <rect x="3" y="3" width="7" height="7" rx="2"/>
-            <rect x="14" y="3" width="7" height="7" rx="2"/>
-            <rect x="3" y="14" width="7" height="7" rx="2"/>
-            <rect x="14" y="14" width="7" height="7" rx="2"/>
-          </svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="#00d2ff"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>
           <span>All</span>
-          <span class="count" id="count_All">141</span>
+          <span class="count" id="count_All">136</span>
         </button>
 
-        <!-- Camera Movement -->
         <button class="cat-tab" onclick="triggerCinematicCategory('Camera Movement', this)">
           <img src="Camera-Movement.png" class="cat-3d-img" alt="Camera Movement">
           <span>Camera Movement</span>
           <span class="count" id="count_Camera_Movement">44</span>
         </button>
 
-        <!-- Camera Angles -->
         <button class="cat-tab" onclick="triggerCinematicCategory('Camera Angles', this)">
           <img src="Camera-Angles.png" class="cat-3d-img" alt="Camera Angles">
           <span>Camera Angles</span>
           <span class="count" id="count_Camera_Angles">12</span>
         </button>
 
-        <!-- Camera Shots (15 from DOCX - Clean Upload Mode) -->
         <button class="cat-tab" onclick="triggerCinematicCategory('Camera Shots', this)">
           <img src="Camera-Shots.png" class="cat-3d-img" alt="Camera Shots">
           <span>Camera Shots</span>
           <span class="count" id="count_Camera_Shots">15</span>
         </button>
 
-        <!-- Cinematic Lighting -->
         <button class="cat-tab" onclick="triggerCinematicCategory('Cinematic Lighting', this)">
           <img src="Cinematic -lighting.png" class="cat-3d-img" alt="Cinematic Lighting">
           <span>Cinematic Lighting</span>
           <span class="count" id="count_Cinematic_Lighting">0</span>
         </button>
 
-        <!-- Atmosphere -->
         <button class="cat-tab" onclick="triggerCinematicCategory('Atmosphere', this)">
           <img src="Atmosphere.png" class="cat-3d-img" alt="Atmosphere">
           <span>Atmosphere</span>
           <span class="count" id="count_Atmosphere">60</span>
         </button>
 
-        <!-- Camera Lens -->
         <button class="cat-tab" onclick="triggerCinematicCategory('Camera Lens', this)">
           <img src="Camera-lens.png" class="cat-3d-img" alt="Camera Lens">
           <span>Camera Lens</span>
           <span class="count" id="count_Camera_Lens">0</span>
         </button>
 
-        <!-- Master Prompts -->
         <button class="cat-tab" onclick="triggerCinematicCategory('Master Prompts', this)">
           <img src="Master-prompt.png" class="cat-3d-img" alt="Master Prompts" onerror="this.src='Camera-Shots.png'">
           <span>Master Prompts</span>
-          <span class="count" id="count_Master_Prompts">10</span>
+          <span class="count" id="count_Master_Prompts">5</span>
         </button>
-
       </div>
     </div>
 
-    <!-- MOVEMENTS GRID -->
     <main class="movements-grid" id="movementsGrid"></main>
-
   </div>
 
-  <!-- CINEMATIC LIGHTBOX MODAL -->
+  <!-- LIGHTBOX -->
   <div id="mediaLightbox">
     <div class="lightbox-box">
       <div class="lightbox-header">
@@ -1118,14 +646,13 @@
     </div>
   </div>
 
-  <!-- ADD MOVEMENT MODAL POPUP -->
+  <!-- ADD MOVEMENT MODAL -->
   <div id="movementModal" class="modal-overlay" style="display: none;">
     <div class="modal-box">
       <div class="modal-header">
         <h3 style="margin: 0; font-size: 18px; color: var(--accent-cyan);">+ Add New Movement</h3>
         <button type="button" id="closeModalBtn" class="close-btn">&times;</button>
       </div>
-      
       <form id="movementForm">
         <div class="form-group">
           <label for="itemCategory">Category</label>
@@ -1139,40 +666,34 @@
             <option value="Master Prompts">Master Prompts</option>
           </select>
         </div>
-
         <div class="form-group">
           <label for="itemTitle">Movement Name</label>
-          <input type="text" id="itemTitle" placeholder="e.g. Dolly Zoom, Dutch Angle, 35mm Prime Iris" required />
+          <input type="text" id="itemTitle" placeholder="e.g. Dolly Zoom, Dutch Angle" required />
         </div>
-
         <div class="form-group">
           <label for="itemPrompt">Prompt Formula / Description</label>
-          <textarea id="itemPrompt" rows="3" placeholder="Enter AI prompt tags and instructions..." required></textarea>
+          <textarea id="itemPrompt" rows="3" placeholder="Enter AI prompt tags..." required></textarea>
         </div>
-
         <div class="form-group">
           <label for="itemMedia">Upload Media (Image or Video)</label>
           <input type="file" id="itemMedia" accept="image/*,video/*" required />
         </div>
-
         <div id="uploadStatus" style="font-size: 13px; color: var(--accent-cyan); margin-bottom: 12px; display: none; text-align: center;">Uploading...</div>
-
         <button type="submit" id="saveBtn" class="submit-btn">+ Save to Vault</button>
       </form>
     </div>
   </div>
 
-  <!-- 10 BEST CLASSIC THEMES MODAL -->
+  <!-- THEMES MODAL -->
   <div id="themesModal" class="modal-overlay" style="display: none;">
     <div class="modal-box" style="max-width: 580px;">
       <div class="modal-header">
         <div>
           <h3 style="margin: 0; font-size: 18px; color: var(--accent-cyan);"><i class="fa-solid fa-palette"></i> 10 Classic Master Themes</h3>
-          <p style="font-size: 12px; color: #94a3b8; margin-top: 4px;">Click any theme to copy tags to clipboard</p>
+          <p style="font-size: 12px; color: #94a3b8; margin-top: 4px;">Click any theme to copy tags</p>
         </div>
         <button type="button" id="closeThemesModalBtn" class="close-btn">&times;</button>
       </div>
-      
       <div class="themes-grid" id="themesGrid"></div>
     </div>
   </div>
@@ -1182,9 +703,9 @@
     <span>Prompt copied to clipboard!</span>
   </div>
 
-  <!-- JAVASCRIPT LOGIC -->
+  <!-- SCRIPT -->
   <script>
-    // 44 Core Camera Movements
+    // 44 Core Movements
     const defaultMovements = [
       { id: "mov_1", name: "Slow Dolly In", category: "Camera Movement", prompt: "Slow dolly in, camera moves slowly forward toward the subject." },
       { id: "mov_2", name: "Slow Dolly Out", category: "Camera Movement", prompt: "Slow dolly out, camera moves slowly backwards away from the subject." },
@@ -1232,7 +753,7 @@
       { id: "mov_44", name: "Worm's Eye Tracking (Ground Level)", category: "Camera Movement", prompt: "Worm's eye view, low angle tracking, camera moves along the ground looking up." }
     ];
 
-    // 12 Camera Angles (From PDF)
+    // 12 Camera Angles
     const cameraAnglesFromPdf = [
       { id: "ang_1", name: "Eye-level Angle", category: "Camera Angles", prompt: "Eye-level angle, camera positioned at subject eye height, natural, neutral, realistic perspective, 8k" },
       { id: "ang_2", name: "Low Angle", category: "Camera Angles", prompt: "Low angle shot, camera looking upward at the subject, commanding power, dominance, grandeur, cinematic" },
@@ -1248,7 +769,7 @@
       { id: "ang_12", name: "Point-Of-View (POV)", category: "Camera Angles", prompt: "Point-of-view POV shot, camera represents first-person character vision, immersive perspective, subjective participation" }
     ];
 
-    // 15 CAMERA SHOTS (CLEAN UPLOAD MODE - IMAGES REMOVED)
+    // 15 Camera Shots (Clean Upload Mode)
     const cameraShotsFromPdf = [
       { id: "sht_1", name: "Extreme Long Shot (ELS) / Extreme Wide Shot (EWS)", category: "Camera Shots", prompt: "Extreme long shot ELS, extreme wide shot EWS, vast expansive landscape, subject appearing very small in distance, establish scale, atmosphere, and location, 8k" },
       { id: "sht_2", name: "Long Shot (LS) / Wide Shot (WS)", category: "Camera Shots", prompt: "Long shot LS, wide shot WS, full body of the subject in modern geometric architectural hall, substantial surroundings, movement and body language, cinematic" },
@@ -1267,7 +788,7 @@
       { id: "sht_15", name: "Tight Close-Up (TCU)", category: "Camera Shots", prompt: "Tight close-up TCU, tightly framed around eyes, nose, and lips, emotional vulnerability, intimacy and intense dramatic cinematic impact" }
     ];
 
-    // 60 Atmosphere Themes (From PDF)
+    // 60 Atmosphere Themes
     const atmosphereThemesFromPdf = [
       { id: "atm_1", name: "Golden Hour Glow", category: "Atmosphere", prompt: "Golden Hour Glow, soft warm golden sunlight at sunrise or sunset, cinematic lighting, 8k" },
       { id: "atm_2", name: "Blue Hour Twilight", category: "Atmosphere", prompt: "Blue Hour Twilight, cool deep blue atmospheric tones, early dawn or late dusk, moody ambience" },
@@ -1331,21 +852,41 @@
       { id: "atm_60", name: "Cinematic Drone Landscape", category: "Atmosphere", prompt: "Cinematic Drone Landscape, high-altitude aerial view of winding coastal cliff road at sunrise" }
     ];
 
-    // 10 Master Prompts
+    // 5 MASTER PROMPTS (DIRECTLY FROM YOUR AI VIDEO GENERATION PROMPTS.DOCX)
     const masterPromptsList = [
-      { id: "mst_1", name: "Blockbuster Action Intro", category: "Master Prompts", prompt: "Anamorphic 35mm lens, intense low-angle slow dolly forward, hyper-realistic, orange and teal grading, 8k cinematic masterpiece" },
-      { id: "mst_2", name: "Sci-Fi Cyber Corridor", category: "Master Prompts", prompt: "Smooth tracking shot through sleek neon-lit metallic corridor, volumetric atmospheric fog, futuristic UI reflections, unreal engine 5" },
-      { id: "mst_3", name: "Epic Mythological War", category: "Master Prompts", prompt: "Wide high-angle crane reveal over ancient battlefield, burning torches, rising smoke embers, golden rim light, slow motion, IMAX 70mm" },
-      { id: "mst_4", name: "Moody Neo-Noir Alley", category: "Master Prompts", prompt: "Wet rain-slicked asphalt reflecting vibrant neon billboards, Dutch angle camera roll, lone trench coat figure silhouette, heavy atmosphere" },
-      { id: "mst_5", name: "Ethereal Dream Sequence", category: "Master Prompts", prompt: "Super slow orbital arc, floating bioluminescent flower particles, soft golden backlight, optical lens flare, 120fps ultra-smooth" },
-      { id: "mst_6", name: "Speed Tracking Chase", category: "Master Prompts", prompt: "Fast ground-level worm's eye tracking alongside wheels, extreme motion blur on background, dynamic urgent camera vibration, photorealistic" },
-      { id: "mst_7", name: "Intimate Cinematic Dialogue", category: "Master Prompts", prompt: "85mm prime lens f/1.4, creamy soft bokeh, over the shoulder rack focus, catchlight in eyes, subtle handheld documentary texture" },
-      { id: "mst_8", name: "Solarpunk Utopia Sunrise", category: "Master Prompts", prompt: "FPV drone smooth descending arc over lush futuristic vertical green towers, morning sunburst rays, crystalline clean reflections" },
-      { id: "mst_9", name: "Crash Zoom Dramatic Reveal", category: "Master Prompts", prompt: "Instant snap zoom from extreme wide landscape into intense protagonist eye close-up, sound-barrier shutter motion, 8k HDR" },
-      { id: "mst_10", name: "Cosmic Hyper Hyperspace", category: "Master Prompts", prompt: "Fast forward warp tunnel hyperlapse, kaleidoscopic neon star trails, barrel roll 360 rotation, zero-gravity surreal motion" }
+      {
+        id: "mst_1",
+        name: "Recreate Master Prompt",
+        category: "Master Prompts",
+        prompt: "Analyze this video scene by scene and generate a detailed AI video prompt for each shot and frame - including camera angles, subject actions, lighting, environment, facial expressions, composition, transitions, and cinematic style. Make the prompts accurate enough to recreate the video as closely as possible. Include exact text in video."
+      },
+      {
+        id: "mst_2",
+        name: "Animation Prompt",
+        category: "Master Prompts",
+        prompt: "Animate sequence of events shown in 6-frame storyboard reference image. Single, continuous, seamless product showcase video of smartphone from Panel 1 to 6. Preserve composition, product styling, modern lighting. Smooth cinematic transitions (push-ins, slow orbits, match-cuts). No fast cuts, no background music, no text overlays."
+      },
+      {
+        id: "mst_3",
+        name: "Image Upscaling",
+        category: "Master Prompts",
+        prompt: "Upscale and restore this image to flawless 100% 8K resolution, ultra-high definition. Apply advanced noise reduction and deblurring. Introduce high-dynamic-range brightness and natural glowing luminosity on facial planes. Preserve authentic natural skin tones and strict facial consistency."
+      },
+      {
+        id: "mst_4",
+        name: "Colour Recreation",
+        category: "Master Prompts",
+        prompt: "Give me a Prompt to apply this color (front facing also) to any other products/profiles. Do not change camera angle and view. Keep only colors and camera view from reference image. AR 1:1."
+      },
+      {
+        id: "mst_5",
+        name: "ChatGPT Prompts Library",
+        category: "Master Prompts",
+        prompt: "/magazine cover /product explosion /cinematic portrait /fashion editorial /luxury advertisement /product photography /movie poster /album cover /brand campaign /architecture photography /street photography /cinematic still /action scene /sci-fi scene /concept art /world building /cyberpunk city /golden hour /neon street /dream sequence /double exposure /product launch /product render"
+      }
     ];
 
-    // Total: 44 Movements + 12 Angles + 15 Shots + 60 Atmosphere + 10 Master Prompts = 141 Total
+    // Total: 44 + 12 + 15 + 60 + 5 = 136 Total
     window.allVaultItems = [...defaultMovements, ...cameraAnglesFromPdf, ...cameraShotsFromPdf, ...atmosphereThemesFromPdf, ...masterPromptsList];
     let currentCategory = "All";
 
@@ -1376,7 +917,7 @@
       });
     }
 
-    // 3 VIDEOS PLAYLIST CONTINUOUS LOOPER (SYNCS BOTH FOREGROUND & AMBIENT GLOW BACKDROP)
+    // VIDEO PLAYLIST CONTINUOUS LOOPER
     const heroVid = document.getElementById("heroVideo");
     const heroVidBg = document.getElementById("heroVideoBg");
 
@@ -1403,7 +944,7 @@
 
     /* INDEXED-DB PERSISTENCE */
     let localDB;
-    const dbReq = indexedDB.open("CinemotionMediaDB", 7);
+    const dbReq = indexedDB.open("CinemotionMediaDB", 8);
     dbReq.onupgradeneeded = (e) => {
       localDB = e.target.result;
       if (!localDB.objectStoreNames.contains("cardMedia")) {
@@ -1417,7 +958,6 @@
 
     const grid = document.getElementById('movementsGrid');
 
-    // RENDER MOVEMENTS GRID
     function renderCards(list) {
       if (!grid) return;
       grid.innerHTML = list.map(item => `
@@ -1471,7 +1011,7 @@
         </div>
       `).join('');
 
-      // Apply initial or stored images
+      // Restore stored media files
       list.forEach(item => {
         if (item.mediaURL) {
           applyMediaUrlToCard(item.id, item.mediaURL, item.mediaType);
@@ -1599,14 +1139,12 @@
       }
     }
 
-    // EDIT (PENCIL) BUTTON ACTION
     window.editCardMedia = function(id, event) {
       if (event) event.stopPropagation();
       const input = document.getElementById(`input_${id}`);
       if (input) input.click();
     };
 
-    // DOWNLOAD ACTION
     window.downloadCardMedia = function(id, name, event) {
       if (event) event.stopPropagation();
       const media = window.cardActiveBlobs[id];
@@ -1634,10 +1172,8 @@
       setTimeout(() => toast.classList.remove('show'), 2200);
     }
 
-    // DELETE ACTION
     window.deleteCardMedia = function(id, event) {
       if (event) event.stopPropagation();
-      
       const media = window.cardActiveBlobs[id];
       if (!media) {
         alert("No media uploaded to delete in this card.");
@@ -1676,7 +1212,7 @@
       }
     };
 
-    // LIGHTBOX SYSTEM
+    // LIGHTBOX PREVIEW
     const mediaLightbox = document.getElementById("mediaLightbox");
     const lightboxStage = document.getElementById("lightboxStage");
     const lightboxTitle = document.getElementById("lightboxTitle");
@@ -1750,7 +1286,7 @@
       };
     }
 
-    // CATEGORY COUNT & FILTER
+    // COUNTS & FILTER
     function updateCounts() {
       const catCounts = {
         'Camera Movement': 0, 'Camera Angles': 0, 'Camera Shots': 0, 'Cinematic Lighting': 0, 'Atmosphere': 0, 'Camera Lens': 0, 'Master Prompts': 0
@@ -1800,7 +1336,7 @@
     }
 
     function openPromptLibrary() {
-      alert("Opening Visual Prompts Library: 141 Director Prompts Loaded.");
+      alert("Opening Visual Prompts Library: 136 Director Prompts Loaded.");
     }
 
     // 2-SECOND FULLSCREEN CATEGORY ANIMATION
@@ -1871,7 +1407,6 @@
       }, 2000);
     }
 
-    // SIDEBAR & PROFILE POPUP CONTROLS
     const sidebarToggleBtn = document.getElementById("sidebarToggleBtn");
     const sidebarDrawer = document.getElementById("sidebarDrawer");
     const sidebarOverlay = document.getElementById("sidebarOverlay");
@@ -1911,11 +1446,10 @@
       if (themesModal && e.target === themesModal) themesModal.style.display = "none";
     });
 
-    // Initial render
     renderCards(window.allVaultItems);
   </script>
 
-  <!-- FIREBASE DATA INTEGRATION FOR + ADD MOVEMENT -->
+  <!-- FIREBASE DATA INTEGRATION -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
