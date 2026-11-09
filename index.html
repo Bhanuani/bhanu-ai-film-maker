@@ -273,7 +273,6 @@
       background: #000;
     }
 
-    /* 3D HERO BANNER VIDEO STYLING */
     .hero-img-box video {
       width: 100%; height: 100%; object-fit: cover; display: block;
       transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), filter 0.6s ease;
@@ -632,7 +631,7 @@
       <div class="hero-top-bar">
         <div class="vault-badge">MASTER DIRECTORS VAULT</div>
         <div class="counter-pill">
-          <span class="num" id="heroCount">44</span> MOVEMENTS
+          <span class="num" id="heroCount">104</span> MOVEMENTS
         </div>
       </div>
 
@@ -667,7 +666,7 @@
           <rect x="14" y="14" width="7" height="7" rx="2"/>
         </svg>
         <span>All</span>
-        <span class="count" id="count_All">44</span>
+        <span class="count" id="count_All">104</span>
       </button>
 
       <button class="cat-tab" onclick="triggerCinematicCategory('Camera Movement', this)">
@@ -694,10 +693,11 @@
         <span class="count" id="count_Cinematic_Lighting">0</span>
       </button>
 
+      <!-- Atmosphere Category with 60 PDF Themes -->
       <button class="cat-tab" onclick="triggerCinematicCategory('Atmosphere', this)">
         <img src="Atmosphere.png" class="cat-3d-img" alt="Atmosphere">
         <span>Atmosphere</span>
-        <span class="count" id="count_Atmosphere">0</span>
+        <span class="count" id="count_Atmosphere">60</span>
       </button>
 
       <button class="cat-tab" onclick="triggerCinematicCategory('Camera Lens', this)">
@@ -776,8 +776,9 @@
     <span>Prompt copied to clipboard!</span>
   </div>
 
-  <!-- JAVASCRIPT LOGIC -->
+  <!-- JAVASCRIPT LOGIC WITH PDF ATMOSPHERE THEMES -->
   <script>
+    // 44 Core Camera Movements
     const defaultMovements = [
       { id: "mov_1", name: "Slow Dolly In", category: "Camera Movement", prompt: "Slow dolly in, camera moves slowly forward toward the subject." },
       { id: "mov_2", name: "Slow Dolly Out", category: "Camera Movement", prompt: "Slow dolly out, camera moves slowly backwards away from the subject." },
@@ -825,7 +826,72 @@
       { id: "mov_44", name: "Worm's Eye Tracking (Ground Level)", category: "Camera Movement", prompt: "Worm's eye view, low angle tracking, camera moves along the ground looking up." }
     ];
 
-    window.allVaultItems = [...defaultMovements];
+    // 60 EXACT ATMOSPHERE THEMES EXTRACTED FROM YOUR PDF (NO TELUGU TEXT)
+    const atmosphereThemesFromPdf = [
+      { id: "atm_1", name: "Golden Hour Glow", category: "Atmosphere", prompt: "Golden Hour Glow, soft warm golden sunlight at sunrise or sunset, cinematic lighting, 8k" },
+      { id: "atm_2", name: "Blue Hour Twilight", category: "Atmosphere", prompt: "Blue Hour Twilight, cool deep blue atmospheric tones, early dawn or late dusk, moody ambience" },
+      { id: "atm_3", name: "Overcast Diffused Light", category: "Atmosphere", prompt: "Overcast Diffused Light, shadowless soft even light under overcast sky, portrait cinematography" },
+      { id: "atm_4", name: "Window Natural Side Light", category: "Atmosphere", prompt: "Window Natural Side Light, dramatic natural lighting through window, chiaroscuro contrast" },
+      { id: "atm_5", name: "Golden Hour Silhouette", category: "Atmosphere", prompt: "Golden Hour Silhouette, subject backlit against bright sunset, pure black silhouette outline" },
+      { id: "atm_6", name: "Dappled Sunlight", category: "Atmosphere", prompt: "Dappled Sunlight, sunlight filtering through lush tree canopy, organic pattern highlights" },
+      { id: "atm_7", name: "Rim Lighting (Hair Light)", category: "Atmosphere", prompt: "Rim Lighting Hair Light, strong backlight defining edges of subject hair and shoulders" },
+      { id: "atm_8", name: "Sunrise Mist and Ray", category: "Atmosphere", prompt: "Sunrise Mist and Ray, morning god rays through foggy atmospheric particulate, sunbeams" },
+      { id: "atm_9", name: "High Noon Desert Sun", category: "Atmosphere", prompt: "High Noon Desert Sun, blazing direct sunlight, intense heat mirage waves, golden sand dunes" },
+      { id: "atm_10", name: "Misty Morning Fog", category: "Atmosphere", prompt: "Misty Morning Fog, dense low-hanging fog, ethereal mysterious dreamscape mood" },
+      { id: "atm_11", name: "Heavy Rain Downpour", category: "Atmosphere", prompt: "Heavy Rain Downpour, pouring rain, water droplets, moody dark grey storm atmosphere" },
+      { id: "atm_12", name: "Post-Rain Puddle Reflections", category: "Atmosphere", prompt: "Post-Rain Puddle Reflections, wet ground reflective mirrors of city lights and architecture" },
+      { id: "atm_13", name: "Gentle Snowfall", category: "Atmosphere", prompt: "Gentle Snowfall, soft falling snowflakes, calm tranquil winter wonderland landscape" },
+      { id: "atm_14", name: "Thunderstorm Lightning Strike", category: "Atmosphere", prompt: "Thunderstorm Lightning Strike, pitch dark sky illuminated by fierce electric lightning bolt" },
+      { id: "atm_15", name: "Morning Dew Drops", category: "Atmosphere", prompt: "Morning Dew Drops, glistening macro dew beads on fresh grass leaves, soft morning glow" },
+      { id: "atm_16", name: "Dramatic Storm Clouds", category: "Atmosphere", prompt: "Dramatic Storm Clouds, massive swirling dark ominous cumulonimbus tempest clouds" },
+      { id: "atm_17", name: "Rainbow After Storm", category: "Atmosphere", prompt: "Rainbow After Storm, vibrant seven-color rainbow arching across clearing dramatic sky" },
+      { id: "atm_18", name: "Misty Waterfall Spray", category: "Atmosphere", prompt: "Misty Waterfall Spray, rushing cascading waterfall surrounded by moist atmospheric spray" },
+      { id: "atm_19", name: "Windblown Elements", category: "Atmosphere", prompt: "Windblown Elements, strong gusting wind whipping hair, clothing, and swaying tall grasses" },
+      { id: "atm_20", name: "Cyberpunk Neon City", category: "Atmosphere", prompt: "Cyberpunk Neon City, futuristic metropolis drenched in glowing cyan and magenta neon light" },
+      { id: "atm_21", name: "Moody Urban Night Street", category: "Atmosphere", prompt: "Moody Urban Night Street, dark narrow alleyway illuminated by a lone warm street lamp" },
+      { id: "atm_22", name: "Traffic Light Trails", category: "Atmosphere", prompt: "Traffic Light Trails, long exposure highway light streaks of red and white vehicle headlights" },
+      { id: "atm_23", name: "Rooftop City Skyline", category: "Atmosphere", prompt: "Rooftop City Skyline, panoramic nocturnal cityscape view of illuminated skyscrapers" },
+      { id: "atm_24", name: "Starry Night Sky (Astro)", category: "Atmosphere", prompt: "Starry Night Sky Astro, brilliant glowing Milky Way galaxy across pitch dark mountain sky" },
+      { id: "atm_25", name: "Campfire Glow in Dark", category: "Atmosphere", prompt: "Campfire Glow in Dark, crackling warm fire embers illuminating faces in deep night forest" },
+      { id: "atm_26", name: "Neon Portrait Reflection", category: "Atmosphere", prompt: "Neon Portrait Reflection, neon signs reflecting off glass and face, cinematic wet look" },
+      { id: "atm_27", name: "Cinematic Moody Portrait", category: "Atmosphere", prompt: "Cinematic Moody Portrait, deep shadows, expressive cinematic color grading, intimate tone" },
+      { id: "atm_28", name: "High-Contrast Chiaroscuro", category: "Atmosphere", prompt: "High-Contrast Chiaroscuro, intense sharp spotlight surrounded by velvety deep black shadows" },
+      { id: "atm_29", name: "Warm Vintage Retro", category: "Atmosphere", prompt: "Warm Vintage Retro, faded nostalgic 1970s tones, warm sepia grain, timeless film aesthetic" },
+      { id: "atm_30", name: "Moody Bohemian Room", category: "Atmosphere", prompt: "Moody Bohemian Room, cozy fairy lights, indoor botanicals, rich textures and warm tones" },
+      { id: "atm_31", name: "Luxury Dark Academia", category: "Atmosphere", prompt: "Luxury Dark Academia, towering library shelves, leather-bound books, antique candles, fireplace" },
+      { id: "atm_32", name: "Industrial Loft Vibe", category: "Atmosphere", prompt: "Industrial Loft Vibe, exposed brick walls, steel conduits, warm hanging Edison bulbs" },
+      { id: "atm_33", name: "Monochrome Noir", category: "Atmosphere", prompt: "Monochrome Noir, classic high-contrast black and white photography, dramatic shadow play" },
+      { id: "atm_34", name: "Deep Dense Forest Canopy", category: "Atmosphere", prompt: "Deep Dense Forest Canopy, ancient primal woods with radiant sun rays cutting through leaves" },
+      { id: "atm_35", name: "Autumn Golden Foliage", category: "Atmosphere", prompt: "Autumn Golden Foliage, radiant forest path covered with vibrant amber, red, and golden leaves" },
+      { id: "atm_36", name: "Tropical Beach Paradise", category: "Atmosphere", prompt: "Tropical Beach Paradise, crystal turquoise water, pristine white sand, coconut palm breeze" },
+      { id: "atm_37", name: "Majestic Mountain Peak", category: "Atmosphere", prompt: "Majestic Mountain Peak, snow-capped alpine summits rising above morning cloud inversions" },
+      { id: "atm_38", name: "Flowing River Stream", category: "Atmosphere", prompt: "Flowing River Stream, silky long exposure alpine creek flowing smoothly over mossy rocks" },
+      { id: "atm_39", name: "African Savannah Sunset", category: "Atmosphere", prompt: "African Savannah Sunset, crimson horizon silhouette of acacia trees and roaming wildlife" },
+      { id: "atm_40", name: "Lush Green Paddy Fields", category: "Atmosphere", prompt: "Lush Green Paddy Fields, terraced emerald rice fields cascading down misty tropical hills" },
+      { id: "atm_41", name: "Desert Sand Dunes", category: "Atmosphere", prompt: "Desert Sand Dunes, sweeping wind-sculpted golden ridges under late afternoon warm light" },
+      { id: "atm_42", name: "Volcanic Lava Glow", category: "Atmosphere", prompt: "Volcanic Lava Glow, molten red-orange lava streams cutting across dark basalt rocks at night" },
+      { id: "atm_43", name: "Mirror Reflection Lake", category: "Atmosphere", prompt: "Mirror Reflection Lake, crystal calm glass water mirroring majestic alpine mountains" },
+      { id: "atm_44", name: "Abstract Bokeh Lights", category: "Atmosphere", prompt: "Abstract Bokeh Lights, out-of-focus soft circular orbs of shimmering colorful light" },
+      { id: "atm_45", name: "Creative Smoke Bomb", category: "Atmosphere", prompt: "Creative Smoke Bomb, swirling vibrant colorful cloud plumes billowing through urban scene" },
+      { id: "atm_46", name: "Double Exposure Art", category: "Atmosphere", prompt: "Double Exposure Art, silhouette portrait seamlessly blended with pine forest landscape" },
+      { id: "atm_47", name: "Levitating Objects", category: "Atmosphere", prompt: "Levitating Objects, magical items floating weightlessly in mid-air defying gravity" },
+      { id: "atm_48", name: "Prism Light Flare", category: "Atmosphere", prompt: "Prism Light Flare, prismatic rainbow spectral flares refracting across subject face" },
+      { id: "atm_49", name: "Glowing Bioluminescent Beach", category: "Atmosphere", prompt: "Glowing Bioluminescent Beach, nocturnal neon blue ocean waves illuminating the dark shoreline" },
+      { id: "atm_50", name: "Ancient Temple Architecture", category: "Atmosphere", prompt: "Ancient Temple Architecture, stone sanctum bathed in mystical shafts of atmospheric sunlight" },
+      { id: "atm_51", name: "Rural Village Sunset", category: "Atmosphere", prompt: "Rural Village Sunset, peaceful rustic hamlet at dusk with golden dust and evening tranquility" },
+      { id: "atm_52", name: "Melancholic Rainy Window", category: "Atmosphere", prompt: "Melancholic Rainy Window, solitary introspective mood gazing through rain-streaked glass" },
+      { id: "atm_53", name: "Romantic Embrace in Rain", category: "Atmosphere", prompt: "Romantic Embrace in Rain, passionate couple under umbrella in glistening wet city street" },
+      { id: "atm_54", name: "Solitary Bench in Autumn", category: "Atmosphere", prompt: "Solitary Bench in Autumn, lonely wooden bench surrounded by fallen leaves and quiet fog" },
+      { id: "atm_55", name: "Nostalgic Old Photograph Vibe", category: "Atmosphere", prompt: "Nostalgic Old Photograph Vibe, vintage faded borders, antique texture, warm childhood memory" },
+      { id: "atm_56", name: "Intense Athletic Focus", category: "Atmosphere", prompt: "Intense Athletic Focus, determined sprinter under stadium floodlights, sweat, high drama" },
+      { id: "atm_57", name: "Epic Adventure Cliffhanger", category: "Atmosphere", prompt: "Epic Adventure Cliffhanger, mountaineer standing on high precipice overlooking sea of clouds" },
+      { id: "atm_58", name: "Holographic User Interface", category: "Atmosphere", prompt: "Holographic User Interface, glowing futuristic cyan interactive screens in dark high-tech room" },
+      { id: "atm_59", name: "Glowing Automotive Reveal", category: "Atmosphere", prompt: "Glowing Automotive Reveal, sleek luxury sports car illuminated by sharp studio light rays" },
+      { id: "atm_60", name: "Cinematic Drone Landscape", category: "Atmosphere", prompt: "Cinematic Drone Landscape, high-altitude aerial view of winding coastal cliff road at sunrise" }
+    ];
+
+    // Combine 44 Camera Movements + 60 PDF Atmosphere Themes = 104 Total
+    window.allVaultItems = [...defaultMovements, ...atmosphereThemesFromPdf];
     let currentCategory = "All";
 
     const classicThemes = [
@@ -1042,9 +1108,10 @@
     }
 
     function openPromptLibrary() {
-      alert("Opening Visual Prompts Library: 44 Camera Movements Loaded.");
+      alert("Opening Visual Prompts Library: 104 Director Prompts Loaded.");
     }
 
+    // Direct render on page load
     renderCards(window.allVaultItems);
   </script>
 
@@ -1147,7 +1214,7 @@
           firebaseItems.push({ id: doc.id, ...doc.data() });
         });
         if (firebaseItems.length > 0) {
-          window.allVaultItems = [...firebaseItems, ...defaultMovements];
+          window.allVaultItems = [...firebaseItems, ...defaultMovements, ...atmosphereThemesFromPdf];
         }
         renderCards(window.allVaultItems);
       } catch (err) {
