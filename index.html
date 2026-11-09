@@ -243,139 +243,164 @@
     /* VAULT LAYOUT */
     .vault-container { max-width: 1440px; margin: 0 auto; padding: 1.5rem 2rem 5rem; }
 
-    /* EXPANDED HERO BANNER (NO TEXT) */
+    /* HERO 3D EXPANDED BANNER (NO CAPTION, FULL DEPTH EXPANSION WITHOUT STRETCH) */
     .hero-banner-wrapper {
-      position: relative;
-      background: #000;
-      border: 1px solid rgba(0, 210, 255, 0.25);
+      position: relative; 
+      background: #000; 
+      border: 1px solid rgba(0, 210, 255, 0.25); 
       border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 0 45px rgba(0, 150, 255, 0.12);
-      margin-bottom: 2rem;
-      cursor: pointer;
+      overflow: hidden; 
+      box-shadow: 0 0 45px rgba(0, 150, 255, 0.12); 
+      margin-bottom: 2rem; 
+      cursor: pointer; 
       transition: all 0.4s ease;
+      height: 520px; /* Expanded full down to line */
     }
 
     .hero-banner-wrapper:hover {
-      border-color: rgba(0, 210, 255, 0.6);
+      border-color: rgba(0, 210, 255, 0.6); 
       box-shadow: 0 0 55px rgba(0, 210, 255, 0.25);
     }
 
+    .hero-top-bar {
+      position: absolute; 
+      top: 1.25rem; 
+      left: 1.5rem; 
+      right: 1.5rem; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      z-index: 5; 
+      pointer-events: none;
+    }
+
+    .vault-badge {
+      font-size: 0.72rem; font-weight: 800; letter-spacing: 1.5px; background: rgba(0, 210, 255, 0.12);
+      border: 1px solid rgba(0, 210, 255, 0.3); color: var(--accent-cyan); padding: 0.35rem 0.85rem; border-radius: 999px;
+    }
+
+    .counter-pill {
+      background: rgba(0, 0, 0, 0.65); border: 1px solid rgba(0, 210, 255, 0.3); padding: 0.35rem 0.85rem;
+      border-radius: 999px; display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; font-weight: 800; color: #fff;
+    }
+
+    .counter-pill span.num { color: var(--accent-cyan); font-size: 1.1rem; }
+
     .hero-img-box {
-      width: 100%;
-      height: 480px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 100%; 
+      height: 100%; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
       overflow: hidden;
       background: #000;
     }
 
     .hero-img-box video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover; /* Keeps exact proportions without stretch */
       display: block;
       transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), filter 0.6s ease;
     }
 
     .hero-banner-wrapper:hover .hero-img-box video {
-      transform: scale(1.025);
-      filter: brightness(1.06);
+      transform: scale(1.035); 
+      filter: brightness(1.08) drop-shadow(0 0 30px rgba(0, 210, 255, 0.3));
     }
 
-    /* CATEGORIES BAR */
-    .categories-bar {
-      display: flex;
-      align-items: center;
-      gap: 0.85rem;
-      overflow-x: auto;
-      padding-bottom: 0.85rem;
-      margin-bottom: 2rem;
-      scrollbar-width: none;
+    /* CATEGORIES BAR WITH ACCENT SCROLLBAR FOR SIDE-SWIPE */
+    .categories-bar-wrapper {
+      position: relative;
+      margin-bottom: 2.2rem;
     }
-    .categories-bar::-webkit-scrollbar { display: none; }
+
+    .categories-bar {
+      display: flex; 
+      align-items: center; 
+      gap: 0.85rem; 
+      overflow-x: auto; 
+      padding-bottom: 0.95rem; 
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent-cyan) rgba(255, 255, 255, 0.05);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* CUSTOM SLEEK SCROLLBAR UNDER CATEGORIES */
+    .categories-bar::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .categories-bar::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 999px;
+      margin: 0 4px;
+    }
+
+    .categories-bar::-webkit-scrollbar-thumb {
+      background: linear-gradient(90deg, #00d2ff 0%, #0088cc 100%);
+      border-radius: 999px;
+      box-shadow: 0 0 10px rgba(0, 210, 255, 0.6);
+    }
 
     .cat-tab {
-      background: rgba(10, 16, 28, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(10, 16, 28, 0.85); 
+      border: 1px solid rgba(255, 255, 255, 0.08); 
       color: var(--text-muted);
-      padding: 0.55rem 1.15rem;
-      border-radius: 999px;
-      font-size: 0.88rem;
-      font-weight: 600;
+      padding: 0.55rem 1.15rem; 
+      border-radius: 999px; 
+      font-size: 0.88rem; 
+      font-weight: 600; 
       display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.25s ease;
+      align-items: center; 
+      gap: 0.75rem; 
+      cursor: pointer; 
+      white-space: nowrap; 
+      transition: all 0.25s ease; 
       backdrop-filter: blur(10px);
-      position: relative;
+      user-select: none;
     }
 
-    .cat-tab:hover {
-      border-color: rgba(0, 210, 255, 0.4);
-      background: rgba(0, 210, 255, 0.05);
-      color: #fff;
+    .cat-tab:hover { 
+      border-color: rgba(0, 210, 255, 0.4); 
+      background: rgba(0, 210, 255, 0.05); 
+      color: #fff; 
     }
 
     .cat-tab.active {
       background: linear-gradient(135deg, rgba(0, 210, 255, 0.2) 0%, rgba(13, 18, 31, 0.95) 100%);
-      border-color: var(--accent-cyan);
-      color: #fff;
+      border-color: var(--accent-cyan); 
+      color: #fff; 
       box-shadow: 0 0 20px rgba(0, 210, 255, 0.25);
     }
 
     .cat-tab span.count {
-      background: rgba(255, 255, 255, 0.08);
-      padding: 0.15rem 0.5rem;
-      border-radius: 999px;
-      font-size: 0.75rem;
+      background: rgba(255, 255, 255, 0.08); 
+      padding: 0.15rem 0.5rem; 
+      border-radius: 999px; 
+      font-size: 0.75rem; 
       font-weight: 700;
     }
 
     .cat-tab.active span.count { background: var(--accent-cyan); color: #000; }
 
     .cat-3d-img {
-      width: 36px;
-      height: 36px;
-      object-fit: contain;
+      width: 36px; 
+      height: 36px; 
+      object-fit: contain; 
       filter: drop-shadow(0 4px 8px rgba(0,0,0,0.8));
-      animation: iconFloatContinuous 3s ease-in-out infinite alternate;
+      animation: iconFloatContinuous 3s ease-in-out infinite alternate; 
       transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .cat-tab:hover .cat-3d-img, .cat-tab.active .cat-3d-img {
-      transform: scale(1.22) rotate(-4deg);
+      transform: scale(1.22) rotate(-4deg); 
       filter: drop-shadow(0 0 12px rgba(0, 210, 255, 0.7));
     }
 
     @keyframes iconFloatContinuous {
       0% { transform: translateY(0px) rotate(0deg); }
       100% { transform: translateY(-4px) rotate(3deg); }
-    }
-
-    /* MASTER PROMPTS ICON ANIMATION (CIRCLE REMOVED, ICON ONLY) */
-    .master-icon-wrap {
-      width: 36px;
-      height: 36px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .cat-tab:hover .master-icon-wrap img,
-    .cat-tab.active .master-icon-wrap img {
-      animation: penWriteTilt 1.2s ease-in-out infinite alternate;
-      filter: drop-shadow(0 0 14px rgba(0, 210, 255, 0.85));
-    }
-
-    @keyframes penWriteTilt {
-      0% { transform: scale(1.2) rotate(0deg) translate(0, 0); }
-      30% { transform: scale(1.25) rotate(-9deg) translate(-2px, -1px); }
-      70% { transform: scale(1.22) rotate(7deg) translate(2px, 1px); }
-      100% { transform: scale(1.25) rotate(-4deg) translate(-1px, 2px); }
     }
 
     /* GRID & CARDS */
@@ -692,52 +717,30 @@
       position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 10;
     }
 
-    /* ALL ICONS ORBIT SCREEN ANIMATION */
-    .all-icons-grid {
+    /* 1. All Categories Grand Orbit Animation */
+    .all-orbit-scene {
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-wrap: wrap;
-      gap: 28px;
-      max-width: 900px;
-      animation: allIconsBurst 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      position: relative;
+      width: 500px;
+      height: 500px;
+      animation: grandOrbitSpin 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    .all-icons-grid img {
-      width: 90px;
-      height: 90px;
+    .all-orbit-icon {
+      position: absolute;
+      width: 75px;
+      height: 75px;
       object-fit: contain;
-      filter: drop-shadow(0 0 25px rgba(0, 210, 255, 0.8));
+      filter: drop-shadow(0 0 20px rgba(0, 210, 255, 0.8));
     }
 
-    @keyframes allIconsBurst {
-      0% { transform: scale(0.3) rotate(-20deg); opacity: 0; }
-      40% { transform: scale(1.15) rotate(0deg); opacity: 1; }
-      75% { transform: scale(1) rotate(2deg); opacity: 1; }
-      100% { transform: scale(1.8) rotate(15deg); opacity: 0; }
-    }
-
-    /* MASTER PROMPTS SCREEN ANIMATION (ICON ONLY WRITING) */
-    .master-screen-rig {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      animation: masterWriteAction 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    .master-screen-rig img {
-      width: 250px;
-      height: 250px;
-      object-fit: contain;
-      filter: drop-shadow(0 0 40px rgba(0, 210, 255, 0.95));
-      animation: penWriteTilt 1.2s ease-in-out infinite alternate;
-    }
-
-    @keyframes masterWriteAction {
-      0% { transform: scale(0.3) rotate(-25deg); opacity: 0; }
-      30% { transform: scale(1.15) rotate(0deg); opacity: 1; }
-      75% { transform: scale(1.05) rotate(5deg); opacity: 1; }
-      100% { transform: scale(2.2) rotate(20deg); opacity: 0; }
+    @keyframes grandOrbitSpin {
+      0% { transform: scale(0.2) rotate(-90deg); opacity: 0; }
+      40% { transform: scale(1.1) rotate(20deg); opacity: 1; }
+      80% { transform: scale(1) rotate(0deg); opacity: 1; }
+      100% { transform: scale(1.4) rotate(45deg); opacity: 0; }
     }
 
     .dolly-real-rig {
@@ -791,7 +794,7 @@
 
     @keyframes glarePuff { 0% { opacity: 0; } 25% { opacity: 1; } 80% { opacity: 0.8; } 100% { opacity: 0; } }
 
-    /* SEASON LAPSE ANIMATION */
+    /* SEASON LAPSE ANIMATION (ATMOSPHERE) */
     .season-sky-lapse {
       position: absolute;
       inset: 0;
@@ -841,6 +844,50 @@
       35% { transform: scale(1.15) rotate(0deg); opacity: 1; }
       75% { transform: scale(1.35) rotate(15deg); }
       100% { transform: scale(3.0) rotate(45deg); opacity: 0; }
+    }
+
+    /* MASTER PROMPT WRITING PEN ANIMATION */
+    .master-writing-rig {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 480px;
+      height: 320px;
+      animation: masterRigPop 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .master-logo-canvas {
+      width: 280px;
+      height: auto;
+      filter: drop-shadow(0 0 40px rgba(0, 210, 255, 0.8));
+    }
+
+    .neon-quill-pen {
+      position: absolute;
+      top: 15%;
+      left: 15%;
+      font-size: 3.5rem;
+      color: #00d2ff;
+      filter: drop-shadow(0 0 25px #00d2ff);
+      animation: penWritingMotion 2s ease-in-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes penWritingMotion {
+      0% { transform: translate(0, 0) rotate(-20deg) scale(0.6); opacity: 0; }
+      20% { transform: translate(40px, 30px) rotate(10deg) scale(1.1); opacity: 1; }
+      40% { transform: translate(120px, 15px) rotate(-15deg); }
+      60% { transform: translate(190px, 50px) rotate(5deg); }
+      80% { transform: translate(250px, 20px) rotate(-10deg); opacity: 1; }
+      100% { transform: translate(320px, 0px) rotate(30deg) scale(1.4); opacity: 0; }
+    }
+
+    @keyframes masterRigPop {
+      0% { transform: scale(0.4); opacity: 0; }
+      30% { transform: scale(1.1); opacity: 1; }
+      75% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.35); opacity: 0; }
     }
 
     .stage-title {
@@ -939,8 +986,15 @@
 
   <div class="vault-container">
 
-    <!-- HERO SECTION (CLEAN 3D VIDEO BANNER EXPANDED FULLY) -->
+    <!-- HERO SECTION (EXPANDED TO FULL LINE, NO TEXT CAPTION, SEAMLESS 3 VIDEOS PLAYLIST LOOPER) -->
     <section class="hero-banner-wrapper" id="heroBanner">
+      <div class="hero-top-bar">
+        <div class="vault-badge">MASTER DIRECTORS VAULT</div>
+        <div class="counter-pill">
+          <span class="num" id="heroCount">126</span> MOVEMENTS
+        </div>
+      </div>
+
       <div class="hero-img-box">
         <video 
           id="heroVideo" 
@@ -957,72 +1011,72 @@
       </div>
     </section>
 
-    <!-- 3D REALISTIC ICONS CATEGORIES BAR -->
-    <div class="categories-bar">
-      
-      <!-- All Tab -->
-      <button class="cat-tab active" onclick="triggerCinematicCategory('All', this)">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="#00d2ff">
-          <rect x="3" y="3" width="7" height="7" rx="2"/>
-          <rect x="14" y="3" width="7" height="7" rx="2"/>
-          <rect x="3" y="14" width="7" height="7" rx="2"/>
-          <rect x="14" y="14" width="7" height="7" rx="2"/>
-        </svg>
-        <span>All</span>
-        <span class="count" id="count_All">116</span>
-      </button>
+    <!-- 3D REALISTIC ICONS CATEGORIES BAR (WITH SIDE SCROLLBAR FOR SIDE-SWIPE) -->
+    <div class="categories-bar-wrapper">
+      <div class="categories-bar">
+        
+        <!-- All Category (Capitalized) -->
+        <button class="cat-tab active" onclick="triggerCinematicCategory('All', this)">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="#00d2ff">
+            <rect x="3" y="3" width="7" height="7" rx="2"/>
+            <rect x="14" y="3" width="7" height="7" rx="2"/>
+            <rect x="3" y="14" width="7" height="7" rx="2"/>
+            <rect x="14" y="14" width="7" height="7" rx="2"/>
+          </svg>
+          <span>All</span>
+          <span class="count" id="count_All">126</span>
+        </button>
 
-      <!-- Camera Movements -->
-      <button class="cat-tab" onclick="triggerCinematicCategory('Camera Movement', this)">
-        <img src="Camera-Movement.png" class="cat-3d-img" alt="Camera Movements">
-        <span>Camera Movements</span>
-        <span class="count" id="count_Camera_Movement">44</span>
-      </button>
+        <!-- Camera Movement (Capitalized) -->
+        <button class="cat-tab" onclick="triggerCinematicCategory('Camera Movement', this)">
+          <img src="Camera-Movement.png" class="cat-3d-img" alt="Camera Movement">
+          <span>Camera Movement</span>
+          <span class="count" id="count_Camera_Movement">44</span>
+        </button>
 
-      <!-- Camera Angles -->
-      <button class="cat-tab" onclick="triggerCinematicCategory('Camera Angles', this)">
-        <img src="Camera-Angles.png" class="cat-3d-img" alt="Camera Angles">
-        <span>Camera Angles</span>
-        <span class="count" id="count_Camera_Angles">12</span>
-      </button>
+        <!-- Camera Angles (Capitalized) -->
+        <button class="cat-tab" onclick="triggerCinematicCategory('Camera Angles', this)">
+          <img src="Camera-Angles.png" class="cat-3d-img" alt="Camera Angles">
+          <span>Camera Angles</span>
+          <span class="count" id="count_Camera_Angles">12</span>
+        </button>
 
-      <!-- Camera Shots -->
-      <button class="cat-tab" onclick="triggerCinematicCategory('Camera Shots', this)">
-        <img src="Camera-Shots.png" class="cat-3d-img" alt="Camera Shots">
-        <span>Camera Shots</span>
-        <span class="count" id="count_Camera_Shots">0</span>
-      </button>
+        <!-- Camera Shots (Capitalized) -->
+        <button class="cat-tab" onclick="triggerCinematicCategory('Camera Shots', this)">
+          <img src="Camera-Shots.png" class="cat-3d-img" alt="Camera Shots">
+          <span>Camera Shots</span>
+          <span class="count" id="count_Camera_Shots">0</span>
+        </button>
 
-      <!-- Cinematic Lighting -->
-      <button class="cat-tab" onclick="triggerCinematicCategory('Cinematic Lighting', this)">
-        <img src="Cinematic -lighting.png" class="cat-3d-img" alt="Cinematic Lighting">
-        <span>Cinematic Lighting</span>
-        <span class="count" id="count_Cinematic_Lighting">0</span>
-      </button>
+        <!-- Cinematic Lighting (Capitalized) -->
+        <button class="cat-tab" onclick="triggerCinematicCategory('Cinematic Lighting', this)">
+          <img src="Cinematic -lighting.png" class="cat-3d-img" alt="Cinematic Lighting">
+          <span>Cinematic Lighting</span>
+          <span class="count" id="count_Cinematic_Lighting">0</span>
+        </button>
 
-      <!-- Atmosphere -->
-      <button class="cat-tab" onclick="triggerCinematicCategory('Atmosphere', this)">
-        <img src="Atmosphere.png" class="cat-3d-img" alt="Atmosphere">
-        <span>Atmosphere</span>
-        <span class="count" id="count_Atmosphere">60</span>
-      </button>
+        <!-- Atmosphere (Capitalized) -->
+        <button class="cat-tab" onclick="triggerCinematicCategory('Atmosphere', this)">
+          <img src="Atmosphere.png" class="cat-3d-img" alt="Atmosphere">
+          <span>Atmosphere</span>
+          <span class="count" id="count_Atmosphere">60</span>
+        </button>
 
-      <!-- Camera Lens -->
-      <button class="cat-tab" onclick="triggerCinematicCategory('Camera Lens', this)">
-        <img src="Camera-lens.png" class="cat-3d-img" alt="Camera Lens">
-        <span>Camera Lens</span>
-        <span class="count" id="count_Camera_Lens">0</span>
-      </button>
+        <!-- Camera Lens (Capitalized) -->
+        <button class="cat-tab" onclick="triggerCinematicCategory('Camera Lens', this)">
+          <img src="Camera-lens.png" class="cat-3d-img" alt="Camera Lens">
+          <span>Camera Lens</span>
+          <span class="count" id="count_Camera_Lens">0</span>
+        </button>
 
-      <!-- Master Prompts (Icon Only Writing Motion) -->
-      <button class="cat-tab" onclick="triggerCinematicCategory('Master Prompts', this)">
-        <span class="master-icon-wrap">
-          <img src="Master-prompt.png" class="cat-3d-img" alt="Master Prompts">
-        </span>
-        <span>Master Prompts</span>
-        <span class="count" id="count_Master_Prompts">0</span>
-      </button>
+        <!-- NEW: Master Prompts Category (Capitalized) with Writing Animation -->
+        <button class="cat-tab" onclick="triggerCinematicCategory('Master Prompts', this)" onmouseenter="triggerHoverMasterAnimation()">
+          <img src="Master-prompt.png" class="cat-3d-img" alt="Master Prompts" onerror="this.src='Camera-Shots.png'">
+          <span>Master Prompts</span>
+          <span class="count" id="count_Master_Prompts">10</span>
+        </button>
 
+      </div>
     </div>
 
     <!-- MOVEMENTS GRID -->
@@ -1118,6 +1172,7 @@
 
   <!-- JAVASCRIPT LOGIC -->
   <script>
+    // 44 Core Camera Movements
     const defaultMovements = [
       { id: "mov_1", name: "Slow Dolly In", category: "Camera Movement", prompt: "Slow dolly in, camera moves slowly forward toward the subject." },
       { id: "mov_2", name: "Slow Dolly Out", category: "Camera Movement", prompt: "Slow dolly out, camera moves slowly backwards away from the subject." },
@@ -1165,7 +1220,7 @@
       { id: "mov_44", name: "Worm's Eye Tracking (Ground Level)", category: "Camera Movement", prompt: "Worm's eye view, low angle tracking, camera moves along the ground looking up." }
     ];
 
-    // 12 CAMERA ANGLES (FROM CAMERA ANGLES.PDF)[cite: 47, 48, 49, 50, 51]
+    // 12 Camera Angles (From PDF)
     const cameraAnglesFromPdf = [
       { id: "ang_1", name: "Eye-level Angle", category: "Camera Angles", prompt: "Eye-level angle, camera positioned at subject eye height, natural, neutral, realistic perspective, 8k" },
       { id: "ang_2", name: "Low Angle", category: "Camera Angles", prompt: "Low angle shot, camera looking upward at the subject, commanding power, dominance, grandeur, cinematic" },
@@ -1181,7 +1236,7 @@
       { id: "ang_12", name: "Point-Of-View (POV)", category: "Camera Angles", prompt: "Point-of-view POV shot, camera represents first-person character vision, immersive perspective, subjective participation" }
     ];
 
-    // 60 ATMOSPHERE THEMES FROM PDF[cite: 15]
+    // 60 Atmosphere Themes (From PDF)
     const atmosphereThemesFromPdf = [
       { id: "atm_1", name: "Golden Hour Glow", category: "Atmosphere", prompt: "Golden Hour Glow, soft warm golden sunlight at sunrise or sunset, cinematic lighting, 8k" },
       { id: "atm_2", name: "Blue Hour Twilight", category: "Atmosphere", prompt: "Blue Hour Twilight, cool deep blue atmospheric tones, early dawn or late dusk, moody ambience" },
@@ -1245,7 +1300,22 @@
       { id: "atm_60", name: "Cinematic Drone Landscape", category: "Atmosphere", prompt: "Cinematic Drone Landscape, high-altitude aerial view of winding coastal cliff road at sunrise" }
     ];
 
-    window.allVaultItems = [...defaultMovements, ...cameraAnglesFromPdf, ...atmosphereThemesFromPdf];
+    // 10 NEW MASTER PROMPTS
+    const masterPromptsList = [
+      { id: "mst_1", name: "Blockbuster Action Intro", category: "Master Prompts", prompt: "Anamorphic 35mm lens, intense low-angle slow dolly forward, hyper-realistic, orange and teal grading, 8k cinematic masterpiece" },
+      { id: "mst_2", name: "Sci-Fi Cyber Corridor", category: "Master Prompts", prompt: "Smooth tracking shot through sleek neon-lit metallic corridor, volumetric atmospheric fog, futuristic UI reflections, unreal engine 5" },
+      { id: "mst_3", name: "Epic Mythological War", category: "Master Prompts", prompt: "Wide high-angle crane reveal over ancient battlefield, burning torches, rising smoke embers, golden rim light, slow motion, IMAX 70mm" },
+      { id: "mst_4", name: "Moody Neo-Noir Alley", category: "Master Prompts", prompt: "Wet rain-slicked asphalt reflecting vibrant neon billboards, Dutch angle camera roll, lone trench coat figure silhouette, heavy atmosphere" },
+      { id: "mst_5", name: "Ethereal Dream Sequence", category: "Master Prompts", prompt: "Super slow orbital arc, floating bioluminescent flower particles, soft golden backlight, optical lens flare, 120fps ultra-smooth" },
+      { id: "mst_6", name: "Speed Tracking Chase", category: "Master Prompts", prompt: "Fast ground-level worm's eye tracking alongside wheels, extreme motion blur on background, dynamic urgent camera vibration, photorealistic" },
+      { id: "mst_7", name: "Intimate Cinematic Dialogue", category: "Master Prompts", prompt: "85mm prime lens f/1.4, creamy soft bokeh, over the shoulder rack focus, catchlight in eyes, subtle handheld documentary texture" },
+      { id: "mst_8", name: "Solarpunk Utopia Sunrise", category: "Master Prompts", prompt: "FPV drone smooth descending arc over lush futuristic vertical green towers, morning sunburst rays, crystalline clean reflections" },
+      { id: "mst_9", name: "Crash Zoom Dramatic Reveal", category: "Master Prompts", prompt: "Instant snap zoom from extreme wide landscape into intense protagonist eye close-up, sound-barrier shutter motion, 8k HDR" },
+      { id: "mst_10", name: "Cosmic Hyper Hyperspace", category: "Master Prompts", prompt: "Fast forward warp tunnel hyperlapse, kaleidoscopic neon star trails, barrel roll 360 rotation, zero-gravity surreal motion" }
+    ];
+
+    // Combine: 44 Movement + 12 Angles + 60 Atmosphere + 10 Master Prompts = 126 Total
+    window.allVaultItems = [...defaultMovements, ...cameraAnglesFromPdf, ...atmosphereThemesFromPdf, ...masterPromptsList];
     let currentCategory = "All";
 
     const classicThemes = [
@@ -1293,7 +1363,7 @@
 
     /* INDEXED-DB PERSISTENCE */
     let localDB;
-    const dbReq = indexedDB.open("CinemotionMediaDB", 3);
+    const dbReq = indexedDB.open("CinemotionMediaDB", 4);
     dbReq.onupgradeneeded = (e) => {
       localDB = e.target.result;
       if (!localDB.objectStoreNames.contains("cardMedia")) {
@@ -1321,7 +1391,7 @@
             <video id="vid_${item.id}" autoplay loop muted playsinline></video>
             <img id="img_${item.id}" alt="${item.name}">
 
-            <!-- Upload Box (Hidden when media is active) -->
+            <!-- Upload Box (Hidden automatically when media is loaded) -->
             <div class="upload-overlay" id="overlay_${item.id}" onclick="triggerFileInput(event, '${item.id}')">
               <i class="fa-solid fa-cloud-arrow-up"></i>
               <span>Click or Drag & Drop Media</span>
@@ -1337,14 +1407,17 @@
                 <span class="tag-badge">${item.category || 'Movement'}</span>
                 
                 <div class="card-meta-actions">
+                  <!-- Edit (Pencil) Button -->
                   <button type="button" class="meta-action-btn edit-btn" title="Change/Upload Media" onclick="editCardMedia('${item.id}', event)">
                     <i class="fa-solid fa-pen"></i>
                   </button>
 
+                  <!-- 1st Box: Download Button -->
                   <button type="button" class="meta-action-btn dl-btn" title="Download Media" onclick="downloadCardMedia('${item.id}', '${item.name.replace(/'/g, "\\'")}', event)">
                     <i class="fa-solid fa-download"></i>
                   </button>
                   
+                  <!-- 2nd Box: Delete Button -->
                   <button type="button" class="meta-action-btn del-btn" title="Delete Media" onclick="deleteCardMedia('${item.id}', event)">
                     <i class="fa-solid fa-trash"></i>
                   </button>
@@ -1565,7 +1638,7 @@
       }
     };
 
-    // LIGHTBOX EXPANDED POPUP SYSTEM
+    // LIGHTBOX SYSTEM
     const mediaLightbox = document.getElementById("mediaLightbox");
     const lightboxStage = document.getElementById("lightboxStage");
     const lightboxTitle = document.getElementById("lightboxTitle");
@@ -1641,6 +1714,9 @@
 
     // CATEGORY COUNT & FILTER
     function updateCounts() {
+      const hero = document.getElementById('heroCount');
+      if (hero) hero.innerText = window.allVaultItems.length;
+
       const catCounts = {
         'Camera Movement': 0, 'Camera Angles': 0, 'Camera Shots': 0, 'Cinematic Lighting': 0, 'Atmosphere': 0, 'Camera Lens': 0, 'Master Prompts': 0
       };
@@ -1689,10 +1765,18 @@
     }
 
     function openPromptLibrary() {
-      alert("Opening Visual Prompts Library: 116 Director Prompts Loaded.");
+      alert("Opening Visual Prompts Library: 126 Director Prompts Loaded.");
     }
 
-    // 2-SECOND CATEGORY ANIMATION STAGE
+    // HOVER ANIMATION FOR MASTER PROMPTS
+    window.triggerHoverMasterAnimation = function() {
+      const stage = document.getElementById('cinematicStage');
+      if (stage && stage.style.display !== 'flex') {
+        // Subtle ambient neon pulse
+      }
+    };
+
+    // 2-SECOND FULLSCREEN CATEGORY ANIMATION (ALL ICONS ON 'ALL', PEN ON 'MASTER PROMPTS', SEASON LAPSE ON 'ATMOSPHERE')
     let animTimeout;
     function triggerCinematicCategory(category, btnElement) {
       filterCategory(category, btnElement);
@@ -1708,33 +1792,31 @@
       stage.style.display = 'flex';
       title.innerText = category;
 
+      // 1. ALL CATEGORY: All 3D Icons Orbit Animation
       if (category === 'All') {
         scene.innerHTML = `
-          <div class="all-icons-grid">
-            <img src="Camera-Movement.png" alt="Movement">
-            <img src="Camera-Angles.png" alt="Angles">
-            <img src="Camera-Shots.png" alt="Shots">
-            <img src="Cinematic -lighting.png" alt="Lighting">
-            <img src="Atmosphere.png" alt="Atmosphere">
-            <img src="Camera-lens.png" alt="Lens">
-            <img src="Master-prompt.png" alt="Master Prompts">
+          <div class="all-orbit-scene">
+            <img src="Camera-Movement.png" class="all-orbit-icon" style="top: 0; left: 210px;">
+            <img src="Camera-Angles.png" class="all-orbit-icon" style="top: 80px; right: 20px;">
+            <img src="Camera-Shots.png" class="all-orbit-icon" style="bottom: 80px; right: 20px;">
+            <img src="Cinematic -lighting.png" class="all-orbit-icon" style="bottom: 0; left: 210px;">
+            <img src="Atmosphere.png" class="all-orbit-icon" style="bottom: 80px; left: 20px;">
+            <img src="Camera-lens.png" class="all-orbit-icon" style="top: 80px; left: 20px;">
+            <img src="Master-prompt.png" class="all-orbit-icon" style="top: 210px; left: 210px; filter: drop-shadow(0 0 35px #00d2ff);" onerror="this.src='Camera-Movement.png'">
           </div>
         `;
-      } else if (category === 'Master Prompts') {
+      }
+      // 2. MASTER PROMPTS: Writing Pen over Logo Animation
+      else if (category === 'Master Prompts') {
         scene.innerHTML = `
-          <div class="master-screen-rig">
-            <img src="Master-prompt.png" alt="Master Prompts Writing">
+          <div class="master-writing-rig">
+            <img src="Master-prompt.png" class="master-logo-canvas" alt="Master Prompt Logo" onerror="this.src='Camera-Shots.png'">
+            <i class="fa-solid fa-pen-nib neon-quill-pen"></i>
           </div>
         `;
-      } else if (category === 'Camera Movement') {
-        scene.innerHTML = `<div class="dolly-real-rig"><img src="Camera-Movement.png" alt="Dolly Camera"></div>`;
-      } else if (category === 'Camera Angles') {
-        scene.innerHTML = `<div class="angles-real-rig"><div class="angle-fast-cam"><img src="Camera-Angles.png" alt="Angle Camera"></div></div>`;
-      } else if (category === 'Camera Shots') {
-        scene.innerHTML = `<div class="clapper-real-rig"><img src="Camera-Shots.png" alt="Clapperboard Slate"></div>`;
-      } else if (category === 'Cinematic Lighting') {
-        scene.innerHTML = `<div class="light-glare"></div><div class="light-real-rig"><img src="Cinematic -lighting.png" alt="Studio Light"></div>`;
-      } else if (category === 'Atmosphere') {
+      }
+      // 3. ATMOSPHERE: Season Lapse (No Rain)
+      else if (category === 'Atmosphere') {
         scene.innerHTML = `
           <div class="season-sky-lapse"></div>
           <div class="smoke-rig-real"><img src="Atmosphere.png" alt="Atmosphere Fan"></div>
@@ -1742,7 +1824,20 @@
             <span>🌸</span><span>☀️</span><span>🍂</span><span>❄️</span>
           </div>
         `;
-      } else if (category === 'Camera Lens') {
+      }
+      else if (category === 'Camera Movement') {
+        scene.innerHTML = `<div class="dolly-real-rig"><img src="Camera-Movement.png" alt="Dolly Camera"></div>`;
+      } 
+      else if (category === 'Camera Angles') {
+        scene.innerHTML = `<div class="angles-real-rig"><div class="angle-fast-cam"><img src="Camera-Angles.png" alt="Angle Camera"></div></div>`;
+      } 
+      else if (category === 'Camera Shots') {
+        scene.innerHTML = `<div class="clapper-real-rig"><img src="Camera-Shots.png" alt="Clapperboard Slate"></div>`;
+      } 
+      else if (category === 'Cinematic Lighting') {
+        scene.innerHTML = `<div class="light-glare"></div><div class="light-real-rig"><img src="Cinematic -lighting.png" alt="Studio Light"></div>`;
+      } 
+      else if (category === 'Camera Lens') {
         scene.innerHTML = `<div class="lens-real-rig"><img src="Camera-lens.png" alt="Cinema Lens"></div>`;
       }
 
@@ -1895,7 +1990,7 @@
           firebaseItems.push({ id: doc.id, ...doc.data() });
         });
         if (firebaseItems.length > 0) {
-          window.allVaultItems = [...firebaseItems, ...defaultMovements, ...cameraAnglesFromPdf, ...atmosphereThemesFromPdf];
+          window.allVaultItems = [...firebaseItems, ...defaultMovements, ...cameraAnglesFromPdf, ...atmosphereThemesFromPdf, ...masterPromptsList];
         }
         renderCards(window.allVaultItems);
       } catch (err) {
