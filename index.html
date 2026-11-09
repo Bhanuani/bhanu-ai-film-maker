@@ -270,14 +270,17 @@
 
     .hero-img-box {
       width: 100%; min-height: 380px; max-height: 480px; display: flex; align-items: center; justify-content: center; overflow: hidden;
+      background: #000;
     }
 
-    .hero-img-box img {
-      width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), filter 0.6s ease;
+    /* 3D HERO BANNER VIDEO STYLING */
+    .hero-img-box video {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), filter 0.6s ease;
     }
 
-    .hero-banner-wrapper:hover .hero-img-box img {
-      transform: scale(1.045); filter: brightness(1.08) drop-shadow(0 0 25px rgba(0, 210, 255, 0.25));
+    .hero-banner-wrapper:hover .hero-img-box video {
+      transform: scale(1.035); filter: brightness(1.08) drop-shadow(0 0 30px rgba(0, 210, 255, 0.3));
     }
 
     .hero-bottom-caption {
@@ -596,7 +599,6 @@
       </div>
 
       <div class="header-actions">
-        <!-- + Add Movement is directly accessible -->
         <button class="add-btn" id="addMovementBtn">
           <i class="fa-solid fa-plus"></i> Add Movement
         </button>
@@ -625,7 +627,7 @@
 
   <div class="vault-container">
 
-    <!-- HERO SECTION -->
+    <!-- HERO SECTION (3 VIDEOS CONTINUOUS PLAYLIST LOOPER) -->
     <section class="hero-banner-wrapper" id="heroBanner">
       <div class="hero-top-bar">
         <div class="vault-badge">MASTER DIRECTORS VAULT</div>
@@ -635,7 +637,18 @@
       </div>
 
       <div class="hero-img-box">
-        <img src="bhanu-3d-header_2.png" alt="Hello, Bhanu Pakala - Cinematic 3D Scene" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/bhanuani/bhanu-ai-film-maker/main/bhanu-3d-header_2.png';">
+        <video 
+          id="heroVideo" 
+          autoplay 
+          muted 
+          playsinline 
+          webkit-playsinline
+          preload="auto"
+          poster="bhanu-3d-header_2.png"
+          src="hero-banner-1.mp4"
+        >
+          Your browser does not support HTML5 video.
+        </video>
       </div>
 
       <div class="hero-bottom-caption">
@@ -842,6 +855,28 @@
       });
     }
 
+    // 3 VIDEOS PLAYLIST CONTINUOUS LOOPER
+    const heroVid = document.getElementById("heroVideo");
+    if (heroVid) {
+      const playlist = [
+        "hero-banner-1.mp4",
+        "hero-banner-2.mp4",
+        "hero-banner-3.mp4"
+      ];
+      let playlistIndex = 0;
+
+      heroVid.addEventListener("ended", () => {
+        playlistIndex = (playlistIndex + 1) % playlist.length;
+        heroVid.src = playlist[playlistIndex];
+        heroVid.play().catch(e => console.log("Video transition:", e));
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        heroVid.muted = true;
+        heroVid.play().catch(() => {});
+      });
+    }
+
     let animTimeout;
     function triggerCinematicCategory(category, btnElement) {
       filterCategory(category, btnElement);
@@ -1010,7 +1045,6 @@
       alert("Opening Visual Prompts Library: 44 Camera Movements Loaded.");
     }
 
-    // Direct render on page load
     renderCards(window.allVaultItems);
   </script>
 
@@ -1034,7 +1068,6 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
 
-    // Modal controls for Add Movement
     const addMovementBtn = document.getElementById("addMovementBtn");
     const movementModal = document.getElementById("movementModal");
     const closeModalBtn = document.getElementById("closeModalBtn");
@@ -1105,7 +1138,6 @@
       });
     }
 
-    // Load any saved movements from Firebase
     async function loadFirebaseMovements() {
       try {
         const q = query(collection(db, "movements"), orderBy("createdAt", "desc"));
