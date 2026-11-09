@@ -241,13 +241,14 @@
       margin-left: auto; background: var(--accent-cyan); color: #000; font-size: 0.72rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 999px;
     }
 
-    /* VAULT LAYOUT */
+    /* FULL-WIDTH RESPONSIVE VAULT CONTAINER */
     .vault-container { 
       max-width: 98%; 
       margin: 0 auto; 
       padding: 1.5rem 1rem 5rem; 
     }
 
+    /* HERO 3D BANNER */
     .hero-banner-wrapper {
       position: relative; 
       background: #000; 
@@ -299,7 +300,7 @@
       transform: scale(1.02);
     }
 
-    /* CATEGORIES BAR */
+    /* CATEGORIES BAR WITH SIDE SCROLLBAR */
     .categories-bar-wrapper {
       position: relative;
       margin-bottom: 2.2rem;
@@ -383,7 +384,7 @@
     .upload-overlay .drag-sub { font-size: 0.7rem; color: var(--text-muted); font-weight: 400; }
     .file-input { display: none; }
 
-    .card-details { padding: 1.25rem; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; gap: 1rem; }
+    .card-details { padding: 1.25rem; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; gap: 0.85rem; }
     .card-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.25rem; }
     .tag-badge { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--accent-cyan); background: rgba(0, 210, 255, 0.08); padding: 0.2rem 0.5rem; border-radius: 6px; border: 1px solid rgba(0, 210, 255, 0.2); }
 
@@ -395,7 +396,54 @@
     .meta-action-btn.del-btn:hover { border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.15); }
 
     .card-details h3 { font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; }
-    .prompt-box { font-size: 0.86rem; color: var(--text-muted); line-height: 1.45; background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.04); padding: 0.75rem; border-radius: 8px; max-height: 120px; overflow-y: auto; }
+
+    /* PROMPT WRAPPER & SPECIFIC RED-CIRCLE EDIT BUTTON */
+    .prompt-container {
+      position: relative;
+      background: rgba(0, 0, 0, 0.35); 
+      border: 1px solid rgba(255, 255, 255, 0.04); 
+      padding: 0.75rem; 
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .prompt-box { 
+      font-size: 0.86rem; 
+      color: var(--text-muted); 
+      line-height: 1.45; 
+      max-height: 120px; 
+      overflow-y: auto; 
+      padding-right: 28px; /* Room for edit pen button */
+    }
+
+    /* RED CIRCLE AREA PENCIL BUTTON (EDITS PROMPT NAME & TEXT ONLY) */
+    .prompt-text-edit-btn {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: rgba(0, 210, 255, 0.08);
+      border: 1px solid rgba(0, 210, 255, 0.3);
+      color: var(--accent-cyan);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.78rem;
+      transition: all 0.2s ease;
+      z-index: 5;
+    }
+
+    .prompt-text-edit-btn:hover {
+      background: var(--accent-cyan);
+      color: #040711;
+      transform: scale(1.12);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
 
     .copy-btn {
       width: 100%; background: linear-gradient(135deg, #00d2ff 0%, #0099cc 100%); color: #040711; border: none; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.88rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s;
@@ -562,7 +610,7 @@
 
   <div class="vault-container">
 
-    <!-- HERO SECTION (CINEMATIC AMBIENT GLOW BACKDROP + CRISP UNTOUCHED FOREGROUND VIDEO) -->
+    <!-- HERO SECTION (AMBIENT GLOW + UNTOUCHED FOREGROUND) -->
     <section class="hero-banner-wrapper" id="heroBanner">
       <video id="heroVideoBg" class="hero-ambient-backdrop" autoplay muted playsinline webkit-playsinline preload="auto" src="hero-banner-1.mp4"></video>
       <video id="heroVideo" class="hero-foreground-video" autoplay muted playsinline webkit-playsinline preload="auto" poster="bhanu-3d-header_2.png" src="hero-banner-1.mp4"></video>
@@ -680,6 +728,28 @@
         </div>
         <div id="uploadStatus" style="font-size: 13px; color: var(--accent-cyan); margin-bottom: 12px; display: none; text-align: center;">Uploading...</div>
         <button type="submit" id="saveBtn" class="submit-btn">+ Save to Vault</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- NEW MODAL: EDIT PROMPT NAME & PROMPT TEXT ONLY (FROM RED CIRCLE) -->
+  <div id="promptEditModal" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 style="margin: 0; font-size: 18px; color: var(--accent-cyan);"><i class="fa-solid fa-pen-to-square"></i> Edit Prompt Details</h3>
+        <button type="button" id="closePromptEditModalBtn" class="close-btn">&times;</button>
+      </div>
+      <form id="promptEditForm">
+        <input type="hidden" id="editPromptId">
+        <div class="form-group">
+          <label for="editPromptName">Prompt / Shot Name</label>
+          <input type="text" id="editPromptName" required />
+        </div>
+        <div class="form-group">
+          <label for="editPromptText">Prompt Formula / Instructions</label>
+          <textarea id="editPromptText" rows="4" required></textarea>
+        </div>
+        <button type="submit" class="submit-btn" style="margin-top: 8px;">Save Prompt Changes</button>
       </form>
     </div>
   </div>
@@ -852,7 +922,7 @@
       { id: "atm_60", name: "Cinematic Drone Landscape", category: "Atmosphere", prompt: "Cinematic Drone Landscape, high-altitude aerial view of winding coastal cliff road at sunrise" }
     ];
 
-    // 5 MASTER PROMPTS (DIRECTLY FROM YOUR AI VIDEO GENERATION PROMPTS.DOCX)
+    // 5 Master Prompts
     const masterPromptsList = [
       {
         id: "mst_1",
@@ -886,7 +956,6 @@
       }
     ];
 
-    // Total: 44 + 12 + 15 + 60 + 5 = 136 Total
     window.allVaultItems = [...defaultMovements, ...cameraAnglesFromPdf, ...cameraShotsFromPdf, ...atmosphereThemesFromPdf, ...masterPromptsList];
     let currentCategory = "All";
 
@@ -917,7 +986,7 @@
       });
     }
 
-    // VIDEO PLAYLIST CONTINUOUS LOOPER
+    // VIDEO PLAYLIST
     const heroVid = document.getElementById("heroVideo");
     const heroVidBg = document.getElementById("heroVideoBg");
 
@@ -929,8 +998,7 @@
         playlistIndex = (playlistIndex + 1) % playlist.length;
         heroVid.src = playlist[playlistIndex];
         if (heroVidBg) heroVidBg.src = playlist[playlistIndex];
-
-        heroVid.play().catch(e => console.log("Video transition:", e));
+        heroVid.play().catch(e => console.log(e));
         if (heroVidBg) heroVidBg.play().catch(() => {});
       });
 
@@ -942,22 +1010,51 @@
       });
     }
 
-    /* INDEXED-DB PERSISTENCE */
+    /* INDEXED-DB PERSISTENCE FOR MEDIA & EDITED PROMPT TEXT */
     let localDB;
-    const dbReq = indexedDB.open("CinemotionMediaDB", 8);
+    const dbReq = indexedDB.open("CinemotionMediaDB", 9);
     dbReq.onupgradeneeded = (e) => {
       localDB = e.target.result;
       if (!localDB.objectStoreNames.contains("cardMedia")) {
         localDB.createObjectStore("cardMedia", { keyPath: "id" });
       }
+      if (!localDB.objectStoreNames.contains("editedPrompts")) {
+        localDB.createObjectStore("editedPrompts", { keyPath: "id" });
+      }
     };
     dbReq.onsuccess = (e) => {
       localDB = e.target.result;
-      renderCards(window.allVaultItems);
+      loadPersistedEditedPrompts();
     };
+
+    function loadPersistedEditedPrompts() {
+      if (!localDB) {
+        renderCards(window.allVaultItems);
+        return;
+      }
+      const tx = localDB.transaction("editedPrompts", "readonly");
+      const store = tx.objectStore("editedPrompts");
+      const req = store.getAll();
+      req.onsuccess = () => {
+        if (req.result && req.result.length > 0) {
+          req.result.forEach(edit => {
+            const item = window.allVaultItems.find(m => m.id === edit.id);
+            if (item) {
+              item.name = edit.name;
+              item.prompt = edit.prompt;
+            }
+          });
+        }
+        renderCards(window.allVaultItems);
+      };
+      req.onerror = () => {
+        renderCards(window.allVaultItems);
+      };
+    }
 
     const grid = document.getElementById('movementsGrid');
 
+    // RENDER MOVEMENTS GRID WITH PROMPT-EDIT PENCIL BUTTON IN RED-CIRCLE AREA
     function renderCards(list) {
       if (!grid) return;
       grid.innerHTML = list.map(item => `
@@ -986,8 +1083,8 @@
                 <span class="tag-badge">${item.category || 'Movement'}</span>
                 
                 <div class="card-meta-actions">
-                  <button type="button" class="meta-action-btn edit-btn" title="Change/Upload Media" onclick="editCardMedia('${item.id}', event)">
-                    <i class="fa-solid fa-pen"></i>
+                  <button type="button" class="meta-action-btn edit-btn" title="Change Media (Upload/Replace)" onclick="editCardMedia('${item.id}', event)">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
                   </button>
 
                   <button type="button" class="meta-action-btn dl-btn" title="Download Media" onclick="downloadCardMedia('${item.id}', '${item.name.replace(/'/g, "\\'")}', event)">
@@ -1000,8 +1097,17 @@
                 </div>
               </div>
 
-              <h3>${item.name}</h3>
-              <p class="prompt-box">${item.prompt}</p>
+              <h3 id="title_${item.id}">${item.name}</h3>
+
+              <!-- PROMPT CONTAINER WITH PENCIL BUTTON IN RED CIRCLE AREA -->
+              <div class="prompt-container">
+                <p class="prompt-box" id="prompt_text_${item.id}">${item.prompt}</p>
+                
+                <!-- RED-CIRCLE PENCIL ICON BUTTON (EDITS PROMPT NAME & TEXT ONLY) -->
+                <button type="button" class="prompt-text-edit-btn" title="Edit Prompt Name & Instructions" onclick="openPromptTextEditor('${item.id}', event)">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+              </div>
             </div>
             
             <button class="copy-btn" onclick="copyPromptText('${item.prompt.replace(/'/g, "\\'")}')">
@@ -1032,6 +1138,74 @@
       }
 
       updateCounts();
+    }
+
+    // ============================================================
+    // PROMPT TEXT EDITOR LOGIC (MODAL)
+    // ============================================================
+    const promptEditModal = document.getElementById("promptEditModal");
+    const closePromptEditModalBtn = document.getElementById("closePromptEditModalBtn");
+    const promptEditForm = document.getElementById("promptEditForm");
+    const editPromptId = document.getElementById("editPromptId");
+    const editPromptName = document.getElementById("editPromptName");
+    const editPromptText = document.getElementById("editPromptText");
+
+    window.openPromptTextEditor = function(id, event) {
+      if (event) event.stopPropagation();
+      const item = window.allVaultItems.find(m => m.id === id);
+      if (!item) return;
+
+      editPromptId.value = id;
+      editPromptName.value = item.name;
+      editPromptText.value = item.prompt;
+
+      promptEditModal.style.display = "flex";
+    };
+
+    if (closePromptEditModalBtn) {
+      closePromptEditModalBtn.onclick = () => {
+        promptEditModal.style.display = "none";
+      };
+    }
+
+    window.addEventListener("click", (e) => {
+      if (e.target === promptEditModal) promptEditModal.style.display = "none";
+    });
+
+    if (promptEditForm) {
+      promptEditForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const id = editPromptId.value;
+        const newName = editPromptName.value.trim();
+        const newText = editPromptText.value.trim();
+
+        if (!newName || !newText) return;
+
+        const item = window.allVaultItems.find(m => m.id === id);
+        if (item) {
+          item.name = newName;
+          item.prompt = newText;
+        }
+
+        // Update DOM elements on card
+        const titleEl = document.getElementById(`title_${id}`);
+        const textEl = document.getElementById(`prompt_text_${id}`);
+        if (titleEl) titleEl.innerText = newName;
+        if (textEl) textEl.innerText = newText;
+
+        // Persist to IndexedDB
+        if (localDB) {
+          const tx = localDB.transaction("editedPrompts", "readwrite");
+          tx.objectStore("editedPrompts").put({ id: id, name: newName, prompt: newText });
+        }
+
+        promptEditModal.style.display = "none";
+
+        const toast = document.getElementById('toast');
+        toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Prompt Details Updated!</span>`;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+      });
     }
 
     // DRAG & DROP HANDLERS
@@ -1212,7 +1386,7 @@
       }
     };
 
-    // LIGHTBOX PREVIEW
+    // LIGHTBOX
     const mediaLightbox = document.getElementById("mediaLightbox");
     const lightboxStage = document.getElementById("lightboxStage");
     const lightboxTitle = document.getElementById("lightboxTitle");
@@ -1286,7 +1460,6 @@
       };
     }
 
-    // COUNTS & FILTER
     function updateCounts() {
       const catCounts = {
         'Camera Movement': 0, 'Camera Angles': 0, 'Camera Shots': 0, 'Cinematic Lighting': 0, 'Atmosphere': 0, 'Camera Lens': 0, 'Master Prompts': 0
@@ -1339,7 +1512,6 @@
       alert("Opening Visual Prompts Library: 136 Director Prompts Loaded.");
     }
 
-    // 2-SECOND FULLSCREEN CATEGORY ANIMATION
     let animTimeout;
     function triggerCinematicCategory(category, btnElement) {
       filterCategory(category, btnElement);
