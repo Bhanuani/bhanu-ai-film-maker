@@ -300,7 +300,7 @@
       transform: scale(1.02);
     }
 
-    /* CATEGORIES BAR WITH SIDE SCROLLBAR */
+    /* CATEGORIES BAR */
     .categories-bar-wrapper {
       position: relative;
       margin-bottom: 2.2rem;
@@ -398,81 +398,109 @@
     .card-details h3 { font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; }
 
     /* ============================================================
-       CINEMATIC IN-PLACE PROMPT COLLAPSE & COPIED OVERLAY
+       CINEMATIC 3D PROMPT WRAPPER & 3D FOLD COLLAPSE ANIMATION
        ============================================================ */
     .prompt-wrapper {
       position: relative;
-      background: rgba(0, 0, 0, 0.35);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      border-radius: 8px;
-      min-height: 84px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      min-height: 90px;
       overflow: hidden;
       display: flex;
       align-items: center;
-      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      perspective: 900px;
+      transition: border-color 0.4s ease, box-shadow 0.4s ease;
     }
 
     .prompt-wrapper.copied-active {
       border-color: var(--accent-cyan);
-      box-shadow: 0 0 25px rgba(0, 210, 255, 0.4);
-      background: rgba(0, 210, 255, 0.06);
+      box-shadow: 0 0 30px rgba(0, 210, 255, 0.45);
     }
 
     .prompt-content {
       width: 100%;
-      padding: 0.75rem 2.2rem 0.75rem 0.75rem;
-      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, filter 0.3s ease;
-      transform-origin: center;
+      padding: 0.85rem 2.4rem 0.85rem 0.85rem;
+      transform-style: preserve-3d;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease, filter 0.35s ease;
+      transform-origin: center center -50px;
     }
 
-    /* Collapse animation applied in-place */
+    /* 3D Depth Fold & Cinematic Blur Collapse */
     .prompt-wrapper.copied-active .prompt-content {
-      transform: scale(0.68) translateY(-6px);
+      transform: perspective(700px) rotateX(75deg) scale(0.65) translateY(-10px);
       opacity: 0;
-      filter: blur(5px);
+      filter: blur(8px);
       pointer-events: none;
     }
 
+    /* Unlimited Dynamic Prompt Box with Sleek Scrollbar */
     .prompt-box {
       font-size: 0.86rem;
-      color: var(--text-muted);
-      line-height: 1.45;
-      max-height: 120px;
+      color: #cbd5e1;
+      line-height: 1.5;
+      max-height: 140px;
       overflow-y: auto;
+      white-space: pre-wrap; /* Keeps all lines, indentations, and unlimited paragraphs */
+      word-break: break-word;
+      padding-right: 4px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0, 210, 255, 0.6) rgba(255, 255, 255, 0.03);
     }
 
-    /* IN-PLACE CINEMATIC COPIED BADGE */
+    .prompt-box::-webkit-scrollbar {
+      width: 4px;
+    }
+    .prompt-box::-webkit-scrollbar-thumb {
+      background: rgba(0, 210, 255, 0.5);
+      border-radius: 999px;
+    }
+
+    /* 3D HOLOGRAPHIC COPIED BADGE WITH NEON PARTICLE GLOW */
     .copied-cinematic-badge {
       position: absolute;
       inset: 0;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 0.65rem;
-      background: rgba(4, 7, 17, 0.88);
-      backdrop-filter: blur(8px);
-      color: var(--accent-cyan);
+      gap: 0.4rem;
+      background: radial-gradient(circle at center, rgba(0, 210, 255, 0.18) 0%, rgba(4, 7, 17, 0.94) 85%);
+      backdrop-filter: blur(10px);
+      color: #ffffff;
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 800;
-      font-size: 1.15rem;
-      letter-spacing: 2.5px;
+      letter-spacing: 2px;
       opacity: 0;
-      transform: scale(0.65);
+      transform: perspective(600px) rotateX(-45deg) scale(0.5);
       pointer-events: none;
-      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      z-index: 5;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 10;
     }
 
     .prompt-wrapper.copied-active .copied-cinematic-badge {
       opacity: 1;
-      transform: scale(1);
-      text-shadow: 0 0 25px rgba(0, 210, 255, 0.9);
+      transform: perspective(600px) rotateX(0deg) scale(1);
     }
 
     .copied-cinematic-badge i {
-      font-size: 1.35rem;
-      color: #00d2ff;
-      filter: drop-shadow(0 0 12px rgba(0, 210, 255, 0.9));
+      font-size: 1.8rem;
+      color: var(--accent-cyan);
+      filter: drop-shadow(0 0 15px rgba(0, 210, 255, 1));
+      animation: checkPulse 0.8s ease-in-out infinite alternate;
+    }
+
+    .copied-cinematic-badge span {
+      font-size: 0.95rem;
+      background: linear-gradient(135deg, #ffffff 30%, #00d2ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px rgba(0, 210, 255, 0.7);
+    }
+
+    @keyframes checkPulse {
+      0% { transform: scale(0.95); filter: drop-shadow(0 0 10px rgba(0, 210, 255, 0.7)); }
+      100% { transform: scale(1.15); filter: drop-shadow(0 0 25px rgba(0, 210, 255, 1)); }
     }
 
     /* Pencil Icon Button on Prompt Box */
@@ -480,19 +508,20 @@
       position: absolute;
       bottom: 8px;
       right: 8px;
-      width: 26px;
-      height: 26px;
-      border-radius: 6px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background: rgba(13, 18, 31, 0.85);
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(13, 18, 31, 0.9);
       color: #94a3b8;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      font-size: 0.78rem;
+      font-size: 0.82rem;
       transition: all 0.2s ease;
       backdrop-filter: blur(6px);
+      z-index: 4;
     }
 
     .prompt-edit-btn:hover {
@@ -500,7 +529,7 @@
       color: var(--accent-cyan);
       background: rgba(0, 210, 255, 0.15);
       transform: scale(1.1);
-      box-shadow: 0 0 10px rgba(0, 210, 255, 0.3);
+      box-shadow: 0 0 12px rgba(0, 210, 255, 0.4);
     }
 
     .copy-btn {
@@ -529,19 +558,19 @@
     .lightbox-stage { width: 100%; max-height: 60vh; background: #000; display: flex; align-items: center; justify-content: center; }
     .lightbox-stage video, .lightbox-stage img { width: 100%; max-height: 60vh; object-fit: contain; }
     .lightbox-footer { padding: 1.2rem 1.5rem; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-color); gap: 1rem; }
-    .lightbox-prompt { font-size: 0.88rem; color: var(--text-muted); flex: 1; max-height: 80px; overflow-y: auto; }
+    .lightbox-prompt { font-size: 0.88rem; color: var(--text-muted); flex: 1; max-height: 100px; overflow-y: auto; white-space: pre-wrap; }
     .lightbox-dl-btn { background: linear-gradient(135deg, #00d2ff 0%, #0099cc 100%); color: #040711; border: none; padding: 0.75rem 1.5rem; border-radius: 999px; font-weight: 800; cursor: pointer; }
 
     #toast { visibility: hidden; position: fixed; bottom: 2rem; right: 2rem; background: #00d2ff; color: #040711; padding: 0.75rem 1.4rem; border-radius: 999px; font-weight: 700; z-index: 100000; opacity: 0; transition: opacity 0.3s, transform 0.3s; transform: translateY(20px); }
     #toast.show { visibility: visible; opacity: 1; transform: translateY(0); }
 
     .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.82); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 99999; }
-    .modal-box { background: #0d121f; border: 1px solid rgba(0, 210, 255, 0.3); border-radius: 16px; width: 90%; max-width: 520px; padding: 24px; color: #fff; max-height: 85vh; overflow-y: auto; }
+    .modal-box { background: #0d121f; border: 1px solid rgba(0, 210, 255, 0.3); border-radius: 16px; width: 92%; max-width: 620px; padding: 24px; color: #fff; max-height: 90vh; overflow-y: auto; }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
     .close-btn { background: none; border: none; color: #94a3b8; font-size: 26px; cursor: pointer; }
     .form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
     .form-group label { font-size: 13px; color: #94a3b8; font-weight: 600; }
-    .form-group input, .form-group select, .form-group textarea { background: #161e2e; border: 1px solid #334155; color: #f8fafc; padding: 10px 14px; border-radius: 8px; font-size: 14px; outline: none; }
+    .form-group input, .form-group select, .form-group textarea { background: #161e2e; border: 1px solid #334155; color: #f8fafc; padding: 10px 14px; border-radius: 8px; font-size: 14px; outline: none; line-height: 1.5; font-family: inherit; }
     .submit-btn { width: 100%; padding: 12px; background: var(--accent-cyan); border: none; border-radius: 8px; color: #040711; font-weight: 700; cursor: pointer; }
 
     .themes-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
@@ -764,7 +793,7 @@
     </div>
   </div>
 
-  <!-- EDIT PROMPT MODAL (PENCIL ICON CLICK ON PROMPT BOX) -->
+  <!-- EDIT PROMPT MODAL (NO CHARACTER LIMIT, PRESERVES UNLIMITED MULTI-LINE PROMPTS) -->
   <div id="editPromptModal" class="modal-overlay" style="display: none;">
     <div class="modal-box">
       <div class="modal-header">
@@ -778,15 +807,15 @@
           <input type="text" id="editPromptTitle" required />
         </div>
         <div class="form-group">
-          <label for="editPromptText">Prompt Description / AI Formula</label>
-          <textarea id="editPromptText" rows="4" required></textarea>
+          <label for="editPromptText">Prompt Description / AI Formula (Unlimited Lines & Text)</label>
+          <textarea id="editPromptText" rows="7" placeholder="Paste or type any size prompt with no restrictions..." required></textarea>
         </div>
         <button type="submit" id="saveEditPromptBtn" class="submit-btn">Update Prompt</button>
       </form>
     </div>
   </div>
 
-  <!-- ADD MOVEMENT MODAL -->
+  <!-- ADD MOVEMENT MODAL (UNLIMITED PROMPT TEXTAREA) -->
   <div id="movementModal" class="modal-overlay" style="display: none;">
     <div class="modal-box">
       <div class="modal-header">
@@ -811,8 +840,8 @@
           <input type="text" id="itemTitle" placeholder="e.g. Dolly Zoom, Dutch Angle" required />
         </div>
         <div class="form-group">
-          <label for="itemPrompt">Prompt Formula / Description</label>
-          <textarea id="itemPrompt" rows="3" placeholder="Enter AI prompt tags..." required></textarea>
+          <label for="itemPrompt">Prompt Formula / Description (Unlimited Length)</label>
+          <textarea id="itemPrompt" rows="6" placeholder="Paste any length prompt without restriction..." required></textarea>
         </div>
         <div class="form-group">
           <label for="itemMedia">Upload Media (Image or Video)</label>
@@ -1083,7 +1112,7 @@
 
     /* INDEXED-DB PERSISTENCE (FOR MEDIA & CUSTOM PROMPT EDITS) */
     let localDB;
-    const dbReq = indexedDB.open("CinemotionMediaDB", 9);
+    const dbReq = indexedDB.open("CinemotionMediaDB", 10);
     dbReq.onupgradeneeded = (e) => {
       localDB = e.target.result;
       if (!localDB.objectStoreNames.contains("cardMedia")) {
@@ -1163,18 +1192,17 @@
 
               <h3 id="title_${item.id}">${item.name}</h3>
               
-              <!-- IN-PLACE PROMPT WRAPPER + COLLAPSE + COPIED OVERLAY -->
+              <!-- PROMPT WRAPPER + IN-PLACE 3D COLLAPSE ANIMATION & HOLOGRAPHIC COPIED BADGE -->
               <div class="prompt-wrapper" id="prompt_wrap_${item.id}">
                 <div class="prompt-content" id="content_${item.id}">
                   <p class="prompt-box" id="text_${item.id}">${item.prompt}</p>
-                  <button type="button" class="prompt-edit-btn" title="Edit Prompt Text" onclick="openEditPromptModal('${item.id}', event)">
+                  <button type="button" class="prompt-edit-btn" title="Edit Prompt Text (Unlimited Lines)" onclick="openEditPromptModal('${item.id}', event)">
                     <i class="fa-solid fa-pen-to-square"></i>
                   </button>
                 </div>
-                <!-- IN-PLACE COPIED NOTIFICATION -->
                 <div class="copied-cinematic-badge" id="copied_badge_${item.id}">
                   <i class="fa-solid fa-circle-check"></i>
-                  <span>COPIED!</span>
+                  <span>COPIED TO CLIPBOARD!</span>
                 </div>
               </div>
             </div>
@@ -1209,7 +1237,7 @@
     }
 
     // ============================================================
-    // EDIT PROMPT NAME & TEXT ONLY (NO MEDIA MODIFIED)
+    // EDIT PROMPT NAME & UNLIMITED PROMPT FORMULA (NO RESTRICTION)
     // ============================================================
     const editPromptModal = document.getElementById("editPromptModal");
     const editPromptForm = document.getElementById("editPromptForm");
@@ -1260,7 +1288,7 @@
           }
 
           const toast = document.getElementById('toast');
-          toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Prompt Updated Successfully!</span>`;
+          toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Prompt Updated Without Restrictions!</span>`;
           toast.classList.add('show');
           setTimeout(() => toast.classList.remove('show'), 2000);
         }
@@ -1542,20 +1570,19 @@
     }
 
     // ============================================================
-    // COPY PROMPT TEXT & TRIGGER IN-PLACE CINEMATIC COLLAPSE ANIMATION
+    // COPY PROMPT TEXT & TRIGGER CINEMATIC 3D IN-PLACE COLLAPSE ANIMATION
     // ============================================================
     function copyPromptText(text, itemId) {
       navigator.clipboard.writeText(text).then(() => {
         if (itemId) {
           const wrap = document.getElementById(`prompt_wrap_${itemId}`);
           if (wrap) {
-            // Trigger collapse & show in-place COPIED! banner
             wrap.classList.add('copied-active');
 
-            // Restore smoothly after 1.3 seconds
+            // 1.2 Seconds hold and smooth expansion
             setTimeout(() => {
               wrap.classList.remove('copied-active');
-            }, 1300);
+            }, 1200);
           }
         }
       });
