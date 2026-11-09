@@ -243,7 +243,7 @@
     /* VAULT LAYOUT */
     .vault-container { max-width: 1440px; margin: 0 auto; padding: 1.5rem 2rem 5rem; }
 
-    /* HERO 3D EXPANDED BANNER (CLEAN - NO TOP BAR BADGES) */
+    /* HERO 3D EXPANDED BANNER */
     .hero-banner-wrapper {
       position: relative; 
       background: #000; 
@@ -692,7 +692,6 @@
       position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 10;
     }
 
-    /* All Categories Grand Orbit Animation */
     .all-orbit-scene {
       display: flex;
       align-items: center;
@@ -961,7 +960,7 @@
 
   <div class="vault-container">
 
-    <!-- HERO SECTION (EXPANDED TO FULL LINE - NO TOP BAR BADGES, NO CAPTION) -->
+    <!-- HERO SECTION (CLEAN 3D BANNER - NO TOP BAR BADGES, NO CAPTION) -->
     <section class="hero-banner-wrapper" id="heroBanner">
       <div class="hero-img-box">
         <video 
@@ -992,7 +991,7 @@
             <rect x="14" y="14" width="7" height="7" rx="2"/>
           </svg>
           <span>All</span>
-          <span class="count" id="count_All">126</span>
+          <span class="count" id="count_All">141</span>
         </button>
 
         <!-- Camera Movement -->
@@ -1009,11 +1008,11 @@
           <span class="count" id="count_Camera_Angles">12</span>
         </button>
 
-        <!-- Camera Shots -->
+        <!-- Camera Shots (15 from PDF) -->
         <button class="cat-tab" onclick="triggerCinematicCategory('Camera Shots', this)">
           <img src="Camera-Shots.png" class="cat-3d-img" alt="Camera Shots">
           <span>Camera Shots</span>
-          <span class="count" id="count_Camera_Shots">0</span>
+          <span class="count" id="count_Camera_Shots">15</span>
         </button>
 
         <!-- Cinematic Lighting -->
@@ -1140,6 +1139,7 @@
 
   <!-- JAVASCRIPT LOGIC -->
   <script>
+    // 44 Core Camera Movements
     const defaultMovements = [
       { id: "mov_1", name: "Slow Dolly In", category: "Camera Movement", prompt: "Slow dolly in, camera moves slowly forward toward the subject." },
       { id: "mov_2", name: "Slow Dolly Out", category: "Camera Movement", prompt: "Slow dolly out, camera moves slowly backwards away from the subject." },
@@ -1201,6 +1201,25 @@
       { id: "ang_10", name: "Over-The-Shoulder (OTS)", category: "Camera Angles", prompt: "Over-the-shoulder shot, camera looking past one person's shoulder toward another subject, dialogue connection, conversation, perspective" },
       { id: "ang_11", name: "Rear / Back Angle", category: "Camera Angles", prompt: "Rear back angle shot, camera positioned behind the subject looking ahead, mystery, anticipation, heroic journey ahead" },
       { id: "ang_12", name: "Point-Of-View (POV)", category: "Camera Angles", prompt: "Point-of-view POV shot, camera represents first-person character vision, immersive perspective, subjective participation" }
+    ];
+
+    // 15 CAMERA SHOTS (FROM CINEMATOGRAPY SHOTS.PDF)
+    const cameraShotsFromPdf = [
+      { id: "sht_1", name: "Extreme Long Shot (ELS) / Extreme Wide Shot (EWS)", category: "Camera Shots", prompt: "Extreme long shot ELS, extreme wide shot EWS, vast expansive landscape, subject appearing very small, establishing scale, epic atmosphere and location, 8k" },
+      { id: "sht_2", name: "Long Shot (LS) / Wide Shot (WS)", category: "Camera Shots", prompt: "Long shot LS, wide shot WS, full body of subject visible with substantial surrounding environment, body language and environmental movement, cinematic" },
+      { id: "sht_3", name: "Full Shot (FS)", category: "Camera Shots", prompt: "Full shot FS, subject framed cleanly from head to toe, focus on complete person and outfit styling, balanced composition" },
+      { id: "sht_4", name: "Medium Long Shot (MLS) / Three-Quarter Shot", category: "Camera Shots", prompt: "Medium long shot MLS, three-quarter shot, subject framed from mid-thigh or knees upward, balancing body language with facial expression" },
+      { id: "sht_5", name: "Cowboy Shot (American Shot)", category: "Camera Shots", prompt: "Cowboy shot, American shot, framed from mid-thigh upward, confident stance, powerful character introduction, dramatic depth" },
+      { id: "sht_6", name: "Medium Shot (MS)", category: "Camera Shots", prompt: "Medium shot MS, subject framed from waist upward, natural gestures, conversational dialogue, professional cinematic framing" },
+      { id: "sht_7", name: "Medium Close-Up (MCU)", category: "Camera Shots", prompt: "Medium close-up MCU, subject framed from chest and upper torso upward, personal emotional connection, expressive reaction dialogue" },
+      { id: "sht_8", name: "Close-Up (CU)", category: "Camera Shots", prompt: "Close-up shot CU, framing focused primarily on face, intense facial emotions, subtle expressions, dramatic character emphasis" },
+      { id: "sht_9", name: "Extreme Close-Up (ECU)", category: "Camera Shots", prompt: "Extreme close-up ECU, macro detail shot of eyes, iris, lips or fingertips, heightened psychological tension, razor-sharp precision focus" },
+      { id: "sht_10", name: "Medium Full Shot (MFS)", category: "Camera Shots", prompt: "Medium full shot MFS, framing from head down to around knees, lifestyle elegance, fluid commercial aesthetic" },
+      { id: "sht_11", name: "Thigh Shot", category: "Camera Shots", prompt: "Thigh shot, camera framed from mid-thigh upward, high-end fashion film aesthetic, brand showcase, dynamic walking motion" },
+      { id: "sht_12", name: "Waist Shot", category: "Camera Shots", prompt: "Waist shot, framed strictly from waist upward, clear presenter demonstration, authentic dialogue framing" },
+      { id: "sht_13", name: "Bust Shot", category: "Camera Shots", prompt: "Bust shot, framing head, shoulders, and upper chest, intimate interview cinematography, emotional storytelling" },
+      { id: "sht_14", name: "Head-and-Shoulders Shot", category: "Camera Shots", prompt: "Head-and-shoulders shot, head and shoulders prominent in frame, clean testimonial portrait, sharp cinematic depth of field" },
+      { id: "sht_15", name: "Tight Close-Up (TCU)", category: "Camera Shots", prompt: "Tight close-up TCU, tightly framed around specific facial region, deep cinematic intimacy, overwhelming emotional impact" }
     ];
 
     // 60 Atmosphere Themes (From PDF)
@@ -1281,7 +1300,8 @@
       { id: "mst_10", name: "Cosmic Hyper Hyperspace", category: "Master Prompts", prompt: "Fast forward warp tunnel hyperlapse, kaleidoscopic neon star trails, barrel roll 360 rotation, zero-gravity surreal motion" }
     ];
 
-    window.allVaultItems = [...defaultMovements, ...cameraAnglesFromPdf, ...atmosphereThemesFromPdf, ...masterPromptsList];
+    // Combine: 44 Movement + 12 Angles + 15 Shots + 60 Atmosphere + 10 Master Prompts = 141 Total
+    window.allVaultItems = [...defaultMovements, ...cameraAnglesFromPdf, ...cameraShotsFromPdf, ...atmosphereThemesFromPdf, ...masterPromptsList];
     let currentCategory = "All";
 
     const classicThemes = [
@@ -1357,6 +1377,7 @@
             <video id="vid_${item.id}" autoplay loop muted playsinline></video>
             <img id="img_${item.id}" alt="${item.name}">
 
+            <!-- Upload Box (Hidden automatically when media is loaded) -->
             <div class="upload-overlay" id="overlay_${item.id}" onclick="triggerFileInput(event, '${item.id}')">
               <i class="fa-solid fa-cloud-arrow-up"></i>
               <span>Click or Drag & Drop Media</span>
@@ -1676,9 +1697,6 @@
 
     // CATEGORY COUNT & FILTER
     function updateCounts() {
-      const hero = document.getElementById('heroCount');
-      if (hero) hero.innerText = window.allVaultItems.length;
-
       const catCounts = {
         'Camera Movement': 0, 'Camera Angles': 0, 'Camera Shots': 0, 'Cinematic Lighting': 0, 'Atmosphere': 0, 'Camera Lens': 0, 'Master Prompts': 0
       };
@@ -1727,10 +1745,10 @@
     }
 
     function openPromptLibrary() {
-      alert("Opening Visual Prompts Library: 126 Director Prompts Loaded.");
+      alert("Opening Visual Prompts Library: 141 Director Prompts Loaded.");
     }
 
-    // 2-SECOND FULLSCREEN CATEGORY ANIMATION (ALL ICONS ON 'ALL', PEN ON 'MASTER PROMPTS', SEASON LAPSE ON 'ATMOSPHERE')
+    // 2-SECOND FULLSCREEN CATEGORY ANIMATION
     let animTimeout;
     function triggerCinematicCategory(category, btnElement) {
       filterCategory(category, btnElement);
@@ -1746,7 +1764,6 @@
       stage.style.display = 'flex';
       title.innerText = category;
 
-      // 1. ALL CATEGORY: All 3D Icons Orbit Animation
       if (category === 'All') {
         scene.innerHTML = `
           <div class="all-orbit-scene">
@@ -1760,7 +1777,6 @@
           </div>
         `;
       }
-      // 2. MASTER PROMPTS: Writing Pen over Logo Animation
       else if (category === 'Master Prompts') {
         scene.innerHTML = `
           <div class="master-writing-rig">
@@ -1769,7 +1785,6 @@
           </div>
         `;
       }
-      // 3. ATMOSPHERE: Season Lapse (No Rain)
       else if (category === 'Atmosphere') {
         scene.innerHTML = `
           <div class="season-sky-lapse"></div>
@@ -1944,7 +1959,7 @@
           firebaseItems.push({ id: doc.id, ...doc.data() });
         });
         if (firebaseItems.length > 0) {
-          window.allVaultItems = [...firebaseItems, ...defaultMovements, ...cameraAnglesFromPdf, ...atmosphereThemesFromPdf, ...masterPromptsList];
+          window.allVaultItems = [...firebaseItems, ...defaultMovements, ...cameraAnglesFromPdf, ...cameraShotsFromPdf, ...atmosphereThemesFromPdf, ...masterPromptsList];
         }
         renderCards(window.allVaultItems);
       } catch (err) {
