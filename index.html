@@ -352,7 +352,7 @@
       transform: scale(1.04);
     }
 
-    /* UPLOAD OVERLAY (HIDDEN COMPLETELY ONCE MEDIA LOADED) */
+    /* UPLOAD OVERLAY - HIDDEN COMPLETELY ONCE MEDIA LOADED */
     .upload-overlay {
       position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
       gap: 0.5rem; background: rgba(8, 12, 22, 0.75); border: 2px dashed rgba(0, 210, 255, 0.3); border-radius: 10px;
@@ -376,7 +376,7 @@
     .upload-overlay .drag-sub { font-size: 0.7rem; color: var(--text-muted); font-weight: 400; }
     .file-input { display: none; }
 
-    /* CARD DETAILS & ACTION BUTTONS */
+    /* CARD DETAILS & ACTION BUTTONS IN META ROW */
     .card-details { padding: 1.25rem; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; gap: 1rem; }
     
     .card-meta { 
@@ -391,7 +391,6 @@
       background: rgba(0, 210, 255, 0.08); padding: 0.2rem 0.5rem; border-radius: 6px; border: 1px solid rgba(0, 210, 255, 0.2);
     }
 
-    /* 3 ACTION BOXES IN CARD META: EDIT (PENCIL) + DOWNLOAD + DELETE */
     .card-meta-actions {
       display: flex;
       align-items: center;
@@ -417,7 +416,6 @@
       transform: translateY(-2px);
     }
 
-    /* Edit (Pencil) Button */
     .meta-action-btn.edit-btn:hover {
       border-color: #f59e0b;
       color: #f59e0b;
@@ -425,7 +423,6 @@
       box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
     }
 
-    /* Download Button */
     .meta-action-btn.dl-btn:hover {
       border-color: var(--accent-cyan);
       color: var(--accent-cyan);
@@ -433,7 +430,6 @@
       box-shadow: 0 0 12px rgba(0, 210, 255, 0.35);
     }
 
-    /* Delete Button */
     .meta-action-btn.del-btn:hover {
       border-color: #ef4444;
       color: #ef4444;
@@ -448,7 +444,6 @@
       border: 1px solid rgba(255, 255, 255, 0.04); padding: 0.75rem; border-radius: 8px;
     }
 
-    /* FULL-WIDTH COPY PROMPT BUTTON */
     .copy-btn {
       width: 100%;
       background: linear-gradient(135deg, #00d2ff 0%, #0099cc 100%); 
@@ -696,20 +691,40 @@
 
     @keyframes glarePuff { 0% { opacity: 0; } 25% { opacity: 1; } 80% { opacity: 0.8; } 100% { opacity: 0; } }
 
-    .sky-transition-real { position: absolute; inset: 0; animation: dayNightCycle 2s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-
-    @keyframes dayNightCycle {
-      0% { background: linear-gradient(180deg, #f59e0b 0%, #38bdf8 60%, #0369a1 100%); opacity: 0.8; }
-      50% { background: linear-gradient(180deg, #9333ea 0%, #4338ca 50%, #1e1b4b 100%); opacity: 0.9; }
-      100% { background: linear-gradient(180deg, #020617 0%, #090d16 60%, #000000 100%); opacity: 0.95; }
+    /* ============================================================
+       SEASON LAPSE ANIMATION (REPLACING OLD RAIN EFFECT)
+       Spring -> Summer -> Autumn -> Winter Transition
+       ============================================================ */
+    .season-sky-lapse {
+      position: absolute;
+      inset: 0;
+      animation: seasonLapseCycle 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
 
-    .rain-real {
-      position: absolute; inset: 0; background: repeating-linear-gradient(105deg, transparent, transparent 15px, rgba(255, 255, 255, 0.45) 16px, transparent 18px);
-      animation: rainFallFast 0.2s linear infinite;
+    @keyframes seasonLapseCycle {
+      0% { background: linear-gradient(180deg, #ec4899 0%, #38bdf8 50%, #10b981 100%); opacity: 0.85; } /* Spring */
+      30% { background: linear-gradient(180deg, #f59e0b 0%, #0ea5e9 40%, #0284c7 100%); opacity: 0.9; }  /* Summer */
+      65% { background: linear-gradient(180deg, #d97706 0%, #b45309 45%, #78350f 100%); opacity: 0.9; }  /* Autumn */
+      100% { background: linear-gradient(180deg, #1e293b 0%, #334155 50%, #94a3b8 100%); opacity: 0.95; } /* Winter */
     }
 
-    @keyframes rainFallFast { 0% { background-position: 0 0; } 100% { background-position: -90px 220px; } }
+    .season-particles {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      gap: 30px;
+      animation: seasonElementsPop 2s ease-in-out forwards;
+    }
+
+    @keyframes seasonElementsPop {
+      0% { opacity: 0; transform: scale(0.5); }
+      20% { opacity: 1; transform: scale(1.1); }
+      80% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1.4); }
+    }
 
     .smoke-rig-real { position: absolute; bottom: 15%; display: flex; align-items: center; animation: mistDrift 2s ease forwards; }
     .smoke-rig-real img { width: 440px; filter: drop-shadow(0 0 45px rgba(56, 189, 248, 0.7)); }
@@ -832,7 +847,7 @@
       <div class="hero-top-bar">
         <div class="vault-badge">MASTER DIRECTORS VAULT</div>
         <div class="counter-pill">
-          <span class="num" id="heroCount">104</span> MOVEMENTS
+          <span class="num" id="heroCount">116</span> MOVEMENTS
         </div>
       </div>
 
@@ -867,7 +882,7 @@
           <rect x="14" y="14" width="7" height="7" rx="2"/>
         </svg>
         <span>All</span>
-        <span class="count" id="count_All">104</span>
+        <span class="count" id="count_All">116</span>
       </button>
 
       <button class="cat-tab" onclick="triggerCinematicCategory('Camera Movement', this)">
@@ -876,10 +891,11 @@
         <span class="count" id="count_Camera_Movement">44</span>
       </button>
 
+      <!-- Camera Angles Category with 12 PDF Angles -->
       <button class="cat-tab" onclick="triggerCinematicCategory('Camera Angles', this)">
         <img src="Camera-Angles.png" class="cat-3d-img" alt="Camera Angles">
         <span>Camera Angles</span>
-        <span class="count" id="count_Camera_Angles">0</span>
+        <span class="count" id="count_Camera_Angles">12</span>
       </button>
 
       <button class="cat-tab" onclick="triggerCinematicCategory('Camera Shots', this)">
@@ -894,6 +910,7 @@
         <span class="count" id="count_Cinematic_Lighting">0</span>
       </button>
 
+      <!-- Atmosphere Category with 60 PDF Themes -->
       <button class="cat-tab" onclick="triggerCinematicCategory('Atmosphere', this)">
         <img src="Atmosphere.png" class="cat-3d-img" alt="Atmosphere">
         <span>Atmosphere</span>
@@ -920,9 +937,7 @@
         <h3 id="lightboxTitle"><i class="fa-solid fa-clapperboard" style="color: var(--accent-cyan);"></i> Movement Title</h3>
         <button type="button" class="close-btn" id="closeLightboxBtn">&times;</button>
       </div>
-      <div class="lightbox-stage" id="lightboxStage">
-        <!-- Rendered dynamically -->
-      </div>
+      <div class="lightbox-stage" id="lightboxStage"></div>
       <div class="lightbox-footer">
         <div class="lightbox-prompt" id="lightboxPrompt">Prompt details...</div>
         <div class="lightbox-actions">
@@ -1049,6 +1064,22 @@
       { id: "mov_44", name: "Worm's Eye Tracking (Ground Level)", category: "Camera Movement", prompt: "Worm's eye view, low angle tracking, camera moves along the ground looking up." }
     ];
 
+    // 12 CAMERA ANGLES (FROM CAMERA ANGLES.PDF)
+    const cameraAnglesFromPdf = [
+      { id: "ang_1", name: "Eye-level Angle", category: "Camera Angles", prompt: "Eye-level angle, camera positioned at subject eye height, natural, neutral, realistic perspective, 8k" },
+      { id: "ang_2", name: "Low Angle", category: "Camera Angles", prompt: "Low angle shot, camera looking upward at the subject, commanding power, dominance, grandeur, cinematic" },
+      { id: "ang_3", name: "High Angle", category: "Camera Angles", prompt: "High angle shot, camera looking down at the subject, vulnerability, scale, dramatic overview" },
+      { id: "ang_4", name: "Bird's-Eye View / Overhead Shot", category: "Camera Angles", prompt: "Bird's-eye view, overhead shot, camera pointing vertically straight down at the scene, patterns, geometric layout, spatial clarity" },
+      { id: "ang_5", name: "Worm's-Eye View", category: "Camera Angles", prompt: "Worm's-eye view, camera positioned extremely low at ground level pointing steeply upward, monumental scale, extreme drama" },
+      { id: "ang_6", name: "Dutch Angle / Canted Angle", category: "Camera Angles", prompt: "Dutch angle, canted angle, camera tilted sideways on Z-axis, diagonal horizon, psychological tension, instability, unease" },
+      { id: "ang_7", name: "Three-Quarter Angle", category: "Camera Angles", prompt: "Three-quarter angle, camera framing front and one side of subject, depth, dimension, visually appealing cinematic portrait" },
+      { id: "ang_8", name: "Straight-On / Frontal Angle", category: "Camera Angles", prompt: "Straight-on frontal angle, camera directly facing the subject, symmetry, absolute clarity, authority, centered composition" },
+      { id: "ang_9", name: "Profile / Side Angle", category: "Camera Angles", prompt: "Profile side angle, camera capturing subject completely from the side, strong contour silhouette, contemplative mood" },
+      { id: "ang_10", name: "Over-The-Shoulder (OTS)", category: "Camera Angles", prompt: "Over-the-shoulder shot, camera looking past one person's shoulder toward another subject, dialogue connection, conversation, perspective" },
+      { id: "ang_11", name: "Rear / Back Angle", category: "Camera Angles", prompt: "Rear back angle shot, camera positioned behind the subject looking ahead, mystery, anticipation, heroic journey ahead" },
+      { id: "ang_12", name: "Point-Of-View (POV)", category: "Camera Angles", prompt: "Point-of-view POV shot, camera represents first-person character vision, immersive perspective, subjective participation" }
+    ];
+
     // 60 ATMOSPHERE THEMES FROM PDF
     const atmosphereThemesFromPdf = [
       { id: "atm_1", name: "Golden Hour Glow", category: "Atmosphere", prompt: "Golden Hour Glow, soft warm golden sunlight at sunrise or sunset, cinematic lighting, 8k" },
@@ -1113,7 +1144,8 @@
       { id: "atm_60", name: "Cinematic Drone Landscape", category: "Atmosphere", prompt: "Cinematic Drone Landscape, high-altitude aerial view of winding coastal cliff road at sunrise" }
     ];
 
-    window.allVaultItems = [...defaultMovements, ...atmosphereThemesFromPdf];
+    // Combine: 44 Movements + 12 Camera Angles + 60 Atmosphere Themes = 116 Total
+    window.allVaultItems = [...defaultMovements, ...cameraAnglesFromPdf, ...atmosphereThemesFromPdf];
     let currentCategory = "All";
 
     const classicThemes = [
@@ -1359,18 +1391,14 @@
       }
     }
 
-    // ============================================================
     // EDIT (PENCIL) BUTTON ACTION
-    // ============================================================
     window.editCardMedia = function(id, event) {
       if (event) event.stopPropagation();
       const input = document.getElementById(`input_${id}`);
       if (input) input.click();
     };
 
-    // ============================================================
-    // 1ST BOX: DOWNLOAD ACTION
-    // ============================================================
+    // DOWNLOAD ACTION
     window.downloadCardMedia = function(id, name, event) {
       if (event) event.stopPropagation();
       const media = window.cardActiveBlobs[id];
@@ -1398,9 +1426,7 @@
       setTimeout(() => toast.classList.remove('show'), 2200);
     }
 
-    // ============================================================
-    // 2ND BOX: DELETE ACTION
-    // ============================================================
+    // DELETE ACTION
     window.deleteCardMedia = function(id, event) {
       if (event) event.stopPropagation();
       
@@ -1442,9 +1468,7 @@
       }
     };
 
-    // ============================================================
-    // LIGHTBOX EXPANDED POPUP SYSTEM (ONLY TRIGGERS IF MEDIA EXISTS)
-    // ============================================================
+    // LIGHTBOX EXPANDED POPUP SYSTEM
     const mediaLightbox = document.getElementById("mediaLightbox");
     const lightboxStage = document.getElementById("lightboxStage");
     const lightboxTitle = document.getElementById("lightboxTitle");
@@ -1460,7 +1484,6 @@
       const item = window.allVaultItems.find(m => m.id === id);
 
       if (!media || !media.url) {
-        // If empty card, click opens file picker directly
         const input = document.getElementById(`input_${id}`);
         if (input) input.click();
         return;
@@ -1572,10 +1595,10 @@
     }
 
     function openPromptLibrary() {
-      alert("Opening Visual Prompts Library: 104 Director Prompts Loaded.");
+      alert("Opening Visual Prompts Library: 116 Director Prompts Loaded.");
     }
 
-    // 2-SECOND CATEGORY ANIMATION STAGE
+    // 2-SECOND CATEGORY ANIMATION STAGE (UPDATED WITH SEASON LAPSE)
     let animTimeout;
     function triggerCinematicCategory(category, btnElement) {
       filterCategory(category, btnElement);
@@ -1600,7 +1623,14 @@
       } else if (category === 'Cinematic Lighting') {
         scene.innerHTML = `<div class="light-glare"></div><div class="light-real-rig"><img src="Cinematic -lighting.png" alt="Studio Light"></div>`;
       } else if (category === 'Atmosphere') {
-        scene.innerHTML = `<div class="sky-transition-real"></div><div class="rain-real"></div><div class="smoke-rig-real"><img src="Atmosphere.png" alt="Atmosphere Smoke Fan"></div>`;
+        // Season Lapse Animation (Spring -> Summer -> Autumn -> Winter)
+        scene.innerHTML = `
+          <div class="season-sky-lapse"></div>
+          <div class="smoke-rig-real"><img src="Atmosphere.png" alt="Atmosphere Fan"></div>
+          <div class="season-particles">
+            <span>🌸</span><span>☀️</span><span>🍂</span><span>❄️</span>
+          </div>
+        `;
       } else if (category === 'Camera Lens') {
         scene.innerHTML = `<div class="lens-real-rig"><img src="Camera-lens.png" alt="Cinema Lens"></div>`;
       } else {
@@ -1756,7 +1786,7 @@
           firebaseItems.push({ id: doc.id, ...doc.data() });
         });
         if (firebaseItems.length > 0) {
-          window.allVaultItems = [...firebaseItems, ...defaultMovements, ...atmosphereThemesFromPdf];
+          window.allVaultItems = [...firebaseItems, ...defaultMovements, ...cameraAnglesFromPdf, ...atmosphereThemesFromPdf];
         }
         renderCards(window.allVaultItems);
       } catch (err) {
