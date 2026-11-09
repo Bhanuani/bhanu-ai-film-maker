@@ -394,7 +394,7 @@
     .upload-overlay i.cloud-icon { font-size: 1.8rem; color: var(--accent-cyan); }
     .upload-overlay span.upload-txt { font-size: 0.82rem; color: #cbd5e1; font-weight: 600; text-align: center; padding: 0 10px; }
 
-    /* Social Media Link Input Trigger */
+    /* Link Input Trigger */
     .link-upload-pill {
       margin-top: 2px;
       background: rgba(0, 210, 255, 0.1);
@@ -875,7 +875,7 @@
     </div>
   </div>
 
-  <!-- SOCIAL MEDIA / CLOUD LINK MODAL -->
+  <!-- LINK MODAL -->
   <div id="linkModal" class="modal-overlay" style="display: none;">
     <div class="modal-box" style="max-width: 500px;">
       <div class="modal-header">
@@ -885,7 +885,7 @@
       <form id="linkForm">
         <input type="hidden" id="linkCardId">
         <div class="form-group">
-          <label for="mediaUrlInput">Paste Link (Google Drive, YouTube, Insta, Direct MP4)</label>
+          <label for="mediaUrlInput">Paste Link (Google Drive / YouTube / Direct MP4)</label>
           <input type="url" id="mediaUrlInput" placeholder="https://drive.google.com/... or https://youtu.be/..." required />
         </div>
         <button type="submit" class="submit-btn">Save Link & Sync Everywhere</button>
@@ -922,7 +922,7 @@
           <textarea id="itemPrompt" rows="6" placeholder="Paste any length prompt without restriction..." required></textarea>
         </div>
         <div class="form-group">
-          <label for="itemMedia">Media Link (Google Drive / Online URL)</label>
+          <label for="itemMediaUrl">Media Link (Google Drive / Online URL)</label>
           <input type="url" id="itemMediaUrl" placeholder="https://drive.google.com/file/d/.../view?usp=sharing" required />
         </div>
         <button type="submit" id="saveBtn" class="submit-btn">+ Save to Vault</button>
@@ -952,12 +952,7 @@
   <!-- CORE SCRIPT -->
   <script>
     const defaultMovements = [
-      { 
-        id: "mov_1", 
-        name: "Slow Dolly In", 
-        category: "Camera Movement", 
-        prompt: "Slow dolly in, camera moves slowly forward toward the subject."
-      },
+      { id: "mov_1", name: "Slow Dolly In", category: "Camera Movement", prompt: "Slow dolly in, camera moves slowly forward toward the subject." },
       { id: "mov_2", name: "Slow Dolly Out", category: "Camera Movement", prompt: "Slow dolly out, camera moves slowly backwards away from the subject." },
       { id: "mov_3", name: "Fast Dolly In", category: "Camera Movement", prompt: "Fast dolly in, camera moves rapidly forward toward the subject, urgent motion." },
       { id: "mov_4", name: "Vertigo Effect (Zolly)", category: "Camera Movement", prompt: "Vertigo effect, dolly zoom, camera moves backward while zooming in, background expands." },
@@ -1100,36 +1095,11 @@
     ];
 
     const masterPromptsList = [
-      {
-        id: "mst_1",
-        name: "Recreate Master Prompt",
-        category: "Master Prompts",
-        prompt: "Analyze this video scene by scene and generate a detailed AI video prompt for each shot and frame - including camera angles, subject actions, lighting, environment, facial expressions, composition, transitions, and cinematic style. Make the prompts accurate enough to recreate the video as closely as possible. Include exact text in video."
-      },
-      {
-        id: "mst_2",
-        name: "Animation Prompt",
-        category: "Master Prompts",
-        prompt: "Animate sequence of events shown in 6-frame storyboard reference image. Single, continuous, seamless product showcase video of smartphone from Panel 1 to 6. Preserve composition, product styling, modern lighting. Smooth cinematic transitions (push-ins, slow orbits, match-cuts). No fast cuts, no background music, no text overlays."
-      },
-      {
-        id: "mst_3",
-        name: "Image Upscaling",
-        category: "Master Prompts",
-        prompt: "Upscale and restore this image to flawless 100% 8K resolution, ultra-high definition. Apply advanced noise reduction and deblurring. Introduce high-dynamic-range brightness and natural glowing luminosity on facial planes. Preserve authentic natural skin tones and strict facial consistency."
-      },
-      {
-        id: "mst_4",
-        name: "Colour Recreation",
-        category: "Master Prompts",
-        prompt: "Give me a Prompt to apply this color (front facing also) to any other products/profiles. Do not change camera angle and view. Keep only colors and camera view from reference image. AR 1:1."
-      },
-      {
-        id: "mst_5",
-        name: "ChatGPT Prompts Library",
-        category: "Master Prompts",
-        prompt: "/magazine cover /product explosion /cinematic portrait /fashion editorial /luxury advertisement /product photography /movie poster /album cover /brand campaign /architecture photography /street photography /cinematic still /action scene /sci-fi scene /concept art /world building /cyberpunk city /golden hour /neon street /dream sequence /double exposure /product launch /product render"
-      }
+      { id: "mst_1", name: "Recreate Master Prompt", category: "Master Prompts", prompt: "Analyze this video scene by scene and generate a detailed AI video prompt for each shot and frame - including camera angles, subject actions, lighting, environment, facial expressions, composition, transitions, and cinematic style. Make the prompts accurate enough to recreate the video as closely as possible. Include exact text in video." },
+      { id: "mst_2", name: "Animation Prompt", category: "Master Prompts", prompt: "Animate sequence of events shown in 6-frame storyboard reference image. Single, continuous, seamless product showcase video of smartphone from Panel 1 to 6. Preserve composition, product styling, modern lighting. Smooth cinematic transitions (push-ins, slow orbits, match-cuts). No fast cuts, no background music, no text overlays." },
+      { id: "mst_3", name: "Image Upscaling", category: "Master Prompts", prompt: "Upscale and restore this image to flawless 100% 8K resolution, ultra-high definition. Apply advanced noise reduction and deblurring. Introduce high-dynamic-range brightness and natural glowing luminosity on facial planes. Preserve authentic natural skin tones and strict facial consistency." },
+      { id: "mst_4", name: "Colour Recreation", category: "Master Prompts", prompt: "Give me a Prompt to apply this color (front facing also) to any other products/profiles. Do not change camera angle and view. Keep only colors and camera view from reference image. AR 1:1." },
+      { id: "mst_5", name: "ChatGPT Prompts Library", category: "Master Prompts", prompt: "/magazine cover /product explosion /cinematic portrait /fashion editorial /luxury advertisement /product photography /movie poster /album cover /brand campaign /architecture photography /street photography /cinematic still /action scene /sci-fi scene /concept art /world building /cyberpunk city /golden hour /neon street /dream sequence /double exposure /product launch /product render" }
     ];
 
     window.allVaultItems = [...defaultMovements, ...cameraAnglesFromPdf, ...cameraShotsFromPdf, ...atmosphereThemesFromPdf, ...masterPromptsList];
@@ -1234,6 +1204,7 @@
       'Master Prompts': 'Master-prompt.png'
     };
 
+    // YouTube Continuous Loop Embed URL
     function getYoutubeEmbedUrl(url) {
       if (!url) return null;
       let videoId = null;
@@ -1242,14 +1213,15 @@
       if (match && match[2].length === 11) {
         videoId = match[2];
       }
-      return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1` : null;
+      return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0` : null;
     }
 
-    function getDriveEmbedUrl(url) {
+    // Google Drive Direct Stream URL (HTML5 Continuous Loop)
+    function getDriveDirectStreamUrl(url) {
       if (!url) return null;
       const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
       if (match && match[1]) {
-        return `https://drive.google.com/file/d/${match[1]}/preview`;
+        return `https://drive.google.com/uc?export=download&id=${match[1]}`;
       }
       return null;
     }
@@ -1567,6 +1539,8 @@
         if (img) img.classList.remove('active-media');
         if (vid) {
           vid.src = url;
+          vid.loop = true;
+          vid.muted = true;
           vid.classList.add('active-media');
           vid.play().catch(() => {});
         }
@@ -1599,17 +1573,25 @@
           yt.classList.add('active-media');
         }
       } else if (isDrive) {
+        // Google Drive Continuous Loop Video
         if (img) img.classList.remove('active-media');
-        if (vid) vid.classList.remove('active-media');
-        if (yt) {
-          yt.src = getDriveEmbedUrl(mediaURL);
-          yt.classList.add('active-media');
+        if (yt) yt.classList.remove('active-media');
+        if (vid) {
+          vid.src = getDriveDirectStreamUrl(mediaURL);
+          vid.loop = true;
+          vid.muted = true;
+          vid.playsInline = true;
+          vid.classList.add('active-media');
+          vid.play().catch(e => console.log("Drive direct stream play:", e));
         }
       } else if (type === 'video') {
         if (img) img.classList.remove('active-media');
         if (yt) yt.classList.remove('active-media');
         if (vid) {
           vid.src = mediaURL;
+          vid.loop = true;
+          vid.muted = true;
+          vid.playsInline = true;
           vid.classList.add('active-media');
           vid.play().catch(() => {});
         }
@@ -1743,16 +1725,19 @@
         iframe.allowFullscreen = true;
         lightboxStage.appendChild(iframe);
       } else if (isDrive) {
-        const iframe = document.createElement('iframe');
-        iframe.src = getDriveEmbedUrl(media.url);
-        iframe.allow = "autoplay";
-        iframe.allowFullscreen = true;
-        lightboxStage.appendChild(iframe);
+        const v = document.createElement('video');
+        v.src = getDriveDirectStreamUrl(media.url);
+        v.controls = true;
+        v.autoplay = true;
+        v.loop = true;
+        v.playsInline = true;
+        lightboxStage.appendChild(v);
       } else if (media.type === 'video') {
         const v = document.createElement('video');
         v.src = media.url;
         v.controls = true;
         v.autoplay = true;
+        v.loop = true;
         v.playsInline = true;
         lightboxStage.appendChild(v);
       } else {
@@ -1959,7 +1944,7 @@
     renderCards(window.allVaultItems);
   </script>
 
-  <!-- FIREBASE FIRESTORE INTEGRATION -->
+  <!-- FIREBASE FIRESTORE SYNC -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
@@ -1977,7 +1962,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Save Link to Cloud Firestore (Works on Spark Plan without credit card)
+    // Save Link to Cloud Firestore
     window.saveMediaLinkToFirestore = async function(cardId, url, mediaType) {
       const toast = document.getElementById('toast');
       toast.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Saving Link to Cloud...</span>`;
