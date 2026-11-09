@@ -248,14 +248,18 @@
       padding: 1.5rem 1rem 5rem; 
     }
 
-    /* PERFECT HERO 3D BANNER - ZERO CROPPING, FULL RESOLUTION PRESERVATION */
+    /* ============================================================
+       SOLUTION 2: CINEMATIC AMBIENT GLOW BANNER
+       Background = 100% blurred video glow filling left & right gaps
+       Foreground = Sharp 100% uncropped video with full details
+       ============================================================ */
     .hero-banner-wrapper {
       position: relative; 
-      background: radial-gradient(circle at center, #060c1c 0%, #010308 100%); 
-      border: 1px solid rgba(0, 210, 255, 0.25); 
+      background: #000; 
+      border: 1px solid rgba(0, 210, 255, 0.3); 
       border-radius: 20px;
       overflow: hidden; 
-      box-shadow: 0 0 50px rgba(0, 150, 255, 0.18); 
+      box-shadow: 0 0 50px rgba(0, 150, 255, 0.25); 
       margin-bottom: 2rem; 
       cursor: pointer; 
       transition: border-color 0.4s ease, box-shadow 0.4s ease;
@@ -267,32 +271,39 @@
     }
 
     .hero-banner-wrapper:hover {
-      border-color: rgba(0, 210, 255, 0.6); 
-      box-shadow: 0 0 65px rgba(0, 210, 255, 0.35);
+      border-color: rgba(0, 210, 255, 0.65); 
+      box-shadow: 0 0 70px rgba(0, 210, 255, 0.4);
     }
 
-    .hero-img-box {
-      width: 100%; 
-      height: 100%; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      background: #000;
+    /* 1. Ambient Background Glow Video (Stretches across all empty spaces) */
+    .hero-ambient-backdrop {
+      position: absolute;
+      inset: -25px; /* extends past borders for smooth edge glow */
+      width: calc(100% + 50px);
+      height: calc(100% + 50px);
+      object-fit: cover;
+      filter: blur(45px) brightness(0.65) saturate(1.5);
+      opacity: 0.85;
+      pointer-events: none;
+      z-index: 1;
+      transform: scale(1.1);
     }
 
-    /* Zero cropping - details fully visible end-to-end */
-    .hero-img-box video {
-      width: 100%; 
-      height: 100%; 
-      object-fit: contain; 
+    /* 2. Main Foreground Video (Zero Cropping, Fully Centered & Crisp) */
+    .hero-foreground-video {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
       object-position: center;
       display: block;
-      transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), filter 0.6s ease;
+      z-index: 2;
+      filter: drop-shadow(0 0 35px rgba(0, 0, 0, 0.95));
+      transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
-    .hero-banner-wrapper:hover .hero-img-box video {
-      transform: scale(1.02); 
-      filter: brightness(1.08) drop-shadow(0 0 35px rgba(0, 210, 255, 0.4));
+    .hero-banner-wrapper:hover .hero-foreground-video {
+      transform: scale(1.02);
     }
 
     /* CATEGORIES BAR WITH SIDE SCROLLBAR */
@@ -982,22 +993,34 @@
 
   <div class="vault-container">
 
-    <!-- HERO SECTION (CLEAN 3D BANNER - PERFECT CONTAINMENT WITHOUT CROPPING) -->
+    <!-- HERO SECTION (CINEMATIC AMBIENT GLOW BACKDROP + CRISP UNTOUCHED FOREGROUND VIDEO) -->
     <section class="hero-banner-wrapper" id="heroBanner">
-      <div class="hero-img-box">
-        <video 
-          id="heroVideo" 
-          autoplay 
-          muted 
-          playsinline 
-          webkit-playsinline
-          preload="auto"
-          poster="bhanu-3d-header_2.png"
-          src="hero-banner-1.mp4"
-        >
-          Your browser does not support HTML5 video.
-        </video>
-      </div>
+      <!-- 1. Ambient blurred video filling the left & right black bars -->
+      <video 
+        id="heroVideoBg" 
+        class="hero-ambient-backdrop" 
+        autoplay 
+        muted 
+        playsinline 
+        webkit-playsinline
+        preload="auto"
+        src="hero-banner-1.mp4"
+      ></video>
+
+      <!-- 2. Crisp centered video with 100% details intact -->
+      <video 
+        id="heroVideo" 
+        class="hero-foreground-video" 
+        autoplay 
+        muted 
+        playsinline 
+        webkit-playsinline
+        preload="auto"
+        poster="bhanu-3d-header_2.png"
+        src="hero-banner-1.mp4"
+      >
+        Your browser does not support HTML5 video.
+      </video>
     </section>
 
     <!-- 3D REALISTIC ICONS CATEGORIES BAR (WITH SIDE SCROLLBAR) -->
@@ -1068,7 +1091,7 @@
       </div>
     </div>
 
-    <!-- MOVEMENTS GRID (EXPANDED TO FULL WIDTH WITH ACCURATE MARGINS) -->
+    <!-- MOVEMENTS GRID -->
     <main class="movements-grid" id="movementsGrid"></main>
 
   </div>
@@ -1225,7 +1248,7 @@
       { id: "ang_12", name: "Point-Of-View (POV)", category: "Camera Angles", prompt: "Point-of-view POV shot, camera represents first-person character vision, immersive perspective, subjective participation" }
     ];
 
-    // 15 CAMERA SHOTS (ALL DEFAULT IMAGES REMOVED - ZERO-CROPPING CLEAN SLATE)
+    // 15 CAMERA SHOTS (CLEAN UPLOAD MODE - IMAGES REMOVED)
     const cameraShotsFromPdf = [
       { id: "sht_1", name: "Extreme Long Shot (ELS) / Extreme Wide Shot (EWS)", category: "Camera Shots", prompt: "Extreme long shot ELS, extreme wide shot EWS, vast expansive landscape, subject appearing very small in distance, establish scale, atmosphere, and location, 8k" },
       { id: "sht_2", name: "Long Shot (LS) / Wide Shot (WS)", category: "Camera Shots", prompt: "Long shot LS, wide shot WS, full body of the subject in modern geometric architectural hall, substantial surroundings, movement and body language, cinematic" },
@@ -1353,25 +1376,34 @@
       });
     }
 
-    // 3 VIDEOS PLAYLIST CONTINUOUS LOOPER
+    // 3 VIDEOS PLAYLIST CONTINUOUS LOOPER (SYNCS BOTH FOREGROUND & AMBIENT GLOW BACKDROP)
     const heroVid = document.getElementById("heroVideo");
+    const heroVidBg = document.getElementById("heroVideoBg");
+
     if (heroVid) {
       const playlist = ["hero-banner-1.mp4", "hero-banner-2.mp4", "hero-banner-3.mp4"];
       let playlistIndex = 0;
+
       heroVid.addEventListener("ended", () => {
         playlistIndex = (playlistIndex + 1) % playlist.length;
         heroVid.src = playlist[playlistIndex];
+        if (heroVidBg) heroVidBg.src = playlist[playlistIndex];
+
         heroVid.play().catch(e => console.log("Video transition:", e));
+        if (heroVidBg) heroVidBg.play().catch(() => {});
       });
+
       document.addEventListener("DOMContentLoaded", () => {
         heroVid.muted = true;
+        if (heroVidBg) heroVidBg.muted = true;
         heroVid.play().catch(() => {});
+        if (heroVidBg) heroVidBg.play().catch(() => {});
       });
     }
 
     /* INDEXED-DB PERSISTENCE */
     let localDB;
-    const dbReq = indexedDB.open("CinemotionMediaDB", 6);
+    const dbReq = indexedDB.open("CinemotionMediaDB", 7);
     dbReq.onupgradeneeded = (e) => {
       localDB = e.target.result;
       if (!localDB.objectStoreNames.contains("cardMedia")) {
