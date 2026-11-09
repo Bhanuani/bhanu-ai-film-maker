@@ -615,11 +615,11 @@
       border-radius: 8px; 
       font-weight: 800; 
       cursor: pointer; 
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      white-space: nowrap;
-      transition: all 0.2s;
+      display: inline-flex; 
+      align-items: center; 
+      gap: 0.5rem; 
+      white-space: nowrap; 
+      transition: all 0.2s; 
     }
     .lightbox-dl-btn:hover { box-shadow: 0 0 18px rgba(0, 210, 255, 0.6); transform: translateY(-2px); }
 
@@ -952,15 +952,13 @@
 
   <!-- SCRIPT -->
   <script>
-    // 44 Core Movements (Includes your specific YouTube video link in 'Slow Dolly In')
+    // 44 Core Movements (YouTube link removed from 'Slow Dolly In', option remains preserved)
     const defaultMovements = [
       { 
         id: "mov_1", 
         name: "Slow Dolly In", 
         category: "Camera Movement", 
-        prompt: "Slow dolly in, camera moves slowly forward toward the subject.",
-        mediaURL: "https://www.youtube.com/watch?v=HEM-DC8nhCo",
-        mediaType: "youtube"
+        prompt: "Slow dolly in, camera moves slowly forward toward the subject."
       },
       { id: "mov_2", name: "Slow Dolly Out", category: "Camera Movement", prompt: "Slow dolly out, camera moves slowly backwards away from the subject." },
       { id: "mov_3", name: "Fast Dolly In", category: "Camera Movement", prompt: "Fast dolly in, camera moves rapidly forward toward the subject, urgent motion." },
@@ -1142,6 +1140,7 @@
 
     window.allVaultItems = [...defaultMovements, ...cameraAnglesFromPdf, ...cameraShotsFromPdf, ...atmosphereThemesFromPdf, ...masterPromptsList];
     let currentCategory = "All";
+    window.hoveredCardId = null;
 
     const classicThemes = [
       { name: "1. Film Noir Monochrome", tag: "35mm black and white film noir, high contrast, hard shadows, dramatic silhouette" },
@@ -1263,7 +1262,9 @@
         const embedUrl = isYoutube ? getYoutubeEmbedUrl(item.mediaURL) : null;
 
         return `
-        <div class="movement-card" id="card_${item.id}">
+        <div class="movement-card" id="card_${item.id}"
+             onmouseenter="window.hoveredCardId='${item.id}'"
+             onmouseleave="if(window.hoveredCardId==='${item.id}') window.hoveredCardId=null;">
           <div class="card-video-box ${item.mediaURL ? 'has-media' : ''}" id="box_${item.id}" 
                onclick="handleCardMediaClick('${item.id}')"
                ondragover="handleDragOver(event, '${item.id}')"
@@ -1277,7 +1278,7 @@
             <div class="upload-overlay" id="overlay_${item.id}">
               <div onclick="triggerFileInput(event, '${item.id}')" style="display: flex; flex-direction: column; align-items: center; gap: 0.2rem;">
                 <i class="fa-solid fa-cloud-arrow-up cloud-icon"></i>
-                <span class="upload-txt">Click or Drag & Drop Media</span>
+                <span class="upload-txt">Click, Drag & Drop or Paste Media (Ctrl+V)</span>
               </div>
               <!-- Social Media Link Button In Red Circle Area -->
               <div class="link-upload-pill" onclick="openLinkModal('${item.id}', event)">
@@ -1506,6 +1507,32 @@
       }
     };
 
+    // CLIPBOARD PASTE SUPPORT (IMAGE / VIDEO)
+    window.addEventListener('paste', (e) => {
+      // Input/Textarea లో టైప్ చేస్తున్నప్పుడు పేస్ట్‌ను అడ్డుకోకూడదు
+      const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+      if (activeTag === 'input' || activeTag === 'textarea') return;
+
+      const clipboardItems = (e.clipboardData || e.originalEvent?.clipboardData)?.items;
+      if (!clipboardItems) return;
+
+      for (let i = 0; i < clipboardItems.length; i++) {
+        const item = clipboardItems[i];
+        if (item.kind === 'file' && (item.type.startsWith('image/') || item.type.startsWith('video/'))) {
+          const pastedFile = item.getAsFile();
+          if (pastedFile) {
+            e.preventDefault();
+            // ఒకవేళ మౌస్ ఏదైనా కార్డు పైన ఉంటే దానికి, లేదా మొదటి కార్డుకు అసైన్ చేస్తుంది
+            const targetId = window.hoveredCardId || (window.allVaultItems && window.allVaultItems[0] ? window.allVaultItems[0].id : null);
+            if (targetId) {
+              processUploadedFile(targetId, pastedFile);
+            }
+            break;
+          }
+        }
+      }
+    });
+
     function processUploadedFile(id, file) {
       const type = file.type.startsWith('video') ? 'video' : 'image';
       applyMediaToCard(id, file, type);
@@ -1516,7 +1543,7 @@
       }
 
       const toast = document.getElementById('toast');
-      toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Media Uploaded Successfully!</span>`;
+      toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Media Attached Successfully!</span>`;
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 2000);
     }
