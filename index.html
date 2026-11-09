@@ -241,31 +241,34 @@
       margin-left: auto; background: var(--accent-cyan); color: #000; font-size: 0.72rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 999px;
     }
 
-    /* FULL-WIDTH RESPONSIVE VAULT LAYOUT CONTAINER */
+    /* FULL-WIDTH RESPONSIVE VAULT CONTAINER */
     .vault-container { 
       max-width: 98%; 
       margin: 0 auto; 
       padding: 1.5rem 1rem 5rem; 
     }
 
-    /* HERO 3D EXPANDED BANNER */
+    /* PERFECT HERO 3D BANNER - ZERO CROPPING, FULL RESOLUTION PRESERVATION */
     .hero-banner-wrapper {
       position: relative; 
-      background: #000; 
+      background: radial-gradient(circle at center, #060c1c 0%, #010308 100%); 
       border: 1px solid rgba(0, 210, 255, 0.25); 
       border-radius: 20px;
       overflow: hidden; 
-      box-shadow: 0 0 45px rgba(0, 150, 255, 0.12); 
+      box-shadow: 0 0 50px rgba(0, 150, 255, 0.18); 
       margin-bottom: 2rem; 
       cursor: pointer; 
-      transition: all 0.4s ease;
-      height: 480px;
+      transition: border-color 0.4s ease, box-shadow 0.4s ease;
       width: 100%;
+      height: 480px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .hero-banner-wrapper:hover {
       border-color: rgba(0, 210, 255, 0.6); 
-      box-shadow: 0 0 55px rgba(0, 210, 255, 0.25);
+      box-shadow: 0 0 65px rgba(0, 210, 255, 0.35);
     }
 
     .hero-img-box {
@@ -274,21 +277,22 @@
       display: flex; 
       align-items: center; 
       justify-content: center; 
-      overflow: hidden;
       background: #000;
     }
 
+    /* Zero cropping - details fully visible end-to-end */
     .hero-img-box video {
       width: 100%; 
       height: 100%; 
-      object-fit: cover; 
+      object-fit: contain; 
+      object-position: center;
       display: block;
       transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), filter 0.6s ease;
     }
 
     .hero-banner-wrapper:hover .hero-img-box video {
-      transform: scale(1.035); 
-      filter: brightness(1.08) drop-shadow(0 0 30px rgba(0, 210, 255, 0.3));
+      transform: scale(1.02); 
+      filter: brightness(1.08) drop-shadow(0 0 35px rgba(0, 210, 255, 0.4));
     }
 
     /* CATEGORIES BAR WITH SIDE SCROLLBAR */
@@ -786,6 +790,7 @@
 
     @keyframes glarePuff { 0% { opacity: 0; } 25% { opacity: 1; } 80% { opacity: 0.8; } 100% { opacity: 0; } }
 
+    /* SEASON LAPSE ANIMATION (ATMOSPHERE) */
     .season-sky-lapse {
       position: absolute;
       inset: 0;
@@ -837,6 +842,7 @@
       100% { transform: scale(3.0) rotate(45deg); opacity: 0; }
     }
 
+    /* MASTER PROMPT WRITING PEN ANIMATION */
     .master-writing-rig {
       position: relative;
       display: flex;
@@ -976,7 +982,7 @@
 
   <div class="vault-container">
 
-    <!-- HERO SECTION (CLEAN 3D BANNER - NO TOP BAR BADGES, NO CAPTION) -->
+    <!-- HERO SECTION (CLEAN 3D BANNER - PERFECT CONTAINMENT WITHOUT CROPPING) -->
     <section class="hero-banner-wrapper" id="heroBanner">
       <div class="hero-img-box">
         <video 
@@ -1024,7 +1030,7 @@
           <span class="count" id="count_Camera_Angles">12</span>
         </button>
 
-        <!-- Camera Shots (15 from DOCX) -->
+        <!-- Camera Shots (15 from DOCX - Clean Upload Mode) -->
         <button class="cat-tab" onclick="triggerCinematicCategory('Camera Shots', this)">
           <img src="Camera-Shots.png" class="cat-3d-img" alt="Camera Shots">
           <span>Camera Shots</span>
@@ -1062,7 +1068,7 @@
       </div>
     </div>
 
-    <!-- MOVEMENTS GRID -->
+    <!-- MOVEMENTS GRID (EXPANDED TO FULL WIDTH WITH ACCURATE MARGINS) -->
     <main class="movements-grid" id="movementsGrid"></main>
 
   </div>
@@ -1219,128 +1225,23 @@
       { id: "ang_12", name: "Point-Of-View (POV)", category: "Camera Angles", prompt: "Point-of-view POV shot, camera represents first-person character vision, immersive perspective, subjective participation" }
     ];
 
-    // 15 CAMERA SHOTS WITH EXAMPLE IMAGES (DIRECTLY EXTRACTED FROM YOUR DOCX)
+    // 15 CAMERA SHOTS (ALL DEFAULT IMAGES REMOVED - ZERO-CROPPING CLEAN SLATE)
     const cameraShotsFromPdf = [
-      { 
-        id: "sht_1", 
-        name: "Extreme Long Shot (ELS) / Extreme Wide Shot (EWS)", 
-        category: "Camera Shots", 
-        prompt: "Extreme long shot ELS, extreme wide shot EWS, vast desert landscape, subject appearing very small in distance, establish scale, atmosphere, and location, 8k",
-        mediaURL: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1200&q=80",
-        mediaType: "image"
-      },
-      { 
-        id: "sht_2", 
-        name: "Long Shot (LS) / Wide Shot (WS)", 
-        category: "Camera Shots", 
-        prompt: "Long shot LS, wide shot WS, full body of the subject in modern geometric architectural hall, substantial surroundings, movement and body language, cinematic",
-        mediaURL: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80",
-        mediaType: "image"
-      },
-      { 
-        id: "sht_3", 
-        name: "Full Shot (FS)", 
-        category: "Camera Shots", 
-        prompt: "Full shot FS, frames the subject from head to toe, elegant interior space, less emphasis on environment, showcasing entire outfit and posture",
-        mediaURL: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=1200&q=80",
-        mediaType: "image"
-      },
-      { 
-        id: "sht_4", 
-        name: "Medium Long Shot (MLS) / Three-Quarter Shot", 
-        category: "Camera Shots", 
-        prompt: "Medium long shot MLS, three-quarter shot, frames subject from knees and mid-thigh upward, elegant evening dress in warm reception room, balance body language with expression",
-        mediaURL: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1200&q=80",
-        mediaType: "image"
-      },
-      { 
-        id: "sht_5", 
-        name: "Cowboy Shot (American Shot)", 
-        category: "Camera Shots", 
-        prompt: "Cowboy shot, American shot, frames from mid-thigh upward, cowboy hat and holster room, confident heroic stance, powerful character introduction",
-        mediaURL: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1200&q=80",
-        mediaType: "image"
-      },
-      { 
-        id: "sht_6", 
-        name: "Medium Shot (MS)", 
-        category: "Camera Shots", 
-        prompt: "Medium shot MS, frames from the waist upward, traditional festival attire with festive lighting diya, dialogue and natural gestures",
-        mediaURL: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1200&q=80",
-        mediaType: "image"
-      },
-      { 
-        id: "sht_7", 
-        name: "Medium Close-Up (MCU)", 
-        category: "Camera Shots", 
-        prompt: "Medium close-up MCU, frames from chest and upper torso upward, expressive conversational storytelling, personal emotional connection",
-        mediaURL: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=1200&q=80",
-        mediaType: "image"
-      },
-      { 
-        id: "sht_8", 
-        name: "Close-Up (CU)", 
-        category: "Camera Shots", 
-        prompt: "Close-up shot CU, focuses primarily on the face, intense sorrowful contemplation, subtle micro-expressions, dramatic emotional emphasis",
-        mediaURL: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=1200&q=80",
-        mediaType: "image"
-      },
-      { 
-        id: "sht_9", 
-        name: "Extreme Close-Up (ECU)", 
-        category: "Camera Shots", 
-        prompt: "Extreme close-up ECU, macro detail shot of iris, pupil, and eyelashes, reflection in cornea, create psychological tension, razor-sharp focus",
-        mediaURL: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1200&q=80",
-        mediaType: "image"
-      },
-      { 
-        id: "sht_10", 
-        name: "Medium Full Shot (MFS)", 
-        category: "Camera Shots", 
-        prompt: "Medium full shot MFS, frames from head to around the knees, modern penthouse luxury interior, high-fashion lifestyle advertising",
-        mediaURL: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80",
-        mediaType: "image"
-      },
-      { 
-        id: "sht_11", 
-        name: "Thigh Shot", 
-        category: "Camera Shots", 
-        prompt: "Thigh shot, frames from mid-thigh upward, elegant black evening gown in luxury hotel corridor, fashion cinematography, walking shot",
-        mediaURL: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=1200&q=80",
-        mediaType: "image"
-      },
-      { 
-        id: "sht_12", 
-        name: "Waist Shot", 
-        category: "Camera Shots", 
-        prompt: "Waist shot, frames subject from waist upward, casual polo shirt with open hands gesture, clear authentic presentation and dialogue",
-        mediaURL: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1200&q=80",
-        mediaType: "image"
-      },
-      { 
-        id: "sht_13", 
-        name: "Bust Shot", 
-        category: "Camera Shots", 
-        prompt: "Bust shot, frames head, shoulders, and upper chest, traditional saree portrait, intense startled gaze, emotional dialogue",
-        mediaURL: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1200&q=80",
-        mediaType: "image"
-      },
-      { 
-        id: "sht_14", 
-        name: "Head-and-Shoulders Shot", 
-        category: "Camera Shots", 
-        prompt: "Head-and-shoulders shot, head and shoulders prominent in frame, neutral dark studio backdrop, soft portrait key light, testimonial video",
-        mediaURL: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1200&q=80",
-        mediaType: "image"
-      },
-      { 
-        id: "sht_15", 
-        name: "Tight Close-Up (TCU)", 
-        category: "Camera Shots", 
-        prompt: "Tight close-up TCU, tightly framed around eyes, nose, and lips, emotional vulnerability, intimacy and intense dramatic cinematic impact",
-        mediaURL: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=1200&q=80",
-        mediaType: "image"
-      }
+      { id: "sht_1", name: "Extreme Long Shot (ELS) / Extreme Wide Shot (EWS)", category: "Camera Shots", prompt: "Extreme long shot ELS, extreme wide shot EWS, vast expansive landscape, subject appearing very small in distance, establish scale, atmosphere, and location, 8k" },
+      { id: "sht_2", name: "Long Shot (LS) / Wide Shot (WS)", category: "Camera Shots", prompt: "Long shot LS, wide shot WS, full body of the subject in modern geometric architectural hall, substantial surroundings, movement and body language, cinematic" },
+      { id: "sht_3", name: "Full Shot (FS)", category: "Camera Shots", prompt: "Full shot FS, frames the subject from head to toe, elegant interior space, less emphasis on environment, showcasing entire outfit and posture" },
+      { id: "sht_4", name: "Medium Long Shot (MLS) / Three-Quarter Shot", category: "Camera Shots", prompt: "Medium long shot MLS, three-quarter shot, frames subject from knees and mid-thigh upward, elegant evening dress in warm reception room, balance body language with expression" },
+      { id: "sht_5", name: "Cowboy Shot (American Shot)", category: "Camera Shots", prompt: "Cowboy shot, American shot, frames from mid-thigh upward, cowboy hat and holster room, confident heroic stance, powerful character introduction" },
+      { id: "sht_6", name: "Medium Shot (MS)", category: "Camera Shots", prompt: "Medium shot MS, frames from the waist upward, traditional festival attire with festive lighting diya, dialogue and natural gestures" },
+      { id: "sht_7", name: "Medium Close-Up (MCU)", category: "Camera Shots", prompt: "Medium close-up MCU, frames from chest and upper torso upward, expressive conversational storytelling, personal emotional connection" },
+      { id: "sht_8", name: "Close-Up (CU)", category: "Camera Shots", prompt: "Close-up shot CU, focuses primarily on the face, intense sorrowful contemplation, subtle micro-expressions, dramatic emotional emphasis" },
+      { id: "sht_9", name: "Extreme Close-Up (ECU)", category: "Camera Shots", prompt: "Extreme close-up ECU, macro detail shot of iris, pupil, and eyelashes, reflection in cornea, create psychological tension, razor-sharp focus" },
+      { id: "sht_10", name: "Medium Full Shot (MFS)", category: "Camera Shots", prompt: "Medium full shot MFS, frames from head to around the knees, modern penthouse luxury interior, high-fashion lifestyle advertising" },
+      { id: "sht_11", name: "Thigh Shot", category: "Camera Shots", prompt: "Thigh shot, frames from mid-thigh upward, elegant black evening gown in luxury hotel corridor, fashion cinematography, walking shot" },
+      { id: "sht_12", name: "Waist Shot", category: "Camera Shots", prompt: "Waist shot, frames subject from waist upward, casual polo shirt with open hands gesture, clear authentic presentation and dialogue" },
+      { id: "sht_13", name: "Bust Shot", category: "Camera Shots", prompt: "Bust shot, frames head, shoulders, and upper chest, traditional saree portrait, intense startled gaze, emotional dialogue" },
+      { id: "sht_14", name: "Head-and-Shoulders Shot", category: "Camera Shots", prompt: "Head-and-shoulders shot, head and shoulders prominent in frame, neutral dark studio backdrop, soft portrait key light, testimonial video" },
+      { id: "sht_15", name: "Tight Close-Up (TCU)", category: "Camera Shots", prompt: "Tight close-up TCU, tightly framed around eyes, nose, and lips, emotional vulnerability, intimacy and intense dramatic cinematic impact" }
     ];
 
     // 60 Atmosphere Themes (From PDF)
@@ -1421,7 +1322,7 @@
       { id: "mst_10", name: "Cosmic Hyper Hyperspace", category: "Master Prompts", prompt: "Fast forward warp tunnel hyperlapse, kaleidoscopic neon star trails, barrel roll 360 rotation, zero-gravity surreal motion" }
     ];
 
-    // Total: 44 Movements + 12 Angles + 15 Shots + 60 Atmosphere + 10 Master Prompts = 141
+    // Total: 44 Movements + 12 Angles + 15 Shots + 60 Atmosphere + 10 Master Prompts = 141 Total
     window.allVaultItems = [...defaultMovements, ...cameraAnglesFromPdf, ...cameraShotsFromPdf, ...atmosphereThemesFromPdf, ...masterPromptsList];
     let currentCategory = "All";
 
@@ -1470,7 +1371,7 @@
 
     /* INDEXED-DB PERSISTENCE */
     let localDB;
-    const dbReq = indexedDB.open("CinemotionMediaDB", 5);
+    const dbReq = indexedDB.open("CinemotionMediaDB", 6);
     dbReq.onupgradeneeded = (e) => {
       localDB = e.target.result;
       if (!localDB.objectStoreNames.contains("cardMedia")) {
