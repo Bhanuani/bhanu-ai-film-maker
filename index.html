@@ -39,12 +39,11 @@
       display: none !important;
     }
 
-    /* TAB SWITCH WELCOME BACK OVERLAY STYLES */
+    /* TAB SWITCH WELCOME BACK - SEAMLESS BLEND MODE */
     #welcomeBackOverlay {
       position: fixed;
       inset: 0;
-      background: rgba(3, 7, 18, 0.94);
-      backdrop-filter: blur(25px);
+      background: radial-gradient(circle at center, rgba(4, 7, 17, 0.4) 0%, rgba(4, 7, 17, 0.95) 85%);
       z-index: 99999999;
       display: flex;
       align-items: center;
@@ -52,7 +51,7 @@
       flex-direction: column;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     #welcomeBackOverlay.show {
@@ -66,8 +65,12 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      opacity: 0.45;
-      filter: saturate(1.3) brightness(0.85);
+      opacity: 0.30;
+      mix-blend-mode: screen;
+      filter: saturate(1.4) brightness(0.9) contrast(1.1);
+      mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+      -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+      pointer-events: none;
     }
 
     .welcome-content {
@@ -75,37 +78,27 @@
       z-index: 2;
       text-align: center;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      gap: 0.75rem;
+      justify-content: center;
       padding: 0 1.5rem;
     }
 
     .welcome-glitch-text {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 3.4rem;
+      font-size: 3.8rem;
       font-weight: 800;
-      letter-spacing: 4px;
+      letter-spacing: 6px;
       text-transform: uppercase;
-      background: linear-gradient(135deg, #ffffff 20%, #00d2ff 85%);
+      background: linear-gradient(135deg, #ffffff 30%, #00d2ff 90%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 45px rgba(0, 210, 255, 0.85);
+      text-shadow: 0 0 50px rgba(0, 210, 255, 0.9), 0 0 20px rgba(0, 210, 255, 0.5);
       animation: welcomePop 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    .welcome-subtext {
-      font-size: 1.15rem;
-      color: var(--accent-cyan);
-      font-weight: 700;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      opacity: 0.9;
-    }
-
     @keyframes welcomePop {
-      0% { transform: scale(0.65) translateY(25px); opacity: 0; filter: blur(12px); }
-      50% { transform: scale(1.06) translateY(-5px); opacity: 1; filter: blur(0); }
+      0% { transform: scale(0.7) translateY(20px); opacity: 0; filter: blur(14px); }
+      50% { transform: scale(1.04) translateY(-3px); opacity: 1; filter: blur(0); }
       100% { transform: scale(1) translateY(0); opacity: 1; }
     }
 
@@ -391,10 +384,6 @@
       transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
-    .hero-banner-wrapper:hover .hero-foreground-video {
-      transform: scale(1.02);
-    }
-
     /* CATEGORIES BAR */
     .categories-bar-wrapper {
       position: relative;
@@ -459,7 +448,6 @@
       animation: iconFloatContinuous 3s ease-in-out infinite alternate; 
       transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .cat-tab:hover .cat-3d-img, .cat-tab.active .cat-3d-img { transform: scale(1.22) rotate(-4deg); filter: drop-shadow(0 0 12px rgba(0, 210, 255, 0.7)); }
 
     @keyframes iconFloatContinuous { 0% { transform: translateY(0px) rotate(0deg); } 100% { transform: translateY(-4px) rotate(3deg); } }
 
@@ -796,17 +784,16 @@
 </head>
 <body>
 
-  <!-- TAB SWITCH WELCOME BACK OVERLAY (WITH welcome-back.mp4) -->
+  <!-- TAB SWITCH WELCOME BACK OVERLAY (SEAMLESS BLENDED) -->
   <div id="welcomeBackOverlay">
     <video id="welcomeVideo" class="welcome-video-bg" muted playsinline loop preload="auto" src="welcome-back.mp4"></video>
     <div class="welcome-content">
       <div class="welcome-glitch-text">WELCOME BACK</div>
-      <div class="welcome-subtext">MASTER DIRECTORS VAULT</div>
     </div>
   </div>
 
   <!-- AUTHENTICATION GATE (LOGIN / REGISTER WITH 4 FIELDS & RULES / MOBILE OTP) -->
-  <div id="authGateModal" class="auth-gate-modal" style="display: none;">
+  <div id="authGateModal" class="auth-gate-modal" style="display: flex;">
     <div class="auth-card">
       <div style="text-align: center; margin-bottom: 1.5rem;">
         <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; color: #fff;">CINEMOTION STUDIO</h2>
@@ -1302,7 +1289,7 @@
       { id: "atm_41", name: "Desert Sand Dunes", category: "Atmosphere", prompt: "Desert Sand Dunes, sweeping wind-sculpted golden ridges under late afternoon warm light" },
       { id: "atm_42", name: "Volcanic Lava Glow", category: "Atmosphere", prompt: "Volcanic Lava Glow, molten red-orange lava streams cutting across dark basalt rocks at night" },
       { id: "atm_43", name: "Mirror Reflection Lake", category: "Atmosphere", prompt: "Mirror Reflection Lake, crystal calm glass water mirroring majestic alpine mountains" },
-      { id: "atm_44", name: "Abstract Bokeh Lights", category: "Atmosphere", prompt: "Abstract Bokeh Lights, out-of-focus soft circular or bulbs of shimmering colorful light" },
+      { id: "atm_44", name: "Abstract Bokeh Lights", category: "Atmosphere", prompt: "Abstract Bokeh Lights, out-of-focus soft circular orbs of shimmering colorful light" },
       { id: "atm_45", name: "Creative Smoke Bomb", category: "Atmosphere", prompt: "Creative Smoke Bomb, swirling vibrant colorful cloud plumes billowing through urban scene" },
       { id: "atm_46", name: "Double Exposure Art", category: "Atmosphere", prompt: "Double Exposure Art, silhouette portrait seamlessly blended with pine forest landscape" },
       { id: "atm_47", name: "Levitating Objects", category: "Atmosphere", prompt: "Levitating Objects, magical items floating weightlessly in mid-air defying gravity" },
@@ -1421,7 +1408,7 @@
             }
           });
         }
-        renderCards(window.allVaultItems);
+        window.renderCards?.(window.allVaultItems);
       };
     }
 
@@ -1556,6 +1543,7 @@
 
       updateCounts();
     }
+    window.renderCards = renderCards;
 
     // SOCIAL MEDIA / CLOUD LINK MODAL HANDLER
     const linkModal = document.getElementById("linkModal");
@@ -1920,7 +1908,7 @@
           yt.classList.remove('active-media');
         }
 
-        // 4. Delete permanently from Cloud Firestore so it won't reload on refresh!
+        // 4. Delete permanently from Cloud Firestore so it won't reload on refresh
         if (typeof window.deleteMediaFromFirestore === 'function') {
           await window.deleteMediaFromFirestore(id);
         }
@@ -2220,37 +2208,37 @@
       const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
       const isStrong = passRegex.test(pass);
 
-      if (isStrong) {
-        passHint.style.color = "#34d399";
-        passHint.innerText = "✓ Password meets all strength criteria.";
-      } else {
-        passHint.style.color = "#f87171";
-        passHint.innerText = "Rule: 1 Capital letter, 1 Small letter, 1 Number, 1 Special Char (@$!%*?&#), min 8 chars.";
+      if (passHint) {
+        if (isStrong) {
+          passHint.style.color = "#34d399";
+          passHint.innerText = "✓ Password meets all strength criteria.";
+        } else {
+          passHint.style.color = "#f87171";
+          passHint.innerText = "Rule: 1 Capital letter, 1 Small letter, 1 Number, 1 Special Char (@$!%*?&#), min 8 chars.";
+        }
       }
 
       const isMatch = pass.length > 0 && pass === confirmPass;
-      if (confirmPass.length > 0) {
-        matchHint.style.display = "block";
-        if (isMatch) {
-          matchHint.style.color = "#34d399";
-          matchHint.innerText = "✓ Passwords match.";
+      if (matchHint) {
+        if (confirmPass.length > 0) {
+          matchHint.style.display = "block";
+          if (isMatch) {
+            matchHint.style.color = "#34d399";
+            matchHint.innerText = "✓ Passwords match.";
+          } else {
+            matchHint.style.color = "#f87171";
+            matchHint.innerText = "Passwords do not match!";
+          }
         } else {
-          matchHint.style.color = "#f87171";
-          matchHint.innerText = "Passwords do not match!";
+          matchHint.style.display = "none";
         }
-      } else {
-        matchHint.style.display = "none";
       }
 
       // Activate Done button only if both are true
-      if (isStrong && isMatch) {
-        doneBtn.disabled = false;
-        doneBtn.style.opacity = "1";
-        doneBtn.style.cursor = "pointer";
-      } else {
-        doneBtn.disabled = true;
-        doneBtn.style.opacity = "0.45";
-        doneBtn.style.cursor = "not-allowed";
+      if (doneBtn) {
+        doneBtn.disabled = !(isStrong && isMatch);
+        doneBtn.style.opacity = (isStrong && isMatch) ? "1" : "0.45";
+        doneBtn.style.cursor = (isStrong && isMatch) ? "pointer" : "not-allowed";
       }
     };
 
@@ -2279,7 +2267,7 @@
       }
     });
 
-    renderCards(window.allVaultItems);
+    window.renderCards?.(window.allVaultItems);
   </script>
 
   <!-- FIREBASE AUTH, FORGOT PASSWORD, PHONE OTP, AND FIRESTORE -->
@@ -2304,6 +2292,7 @@
       where,
       deleteDoc,
       doc,
+      setDoc,
       orderBy
     } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
@@ -2349,6 +2338,18 @@
       if (code === "auth/weak-password") {
         return "Password is too weak. Please meet all complexity criteria.";
       }
+      if (code === "auth/invalid-email") {
+        return "Please enter a valid email address.";
+      }
+      if (code === "auth/user-not-found" || code === "auth/wrong-password") {
+        return "Email or password is incorrect.";
+      }
+      if (code === "auth/too-many-requests") {
+        return "Too many attempts. Please wait a while and try again.";
+      }
+      if (code === "auth/network-request-failed") {
+        return "Network error. Check your internet connection and try again.";
+      }
       return `${action} failed: ${err?.message || "Unknown error"}`;
     }
 
@@ -2379,7 +2380,7 @@
         if (byId("profileAvatarLarge")) byId("profileAvatarLarge").innerText = firstLetter;
 
         // Secure check: Only bhanu.pakala03@gmail.com gets editing controls
-        if (user.email === "bhanu.pakala03@gmail.com") {
+        if ((user.email || "").toLowerCase() === "bhanu.pakala03@gmail.com") {
           document.body.classList.add("is-admin-active");
           if (byId("profileBadgeRole")) byId("profileBadgeRole").innerText = "MASTER DIRECTOR (ADMIN)";
         } else {
@@ -2467,6 +2468,10 @@
       if (!email || !jobStudy || !pass || !confirmPass) {
         return showAuthMessage("Please fill in all 4 registration fields.");
       }
+      const strongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#])[A-Za-z\\d@$!%*?&#]{8,}$/;
+      if (!strongPassword.test(pass)) {
+        return showAuthMessage("Password must be at least 8 characters and include uppercase, lowercase, number, and special character (@$!%*?&#).");
+      }
       if (pass !== confirmPass) {
         return showAuthMessage("Passwords do not match!");
       }
@@ -2476,20 +2481,29 @@
 
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-        // Save user profile details to Firestore
-        await addDoc(collection(db, "registered_users"), {
-          uid: userCredential.user.uid,
-          email: email,
-          occupation: jobStudy,
-          createdAt: new Date().toISOString()
-        });
+        // Save one profile per Firebase UID. Authentication can succeed even if
+        // Firestore rules/network prevent this optional profile write.
+        try {
+          await setDoc(doc(db, "registered_users", userCredential.user.uid), {
+            uid: userCredential.user.uid,
+            email: email,
+            occupation: jobStudy,
+            createdAt: new Date().toISOString()
+          });
+        } catch (profileError) {
+          console.warn("Account created, but profile details could not be saved:", profileError);
+          showAuthMessage("Your account was created, but your profile details could not be saved. Please contact the administrator.");
+        }
 
         await notifyAdminOnLogin(email, `New User Registered (${jobStudy})`);
         alert("Registration Successful! Welcome to Cinemotion Studio.");
       } catch (err) {
         showAuthMessage(explainFirebaseError(err, "Registration"));
       } finally {
-        if (doneBtn) { doneBtn.disabled = false; doneBtn.textContent = "Done"; }
+        if (doneBtn) {
+          doneBtn.textContent = "Done";
+          window.checkRegisterPasswordRules();
+        }
       }
     });
 
@@ -2657,8 +2671,10 @@
           }
         });
         if (customMovements.length) {
-          window.allVaultItems = [...customMovements, ...window.allVaultItems];
-          renderCards(window.allVaultItems);
+          const customIds = new Set(customMovements.map(item => item.id));
+          const builtInAndOtherItems = window.allVaultItems.filter(item => !customIds.has(item.id));
+          window.allVaultItems = [...customMovements, ...builtInAndOtherItems];
+          window.renderCards?.(window.allVaultItems);
         }
       } catch (err) {
         console.error("Firestore load error:", err);
