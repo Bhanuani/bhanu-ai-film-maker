@@ -2105,42 +2105,29 @@
       const matchHint = document.getElementById("regMatchHint");
       const doneBtn = document.getElementById("regDoneBtn");
 
-      // Rule: At least 1 Uppercase, 1 Lowercase, 1 Number, 1 Special Char, min 8 chars
       const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
       const isStrong = passRegex.test(pass);
-
-      if (isStrong) {
-        passHint.style.color = "#34d399";
-        passHint.innerText = "✓ Password meets all strength criteria.";
-      } else {
-        passHint.style.color = "#f87171";
-        passHint.innerText = "Rule: 1 Capital letter, 1 Small letter, 1 Number, 1 Special Char (@$!%*?&#), min 8 chars.";
-      }
-
       const isMatch = pass.length > 0 && pass === confirmPass;
-      if (confirmPass.length > 0) {
-        matchHint.style.display = "block";
-        if (isMatch) {
-          matchHint.style.color = "#34d399";
-          matchHint.innerText = "✓ Passwords match.";
-        } else {
-          matchHint.style.color = "#f87171";
-          matchHint.innerText = "Passwords do not match!";
-        }
-      } else {
-        matchHint.style.display = "none";
+
+      if (passHint) {
+        passHint.style.color = isStrong ? "#34d399" : "#f87171";
+        passHint.innerText = isStrong
+          ? "✓ Password meets all strength criteria."
+          : "Use 8+ characters with uppercase, lowercase, number and a special character (@$!%*?&#).";
       }
 
-      // Activate Done button only if both are true
-      if (isStrong && isMatch) {
-        doneBtn.disabled = false;
-        doneBtn.style.opacity = "1";
-        doneBtn.style.cursor = "pointer";
-      } else {
-        doneBtn.disabled = true;
-        doneBtn.style.opacity = "0.45";
-        doneBtn.style.cursor = "not-allowed";
+      if (matchHint) {
+        matchHint.style.display = confirmPass.length > 0 ? "block" : "none";
+        matchHint.style.color = isMatch ? "#34d399" : "#f87171";
+        matchHint.innerText = isMatch ? "✓ Passwords match." : "Passwords do not match!";
       }
+
+      if (doneBtn) {
+        doneBtn.disabled = !(isStrong && isMatch);
+        doneBtn.style.opacity = doneBtn.disabled ? "0.45" : "1";
+        doneBtn.style.cursor = doneBtn.disabled ? "not-allowed" : "pointer";
+      }
+      return { isStrong, isMatch };
     };
 
     renderCards(window.allVaultItems);
@@ -2201,14 +2188,23 @@
       if (code === "auth/unauthorized-domain") {
         return "This domain is not authorized in Firebase Console.";
       }
-      if (code === "auth/invalid-credential") {
-        return "Email or password is incorrect.";
+      if (code === "auth/invalid-credential" || code === "auth/wrong-password" || code === "auth/user-not-found") {
+        return "Email or password is incorrect. Check your details or use Forgot Password.";
       }
       if (code === "auth/email-already-in-use") {
-        return "This email already has an account. Please use Login.";
+        return "This email is already registered. Switch to Login, or use Forgot Password if you do not know the password.";
       }
       if (code === "auth/weak-password") {
-        return "Password is too weak. Please meet all complexity criteria.";
+        return "Password is too weak. Use at least 8 characters with uppercase, lowercase, number and one special character.";
+      }
+      if (code === "auth/operation-not-allowed") {
+        return "Email/Password sign-in is disabled. Enable it in Firebase Console > Authentication > Sign-in method.";
+      }
+      if (code === "auth/invalid-email") {
+        return "Enter a valid email address.";
+      }
+      if (code === "auth/too-many-requests") {
+        return "Too many attempts. Wait a few minutes and try again.";
       }
       return `${action} failed: ${err?.message || "Unknown error"}`;
     }
@@ -2292,6 +2288,10 @@
       if (byId("registerAuthForm")) byId("registerAuthForm").style.display = isRegister ? "block" : "none";
       if (byId("phoneAuthForm")) byId("phoneAuthForm").style.display = isPhone ? "block" : "none";
 
+      if (isRegister && typeof window.checkRegisterPasswordRules === "function") {
+        window.checkRegisterPasswordRules();
+      }
+
       if (isPhone) {
         try { initRecaptcha(); }
         catch (err) { showAuthMessage(explainFirebaseError(err, "reCAPTCHA initialization")); }
@@ -2317,40 +2317,78 @@
       }
     });
 
-    // 2. New User Registration (Executes on "Done" button submit)
+    // 2. New User Registration
     byId("registerAuthForm")?.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const email = byId("regEmailInput")?.value.trim();
-      const jobStudy = byId("regJobInput")?.value;
-      const pass = byId("regPassInput")?.value;
-      const confirmPass = byId("regConfirmPassInput")?.value;
+
+      const emailInput = byId("regEmailInput");
+      const email = emailInput?.value.trim().toLowerCase() || "";
+      const jobStudy = byId("regJobInput")?.value || "";
+      const pass = byId("regPassInput")?.value || "";
+      const confirmPass = byId("regConfirmPassInput")?.value || "";
+      const doneBtn = byId("regDoneBtn");
 
       if (!email || !jobStudy || !pass || !confirmPass) {
-        return showAuthMessage("Please fill in all 4 registration fields.");
+        showAuthMessage("Please complete all 4 registration fields.");
+        return;
       }
-      if (pass !== confirmPass) {
-        return showAuthMessage("Passwords do not match!");
+      if (emailInput && !emailInput.checkValidity()) {
+        showAuthMessage("Please enter a valid email address.");
+        emailInput.focus();
+        return;
       }
 
-      const doneBtn = byId("regDoneBtn");
-      if (doneBtn) { doneBtn.disabled = true; doneBtn.textContent = "Registering..."; }
+      const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+      if (!passRegex.test(pass)) {
+        showAuthMessage("Password must contain at least 8 characters, uppercase, lowercase, a number and a special character (@$!%*?&#).");
+        byId("regPassInput")?.focus();
+        return;
+      }
+      if (pass !== confirmPass) {
+        showAuthMessage("Passwords do not match. Re-enter the same password.");
+        byId("regConfirmPassInput")?.focus();
+        return;
+      }
+
+      if (doneBtn) {
+        doneBtn.disabled = true;
+        doneBtn.textContent = "Creating account...";
+      }
 
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-        // Save user profile details to Firestore
-        await addDoc(collection(db, "registered_users"), {
-          uid: userCredential.user.uid,
-          email: email,
-          occupation: jobStudy,
-          createdAt: new Date().toISOString()
-        });
 
-        await notifyAdminOnLogin(email, `New User Registered (${jobStudy})`);
-        alert("Registration Successful! Welcome to Cinemotion Studio.");
+        // Firestore profile storage is best-effort. A Firestore rules error
+        // must not make a successfully created Firebase Auth account look failed.
+        try {
+          await addDoc(collection(db, "registered_users"), {
+            uid: userCredential.user.uid,
+            email,
+            occupation: jobStudy,
+            createdAt: new Date().toISOString()
+          });
+        } catch (profileError) {
+          console.warn("Account created, but profile details could not be saved to Firestore:", profileError);
+        }
+
+        // Notification failures should never block account creation.
+        notifyAdminOnLogin(email, `New User Registered (${jobStudy})`)
+          .catch((notificationError) => console.warn("Registration notification failed:", notificationError));
+
+        alert("Registration successful! Your CINEMOTION STUDIO account has been created.");
+        byId("registerAuthForm")?.reset();
+        window.checkRegisterPasswordRules?.();
       } catch (err) {
         showAuthMessage(explainFirebaseError(err, "Registration"));
       } finally {
-        if (doneBtn) { doneBtn.disabled = false; doneBtn.textContent = "Done"; }
+        if (doneBtn) {
+          doneBtn.textContent = "Done";
+          if (typeof window.checkRegisterPasswordRules === "function") {
+            window.checkRegisterPasswordRules();
+          } else {
+            doneBtn.disabled = false;
+          }
+        }
       }
     });
 
