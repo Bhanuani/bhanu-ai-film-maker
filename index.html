@@ -39,19 +39,19 @@
       display: none !important;
     }
 
-    /* TAB SWITCH WELCOME BACK - PURE VIDEO BLEND (NO EXTRA TEXT) */
+    /* TAB SWITCH WELCOME BACK - SEAMLESS BLEND MODE */
     #welcomeBackOverlay {
       position: fixed;
       inset: 0;
-      background: rgba(3, 7, 18, 0.88);
-      backdrop-filter: blur(14px);
+      background: radial-gradient(circle at center, rgba(4, 7, 17, 0.4) 0%, rgba(4, 7, 17, 0.95) 85%);
       z-index: 99999999;
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-direction: column;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     #welcomeBackOverlay.show {
@@ -59,14 +59,47 @@
       pointer-events: auto;
     }
 
-    .welcome-direct-video {
-      width: 90%;
-      max-width: 860px;
-      aspect-ratio: 16 / 9;
-      object-fit: contain;
+    .welcome-video-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.30;
       mix-blend-mode: screen;
-      filter: drop-shadow(0 0 40px rgba(0, 210, 255, 0.5));
+      filter: saturate(1.4) brightness(0.9) contrast(1.1);
+      mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+      -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
       pointer-events: none;
+    }
+
+    .welcome-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 1.5rem;
+    }
+
+    .welcome-glitch-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 3.8rem;
+      font-weight: 800;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #ffffff 30%, #00d2ff 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 50px rgba(0, 210, 255, 0.9), 0 0 20px rgba(0, 210, 255, 0.5);
+      animation: welcomePop 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes welcomePop {
+      0% { transform: scale(0.7) translateY(20px); opacity: 0; filter: blur(14px); }
+      50% { transform: scale(1.04) translateY(-3px); opacity: 1; filter: blur(0); }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
     }
 
     /* HEADER - PERFECTLY ALIGNED */
@@ -349,10 +382,6 @@
       z-index: 2;
       filter: drop-shadow(0 0 35px rgba(0, 0, 0, 0.95));
       transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    .hero-banner-wrapper:hover .hero-foreground-video {
-      transform: scale(1.02);
     }
 
     /* CATEGORIES BAR */
@@ -755,9 +784,12 @@
 </head>
 <body>
 
-  <!-- TAB SWITCH WELCOME BACK OVERLAY (ONLY VIDEO, NO EXTRA TEXT) -->
+  <!-- TAB SWITCH WELCOME BACK OVERLAY (SEAMLESS BLENDED) -->
   <div id="welcomeBackOverlay">
-    <video id="welcomeVideo" class="welcome-direct-video" muted playsinline preload="auto" src="welcome-back.mp4"></video>
+    <video id="welcomeVideo" class="welcome-video-bg" muted playsinline loop preload="auto" src="welcome-back.mp4"></video>
+    <div class="welcome-content">
+      <div class="welcome-glitch-text">WELCOME BACK</div>
+    </div>
   </div>
 
   <!-- AUTHENTICATION GATE (LOGIN / REGISTER WITH 4 FIELDS & RULES / MOBILE OTP) -->
@@ -1840,17 +1872,20 @@
       if (confirm("Are you sure you want to permanently delete this media?")) {
         delete window.cardActiveBlobs[id];
 
+        // 1. Delete from local IndexedDB
         if (localDB) {
           const tx = localDB.transaction("cardMedia", "readwrite");
           tx.objectStore("cardMedia").delete(id);
         }
 
+        // 2. Remove media from in-memory array
         const targetItem = window.allVaultItems?.find(m => m.id === id);
         if (targetItem) {
           delete targetItem.mediaURL;
           delete targetItem.mediaType;
         }
 
+        // 3. Clear DOM
         const box = document.getElementById(`box_${id}`);
         const vid = document.getElementById(`vid_${id}`);
         const img = document.getElementById(`img_${id}`);
@@ -1872,6 +1907,7 @@
           yt.classList.remove('active-media');
         }
 
+        // 4. Delete permanently from Cloud Firestore so it won't reload on refresh
         if (typeof window.deleteMediaFromFirestore === 'function') {
           await window.deleteMediaFromFirestore(id);
         }
@@ -2193,6 +2229,7 @@
         matchHint.style.display = "none";
       }
 
+      // Activate Done button only if both are true
       if (isStrong && isMatch) {
         doneBtn.disabled = false;
         doneBtn.style.opacity = "1";
@@ -2204,27 +2241,27 @@
       }
     };
 
-    // TAB SWITCH "WELCOME BACK" TRIGGER - ONE-TIME PLAY, NO EXTRA TEXT
-    let welcomeTimer;
+    // TAB SWITCH "WELCOME BACK" TRIGGER LOGIC
+    let welcomeTimeout;
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
         const overlay = document.getElementById("welcomeBackOverlay");
         const video = document.getElementById("welcomeVideo");
 
-        if (overlay && video) {
-          clearTimeout(welcomeTimer);
+        if (overlay) {
+          clearTimeout(welcomeTimeout);
           overlay.classList.add("show");
-          video.currentTime = 0;
-          video.play().catch(() => {});
 
-          video.onended = () => {
-            overlay.classList.remove("show");
-          };
+          if (video) {
+            video.currentTime = 0;
+            video.play().catch(() => {});
+          }
 
-          welcomeTimer = setTimeout(() => {
+          // Shows for 2.6 seconds and smoothly fades out
+          welcomeTimeout = setTimeout(() => {
             overlay.classList.remove("show");
-            video.pause();
-          }, 2900);
+            if (video) video.pause();
+          }, 2600);
         }
       }
     });
@@ -2328,6 +2365,7 @@
         if (byId("headerUserAvatar")) byId("headerUserAvatar").innerText = firstLetter;
         if (byId("profileAvatarLarge")) byId("profileAvatarLarge").innerText = firstLetter;
 
+        // Secure check: Only bhanu.pakala03@gmail.com gets editing controls
         if (user.email === "bhanu.pakala03@gmail.com") {
           document.body.classList.add("is-admin-active");
           if (byId("profileBadgeRole")) byId("profileBadgeRole").innerText = "MASTER DIRECTOR (ADMIN)";
@@ -2366,6 +2404,7 @@
       }
     }
 
+    // Switch between Login, Register, and Phone OTP tabs
     window.switchAuthMode = function(mode) {
       const isEmail = mode === "email";
       const isRegister = mode === "register";
@@ -2404,7 +2443,7 @@
       }
     });
 
-    // 2. New User Registration
+    // 2. New User Registration (Executes on "Done" button submit)
     byId("registerAuthForm")?.addEventListener("submit", async (e) => {
       e.preventDefault();
       const email = byId("regEmailInput")?.value.trim();
@@ -2424,6 +2463,7 @@
 
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+        // Save user profile details to Firestore
         await addDoc(collection(db, "registered_users"), {
           uid: userCredential.user.uid,
           email: email,
@@ -2507,7 +2547,7 @@
       catch (err) { showAuthMessage(explainFirebaseError(err, "Sign out")); }
     };
 
-    // FIRESTORE PERMANENT DELETE FUNCTION
+    // FIRESTORE PERMANENT DELETE FUNCTION (Fixes video reappearing on refresh)
     window.deleteMediaFromFirestore = async function(cardId) {
       try {
         const q = query(collection(db, "movements"), where("linkedCardId", "==", cardId));
@@ -2517,12 +2557,13 @@
           delPromises.push(deleteDoc(doc(db, "movements", docSnap.id)));
         });
         await Promise.all(delPromises);
+        console.log("Deleted Firestore records for cardId:", cardId);
       } catch (err) {
         console.error("Firestore permanent delete error:", err);
       }
     };
 
-    // FIRESTORE SAVE FUNCTION
+    // FIRESTORE SAVE FUNCTION (Clears old links first to prevent duplicates)
     window.saveMediaLinkToFirestore = async function(cardId, url, mediaType) {
       const toast = byId("toast");
       if (toast) { toast.textContent = "Saving link to cloud..."; toast.classList.add("show"); }
