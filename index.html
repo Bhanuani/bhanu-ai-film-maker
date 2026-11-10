@@ -711,7 +711,7 @@
     .auth-gate-modal { position: fixed; inset: 0; background: rgba(3, 7, 18, 0.96); backdrop-filter: blur(25px); z-index: 1000000; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
     .auth-card { background: #0c1222; border: 1px solid rgba(0, 210, 255, 0.35); border-radius: 20px; width: 100%; max-width: 440px; padding: 2rem; box-shadow: 0 0 60px rgba(0, 210, 255, 0.2); }
     .auth-tabs { display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; }
-    .auth-tab-btn { flex: 1; padding: 0.75rem; background: none; border: none; color: #94a3b8; font-weight: 700; cursor: pointer; border-bottom: 2px solid transparent; font-size: 0.9rem; }
+    .auth-tab-btn { flex: 1; padding: 0.75rem; background: none; border: none; color: #94a3b8; font-weight: 700; cursor: pointer; border-bottom: 2px solid transparent; font-size: 0.88rem; }
     .auth-tab-btn.active { color: var(--accent-cyan); border-bottom-color: var(--accent-cyan); }
     .forgot-pass-link { font-size: 12px; color: var(--accent-cyan); text-align: right; cursor: pointer; margin-top: -8px; margin-bottom: 14px; display: block; text-decoration: none; }
     .forgot-pass-link:hover { text-decoration: underline; }
@@ -719,7 +719,7 @@
 </head>
 <body>
 
-  <!-- AUTHENTICATION GATE (LOGIN / REGISTER / MOBILE OTP) -->
+  <!-- AUTHENTICATION GATE (LOGIN / REGISTER WITH 4 FIELDS & RULES / MOBILE OTP) -->
   <div id="authGateModal" class="auth-gate-modal" style="display: none;">
     <div class="auth-card">
       <div style="text-align: center; margin-bottom: 1.5rem;">
@@ -728,14 +728,15 @@
       </div>
 
       <div class="auth-tabs">
-        <button type="button" class="auth-tab-btn active" id="tabEmailBtn" onclick="switchAuthMode('email')">Email Login / Sign Up</button>
+        <button type="button" class="auth-tab-btn active" id="tabEmailBtn" onclick="switchAuthMode('email')">Login</button>
+        <button type="button" class="auth-tab-btn" id="tabRegisterBtn" onclick="switchAuthMode('register')">Register</button>
         <button type="button" class="auth-tab-btn" id="tabPhoneBtn" onclick="switchAuthMode('phone')">Mobile (OTP)</button>
       </div>
 
-      <!-- EMAIL LOGIN & REGISTER -->
+      <!-- 1. LOGIN FORM -->
       <form id="emailAuthForm">
         <div class="form-group">
-          <label>Email Address</label>
+          <label>Mail ID</label>
           <input type="email" id="userEmailInput" placeholder="name@example.com" required />
         </div>
         <div class="form-group">
@@ -743,10 +744,50 @@
           <input type="password" id="userPassInput" placeholder="••••••••" required />
         </div>
         <a class="forgot-pass-link" onclick="openForgotPasswordModal()">Forgot Password?</a>
-        <button type="submit" class="submit-btn" id="emailSubmitBtn">Login / Register</button>
+        <button type="submit" class="submit-btn" id="emailSubmitBtn">Login</button>
       </form>
 
-      <!-- MOBILE PHONE OTP FORM -->
+      <!-- 2. NEW USER REGISTRATION FORM (4 STRICT FIELDS) -->
+      <form id="registerAuthForm" style="display: none;">
+        <!-- Field 1: Mail ID -->
+        <div class="form-group">
+          <label>1. Mail ID</label>
+          <input type="email" id="regEmailInput" placeholder="name@example.com" required />
+        </div>
+
+        <!-- Field 2: Job / Study / Other -->
+        <div class="form-group">
+          <label>2. Job / Study / Other</label>
+          <select id="regJobInput" required style="background: #161e2e; border: 1px solid #334155; color: #f8fafc; padding: 12px 14px; border-radius: 8px; font-size: 14px; outline: none;">
+            <option value="" disabled selected>Select Occupation / Study</option>
+            <option value="Job">Job / Working Professional</option>
+            <option value="Study">Study / Student</option>
+            <option value="Filmmaker">Filmmaker / Editor</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <!-- Field 3: Password (Must be Capital, Small, Special Char, Number) -->
+        <div class="form-group">
+          <label>3. Password</label>
+          <input type="password" id="regPassInput" placeholder="Must include Upper, Lower, Number, Special" oninput="checkRegisterPasswordRules()" required />
+          <small id="regPassHint" style="font-size: 11px; color: #f87171; line-height: 1.3;">
+            Rule: 1 Capital letter, 1 Small letter, 1 Number, 1 Special Char (@$!%*?&#), min 8 chars.
+          </small>
+        </div>
+
+        <!-- Field 4: Re-Enter Password -->
+        <div class="form-group">
+          <label>4. Re-Enter Password</label>
+          <input type="password" id="regConfirmPassInput" placeholder="Re-enter same password" oninput="checkRegisterPasswordRules()" required />
+          <small id="regMatchHint" style="font-size: 11px; color: #f87171; display: none;">Passwords do not match!</small>
+        </div>
+
+        <!-- Done Button: Activates ONLY when password meets rules and matches exactly -->
+        <button type="submit" class="submit-btn" id="regDoneBtn" disabled style="opacity: 0.45; cursor: not-allowed; transition: all 0.25s;">Done</button>
+      </form>
+
+      <!-- 3. MOBILE PHONE OTP FORM -->
       <form id="phoneAuthForm" style="display: none;">
         <div class="form-group">
           <label>Mobile Number (with Country Code)</label>
@@ -1263,20 +1304,20 @@
     const dbReq = window.indexedDB ? indexedDB.open("CinemotionMediaDB", 12) : null;
     if (!dbReq) console.warn("IndexedDB is unavailable; local media and prompt edits will not persist.");
     if (dbReq) {
-    dbReq.onupgradeneeded = (e) => {
-      localDB = e.target.result;
-      if (!localDB.objectStoreNames.contains("cardMedia")) {
-        localDB.createObjectStore("cardMedia", { keyPath: "id" });
-      }
-      if (!localDB.objectStoreNames.contains("promptEdits")) {
-        localDB.createObjectStore("promptEdits", { keyPath: "id" });
-      }
-    };
-    dbReq.onsuccess = (e) => {
-      localDB = e.target.result;
-      loadSavedPromptEdits();
-    };
-    dbReq.onerror = (e) => console.error("IndexedDB initialization failed:", e.target.error);
+      dbReq.onupgradeneeded = (e) => {
+        localDB = e.target.result;
+        if (!localDB.objectStoreNames.contains("cardMedia")) {
+          localDB.createObjectStore("cardMedia", { keyPath: "id" });
+        }
+        if (!localDB.objectStoreNames.contains("promptEdits")) {
+          localDB.createObjectStore("promptEdits", { keyPath: "id" });
+        }
+      };
+      dbReq.onsuccess = (e) => {
+        localDB = e.target.result;
+        loadSavedPromptEdits();
+      };
+      dbReq.onerror = (e) => console.error("IndexedDB initialization failed:", e.target.error);
     }
 
     function loadSavedPromptEdits() {
@@ -1308,7 +1349,6 @@
       'Master Prompts': 'Master-prompt.png'
     };
 
-    // YouTube Continuous Loop Embed URL
     function getYoutubeEmbedUrl(url) {
       if (!url) return null;
       let videoId = null;
@@ -1317,7 +1357,6 @@
       return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0` : null;
     }
 
-    // Google Drive Iframe Preview URL
     function getDriveEmbedUrl(url) {
       if (!url) return null;
       const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
@@ -1398,7 +1437,7 @@
             </div>
             
             <!-- Standard User Allowed Control: Copy Prompt -->
-            <button class="copy-btn" onclick="copyPromptText('${item.prompt.replace(/'/g, "\\'")}', '${item.id}')">
+            <button class="copy-btn" onclick="copyCardPrompt('${item.id}')">
               <i class="fa-solid fa-copy"></i> Copy Prompt
             </button>
           </div>
@@ -1613,7 +1652,6 @@
 
     function processUploadedFile(id, file) {
       const type = file.type.startsWith('video') ? 'video' : 'image';
-      
       applyMediaToCard(id, file, type);
 
       if (localDB) {
@@ -1676,7 +1714,6 @@
           yt.classList.add('active-media');
         }
       } else if (isDrive) {
-        // Google Drive Iframe Preview Player (100% Works without CORS issue)
         if (img) img.classList.remove('active-media');
         if (vid) vid.classList.remove('active-media');
         if (yt) {
@@ -1909,6 +1946,14 @@
       }
     }
 
+    window.copyCardPrompt = function(itemId) {
+      const textEl = document.getElementById(`text_${itemId}`);
+      const textToCopy = textEl ? textEl.innerText : '';
+      if (textToCopy) {
+        copyPromptText(textToCopy, itemId);
+      }
+    };
+
     function showToast(msg) {
       const toast = document.getElementById('toast');
       document.getElementById('toastMsg').innerText = msg;
@@ -2052,6 +2097,52 @@
       document.getElementById("forgotPasswordModal").style.display = "none";
     };
 
+    // Live validation for Register Password Rules and Match
+    window.checkRegisterPasswordRules = function() {
+      const pass = document.getElementById("regPassInput")?.value || "";
+      const confirmPass = document.getElementById("regConfirmPassInput")?.value || "";
+      const passHint = document.getElementById("regPassHint");
+      const matchHint = document.getElementById("regMatchHint");
+      const doneBtn = document.getElementById("regDoneBtn");
+
+      // Rule: At least 1 Uppercase, 1 Lowercase, 1 Number, 1 Special Char, min 8 chars
+      const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+      const isStrong = passRegex.test(pass);
+
+      if (isStrong) {
+        passHint.style.color = "#34d399";
+        passHint.innerText = "✓ Password meets all strength criteria.";
+      } else {
+        passHint.style.color = "#f87171";
+        passHint.innerText = "Rule: 1 Capital letter, 1 Small letter, 1 Number, 1 Special Char (@$!%*?&#), min 8 chars.";
+      }
+
+      const isMatch = pass.length > 0 && pass === confirmPass;
+      if (confirmPass.length > 0) {
+        matchHint.style.display = "block";
+        if (isMatch) {
+          matchHint.style.color = "#34d399";
+          matchHint.innerText = "✓ Passwords match.";
+        } else {
+          matchHint.style.color = "#f87171";
+          matchHint.innerText = "Passwords do not match!";
+        }
+      } else {
+        matchHint.style.display = "none";
+      }
+
+      // Activate Done button only if both are true
+      if (isStrong && isMatch) {
+        doneBtn.disabled = false;
+        doneBtn.style.opacity = "1";
+        doneBtn.style.cursor = "pointer";
+      } else {
+        doneBtn.disabled = true;
+        doneBtn.style.opacity = "0.45";
+        doneBtn.style.cursor = "not-allowed";
+      }
+    };
+
     renderCards(window.allVaultItems);
   </script>
 
@@ -2077,8 +2168,6 @@
       orderBy
     } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-    // IMPORTANT: These values must match Firebase Console > Project settings > Your apps > Web app.
-    // If your Firebase Console shows different values, replace this entire object with its Web config.
     const firebaseConfig = {
       apiKey: "AIzaSyCbF3oQKFz0pFVZ5EdOzFbfrqhiWfKsqHk",
       authDomain: "ai-film-making-7d66f.firebaseapp.com",
@@ -2090,7 +2179,6 @@
     };
 
     const NOTIFY_RECEIVER_EMAIL = "prasadpakala10@gmail.com";
-    // Optional EmailJS credentials. Leave blank to disable email notifications.
     const EMAILJS_PUBLIC_KEY = "";
     const EMAILJS_SERVICE_ID = "";
     const EMAILJS_TEMPLATE_ID = "";
@@ -2105,45 +2193,33 @@
       console.error(`${action} failed:`, err);
       const code = err?.code || "unknown";
       if (code === "auth/configuration-not-found") {
-        return "Firebase Authentication is not configured for this Firebase project. In Firebase Console, open Build > Authentication > Get started, then Sign-in method and enable Email/Password. Confirm this HTML uses the Web app config from the same project. Adding an authorized domain alone does not enable Authentication.";
+        return "Firebase Authentication is not configured for this Firebase project.";
       }
       if (code === "auth/operation-not-allowed") {
-        return "This sign-in provider is disabled. Open Firebase Console > Authentication > Sign-in method and enable the provider you are using.";
+        return "This sign-in provider is disabled in Firebase Console.";
       }
       if (code === "auth/unauthorized-domain") {
-        return "This website domain is not authorized. Open Firebase Console > Authentication > Settings > Authorized domains and add localhost (for local testing) or your deployed domain.";
-      }
-      if (code === "auth/api-key-not-valid" || code === "auth/invalid-api-key") {
-        return "The Firebase API key is invalid or restricted. Copy the Web app config again from Firebase Console > Project settings > Your apps.";
+        return "This domain is not authorized in Firebase Console.";
       }
       if (code === "auth/invalid-credential") {
-        return "Email or password is incorrect, or the account could not be verified. Check the credentials or use Forgot Password.";
+        return "Email or password is incorrect.";
       }
       if (code === "auth/email-already-in-use") {
-        return "This email already has an account. Use Login instead of creating a new account, or reset the password.";
+        return "This email already has an account. Please use Login.";
       }
       if (code === "auth/weak-password") {
-        return "Choose a password with at least 6 characters.";
+        return "Password is too weak. Please meet all complexity criteria.";
       }
-      if (code === "auth/invalid-phone-number") {
-        return "Enter a valid phone number including country code, for example +919876543210.";
-      }
-      if (code === "auth/captcha-check-failed") {
-        return "Phone verification failed. Refresh the page and try again. Make sure your website domain is authorized.";
-      }
-      return `${action} failed (${code}): ${err?.message || "Unknown error"}`;
+      return `${action} failed: ${err?.message || "Unknown error"}`;
     }
 
     let app, auth, db;
     try {
-      if (!firebaseConfig.apiKey || !firebaseConfig.authDomain || !firebaseConfig.projectId || !firebaseConfig.appId) {
-        throw new Error("Firebase Web app configuration is incomplete. Copy the complete config from Firebase Console.");
-      }
       app = initializeApp(firebaseConfig);
       auth = getAuth(app);
       db = getFirestore(app);
     } catch (err) {
-      showAuthMessage("Could not initialize Firebase. " + (err.message || err));
+      showAuthMessage("Could not initialize Firebase: " + (err.message || err));
       throw err;
     }
 
@@ -2151,7 +2227,7 @@
       window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
     }
 
-    // Keep the login gate in sync with Firebase Authentication.
+    // Keep the login gate in sync with Firebase Authentication
     onAuthStateChanged(auth, (user) => {
       const gate = byId("authGateModal");
       if (user) {
@@ -2163,7 +2239,7 @@
         if (byId("headerUserAvatar")) byId("headerUserAvatar").innerText = firstLetter;
         if (byId("profileAvatarLarge")) byId("profileAvatarLarge").innerText = firstLetter;
 
-        // UI visibility only. Enforce admin permissions in Firestore Security Rules too.
+        // Secure check: Only bhanu.pakala03@gmail.com gets editing controls
         if (user.email === "bhanu.pakala03@gmail.com") {
           document.body.classList.add("is-admin-active");
           if (byId("profileBadgeRole")) byId("profileBadgeRole").innerText = "MASTER DIRECTOR (ADMIN)";
@@ -2179,7 +2255,6 @@
     }, (err) => showAuthMessage(explainFirebaseError(err, "Authentication state check")));
 
     async function notifyAdminOnLogin(identifier, method) {
-      // Login should still work if optional analytics/email notifications fail.
       try {
         await addDoc(collection(db, "user_logins"), {
           identifier,
@@ -2203,20 +2278,27 @@
       }
     }
 
-    // Switch between email and phone sign-in forms.
+    // Switch between Login, Register, and Phone OTP tabs
     window.switchAuthMode = function(mode) {
       const isEmail = mode === "email";
+      const isRegister = mode === "register";
+      const isPhone = mode === "phone";
+
       byId("tabEmailBtn")?.classList.toggle("active", isEmail);
-      byId("tabPhoneBtn")?.classList.toggle("active", !isEmail);
+      byId("tabRegisterBtn")?.classList.toggle("active", isRegister);
+      byId("tabPhoneBtn")?.classList.toggle("active", isPhone);
+
       if (byId("emailAuthForm")) byId("emailAuthForm").style.display = isEmail ? "block" : "none";
-      if (byId("phoneAuthForm")) byId("phoneAuthForm").style.display = isEmail ? "none" : "block";
-      if (!isEmail) {
+      if (byId("registerAuthForm")) byId("registerAuthForm").style.display = isRegister ? "block" : "none";
+      if (byId("phoneAuthForm")) byId("phoneAuthForm").style.display = isPhone ? "block" : "none";
+
+      if (isPhone) {
         try { initRecaptcha(); }
         catch (err) { showAuthMessage(explainFirebaseError(err, "reCAPTCHA initialization")); }
       }
     };
 
-    // Email sign-in. If Firebase confirms the account does not exist, offer registration.
+    // 1. Existing User Login
     byId("emailAuthForm")?.addEventListener("submit", async (e) => {
       e.preventDefault();
       const email = byId("userEmailInput")?.value.trim();
@@ -2226,26 +2308,53 @@
       const submit = byId("emailSubmitBtn");
       if (submit) { submit.disabled = true; submit.textContent = "Please wait..."; }
       try {
-        try {
-          await signInWithEmailAndPassword(auth, email, password);
-          await notifyAdminOnLogin(email, "Email Login");
-        } catch (signInErr) {
-          if (signInErr.code === "auth/user-not-found") {
-            const create = confirm("No account was found for this email. Would you like to create a new account?");
-            if (!create) return;
-            const credential = await createUserWithEmailAndPassword(auth, email, password);
-            await notifyAdminOnLogin(credential.user.email || email, "New Registration");
-          } else {
-            throw signInErr;
-          }
-        }
+        await signInWithEmailAndPassword(auth, email, password);
+        await notifyAdminOnLogin(email, "Email Login");
       } catch (err) {
-        showAuthMessage(explainFirebaseError(err, "Email login/registration"));
+        showAuthMessage(explainFirebaseError(err, "Login"));
       } finally {
-        if (submit) { submit.disabled = false; submit.textContent = "Login / Register"; }
+        if (submit) { submit.disabled = false; submit.textContent = "Login"; }
       }
     });
 
+    // 2. New User Registration (Executes on "Done" button submit)
+    byId("registerAuthForm")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = byId("regEmailInput")?.value.trim();
+      const jobStudy = byId("regJobInput")?.value;
+      const pass = byId("regPassInput")?.value;
+      const confirmPass = byId("regConfirmPassInput")?.value;
+
+      if (!email || !jobStudy || !pass || !confirmPass) {
+        return showAuthMessage("Please fill in all 4 registration fields.");
+      }
+      if (pass !== confirmPass) {
+        return showAuthMessage("Passwords do not match!");
+      }
+
+      const doneBtn = byId("regDoneBtn");
+      if (doneBtn) { doneBtn.disabled = true; doneBtn.textContent = "Registering..."; }
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+        // Save user profile details to Firestore
+        await addDoc(collection(db, "registered_users"), {
+          uid: userCredential.user.uid,
+          email: email,
+          occupation: jobStudy,
+          createdAt: new Date().toISOString()
+        });
+
+        await notifyAdminOnLogin(email, `New User Registered (${jobStudy})`);
+        alert("Registration Successful! Welcome to Cinemotion Studio.");
+      } catch (err) {
+        showAuthMessage(explainFirebaseError(err, "Registration"));
+      } finally {
+        if (doneBtn) { doneBtn.disabled = false; doneBtn.textContent = "Done"; }
+      }
+    });
+
+    // 3. Forgot Password Form
     byId("forgotPasswordForm")?.addEventListener("submit", async (e) => {
       e.preventDefault();
       const email = byId("resetEmailInput")?.value.trim();
@@ -2259,7 +2368,7 @@
       }
     });
 
-    // Phone OTP. Phone provider must be enabled in Firebase Console.
+    // 4. Phone OTP
     function initRecaptcha() {
       if (window.recaptchaVerifier) return window.recaptchaVerifier;
       const container = byId("recaptcha-container");
@@ -2305,6 +2414,7 @@
       }
     };
 
+    // Logout
     window.handleUserLogout = async function() {
       if (!confirm("Are you sure you want to log out?")) return;
       try { await signOut(auth); }
@@ -2390,7 +2500,6 @@
         }
       } catch (err) {
         console.error("Firestore load error:", err);
-        // The vault UI remains usable even if cloud data is unavailable.
       }
     }
   </script>
