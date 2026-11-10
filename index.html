@@ -1260,7 +1260,9 @@
 
     /* INDEXED-DB PERSISTENCE */
     let localDB;
-    const dbReq = indexedDB.open("CinemotionMediaDB", 12);
+    const dbReq = window.indexedDB ? indexedDB.open("CinemotionMediaDB", 12) : null;
+    if (!dbReq) console.warn("IndexedDB is unavailable; local media and prompt edits will not persist.");
+    if (dbReq) {
     dbReq.onupgradeneeded = (e) => {
       localDB = e.target.result;
       if (!localDB.objectStoreNames.contains("cardMedia")) {
@@ -1274,6 +1276,8 @@
       localDB = e.target.result;
       loadSavedPromptEdits();
     };
+    dbReq.onerror = (e) => console.error("IndexedDB initialization failed:", e.target.error);
+    }
 
     function loadSavedPromptEdits() {
       if (!localDB) return;
@@ -1453,12 +1457,24 @@
     if (linkForm) {
       linkForm.addEventListener("submit", (e) => {
         e.preventDefault();
-        const id = linkCardId.value;
-        const url = mediaUrlInput.value.trim();
+        const id = linkCardId?.value;
+        const url = mediaUrlInput?.value.trim() || "";
+        if (!id || !url) {
+          alert("Please select a card and enter a media URL.");
+          return;
+        }
 
         const isYoutube = url.includes('youtube.com') || url.includes('youtu.be');
         const isDrive = url.includes('drive.google.com');
         const mediaType = isYoutube ? 'youtube' : (isDrive ? 'drive' : 'video');
+        if (isYoutube && !getYoutubeEmbedUrl(url)) {
+          alert("Please enter a valid YouTube video URL.");
+          return;
+        }
+        if (isDrive && !getDriveEmbedUrl(url)) {
+          alert("Please enter a Google Drive file URL in /file/d/FILE_ID/ format.");
+          return;
+        }
 
         applyMediaUrlToCard(id, url, mediaType);
 
@@ -1873,19 +1889,24 @@
       }
     }
 
-    function copyPromptText(text, itemId) {
-      navigator.clipboard.writeText(text).then(() => {
+    async function copyPromptText(text, itemId) {
+      try {
+        if (!navigator.clipboard || !navigator.clipboard.writeText) {
+          throw new Error("Clipboard access is unavailable. Use HTTPS or localhost.");
+        }
+        await navigator.clipboard.writeText(String(text ?? ""));
         if (itemId) {
           const wrap = document.getElementById(`prompt_wrap_${itemId}`);
           if (wrap) {
             wrap.classList.add('copied-active');
-            setTimeout(() => {
-              wrap.classList.remove('copied-active');
-            }, 1300);
+            setTimeout(() => wrap.classList.remove('copied-active'), 1300);
           }
         }
         showToast("Prompt copied to clipboard!");
-      });
+      } catch (err) {
+        console.error("Clipboard copy failed:", err);
+        showToast("Copy failed. Allow clipboard access or use HTTPS.");
+      }
     }
 
     function showToast(msg) {
@@ -1909,7 +1930,7 @@
       const q = searchEl ? searchEl.value.toLowerCase() : '';
       let filtered = window.allVaultItems;
       if (currentCategory !== "All") filtered = filtered.filter(m => m.category === currentCategory);
-      filtered = filtered.filter(m => m.name.toLowerCase().includes(q) || m.prompt.toLowerCase().includes(q));
+      filtered = filtered.filter(m => String(m.name || '').toLowerCase().includes(q) || String(m.prompt || '').toLowerCase().includes(q));
       renderCards(filtered);
     }
 
@@ -2034,21 +2055,30 @@
     renderCards(window.allVaultItems);
   </script>
 
-  <!-- FIREBASE AUTH, FORGOT PASS, AND LOGINS INTEGRATION -->
+  <!-- FIREBASE AUTH, FORGOT PASSWORD, PHONE OTP, AND FIRESTORE -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-    import { 
-      getAuth, 
-      onAuthStateChanged, 
-      signInWithEmailAndPassword, 
-      createUserWithEmailAndPassword, 
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
       sendPasswordResetEmail,
-      signInWithPhoneNumber, 
-      RecaptchaVerifier, 
-      signOut 
+      signInWithPhoneNumber,
+      RecaptchaVerifier,
+      signOut
     } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      getDocs,
+      query,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
+    // IMPORTANT: These values must match Firebase Console > Project settings > Your apps > Web app.
+    // If your Firebase Console shows different values, replace this entire object with its Web config.
     const firebaseConfig = {
       apiKey: "AIzaSyCbF3oQKFz0pFVZ5EdOzFbfrqhiWfKsqHk",
       authDomain: "ai-film-making-7d66f.firebaseapp.com",
@@ -2059,277 +2089,310 @@
       measurementId: "G-MFLLSFB155"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
     const NOTIFY_RECEIVER_EMAIL = "prasadpakala10@gmail.com";
+    // Optional EmailJS credentials. Leave blank to disable email notifications.
+    const EMAILJS_PUBLIC_KEY = "";
+    const EMAILJS_SERVICE_ID = "";
+    const EMAILJS_TEMPLATE_ID = "";
 
-    // SESSION PERSISTENCE (Won't ask for credentials unless user logs out)
-    onAuthStateChanged(auth, async (user) => {
+    const byId = (id) => document.getElementById(id);
+    function showAuthMessage(message) {
+      console.error("CINEMOTION Firebase:", message);
+      alert(message);
+    }
+
+    function explainFirebaseError(err, action = "Firebase operation") {
+      console.error(`${action} failed:`, err);
+      const code = err?.code || "unknown";
+      if (code === "auth/configuration-not-found") {
+        return "Firebase Authentication is not configured for this Firebase project. In Firebase Console, open Build > Authentication > Get started, then Sign-in method and enable Email/Password. Confirm this HTML uses the Web app config from the same project. Adding an authorized domain alone does not enable Authentication.";
+      }
+      if (code === "auth/operation-not-allowed") {
+        return "This sign-in provider is disabled. Open Firebase Console > Authentication > Sign-in method and enable the provider you are using.";
+      }
+      if (code === "auth/unauthorized-domain") {
+        return "This website domain is not authorized. Open Firebase Console > Authentication > Settings > Authorized domains and add localhost (for local testing) or your deployed domain.";
+      }
+      if (code === "auth/api-key-not-valid" || code === "auth/invalid-api-key") {
+        return "The Firebase API key is invalid or restricted. Copy the Web app config again from Firebase Console > Project settings > Your apps.";
+      }
+      if (code === "auth/invalid-credential") {
+        return "Email or password is incorrect, or the account could not be verified. Check the credentials or use Forgot Password.";
+      }
+      if (code === "auth/email-already-in-use") {
+        return "This email already has an account. Use Login instead of creating a new account, or reset the password.";
+      }
+      if (code === "auth/weak-password") {
+        return "Choose a password with at least 6 characters.";
+      }
+      if (code === "auth/invalid-phone-number") {
+        return "Enter a valid phone number including country code, for example +919876543210.";
+      }
+      if (code === "auth/captcha-check-failed") {
+        return "Phone verification failed. Refresh the page and try again. Make sure your website domain is authorized.";
+      }
+      return `${action} failed (${code}): ${err?.message || "Unknown error"}`;
+    }
+
+    let app, auth, db;
+    try {
+      if (!firebaseConfig.apiKey || !firebaseConfig.authDomain || !firebaseConfig.projectId || !firebaseConfig.appId) {
+        throw new Error("Firebase Web app configuration is incomplete. Copy the complete config from Firebase Console.");
+      }
+      app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      db = getFirestore(app);
+    } catch (err) {
+      showAuthMessage("Could not initialize Firebase. " + (err.message || err));
+      throw err;
+    }
+
+    if (window.emailjs && EMAILJS_PUBLIC_KEY) {
+      window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+    }
+
+    // Keep the login gate in sync with Firebase Authentication.
+    onAuthStateChanged(auth, (user) => {
+      const gate = byId("authGateModal");
       if (user) {
-        document.getElementById("authGateModal").style.display = "none";
-        
+        if (gate) gate.style.display = "none";
         const displayName = user.email || user.phoneNumber || "Director";
-        document.getElementById("headerUserDisplay")?.innerText = displayName;
-        document.getElementById("profileDisplayName").innerText = displayName;
-        document.getElementById("profileDisplayEmail").innerText = user.email || user.phoneNumber || "";
-        
+        if (byId("profileDisplayName")) byId("profileDisplayName").innerText = displayName;
+        if (byId("profileDisplayEmail")) byId("profileDisplayEmail").innerText = user.email || user.phoneNumber || "";
         const firstLetter = (displayName[0] || "D").toUpperCase();
-        document.getElementById("headerUserAvatar").innerText = firstLetter;
-        document.getElementById("profileAvatarLarge").innerText = firstLetter;
+        if (byId("headerUserAvatar")) byId("headerUserAvatar").innerText = firstLetter;
+        if (byId("profileAvatarLarge")) byId("profileAvatarLarge").innerText = firstLetter;
 
-        // Check if Admin securely via logged-in email
+        // UI visibility only. Enforce admin permissions in Firestore Security Rules too.
         if (user.email === "bhanu.pakala03@gmail.com") {
           document.body.classList.add("is-admin-active");
-          document.getElementById("profileBadgeRole").innerText = "MASTER DIRECTOR (ADMIN)";
+          if (byId("profileBadgeRole")) byId("profileBadgeRole").innerText = "MASTER DIRECTOR (ADMIN)";
         } else {
           document.body.classList.remove("is-admin-active");
-          document.getElementById("profileBadgeRole").innerText = "VAULT VIEWER";
+          if (byId("profileBadgeRole")) byId("profileBadgeRole").innerText = "VAULT VIEWER";
         }
+        loadFirebaseMovements();
       } else {
         document.body.classList.remove("is-admin-active");
-        document.getElementById("authGateModal").style.display = "flex";
+        if (gate) gate.style.display = "flex";
       }
-    });
+    }, (err) => showAuthMessage(explainFirebaseError(err, "Authentication state check")));
 
-    // Notify prasadpakala10@gmail.com about login details
     async function notifyAdminOnLogin(identifier, method) {
+      // Login should still work if optional analytics/email notifications fail.
       try {
         await addDoc(collection(db, "user_logins"), {
-          identifier: identifier,
-          method: method,
+          identifier,
+          method,
           timestamp: new Date().toISOString()
         });
-
-        if (window.emailjs) {
-          emailjs.send("default_service", "template_login_alert", {
+      } catch (err) {
+        console.warn("Login record was not saved to Firestore:", err);
+      }
+      if (window.emailjs && EMAILJS_PUBLIC_KEY && EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID) {
+        try {
+          await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
             to_email: NOTIFY_RECEIVER_EMAIL,
             user_info: identifier,
             login_time: new Date().toLocaleString(),
             auth_type: method
-          }).catch(e => console.log("Email Notification alert:", e));
+          });
+        } catch (err) {
+          console.warn("EmailJS notification failed:", err);
         }
-      } catch (err) {
-        console.error("Login tracking error:", err);
       }
     }
 
-    // Switch between Email and Phone tabs
+    // Switch between email and phone sign-in forms.
     window.switchAuthMode = function(mode) {
-      if (mode === 'email') {
-        document.getElementById("tabEmailBtn").classList.add("active");
-        document.getElementById("tabPhoneBtn").classList.remove("active");
-        document.getElementById("emailAuthForm").style.display = "block";
-        document.getElementById("phoneAuthForm").style.display = "none";
-      } else {
-        document.getElementById("tabPhoneBtn").classList.add("active");
-        document.getElementById("tabEmailBtn").classList.remove("active");
-        document.getElementById("phoneAuthForm").style.display = "block";
-        document.getElementById("emailAuthForm").style.display = "none";
-        initRecaptcha();
+      const isEmail = mode === "email";
+      byId("tabEmailBtn")?.classList.toggle("active", isEmail);
+      byId("tabPhoneBtn")?.classList.toggle("active", !isEmail);
+      if (byId("emailAuthForm")) byId("emailAuthForm").style.display = isEmail ? "block" : "none";
+      if (byId("phoneAuthForm")) byId("phoneAuthForm").style.display = isEmail ? "none" : "block";
+      if (!isEmail) {
+        try { initRecaptcha(); }
+        catch (err) { showAuthMessage(explainFirebaseError(err, "reCAPTCHA initialization")); }
       }
     };
 
-    // EMAIL SIGN IN / REGISTER
-    document.getElementById("emailAuthForm").addEventListener("submit", async (e) => {
+    // Email sign-in. If Firebase confirms the account does not exist, offer registration.
+    byId("emailAuthForm")?.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const email = document.getElementById("userEmailInput").value.trim();
-      const pass = document.getElementById("userPassInput").value;
+      const email = byId("userEmailInput")?.value.trim();
+      const password = byId("userPassInput")?.value || "";
+      if (!email || !password) return showAuthMessage("Enter your email address and password.");
 
+      const submit = byId("emailSubmitBtn");
+      if (submit) { submit.disabled = true; submit.textContent = "Please wait..."; }
       try {
-        await signInWithEmailAndPassword(auth, email, pass);
-        notifyAdminOnLogin(email, "Email Login");
-      } catch (signInErr) {
-        if (signInErr.code === 'auth/user-not-found' || signInErr.code === 'auth/invalid-credential') {
-          try {
-            await createUserWithEmailAndPassword(auth, email, pass);
-            notifyAdminOnLogin(email, "New Registration");
-          } catch (signUpErr) {
-            alert("Registration Error: " + signUpErr.message);
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          await notifyAdminOnLogin(email, "Email Login");
+        } catch (signInErr) {
+          if (signInErr.code === "auth/user-not-found") {
+            const create = confirm("No account was found for this email. Would you like to create a new account?");
+            if (!create) return;
+            const credential = await createUserWithEmailAndPassword(auth, email, password);
+            await notifyAdminOnLogin(credential.user.email || email, "New Registration");
+          } else {
+            throw signInErr;
           }
-        } else {
-          alert("Login Error: " + signInErr.message);
         }
-      }
-    });
-
-    // FORGOT PASSWORD -> SENDS RESET LINK TO USER EMAIL
-    document.getElementById("forgotPasswordForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const resetEmail = document.getElementById("resetEmailInput").value.trim();
-
-      try {
-        await sendPasswordResetEmail(auth, resetEmail);
-        alert("A password reset email has been sent to " + resetEmail + ". Check your inbox to set a new password.");
-        closeForgotPasswordModal();
       } catch (err) {
-        alert("Error sending reset email: " + err.message);
+        showAuthMessage(explainFirebaseError(err, "Email login/registration"));
+      } finally {
+        if (submit) { submit.disabled = false; submit.textContent = "Login / Register"; }
       }
     });
 
-    // PHONE OTP AUTHENTICATION
-    function initRecaptcha() {
-      if (!window.recaptchaVerifier) {
-        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'invisible' });
+    byId("forgotPasswordForm")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = byId("resetEmailInput")?.value.trim();
+      if (!email) return showAuthMessage("Enter your registered email address.");
+      try {
+        await sendPasswordResetEmail(auth, email);
+        alert("Password reset email sent. Check your inbox and spam folder.");
+        if (byId("forgotPasswordModal")) byId("forgotPasswordModal").style.display = "none";
+      } catch (err) {
+        showAuthMessage(explainFirebaseError(err, "Password reset"));
       }
+    });
+
+    // Phone OTP. Phone provider must be enabled in Firebase Console.
+    function initRecaptcha() {
+      if (window.recaptchaVerifier) return window.recaptchaVerifier;
+      const container = byId("recaptcha-container");
+      if (!container) throw new Error("The reCAPTCHA container is missing from the page.");
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, container, { size: "invisible" });
+      return window.recaptchaVerifier;
     }
 
     window.requestPhoneOtp = async function() {
-      const phoneNumber = document.getElementById("userPhoneInput").value.trim();
-      if (!phoneNumber) return alert("Please enter mobile number with country code (+91)");
-
+      const phoneNumber = byId("userPhoneInput")?.value.trim();
+      if (!phoneNumber) return showAuthMessage("Enter your mobile number with country code, for example +919876543210.");
+      const sendButton = byId("sendOtpBtn");
+      if (sendButton) { sendButton.disabled = true; sendButton.textContent = "Sending OTP..."; }
       try {
-        initRecaptcha();
-        const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
-        window.confirmationResult = confirmationResult;
-        document.getElementById("otpGroup").style.display = "block";
-        document.getElementById("verifyOtpBtn").style.display = "block";
-        document.getElementById("sendOtpBtn").style.display = "none";
-        alert("OTP sent successfully to " + phoneNumber);
+        const verifier = initRecaptcha();
+        window.confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, verifier);
+        if (byId("otpGroup")) byId("otpGroup").style.display = "block";
+        if (byId("verifyOtpBtn")) byId("verifyOtpBtn").style.display = "block";
+        if (sendButton) sendButton.style.display = "none";
+        alert("OTP sent to " + phoneNumber);
       } catch (err) {
-        alert("OTP Error: " + err.message);
+        try { window.recaptchaVerifier?.clear(); } catch (_) {}
+        window.recaptchaVerifier = null;
+        showAuthMessage(explainFirebaseError(err, "Phone OTP request"));
+      } finally {
+        if (sendButton && sendButton.style.display !== "none") {
+          sendButton.disabled = false;
+          sendButton.textContent = "Send OTP";
+        }
       }
     };
 
     window.confirmPhoneOtp = async function() {
-      const code = document.getElementById("otpCodeInput").value.trim();
-      if (!code || !window.confirmationResult) return alert("Please enter the 6-digit OTP");
-
+      const code = byId("otpCodeInput")?.value.trim();
+      if (!/^\d{6}$/.test(code || "") || !window.confirmationResult) {
+        return showAuthMessage("Enter the 6-digit OTP sent to your phone.");
+      }
       try {
         const result = await window.confirmationResult.confirm(code);
-        notifyAdminOnLogin(result.user.phoneNumber, "Phone OTP");
+        await notifyAdminOnLogin(result.user.phoneNumber || "Phone user", "Phone OTP");
       } catch (err) {
-        alert("Invalid OTP code!");
+        showAuthMessage(explainFirebaseError(err, "OTP verification"));
       }
     };
 
-    // LOGOUT (Asks credentials again only after logout)
     window.handleUserLogout = async function() {
-      if (confirm("Are you sure you want to log out?")) {
-        await signOut(auth);
-      }
+      if (!confirm("Are you sure you want to log out?")) return;
+      try { await signOut(auth); }
+      catch (err) { showAuthMessage(explainFirebaseError(err, "Sign out")); }
     };
 
-    // Save Link to Cloud Firestore
     window.saveMediaLinkToFirestore = async function(cardId, url, mediaType) {
-      const toast = document.getElementById('toast');
-      toast.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Saving Link to Cloud...</span>`;
-      toast.classList.add('show');
-
+      const toast = byId("toast");
+      if (toast) { toast.textContent = "Saving link to cloud..."; toast.classList.add("show"); }
       try {
         await addDoc(collection(db, "movements"), {
           linkedCardId: cardId,
           mediaURL: url,
-          mediaType: mediaType,
+          mediaType,
           createdAt: new Date().toISOString()
         });
-
-        const item = window.allVaultItems.find(m => m.id === cardId);
-        if (item) {
-          item.mediaURL = url;
-          item.mediaType = mediaType;
-        }
-
-        toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Link Synced Everywhere!</span>`;
-        setTimeout(() => toast.classList.remove('show'), 2500);
+        const item = window.allVaultItems?.find(m => m.id === cardId);
+        if (item) { item.mediaURL = url; item.mediaType = mediaType; }
+        if (toast) { toast.textContent = "Link synced to cloud!"; setTimeout(() => toast.classList.remove("show"), 2500); }
       } catch (err) {
-        console.error("Firestore Save Error:", err);
-        toast.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> <span>Cloud sync failed: ${err.message}</span>`;
-        setTimeout(() => toast.classList.remove('show'), 3500);
+        console.error("Firestore save error:", err);
+        if (toast) { toast.textContent = "Cloud sync failed: " + (err.message || err); setTimeout(() => toast.classList.remove("show"), 4000); }
       }
     };
 
-    const addMovementBtn = document.getElementById("addMovementBtn");
-    const movementModal = document.getElementById("movementModal");
-    const closeModalBtn = document.getElementById("closeModalBtn");
-    const movementForm = document.getElementById("movementForm");
-    const saveBtn = document.getElementById("saveBtn");
+    const addMovementBtn = byId("addMovementBtn");
+    const movementModal = byId("movementModal");
+    const closeModalBtn = byId("closeModalBtn");
+    const movementForm = byId("movementForm");
+    const saveBtn = byId("saveBtn");
 
-    if (addMovementBtn && movementModal) {
-      addMovementBtn.onclick = () => { movementModal.style.display = "flex"; };
-    }
-    if (closeModalBtn && movementModal) {
-      closeModalBtn.onclick = () => { movementModal.style.display = "none"; };
-    }
-    window.addEventListener("click", (e) => {
-      if (e.target === movementModal) movementModal.style.display = "none";
+    if (addMovementBtn && movementModal) addMovementBtn.onclick = () => { movementModal.style.display = "flex"; };
+    if (closeModalBtn && movementModal) closeModalBtn.onclick = () => { movementModal.style.display = "none"; };
+    window.addEventListener("click", (e) => { if (e.target === movementModal) movementModal.style.display = "none"; });
+
+    movementForm?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const url = byId("itemMediaUrl")?.value.trim();
+      if (!url) return showAuthMessage("Please enter a media link.");
+      const category = byId("itemCategory")?.value;
+      const title = byId("itemTitle")?.value.trim();
+      const prompt = byId("itemPrompt")?.value.trim();
+      const isDrive = url.includes("drive.google.com");
+      const isYoutube = url.includes("youtube.com") || url.includes("youtu.be");
+      const mediaType = isYoutube ? "youtube" : (isDrive ? "drive" : "video");
+      try {
+        if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = "Saving..."; }
+        const movementData = { name: title, category, prompt, mediaURL: url, mediaType, createdAt: new Date().toISOString() };
+        const docRef = await addDoc(collection(db, "movements"), movementData);
+        movementData.id = docRef.id;
+        window.allVaultItems.unshift(movementData);
+        filterCards();
+        movementForm.reset();
+        if (movementModal) movementModal.style.display = "none";
+        alert("New movement saved successfully!");
+      } catch (err) {
+        showAuthMessage(explainFirebaseError(err, "Saving movement"));
+      } finally {
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = "+ Save to Vault"; }
+      }
     });
 
-    if (movementForm) {
-      movementForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const urlInput = document.getElementById("itemMediaUrl");
-        const url = urlInput.value.trim();
-        if (!url) return alert("Please enter a media link.");
-
-        const category = document.getElementById("itemCategory").value;
-        const title = document.getElementById("itemTitle").value;
-        const prompt = document.getElementById("itemPrompt").value;
-        const isDrive = url.includes("drive.google.com");
-        const isYoutube = url.includes("youtube.com") || url.includes("youtu.be");
-        const mediaType = isYoutube ? "youtube" : (isDrive ? "drive" : "video");
-
-        try {
-          if (saveBtn) saveBtn.disabled = true;
-
-          const movementData = {
-            name: title,
-            category: category,
-            prompt: prompt,
-            mediaURL: url,
-            mediaType: mediaType,
-            createdAt: new Date().toISOString()
-          };
-
-          const docRef = await addDoc(collection(db, "movements"), movementData);
-          movementData.id = docRef.id;
-
-          window.allVaultItems.unshift(movementData);
-          filterCards();
-
-          movementForm.reset();
-          if (saveBtn) saveBtn.disabled = false;
-          if (movementModal) movementModal.style.display = "none";
-          alert("New Movement saved successfully!");
-        } catch (err) {
-          alert("Save error: " + err.message);
-          if (saveBtn) saveBtn.disabled = false;
-        }
-      });
-    }
-
-    // Load custom cloud synced movements from Firestore
     async function loadFirebaseMovements() {
       try {
         const q = query(collection(db, "movements"), orderBy("createdAt", "desc"));
         const snapshot = await getDocs(q);
-        const newCustomMovements = [];
-
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          if (data.name) {
-            newCustomMovements.push({ id: doc.id, ...data });
-          } else if (data.linkedCardId && data.mediaURL) {
-            const target = window.allVaultItems.find(m => m.id === data.linkedCardId);
+        const customMovements = [];
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          if (data.name) customMovements.push({ id: docSnap.id, ...data });
+          else if (data.linkedCardId && data.mediaURL) {
+            const target = window.allVaultItems?.find(m => m.id === data.linkedCardId);
             if (target) {
               target.mediaURL = data.mediaURL;
               target.mediaType = data.mediaType;
-              applyMediaUrlToCard(target.id, data.mediaURL, data.mediaType);
+              if (typeof applyMediaUrlToCard === "function") applyMediaUrlToCard(target.id, data.mediaURL, data.mediaType);
             }
           }
         });
-
-        if (newCustomMovements.length > 0) {
-          window.allVaultItems = [...newCustomMovements, ...window.allVaultItems];
+        if (customMovements.length) {
+          window.allVaultItems = [...customMovements, ...window.allVaultItems];
           renderCards(window.allVaultItems);
         }
       } catch (err) {
-        console.error("Firebase Load Error:", err);
+        console.error("Firestore load error:", err);
+        // The vault UI remains usable even if cloud data is unavailable.
       }
     }
-
-    loadFirebaseMovements();
   </script>
 </body>
 </html>
