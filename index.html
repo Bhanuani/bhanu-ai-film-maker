@@ -39,7 +39,7 @@
       display: none !important;
     }
 
-    /* HEADER */
+    /* HEADER - PERFECTLY ALIGNED WITH CARDS */
     header {
       background: rgba(4, 7, 17, 0.95);
       border-bottom: 1px solid var(--border-color);
@@ -51,9 +51,10 @@
     }
 
     .header-inner {
-      max-width: 98%;
+      max-width: 1720px;
+      width: 96%;
       margin: 0 auto;
-      padding: 0.85rem 1.5rem;
+      padding: 0.85rem 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -82,6 +83,7 @@
       font-family: 'Space Grotesk', sans-serif;
       font-size: 1.35rem;
       font-weight: 800;
+      user-select: none;
     }
 
     .brand-logo .studio-pill {
@@ -263,11 +265,12 @@
       margin-left: auto; background: var(--accent-cyan); color: #000; font-size: 0.72rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 999px;
     }
 
-    /* VAULT LAYOUT CONTAINER */
+    /* VAULT LAYOUT CONTAINER - MATCHES HEADER WIDTH EXACTLY */
     .vault-container { 
-      max-width: 98%; 
+      max-width: 1720px; 
+      width: 96%;
       margin: 0 auto; 
-      padding: 1.5rem 1rem 5rem; 
+      padding: 1.5rem 0 5rem; 
     }
 
     /* HERO BANNER */
@@ -318,11 +321,7 @@
       transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
-    .hero-banner-wrapper:hover .hero-foreground-video {
-      transform: scale(1.02);
-    }
-
-    /* CATEGORIES BAR */
+    /* CATEGORIES BAR - FLUSH LEFT & RIGHT */
     .categories-bar-wrapper {
       position: relative;
       margin-bottom: 2.2rem;
@@ -386,12 +385,16 @@
       animation: iconFloatContinuous 3s ease-in-out infinite alternate; 
       transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .cat-tab:hover .cat-3d-img, .cat-tab.active .cat-3d-img { transform: scale(1.22) rotate(-4deg); filter: drop-shadow(0 0 12px rgba(0, 210, 255, 0.7)); }
 
     @keyframes iconFloatContinuous { 0% { transform: translateY(0px) rotate(0deg); } 100% { transform: translateY(-4px) rotate(3deg); } }
 
-    /* CARD GRID */
-    .movements-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 1.5rem; width: 100%; }
+    /* CARD GRID - PRECISE 5-COLUMN DISTRIBUTION MATCHING SCREEN BOUNDARIES */
+    .movements-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); 
+      gap: 1.5rem; 
+      width: 100%; 
+    }
 
     .movement-card {
       background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden;
@@ -406,7 +409,6 @@
     .card-video-box video.active-media, .card-video-box img.active-media, .card-video-box iframe.active-media { display: block; }
     .card-video-box:hover video.active-media, .card-video-box:hover img.active-media { transform: scale(1.04); }
 
-    /* MEDIA UPLOAD + SOCIAL MEDIA LINK OPTION */
     .upload-overlay {
       position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
       gap: 0.6rem; background: rgba(8, 12, 22, 0.78); border: 2px dashed rgba(0, 210, 255, 0.3); border-radius: 10px; margin: 8px; transition: all 0.25s ease;
@@ -1083,7 +1085,7 @@
 
   <div id="toast">
     <i class="fa-solid fa-circle-check"></i>
-    <span id="toastMsg">Prompt copied to clipboard!</span>
+    <span id="toastMsg">Action Successful!</span>
   </div>
 
   <!-- SCRIPT -->
@@ -1659,7 +1661,19 @@
         tx.objectStore("cardMedia").put({ id: id, fileBlob: file, fileType: type, fileName: file.name });
       }
 
-      showToast("Media Attached Locally!");
+      // Convert small image directly to Base64 to sync with Firebase
+      if (file.type.startsWith('image') && file.size < 850000) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const base64Data = e.target.result;
+          if (typeof window.saveMediaLinkToFirestore === 'function') {
+            window.saveMediaLinkToFirestore(id, base64Data, 'image');
+          }
+        };
+        reader.readAsDataURL(file);
+      } else {
+        showToast("Media Attached Locally!");
+      }
     }
 
     window.cardActiveBlobs = {};
@@ -1776,7 +1790,8 @@
       showToast(`Download Started: ${cleanName}`);
     }
 
-    window.deleteCardMedia = function(id, event) {
+    // PERMANENT DELETE (DELETES FROM LOCAL DB AND FIRESTORE)
+    window.deleteCardMedia = async function(id, event) {
       if (event) event.stopPropagation();
       const media = window.cardActiveBlobs[id];
       if (!media) {
@@ -1784,21 +1799,29 @@
         return;
       }
 
-      if (confirm("Are you sure you want to delete this media?")) {
+      if (confirm("Are you sure you want to permanently delete this media?")) {
         delete window.cardActiveBlobs[id];
 
+        // 1. Delete from local IndexedDB
         if (localDB) {
           const tx = localDB.transaction("cardMedia", "readwrite");
           tx.objectStore("cardMedia").delete(id);
         }
 
+        // 2. Remove media from in-memory array
+        const targetItem = window.allVaultItems?.find(m => m.id === id);
+        if (targetItem) {
+          delete targetItem.mediaURL;
+          delete targetItem.mediaType;
+        }
+
+        // 3. Clear DOM
         const box = document.getElementById(`box_${id}`);
         const vid = document.getElementById(`vid_${id}`);
         const img = document.getElementById(`img_${id}`);
         const yt = document.getElementById(`yt_${id}`);
 
         if (box) box.classList.remove('has-media');
-
         if (vid) {
           vid.pause();
           vid.removeAttribute('src');
@@ -1814,7 +1837,12 @@
           yt.classList.remove('active-media');
         }
 
-        showToast("Media Deleted!");
+        // 4. Delete permanently from Cloud Firestore so it won't reload on refresh!
+        if (typeof window.deleteMediaFromFirestore === 'function') {
+          await window.deleteMediaFromFirestore(id);
+        }
+
+        showToast("Media permanently deleted from Cloud & Local!");
       }
     };
 
@@ -2105,29 +2133,42 @@
       const matchHint = document.getElementById("regMatchHint");
       const doneBtn = document.getElementById("regDoneBtn");
 
+      // Rule: At least 1 Uppercase, 1 Lowercase, 1 Number, 1 Special Char (@$!%*?&#), min 8 chars
       const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
       const isStrong = passRegex.test(pass);
+
+      if (isStrong) {
+        passHint.style.color = "#34d399";
+        passHint.innerText = "✓ Password meets all strength criteria.";
+      } else {
+        passHint.style.color = "#f87171";
+        passHint.innerText = "Rule: 1 Capital letter, 1 Small letter, 1 Number, 1 Special Char (@$!%*?&#), min 8 chars.";
+      }
+
       const isMatch = pass.length > 0 && pass === confirmPass;
-
-      if (passHint) {
-        passHint.style.color = isStrong ? "#34d399" : "#f87171";
-        passHint.innerText = isStrong
-          ? "✓ Password meets all strength criteria."
-          : "Use 8+ characters with uppercase, lowercase, number and a special character (@$!%*?&#).";
+      if (confirmPass.length > 0) {
+        matchHint.style.display = "block";
+        if (isMatch) {
+          matchHint.style.color = "#34d399";
+          matchHint.innerText = "✓ Passwords match.";
+        } else {
+          matchHint.style.color = "#f87171";
+          matchHint.innerText = "Passwords do not match!";
+        }
+      } else {
+        matchHint.style.display = "none";
       }
 
-      if (matchHint) {
-        matchHint.style.display = confirmPass.length > 0 ? "block" : "none";
-        matchHint.style.color = isMatch ? "#34d399" : "#f87171";
-        matchHint.innerText = isMatch ? "✓ Passwords match." : "Passwords do not match!";
+      // Activate Done button only if both are true
+      if (isStrong && isMatch) {
+        doneBtn.disabled = false;
+        doneBtn.style.opacity = "1";
+        doneBtn.style.cursor = "pointer";
+      } else {
+        doneBtn.disabled = true;
+        doneBtn.style.opacity = "0.45";
+        doneBtn.style.cursor = "not-allowed";
       }
-
-      if (doneBtn) {
-        doneBtn.disabled = !(isStrong && isMatch);
-        doneBtn.style.opacity = doneBtn.disabled ? "0.45" : "1";
-        doneBtn.style.cursor = doneBtn.disabled ? "not-allowed" : "pointer";
-      }
-      return { isStrong, isMatch };
     };
 
     renderCards(window.allVaultItems);
@@ -2152,6 +2193,9 @@
       addDoc,
       getDocs,
       query,
+      where,
+      deleteDoc,
+      doc,
       orderBy
     } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
@@ -2188,23 +2232,14 @@
       if (code === "auth/unauthorized-domain") {
         return "This domain is not authorized in Firebase Console.";
       }
-      if (code === "auth/invalid-credential" || code === "auth/wrong-password" || code === "auth/user-not-found") {
-        return "Email or password is incorrect. Check your details or use Forgot Password.";
+      if (code === "auth/invalid-credential") {
+        return "Email or password is incorrect.";
       }
       if (code === "auth/email-already-in-use") {
-        return "This email is already registered. Switch to Login, or use Forgot Password if you do not know the password.";
+        return "This email already has an account. Please use Login.";
       }
       if (code === "auth/weak-password") {
-        return "Password is too weak. Use at least 8 characters with uppercase, lowercase, number and one special character.";
-      }
-      if (code === "auth/operation-not-allowed") {
-        return "Email/Password sign-in is disabled. Enable it in Firebase Console > Authentication > Sign-in method.";
-      }
-      if (code === "auth/invalid-email") {
-        return "Enter a valid email address.";
-      }
-      if (code === "auth/too-many-requests") {
-        return "Too many attempts. Wait a few minutes and try again.";
+        return "Password is too weak. Please meet all complexity criteria.";
       }
       return `${action} failed: ${err?.message || "Unknown error"}`;
     }
@@ -2288,10 +2323,6 @@
       if (byId("registerAuthForm")) byId("registerAuthForm").style.display = isRegister ? "block" : "none";
       if (byId("phoneAuthForm")) byId("phoneAuthForm").style.display = isPhone ? "block" : "none";
 
-      if (isRegister && typeof window.checkRegisterPasswordRules === "function") {
-        window.checkRegisterPasswordRules();
-      }
-
       if (isPhone) {
         try { initRecaptcha(); }
         catch (err) { showAuthMessage(explainFirebaseError(err, "reCAPTCHA initialization")); }
@@ -2317,78 +2348,40 @@
       }
     });
 
-    // 2. New User Registration
+    // 2. New User Registration (Executes on "Done" button submit)
     byId("registerAuthForm")?.addEventListener("submit", async (e) => {
       e.preventDefault();
-
-      const emailInput = byId("regEmailInput");
-      const email = emailInput?.value.trim().toLowerCase() || "";
-      const jobStudy = byId("regJobInput")?.value || "";
-      const pass = byId("regPassInput")?.value || "";
-      const confirmPass = byId("regConfirmPassInput")?.value || "";
-      const doneBtn = byId("regDoneBtn");
+      const email = byId("regEmailInput")?.value.trim();
+      const jobStudy = byId("regJobInput")?.value;
+      const pass = byId("regPassInput")?.value;
+      const confirmPass = byId("regConfirmPassInput")?.value;
 
       if (!email || !jobStudy || !pass || !confirmPass) {
-        showAuthMessage("Please complete all 4 registration fields.");
-        return;
-      }
-      if (emailInput && !emailInput.checkValidity()) {
-        showAuthMessage("Please enter a valid email address.");
-        emailInput.focus();
-        return;
-      }
-
-      const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
-      if (!passRegex.test(pass)) {
-        showAuthMessage("Password must contain at least 8 characters, uppercase, lowercase, a number and a special character (@$!%*?&#).");
-        byId("regPassInput")?.focus();
-        return;
+        return showAuthMessage("Please fill in all 4 registration fields.");
       }
       if (pass !== confirmPass) {
-        showAuthMessage("Passwords do not match. Re-enter the same password.");
-        byId("regConfirmPassInput")?.focus();
-        return;
+        return showAuthMessage("Passwords do not match!");
       }
 
-      if (doneBtn) {
-        doneBtn.disabled = true;
-        doneBtn.textContent = "Creating account...";
-      }
+      const doneBtn = byId("regDoneBtn");
+      if (doneBtn) { doneBtn.disabled = true; doneBtn.textContent = "Registering..."; }
 
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+        // Save user profile details to Firestore
+        await addDoc(collection(db, "registered_users"), {
+          uid: userCredential.user.uid,
+          email: email,
+          occupation: jobStudy,
+          createdAt: new Date().toISOString()
+        });
 
-        // Firestore profile storage is best-effort. A Firestore rules error
-        // must not make a successfully created Firebase Auth account look failed.
-        try {
-          await addDoc(collection(db, "registered_users"), {
-            uid: userCredential.user.uid,
-            email,
-            occupation: jobStudy,
-            createdAt: new Date().toISOString()
-          });
-        } catch (profileError) {
-          console.warn("Account created, but profile details could not be saved to Firestore:", profileError);
-        }
-
-        // Notification failures should never block account creation.
-        notifyAdminOnLogin(email, `New User Registered (${jobStudy})`)
-          .catch((notificationError) => console.warn("Registration notification failed:", notificationError));
-
-        alert("Registration successful! Your CINEMOTION STUDIO account has been created.");
-        byId("registerAuthForm")?.reset();
-        window.checkRegisterPasswordRules?.();
+        await notifyAdminOnLogin(email, `New User Registered (${jobStudy})`);
+        alert("Registration Successful! Welcome to Cinemotion Studio.");
       } catch (err) {
         showAuthMessage(explainFirebaseError(err, "Registration"));
       } finally {
-        if (doneBtn) {
-          doneBtn.textContent = "Done";
-          if (typeof window.checkRegisterPasswordRules === "function") {
-            window.checkRegisterPasswordRules();
-          } else {
-            doneBtn.disabled = false;
-          }
-        }
+        if (doneBtn) { doneBtn.disabled = false; doneBtn.textContent = "Done"; }
       }
     });
 
@@ -2459,10 +2452,35 @@
       catch (err) { showAuthMessage(explainFirebaseError(err, "Sign out")); }
     };
 
+    // FIRESTORE PERMANENT DELETE FUNCTION (Fixes video reappearing on refresh)
+    window.deleteMediaFromFirestore = async function(cardId) {
+      try {
+        const q = query(collection(db, "movements"), where("linkedCardId", "==", cardId));
+        const snapshot = await getDocs(q);
+        const delPromises = [];
+        snapshot.forEach((docSnap) => {
+          delPromises.push(deleteDoc(doc(db, "movements", docSnap.id)));
+        });
+        await Promise.all(delPromises);
+        console.log("Deleted Firestore records for cardId:", cardId);
+      } catch (err) {
+        console.error("Firestore permanent delete error:", err);
+      }
+    };
+
+    // FIRESTORE SAVE FUNCTION (Clears old links first to prevent duplicates)
     window.saveMediaLinkToFirestore = async function(cardId, url, mediaType) {
       const toast = byId("toast");
       if (toast) { toast.textContent = "Saving link to cloud..."; toast.classList.add("show"); }
       try {
+        // Clear any previous entry for this card first
+        const q = query(collection(db, "movements"), where("linkedCardId", "==", cardId));
+        const snap = await getDocs(q);
+        const delPromises = [];
+        snap.forEach((d) => delPromises.push(deleteDoc(doc(db, "movements", d.id))));
+        await Promise.all(delPromises);
+
+        // Save fresh media record
         await addDoc(collection(db, "movements"), {
           linkedCardId: cardId,
           mediaURL: url,
