@@ -9,6 +9,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- EmailJS Library for Notifications -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
   <style>
     :root {
@@ -29,6 +32,11 @@
       font-family: 'Plus Jakarta Sans', sans-serif;
       min-height: 100vh;
       overflow-x: hidden;
+    }
+
+    /* Regular users cannot see admin editing/deleting options */
+    body:not(.is-admin-active) .admin-only {
+      display: none !important;
     }
 
     /* HEADER */
@@ -209,6 +217,20 @@
 
     .profile-info h4 { font-size: 0.95rem; color: #fff; margin-bottom: 2px; }
     .profile-info p { font-size: 0.76rem; color: var(--accent-cyan); word-break: break-all; }
+
+    .logout-btn-dropdown {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #ef4444;
+      padding: 0.45rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .logout-btn-dropdown:hover { background: #ef4444; color: #fff; }
 
     /* SIDEBAR */
     .sidebar-overlay {
@@ -394,7 +416,6 @@
     .upload-overlay i.cloud-icon { font-size: 1.8rem; color: var(--accent-cyan); }
     .upload-overlay span.upload-txt { font-size: 0.82rem; color: #cbd5e1; font-weight: 600; text-align: center; padding: 0 10px; }
 
-    /* Link Input Trigger */
     .link-upload-pill {
       margin-top: 2px;
       background: rgba(0, 210, 255, 0.1);
@@ -685,9 +706,80 @@
     @keyframes masterRigPop { 0% { transform: scale(0.4); opacity: 0; } 50% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.35); opacity: 0; } }
 
     .stage-title { position: absolute; bottom: 12%; font-size: 1.5rem; font-family: 'Space Grotesk', sans-serif; font-weight: 800; color: #fff; text-transform: uppercase; background: rgba(4, 7, 17, 0.75); padding: 0.6rem 2rem; border-radius: 999px; border: 1px solid var(--accent-cyan); z-index: 20; }
+
+    /* AUTHENTICATION GATE & FORGOT PASSWORD MODALS */
+    .auth-gate-modal { position: fixed; inset: 0; background: rgba(3, 7, 18, 0.96); backdrop-filter: blur(25px); z-index: 1000000; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+    .auth-card { background: #0c1222; border: 1px solid rgba(0, 210, 255, 0.35); border-radius: 20px; width: 100%; max-width: 440px; padding: 2rem; box-shadow: 0 0 60px rgba(0, 210, 255, 0.2); }
+    .auth-tabs { display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; }
+    .auth-tab-btn { flex: 1; padding: 0.75rem; background: none; border: none; color: #94a3b8; font-weight: 700; cursor: pointer; border-bottom: 2px solid transparent; font-size: 0.9rem; }
+    .auth-tab-btn.active { color: var(--accent-cyan); border-bottom-color: var(--accent-cyan); }
+    .forgot-pass-link { font-size: 12px; color: var(--accent-cyan); text-align: right; cursor: pointer; margin-top: -8px; margin-bottom: 14px; display: block; text-decoration: none; }
+    .forgot-pass-link:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
+
+  <!-- AUTHENTICATION GATE (LOGIN / REGISTER / MOBILE OTP) -->
+  <div id="authGateModal" class="auth-gate-modal" style="display: none;">
+    <div class="auth-card">
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; color: #fff;">CINEMOTION STUDIO</h2>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Director Vault Sign-In</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab-btn active" id="tabEmailBtn" onclick="switchAuthMode('email')">Email Login / Sign Up</button>
+        <button type="button" class="auth-tab-btn" id="tabPhoneBtn" onclick="switchAuthMode('phone')">Mobile (OTP)</button>
+      </div>
+
+      <!-- EMAIL LOGIN & REGISTER -->
+      <form id="emailAuthForm">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="userEmailInput" placeholder="name@example.com" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="userPassInput" placeholder="••••••••" required />
+        </div>
+        <a class="forgot-pass-link" onclick="openForgotPasswordModal()">Forgot Password?</a>
+        <button type="submit" class="submit-btn" id="emailSubmitBtn">Login / Register</button>
+      </form>
+
+      <!-- MOBILE PHONE OTP FORM -->
+      <form id="phoneAuthForm" style="display: none;">
+        <div class="form-group">
+          <label>Mobile Number (with Country Code)</label>
+          <input type="tel" id="userPhoneInput" placeholder="+91 9876543210" />
+        </div>
+        <div id="recaptcha-container"></div>
+        <div class="form-group" id="otpGroup" style="display: none;">
+          <label>Enter 6-Digit OTP</label>
+          <input type="text" id="otpCodeInput" placeholder="123456" maxlength="6" />
+        </div>
+        <button type="button" class="submit-btn" id="sendOtpBtn" onclick="requestPhoneOtp()">Send OTP</button>
+        <button type="button" class="submit-btn" id="verifyOtpBtn" style="display: none;" onclick="confirmPhoneOtp()">Verify & Sign In</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- FORGOT PASSWORD MODAL -->
+  <div id="forgotPasswordModal" class="auth-gate-modal" style="display: none;">
+    <div class="auth-card" style="max-width: 400px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
+        <h3 style="color: var(--accent-cyan); font-size: 1.15rem;"><i class="fa-solid fa-key"></i> Reset Password</h3>
+        <button type="button" onclick="closeForgotPasswordModal()" style="background:none; border:none; color:#94a3b8; font-size:1.5rem; cursor:pointer;">&times;</button>
+      </div>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 1rem;">Enter your registered Email. We will send a secure password reset link to update your password.</p>
+      <form id="forgotPasswordForm">
+        <div class="form-group">
+          <label>Your Registered Email</label>
+          <input type="email" id="resetEmailInput" placeholder="Enter your email" required />
+        </div>
+        <button type="submit" class="submit-btn">Send Reset Link</button>
+      </form>
+    </div>
+  </div>
 
   <div id="cinematicStage">
     <div class="stage-backdrop"></div>
@@ -744,27 +836,31 @@
       </div>
 
       <div class="header-actions">
-        <button class="add-btn" id="addMovementBtn">
+        <!-- Admin-Only Button: Regular users cannot see this -->
+        <button class="add-btn admin-only" id="addMovementBtn">
           <i class="fa-solid fa-plus"></i> Add Movement
         </button>
         
         <div class="profile-pill" id="profilePillBtn">
-          <div class="avatar">BP</div>
+          <div class="avatar" id="headerUserAvatar">BP</div>
           <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; color: #94a3b8;"></i>
         </div>
 
         <div class="profile-dropdown" id="profileDropdown">
           <div class="profile-dropdown-header">
-            <div class="profile-avatar-large">BP</div>
+            <div class="profile-avatar-large" id="profileAvatarLarge">BP</div>
             <div class="profile-info">
-              <h4>BHANU PAKALA</h4>
-              <p>bhanu.pakala03@gmail.com</p>
+              <h4 id="profileDisplayName">BHANU PAKALA</h4>
+              <p id="profileDisplayEmail">bhanu.pakala03@gmail.com</p>
             </div>
           </div>
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span class="profile-badge" style="font-size: 11px; color: var(--accent-cyan); font-weight: 700;">MASTER DIRECTOR</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <span class="profile-badge" id="profileBadgeRole" style="font-size: 11px; color: var(--accent-cyan); font-weight: 700;">DIRECTOR</span>
             <span style="font-size: 11px; color: #94a3b8;">Cinemotion AI</span>
           </div>
+          <button type="button" class="logout-btn-dropdown" onclick="handleUserLogout()">
+            <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+          </button>
         </div>
       </div>
     </div>
@@ -772,8 +868,8 @@
 
   <div class="vault-container">
     <section class="hero-banner-wrapper" id="heroBanner">
-      <video id="heroVideoBg" class="hero-ambient-backdrop" autoplay muted playsinline webkit-playsinline preload="auto" src="hero-banner-1.mp4"></video>
-      <video id="heroVideo" class="hero-foreground-video" autoplay muted playsinline webkit-playsinline preload="auto" poster="bhanu-3d-header_2.png" src="hero-banner-1.mp4"></video>
+      <video id="heroVideoBg" class="hero-ambient-backdrop" autoplay muted playsinline loop preload="auto" src="hero-banner-1.mp4"></video>
+      <video id="heroVideo" class="hero-foreground-video" autoplay muted playsinline loop preload="auto" poster="bhanu-3d-header_2.png" src="hero-banner-1.mp4"></video>
     </section>
 
     <div class="categories-bar-wrapper">
@@ -946,11 +1042,12 @@
 
   <div id="toast">
     <i class="fa-solid fa-circle-check"></i>
-    <span>Prompt copied to clipboard!</span>
+    <span id="toastMsg">Prompt copied to clipboard!</span>
   </div>
 
-  <!-- CORE SCRIPT -->
+  <!-- SCRIPT -->
   <script>
+    // 44 Core Movements
     const defaultMovements = [
       { id: "mov_1", name: "Slow Dolly In", category: "Camera Movement", prompt: "Slow dolly in, camera moves slowly forward toward the subject." },
       { id: "mov_2", name: "Slow Dolly Out", category: "Camera Movement", prompt: "Slow dolly out, camera moves slowly backwards away from the subject." },
@@ -998,6 +1095,7 @@
       { id: "mov_44", name: "Worm's Eye Tracking (Ground Level)", category: "Camera Movement", prompt: "Worm's eye view, low angle tracking, camera moves along the ground looking up." }
     ];
 
+    // 12 Camera Angles
     const cameraAnglesFromPdf = [
       { id: "ang_1", name: "Eye-level Angle", category: "Camera Angles", prompt: "Eye-level angle, camera positioned at subject eye height, natural, neutral, realistic perspective, 8k" },
       { id: "ang_2", name: "Low Angle", category: "Camera Angles", prompt: "Low angle shot, camera looking upward at the subject, commanding power, dominance, grandeur, cinematic" },
@@ -1013,6 +1111,7 @@
       { id: "ang_12", name: "Point-Of-View (POV)", category: "Camera Angles", prompt: "Point-of-view POV shot, camera represents first-person character vision, immersive perspective, subjective participation" }
     ];
 
+    // 15 Camera Shots
     const cameraShotsFromPdf = [
       { id: "sht_1", name: "Extreme Long Shot (ELS) / Extreme Wide Shot (EWS)", category: "Camera Shots", prompt: "Extreme long shot ELS, extreme wide shot EWS, vast expansive landscape, subject appearing very small in distance, establish scale, atmosphere, and location, 8k" },
       { id: "sht_2", name: "Long Shot (LS) / Wide Shot (WS)", category: "Camera Shots", prompt: "Long shot LS, wide shot WS, full body of the subject in modern geometric architectural hall, substantial surroundings, movement and body language, cinematic" },
@@ -1031,6 +1130,7 @@
       { id: "sht_15", name: "Tight Close-Up (TCU)", category: "Camera Shots", prompt: "Tight close-up TCU, tightly framed around eyes, nose, and lips, emotional vulnerability, intimacy and intense dramatic cinematic impact" }
     ];
 
+    // 60 Atmosphere Themes
     const atmosphereThemesFromPdf = [
       { id: "atm_1", name: "Golden Hour Glow", category: "Atmosphere", prompt: "Golden Hour Glow, soft warm golden sunlight at sunrise or sunset, cinematic lighting, 8k" },
       { id: "atm_2", name: "Blue Hour Twilight", category: "Atmosphere", prompt: "Blue Hour Twilight, cool deep blue atmospheric tones, early dawn or late dusk, moody ambience" },
@@ -1094,6 +1194,7 @@
       { id: "atm_60", name: "Cinematic Drone Landscape", category: "Atmosphere", prompt: "Cinematic Drone Landscape, high-altitude aerial view of winding coastal cliff road at sunrise" }
     ];
 
+    // 5 Master Prompts
     const masterPromptsList = [
       { id: "mst_1", name: "Recreate Master Prompt", category: "Master Prompts", prompt: "Analyze this video scene by scene and generate a detailed AI video prompt for each shot and frame - including camera angles, subject actions, lighting, environment, facial expressions, composition, transitions, and cinematic style. Make the prompts accurate enough to recreate the video as closely as possible. Include exact text in video." },
       { id: "mst_2", name: "Animation Prompt", category: "Master Prompts", prompt: "Animate sequence of events shown in 6-frame storyboard reference image. Single, continuous, seamless product showcase video of smartphone from Panel 1 to 6. Preserve composition, product styling, modern lighting. Smooth cinematic transitions (push-ins, slow orbits, match-cuts). No fast cuts, no background music, no text overlays." },
@@ -1104,7 +1205,6 @@
 
     window.allVaultItems = [...defaultMovements, ...cameraAnglesFromPdf, ...cameraShotsFromPdf, ...atmosphereThemesFromPdf, ...masterPromptsList];
     let currentCategory = "All";
-    window.hoveredCardId = null;
 
     const classicThemes = [
       { name: "1. Film Noir Monochrome", tag: "35mm black and white film noir, high contrast, hard shadows, dramatic silhouette" },
@@ -1208,11 +1308,8 @@
     function getYoutubeEmbedUrl(url) {
       if (!url) return null;
       let videoId = null;
-      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-      const match = url.match(regExp);
-      if (match && match[2].length === 11) {
-        videoId = match[2];
-      }
+      const match = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
+      if (match && match[2].length === 11) videoId = match[2];
       return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0` : null;
     }
 
@@ -1220,10 +1317,7 @@
     function getDriveEmbedUrl(url) {
       if (!url) return null;
       const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-      if (match && match[1]) {
-        return `https://drive.google.com/file/d/${match[1]}/preview`;
-      }
-      return null;
+      return match && match[1] ? `https://drive.google.com/file/d/${match[1]}/preview` : null;
     }
 
     const grid = document.getElementById('movementsGrid');
@@ -1234,9 +1328,7 @@
         const iconSrc = categoryIconMap[item.category] || 'Camera-Movement.png';
 
         return `
-        <div class="movement-card" id="card_${item.id}"
-             onmouseenter="window.hoveredCardId='${item.id}'"
-             onmouseleave="if(window.hoveredCardId==='${item.id}') window.hoveredCardId=null;">
+        <div class="movement-card" id="card_${item.id}">
           <div class="card-video-box ${item.mediaURL ? 'has-media' : ''}" id="box_${item.id}" 
                onclick="handleCardMediaClick('${item.id}')"
                ondragover="handleDragOver(event, '${item.id}')"
@@ -1247,7 +1339,8 @@
             <img id="img_${item.id}" alt="${item.name}">
             <iframe id="yt_${item.id}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
-            <div class="upload-overlay" id="overlay_${item.id}">
+            <!-- Admin-Only Overlay: Regular users cannot see this -->
+            <div class="upload-overlay admin-only" id="overlay_${item.id}">
               <div onclick="triggerFileInput(event, '${item.id}')" style="display: flex; flex-direction: column; align-items: center; gap: 0.2rem;">
                 <i class="fa-solid fa-cloud-arrow-up cloud-icon"></i>
                 <span class="upload-txt">Click, Drag & Drop or Paste Media (Ctrl+V)</span>
@@ -1266,7 +1359,8 @@
               <div class="card-meta">
                 <span class="tag-badge">${item.category || 'Movement'}</span>
                 
-                <div class="card-meta-actions">
+                <!-- Admin-Only Controls: Regular users cannot modify or delete -->
+                <div class="card-meta-actions admin-only">
                   <button type="button" class="meta-action-btn edit-btn" title="Paste / Attach Link" onclick="openLinkModal('${item.id}', event)">
                     <i class="fa-solid fa-cloud-arrow-up"></i>
                   </button>
@@ -1286,7 +1380,8 @@
               <div class="prompt-wrapper" id="prompt_wrap_${item.id}">
                 <div class="prompt-content" id="content_${item.id}">
                   <p class="prompt-box" id="text_${item.id}">${item.prompt}</p>
-                  <button type="button" class="prompt-edit-btn" title="Edit Prompt Text" onclick="openEditPromptModal('${item.id}', event)">
+                  <!-- Admin Only Prompt Edit Button -->
+                  <button type="button" class="prompt-edit-btn admin-only" title="Edit Prompt Text" onclick="openEditPromptModal('${item.id}', event)">
                     <i class="fa-solid fa-pen-to-square"></i>
                   </button>
                 </div>
@@ -1298,6 +1393,7 @@
               </div>
             </div>
             
+            <!-- Standard User Allowed Control: Copy Prompt -->
             <button class="copy-btn" onclick="copyPromptText('${item.prompt.replace(/'/g, "\\'")}', '${item.id}')">
               <i class="fa-solid fa-copy"></i> Copy Prompt
             </button>
@@ -1374,10 +1470,7 @@
         if (typeof window.saveMediaLinkToFirestore === 'function') {
           window.saveMediaLinkToFirestore(id, url, mediaType);
         } else {
-          const toast = document.getElementById('toast');
-          toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Link Saved Locally!</span>`;
-          toast.classList.add('show');
-          setTimeout(() => toast.classList.remove('show'), 2000);
+          showToast("Link Saved Locally!");
         }
 
         linkModal.style.display = "none";
@@ -1433,10 +1526,7 @@
             tx.objectStore("promptEdits").put({ id: id, name: newTitle, prompt: newPrompt });
           }
 
-          const toast = document.getElementById('toast');
-          toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Prompt Updated!</span>`;
-          toast.classList.add('show');
-          setTimeout(() => toast.classList.remove('show'), 2000);
+          showToast("Prompt Updated!");
         }
 
         editPromptModal.style.display = "none";
@@ -1495,7 +1585,7 @@
           const pastedFile = item.getAsFile();
           if (pastedFile) {
             e.preventDefault();
-            const targetId = window.hoveredCardId || (window.allVaultItems && window.allVaultItems[0] ? window.allVaultItems[0].id : null);
+            const targetId = window.allVaultItems && window.allVaultItems[0] ? window.allVaultItems[0].id : null;
             if (targetId) {
               processUploadedFile(targetId, pastedFile);
             }
@@ -1515,10 +1605,7 @@
         tx.objectStore("cardMedia").put({ id: id, fileBlob: file, fileType: type, fileName: file.name });
       }
 
-      const toast = document.getElementById('toast');
-      toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Media Attached Locally!</span>`;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2000);
+      showToast("Media Attached Locally!");
     }
 
     window.cardActiveBlobs = {};
@@ -1633,10 +1720,7 @@
       a.click();
       document.body.removeChild(a);
 
-      const toast = document.getElementById('toast');
-      toast.innerHTML = `<i class="fa-solid fa-download"></i> <span>Download Started: ${cleanName}</span>`;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2200);
+      showToast(`Download Started: ${cleanName}`);
     }
 
     window.deleteCardMedia = function(id, event) {
@@ -1677,10 +1761,7 @@
           yt.classList.remove('active-media');
         }
 
-        const toast = document.getElementById('toast');
-        toast.innerHTML = `<i class="fa-solid fa-trash"></i> <span>Media Deleted!</span>`;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 2000);
+        showToast("Media Deleted!");
       }
     };
 
@@ -1700,7 +1781,6 @@
       const item = window.allVaultItems.find(m => m.id === id);
 
       if (!media || !media.url) {
-        openLinkModal(id);
         return;
       }
 
@@ -1804,7 +1884,15 @@
             }, 1300);
           }
         }
+        showToast("Prompt copied to clipboard!");
       });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2200);
     }
 
     function filterCategory(cat, btn) {
@@ -1935,12 +2023,30 @@
       if (themesModal && e.target === themesModal) themesModal.style.display = "none";
     });
 
+    window.openForgotPasswordModal = function() {
+      document.getElementById("forgotPasswordModal").style.display = "flex";
+    };
+
+    window.closeForgotPasswordModal = function() {
+      document.getElementById("forgotPasswordModal").style.display = "none";
+    };
+
     renderCards(window.allVaultItems);
   </script>
 
-  <!-- FIREBASE FIRESTORE SYNC -->
+  <!-- FIREBASE AUTH, FORGOT PASS, AND LOGINS INTEGRATION -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+    import { 
+      getAuth, 
+      onAuthStateChanged, 
+      signInWithEmailAndPassword, 
+      createUserWithEmailAndPassword, 
+      sendPasswordResetEmail,
+      signInWithPhoneNumber, 
+      RecaptchaVerifier, 
+      signOut 
+    } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
     import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -1954,7 +2060,156 @@
     };
 
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getFirestore(app);
+
+    const NOTIFY_RECEIVER_EMAIL = "prasadpakala10@gmail.com";
+
+    // SESSION PERSISTENCE (Won't ask for credentials unless user logs out)
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        document.getElementById("authGateModal").style.display = "none";
+        
+        const displayName = user.email || user.phoneNumber || "Director";
+        document.getElementById("headerUserDisplay")?.innerText = displayName;
+        document.getElementById("profileDisplayName").innerText = displayName;
+        document.getElementById("profileDisplayEmail").innerText = user.email || user.phoneNumber || "";
+        
+        const firstLetter = (displayName[0] || "D").toUpperCase();
+        document.getElementById("headerUserAvatar").innerText = firstLetter;
+        document.getElementById("profileAvatarLarge").innerText = firstLetter;
+
+        // Check if Admin securely via logged-in email
+        if (user.email === "bhanu.pakala03@gmail.com") {
+          document.body.classList.add("is-admin-active");
+          document.getElementById("profileBadgeRole").innerText = "MASTER DIRECTOR (ADMIN)";
+        } else {
+          document.body.classList.remove("is-admin-active");
+          document.getElementById("profileBadgeRole").innerText = "VAULT VIEWER";
+        }
+      } else {
+        document.body.classList.remove("is-admin-active");
+        document.getElementById("authGateModal").style.display = "flex";
+      }
+    });
+
+    // Notify prasadpakala10@gmail.com about login details
+    async function notifyAdminOnLogin(identifier, method) {
+      try {
+        await addDoc(collection(db, "user_logins"), {
+          identifier: identifier,
+          method: method,
+          timestamp: new Date().toISOString()
+        });
+
+        if (window.emailjs) {
+          emailjs.send("default_service", "template_login_alert", {
+            to_email: NOTIFY_RECEIVER_EMAIL,
+            user_info: identifier,
+            login_time: new Date().toLocaleString(),
+            auth_type: method
+          }).catch(e => console.log("Email Notification alert:", e));
+        }
+      } catch (err) {
+        console.error("Login tracking error:", err);
+      }
+    }
+
+    // Switch between Email and Phone tabs
+    window.switchAuthMode = function(mode) {
+      if (mode === 'email') {
+        document.getElementById("tabEmailBtn").classList.add("active");
+        document.getElementById("tabPhoneBtn").classList.remove("active");
+        document.getElementById("emailAuthForm").style.display = "block";
+        document.getElementById("phoneAuthForm").style.display = "none";
+      } else {
+        document.getElementById("tabPhoneBtn").classList.add("active");
+        document.getElementById("tabEmailBtn").classList.remove("active");
+        document.getElementById("phoneAuthForm").style.display = "block";
+        document.getElementById("emailAuthForm").style.display = "none";
+        initRecaptcha();
+      }
+    };
+
+    // EMAIL SIGN IN / REGISTER
+    document.getElementById("emailAuthForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("userEmailInput").value.trim();
+      const pass = document.getElementById("userPassInput").value;
+
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+        notifyAdminOnLogin(email, "Email Login");
+      } catch (signInErr) {
+        if (signInErr.code === 'auth/user-not-found' || signInErr.code === 'auth/invalid-credential') {
+          try {
+            await createUserWithEmailAndPassword(auth, email, pass);
+            notifyAdminOnLogin(email, "New Registration");
+          } catch (signUpErr) {
+            alert("Registration Error: " + signUpErr.message);
+          }
+        } else {
+          alert("Login Error: " + signInErr.message);
+        }
+      }
+    });
+
+    // FORGOT PASSWORD -> SENDS RESET LINK TO USER EMAIL
+    document.getElementById("forgotPasswordForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const resetEmail = document.getElementById("resetEmailInput").value.trim();
+
+      try {
+        await sendPasswordResetEmail(auth, resetEmail);
+        alert("A password reset email has been sent to " + resetEmail + ". Check your inbox to set a new password.");
+        closeForgotPasswordModal();
+      } catch (err) {
+        alert("Error sending reset email: " + err.message);
+      }
+    });
+
+    // PHONE OTP AUTHENTICATION
+    function initRecaptcha() {
+      if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'invisible' });
+      }
+    }
+
+    window.requestPhoneOtp = async function() {
+      const phoneNumber = document.getElementById("userPhoneInput").value.trim();
+      if (!phoneNumber) return alert("Please enter mobile number with country code (+91)");
+
+      try {
+        initRecaptcha();
+        const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
+        window.confirmationResult = confirmationResult;
+        document.getElementById("otpGroup").style.display = "block";
+        document.getElementById("verifyOtpBtn").style.display = "block";
+        document.getElementById("sendOtpBtn").style.display = "none";
+        alert("OTP sent successfully to " + phoneNumber);
+      } catch (err) {
+        alert("OTP Error: " + err.message);
+      }
+    };
+
+    window.confirmPhoneOtp = async function() {
+      const code = document.getElementById("otpCodeInput").value.trim();
+      if (!code || !window.confirmationResult) return alert("Please enter the 6-digit OTP");
+
+      try {
+        const result = await window.confirmationResult.confirm(code);
+        notifyAdminOnLogin(result.user.phoneNumber, "Phone OTP");
+      } catch (err) {
+        alert("Invalid OTP code!");
+      }
+    };
+
+    // LOGOUT (Asks credentials again only after logout)
+    window.handleUserLogout = async function() {
+      if (confirm("Are you sure you want to log out?")) {
+        await signOut(auth);
+      }
+    };
 
     // Save Link to Cloud Firestore
     window.saveMediaLinkToFirestore = async function(cardId, url, mediaType) {
@@ -2044,6 +2299,7 @@
       });
     }
 
+    // Load custom cloud synced movements from Firestore
     async function loadFirebaseMovements() {
       try {
         const q = query(collection(db, "movements"), orderBy("createdAt", "desc"));
