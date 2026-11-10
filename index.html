@@ -39,19 +39,19 @@
       display: none !important;
     }
 
-    /* TAB SWITCH WELCOME BACK - SEAMLESS BLEND MODE */
+    /* TAB SWITCH WELCOME BACK - VIDEO ANIMATION BLEND */
     #welcomeBackOverlay {
       position: fixed;
       inset: 0;
-      background: radial-gradient(circle at center, rgba(4, 7, 17, 0.4) 0%, rgba(4, 7, 17, 0.95) 85%);
+      background: rgba(3, 7, 18, 0.88);
+      backdrop-filter: blur(12px);
       z-index: 99999999;
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-direction: column;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: opacity 0.4s ease;
     }
 
     #welcomeBackOverlay.show {
@@ -59,47 +59,13 @@
       pointer-events: auto;
     }
 
-    .welcome-video-bg {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0.30;
+    .welcome-direct-video {
+      width: 90%;
+      max-width: 820px;
+      aspect-ratio: 16 / 9;
+      object-fit: contain;
       mix-blend-mode: screen;
-      filter: saturate(1.4) brightness(0.9) contrast(1.1);
-      mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
-      -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
-      pointer-events: none;
-    }
-
-    .welcome-content {
-      position: relative;
-      z-index: 2;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 1.5rem;
-    }
-
-    .welcome-glitch-text {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 3.8rem;
-      font-weight: 800;
-      letter-spacing: 6px;
-      text-transform: uppercase;
-      background: linear-gradient(135deg, #ffffff 30%, #00d2ff 90%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 50px rgba(0, 210, 255, 0.9), 0 0 20px rgba(0, 210, 255, 0.5);
-      animation: welcomePop 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    @keyframes welcomePop {
-      0% { transform: scale(0.7) translateY(20px); opacity: 0; filter: blur(14px); }
-      50% { transform: scale(1.04) translateY(-3px); opacity: 1; filter: blur(0); }
-      100% { transform: scale(1) translateY(0); opacity: 1; }
+      filter: drop-shadow(0 0 35px rgba(0, 210, 255, 0.5));
     }
 
     /* HEADER - PERFECTLY ALIGNED */
@@ -382,6 +348,10 @@
       z-index: 2;
       filter: drop-shadow(0 0 35px rgba(0, 0, 0, 0.95));
       transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .hero-banner-wrapper:hover .hero-foreground-video {
+      transform: scale(1.02);
     }
 
     /* CATEGORIES BAR */
@@ -786,14 +756,11 @@
 
   <!-- TAB SWITCH WELCOME BACK OVERLAY (SEAMLESS BLENDED) -->
   <div id="welcomeBackOverlay">
-    <video id="welcomeVideo" class="welcome-video-bg" muted playsinline loop preload="auto" src="welcome-back.mp4"></video>
-    <div class="welcome-content">
-      <div class="welcome-glitch-text">WELCOME BACK</div>
-    </div>
+    <video id="welcomeVideo" class="welcome-direct-video" muted playsinline preload="auto" src="welcome-back.mp4"></video>
   </div>
 
   <!-- AUTHENTICATION GATE (LOGIN / REGISTER WITH 4 FIELDS & RULES / MOBILE OTP) -->
-  <div id="authGateModal" class="auth-gate-modal" style="display: flex;">
+  <div id="authGateModal" class="auth-gate-modal" style="display: none;">
     <div class="auth-card">
       <div style="text-align: center; margin-bottom: 1.5rem;">
         <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; color: #fff;">CINEMOTION STUDIO</h2>
@@ -1408,7 +1375,7 @@
             }
           });
         }
-        window.renderCards?.(window.allVaultItems);
+        renderCards(window.allVaultItems);
       };
     }
 
@@ -1543,7 +1510,6 @@
 
       updateCounts();
     }
-    window.renderCards = renderCards;
 
     // SOCIAL MEDIA / CLOUD LINK MODAL HANDLER
     const linkModal = document.getElementById("linkModal");
@@ -1873,20 +1839,17 @@
       if (confirm("Are you sure you want to permanently delete this media?")) {
         delete window.cardActiveBlobs[id];
 
-        // 1. Delete from local IndexedDB
         if (localDB) {
           const tx = localDB.transaction("cardMedia", "readwrite");
           tx.objectStore("cardMedia").delete(id);
         }
 
-        // 2. Remove media from in-memory array
         const targetItem = window.allVaultItems?.find(m => m.id === id);
         if (targetItem) {
           delete targetItem.mediaURL;
           delete targetItem.mediaType;
         }
 
-        // 3. Clear DOM
         const box = document.getElementById(`box_${id}`);
         const vid = document.getElementById(`vid_${id}`);
         const img = document.getElementById(`img_${id}`);
@@ -1908,7 +1871,6 @@
           yt.classList.remove('active-media');
         }
 
-        // 4. Delete permanently from Cloud Firestore so it won't reload on refresh
         if (typeof window.deleteMediaFromFirestore === 'function') {
           await window.deleteMediaFromFirestore(id);
         }
@@ -2208,66 +2170,65 @@
       const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
       const isStrong = passRegex.test(pass);
 
-      if (passHint) {
-        if (isStrong) {
-          passHint.style.color = "#34d399";
-          passHint.innerText = "✓ Password meets all strength criteria.";
-        } else {
-          passHint.style.color = "#f87171";
-          passHint.innerText = "Rule: 1 Capital letter, 1 Small letter, 1 Number, 1 Special Char (@$!%*?&#), min 8 chars.";
-        }
+      if (isStrong) {
+        passHint.style.color = "#34d399";
+        passHint.innerText = "✓ Password meets all strength criteria.";
+      } else {
+        passHint.style.color = "#f87171";
+        passHint.innerText = "Rule: 1 Capital letter, 1 Small letter, 1 Number, 1 Special Char (@$!%*?&#), min 8 chars.";
       }
 
       const isMatch = pass.length > 0 && pass === confirmPass;
-      if (matchHint) {
-        if (confirmPass.length > 0) {
-          matchHint.style.display = "block";
-          if (isMatch) {
-            matchHint.style.color = "#34d399";
-            matchHint.innerText = "✓ Passwords match.";
-          } else {
-            matchHint.style.color = "#f87171";
-            matchHint.innerText = "Passwords do not match!";
-          }
+      if (confirmPass.length > 0) {
+        matchHint.style.display = "block";
+        if (isMatch) {
+          matchHint.style.color = "#34d399";
+          matchHint.innerText = "✓ Passwords match.";
         } else {
-          matchHint.style.display = "none";
+          matchHint.style.color = "#f87171";
+          matchHint.innerText = "Passwords do not match!";
         }
+      } else {
+        matchHint.style.display = "none";
       }
 
-      // Activate Done button only if both are true
-      if (doneBtn) {
-        doneBtn.disabled = !(isStrong && isMatch);
-        doneBtn.style.opacity = (isStrong && isMatch) ? "1" : "0.45";
-        doneBtn.style.cursor = (isStrong && isMatch) ? "pointer" : "not-allowed";
+      if (isStrong && isMatch) {
+        doneBtn.disabled = false;
+        doneBtn.style.opacity = "1";
+        doneBtn.style.cursor = "pointer";
+      } else {
+        doneBtn.disabled = true;
+        doneBtn.style.opacity = "0.45";
+        doneBtn.style.cursor = "not-allowed";
       }
     };
 
-    // TAB SWITCH "WELCOME BACK" TRIGGER LOGIC
-    let welcomeTimeout;
+    // TAB SWITCH "WELCOME BACK" TRIGGER
+    let welcomeTimer;
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
         const overlay = document.getElementById("welcomeBackOverlay");
         const video = document.getElementById("welcomeVideo");
 
-        if (overlay) {
-          clearTimeout(welcomeTimeout);
+        if (overlay && video) {
+          clearTimeout(welcomeTimer);
           overlay.classList.add("show");
+          video.currentTime = 0;
+          video.play().catch(() => {});
 
-          if (video) {
-            video.currentTime = 0;
-            video.play().catch(() => {});
-          }
-
-          // Shows for 2.6 seconds and smoothly fades out
-          welcomeTimeout = setTimeout(() => {
+          video.onended = () => {
             overlay.classList.remove("show");
-            if (video) video.pause();
-          }, 2600);
+          };
+
+          welcomeTimer = setTimeout(() => {
+            overlay.classList.remove("show");
+            video.pause();
+          }, 2850);
         }
       }
     });
 
-    window.renderCards?.(window.allVaultItems);
+    renderCards(window.allVaultItems);
   </script>
 
   <!-- FIREBASE AUTH, FORGOT PASSWORD, PHONE OTP, AND FIRESTORE -->
@@ -2292,7 +2253,6 @@
       where,
       deleteDoc,
       doc,
-      setDoc,
       orderBy
     } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
@@ -2338,18 +2298,6 @@
       if (code === "auth/weak-password") {
         return "Password is too weak. Please meet all complexity criteria.";
       }
-      if (code === "auth/invalid-email") {
-        return "Please enter a valid email address.";
-      }
-      if (code === "auth/user-not-found" || code === "auth/wrong-password") {
-        return "Email or password is incorrect.";
-      }
-      if (code === "auth/too-many-requests") {
-        return "Too many attempts. Please wait a while and try again.";
-      }
-      if (code === "auth/network-request-failed") {
-        return "Network error. Check your internet connection and try again.";
-      }
       return `${action} failed: ${err?.message || "Unknown error"}`;
     }
 
@@ -2379,8 +2327,7 @@
         if (byId("headerUserAvatar")) byId("headerUserAvatar").innerText = firstLetter;
         if (byId("profileAvatarLarge")) byId("profileAvatarLarge").innerText = firstLetter;
 
-        // Secure check: Only bhanu.pakala03@gmail.com gets editing controls
-        if ((user.email || "").toLowerCase() === "bhanu.pakala03@gmail.com") {
+        if (user.email === "bhanu.pakala03@gmail.com") {
           document.body.classList.add("is-admin-active");
           if (byId("profileBadgeRole")) byId("profileBadgeRole").innerText = "MASTER DIRECTOR (ADMIN)";
         } else {
@@ -2418,7 +2365,6 @@
       }
     }
 
-    // Switch between Login, Register, and Phone OTP tabs
     window.switchAuthMode = function(mode) {
       const isEmail = mode === "email";
       const isRegister = mode === "register";
@@ -2457,7 +2403,7 @@
       }
     });
 
-    // 2. New User Registration (Executes on "Done" button submit)
+    // 2. New User Registration
     byId("registerAuthForm")?.addEventListener("submit", async (e) => {
       e.preventDefault();
       const email = byId("regEmailInput")?.value.trim();
@@ -2468,10 +2414,6 @@
       if (!email || !jobStudy || !pass || !confirmPass) {
         return showAuthMessage("Please fill in all 4 registration fields.");
       }
-      const strongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#])[A-Za-z\\d@$!%*?&#]{8,}$/;
-      if (!strongPassword.test(pass)) {
-        return showAuthMessage("Password must be at least 8 characters and include uppercase, lowercase, number, and special character (@$!%*?&#).");
-      }
       if (pass !== confirmPass) {
         return showAuthMessage("Passwords do not match!");
       }
@@ -2481,29 +2423,19 @@
 
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-        // Save one profile per Firebase UID. Authentication can succeed even if
-        // Firestore rules/network prevent this optional profile write.
-        try {
-          await setDoc(doc(db, "registered_users", userCredential.user.uid), {
-            uid: userCredential.user.uid,
-            email: email,
-            occupation: jobStudy,
-            createdAt: new Date().toISOString()
-          });
-        } catch (profileError) {
-          console.warn("Account created, but profile details could not be saved:", profileError);
-          showAuthMessage("Your account was created, but your profile details could not be saved. Please contact the administrator.");
-        }
+        await addDoc(collection(db, "registered_users"), {
+          uid: userCredential.user.uid,
+          email: email,
+          occupation: jobStudy,
+          createdAt: new Date().toISOString()
+        });
 
         await notifyAdminOnLogin(email, `New User Registered (${jobStudy})`);
         alert("Registration Successful! Welcome to Cinemotion Studio.");
       } catch (err) {
         showAuthMessage(explainFirebaseError(err, "Registration"));
       } finally {
-        if (doneBtn) {
-          doneBtn.textContent = "Done";
-          window.checkRegisterPasswordRules();
-        }
+        if (doneBtn) { doneBtn.disabled = false; doneBtn.textContent = "Done"; }
       }
     });
 
@@ -2574,7 +2506,7 @@
       catch (err) { showAuthMessage(explainFirebaseError(err, "Sign out")); }
     };
 
-    // FIRESTORE PERMANENT DELETE FUNCTION (Fixes video reappearing on refresh)
+    // FIRESTORE PERMANENT DELETE FUNCTION
     window.deleteMediaFromFirestore = async function(cardId) {
       try {
         const q = query(collection(db, "movements"), where("linkedCardId", "==", cardId));
@@ -2584,13 +2516,12 @@
           delPromises.push(deleteDoc(doc(db, "movements", docSnap.id)));
         });
         await Promise.all(delPromises);
-        console.log("Deleted Firestore records for cardId:", cardId);
       } catch (err) {
         console.error("Firestore permanent delete error:", err);
       }
     };
 
-    // FIRESTORE SAVE FUNCTION (Clears old links first to prevent duplicates)
+    // FIRESTORE SAVE FUNCTION
     window.saveMediaLinkToFirestore = async function(cardId, url, mediaType) {
       const toast = byId("toast");
       if (toast) { toast.textContent = "Saving link to cloud..."; toast.classList.add("show"); }
@@ -2671,10 +2602,8 @@
           }
         });
         if (customMovements.length) {
-          const customIds = new Set(customMovements.map(item => item.id));
-          const builtInAndOtherItems = window.allVaultItems.filter(item => !customIds.has(item.id));
-          window.allVaultItems = [...customMovements, ...builtInAndOtherItems];
-          window.renderCards?.(window.allVaultItems);
+          window.allVaultItems = [...customMovements, ...window.allVaultItems];
+          renderCards(window.allVaultItems);
         }
       } catch (err) {
         console.error("Firestore load error:", err);
