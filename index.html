@@ -39,7 +39,77 @@
       display: none !important;
     }
 
-    /* HEADER - PERFECTLY ALIGNED WITH CARDS */
+    /* TAB SWITCH WELCOME BACK OVERLAY STYLES */
+    #welcomeBackOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.94);
+      backdrop-filter: blur(25px);
+      z-index: 99999999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #welcomeBackOverlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .welcome-video-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.45;
+      filter: saturate(1.3) brightness(0.85);
+    }
+
+    .welcome-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0 1.5rem;
+    }
+
+    .welcome-glitch-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 3.4rem;
+      font-weight: 800;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #ffffff 20%, #00d2ff 85%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 45px rgba(0, 210, 255, 0.85);
+      animation: welcomePop 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .welcome-subtext {
+      font-size: 1.15rem;
+      color: var(--accent-cyan);
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      opacity: 0.9;
+    }
+
+    @keyframes welcomePop {
+      0% { transform: scale(0.65) translateY(25px); opacity: 0; filter: blur(12px); }
+      50% { transform: scale(1.06) translateY(-5px); opacity: 1; filter: blur(0); }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+
+    /* HEADER - PERFECTLY ALIGNED */
     header {
       background: rgba(4, 7, 17, 0.95);
       border-bottom: 1px solid var(--border-color);
@@ -265,7 +335,7 @@
       margin-left: auto; background: var(--accent-cyan); color: #000; font-size: 0.72rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 999px;
     }
 
-    /* VAULT LAYOUT CONTAINER - MATCHES HEADER WIDTH EXACTLY */
+    /* VAULT LAYOUT CONTAINER */
     .vault-container { 
       max-width: 1720px; 
       width: 96%;
@@ -321,7 +391,11 @@
       transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
-    /* CATEGORIES BAR - FLUSH LEFT & RIGHT */
+    .hero-banner-wrapper:hover .hero-foreground-video {
+      transform: scale(1.02);
+    }
+
+    /* CATEGORIES BAR */
     .categories-bar-wrapper {
       position: relative;
       margin-bottom: 2.2rem;
@@ -385,10 +459,11 @@
       animation: iconFloatContinuous 3s ease-in-out infinite alternate; 
       transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
+    .cat-tab:hover .cat-3d-img, .cat-tab.active .cat-3d-img { transform: scale(1.22) rotate(-4deg); filter: drop-shadow(0 0 12px rgba(0, 210, 255, 0.7)); }
 
     @keyframes iconFloatContinuous { 0% { transform: translateY(0px) rotate(0deg); } 100% { transform: translateY(-4px) rotate(3deg); } }
 
-    /* CARD GRID - PRECISE 5-COLUMN DISTRIBUTION MATCHING SCREEN BOUNDARIES */
+    /* CARD GRID */
     .movements-grid { 
       display: grid; 
       grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); 
@@ -720,6 +795,15 @@
   </style>
 </head>
 <body>
+
+  <!-- TAB SWITCH WELCOME BACK OVERLAY (WITH welcome-back.mp4) -->
+  <div id="welcomeBackOverlay">
+    <video id="welcomeVideo" class="welcome-video-bg" muted playsinline loop preload="auto" src="welcome-back.mp4"></video>
+    <div class="welcome-content">
+      <div class="welcome-glitch-text">WELCOME BACK</div>
+      <div class="welcome-subtext">MASTER DIRECTORS VAULT</div>
+    </div>
+  </div>
 
   <!-- AUTHENTICATION GATE (LOGIN / REGISTER WITH 4 FIELDS & RULES / MOBILE OTP) -->
   <div id="authGateModal" class="auth-gate-modal" style="display: none;">
@@ -1218,7 +1302,7 @@
       { id: "atm_41", name: "Desert Sand Dunes", category: "Atmosphere", prompt: "Desert Sand Dunes, sweeping wind-sculpted golden ridges under late afternoon warm light" },
       { id: "atm_42", name: "Volcanic Lava Glow", category: "Atmosphere", prompt: "Volcanic Lava Glow, molten red-orange lava streams cutting across dark basalt rocks at night" },
       { id: "atm_43", name: "Mirror Reflection Lake", category: "Atmosphere", prompt: "Mirror Reflection Lake, crystal calm glass water mirroring majestic alpine mountains" },
-      { id: "atm_44", name: "Abstract Bokeh Lights", category: "Atmosphere", prompt: "Abstract Bokeh Lights, out-of-focus soft circular orbs of shimmering colorful light" },
+      { id: "atm_44", name: "Abstract Bokeh Lights", category: "Atmosphere", prompt: "Abstract Bokeh Lights, out-of-focus soft circular or bulbs of shimmering colorful light" },
       { id: "atm_45", name: "Creative Smoke Bomb", category: "Atmosphere", prompt: "Creative Smoke Bomb, swirling vibrant colorful cloud plumes billowing through urban scene" },
       { id: "atm_46", name: "Double Exposure Art", category: "Atmosphere", prompt: "Double Exposure Art, silhouette portrait seamlessly blended with pine forest landscape" },
       { id: "atm_47", name: "Levitating Objects", category: "Atmosphere", prompt: "Levitating Objects, magical items floating weightlessly in mid-air defying gravity" },
@@ -1661,7 +1745,6 @@
         tx.objectStore("cardMedia").put({ id: id, fileBlob: file, fileType: type, fileName: file.name });
       }
 
-      // Convert small image directly to Base64 to sync with Firebase
       if (file.type.startsWith('image') && file.size < 850000) {
         const reader = new FileReader();
         reader.onload = function(e) {
@@ -2171,6 +2254,31 @@
       }
     };
 
+    // TAB SWITCH "WELCOME BACK" TRIGGER LOGIC
+    let welcomeTimeout;
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        const overlay = document.getElementById("welcomeBackOverlay");
+        const video = document.getElementById("welcomeVideo");
+
+        if (overlay) {
+          clearTimeout(welcomeTimeout);
+          overlay.classList.add("show");
+
+          if (video) {
+            video.currentTime = 0;
+            video.play().catch(() => {});
+          }
+
+          // Shows for 2.6 seconds and smoothly fades out
+          welcomeTimeout = setTimeout(() => {
+            overlay.classList.remove("show");
+            if (video) video.pause();
+          }, 2600);
+        }
+      }
+    });
+
     renderCards(window.allVaultItems);
   </script>
 
@@ -2473,14 +2581,12 @@
       const toast = byId("toast");
       if (toast) { toast.textContent = "Saving link to cloud..."; toast.classList.add("show"); }
       try {
-        // Clear any previous entry for this card first
         const q = query(collection(db, "movements"), where("linkedCardId", "==", cardId));
         const snap = await getDocs(q);
         const delPromises = [];
         snap.forEach((d) => delPromises.push(deleteDoc(doc(db, "movements", d.id))));
         await Promise.all(delPromises);
 
-        // Save fresh media record
         await addDoc(collection(db, "movements"), {
           linkedCardId: cardId,
           mediaURL: url,
