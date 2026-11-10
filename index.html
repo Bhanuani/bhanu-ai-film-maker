@@ -548,13 +548,13 @@
     .prompt-box::-webkit-scrollbar { width: 4px; }
     .prompt-box::-webkit-scrollbar-thumb { background: rgba(0, 210, 255, 0.5); border-radius: 999px; }
 
-    /* COPIED VIDEO OVERLAY - SEAMLESS SCREEN BLEND IN RED-CIRCLED AREA */
+    /* COPIED VIDEO OVERLAY - FULLY EXPANDED TO FILL CIRCLED AREA WITHOUT BLACK GAPS */
     .copied-video-player {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
-      object-fit: contain;
+      object-fit: fill; /* Fills entire container edge-to-edge eliminating empty black side regions */
       mix-blend-mode: screen;
       pointer-events: none;
       opacity: 0;
@@ -1451,7 +1451,7 @@
                   </button>
                 </div>
                 
-                <!-- Screen Blended Copied Video Player inside the red-circled area -->
+                <!-- Screen Blended Copied Video Player inside the red-circled area (Now Edge-to-Edge Fill) -->
                 <video id="copied_video_${item.id}" class="copied-video-player" muted playsinline preload="auto"></video>
               </div>
             </div>
@@ -1500,12 +1500,17 @@
 
     window.openLinkModal = function(id, event) {
       if (event) event.stopPropagation();
+      if (!linkModal || !linkCardId || !mediaUrlInput) {
+        console.error("Link modal is missing required HTML elements.");
+        showToast("Unable to open the media-link form.");
+        return;
+      }
       linkCardId.value = id;
-      mediaUrlInput.value = '';
+      mediaUrlInput.value = "";
       linkModal.style.display = "flex";
     };
 
-    if (closeLinkModalBtn) {
+    if (closeLinkModalBtn && linkModal) {
       closeLinkModalBtn.onclick = () => { linkModal.style.display = "none"; };
     }
 
@@ -1679,7 +1684,9 @@
         tx.objectStore("cardMedia").put({ id: id, fileBlob: file, fileType: type, fileName: file.name });
       }
 
-      if (file.type.startsWith('image') && file.size < 850000) {
+      // Base64 adds roughly 33% overhead; keep the original image comfortably below
+      // Firestore's 1 MiB document limit. Larger files remain available locally.
+      if (file.type.startsWith('image') && file.size <= 700000) {
         const reader = new FileReader();
         reader.onload = function(e) {
           const base64Data = e.target.result;
@@ -1689,13 +1696,21 @@
         };
         reader.readAsDataURL(file);
       } else {
-        showToast("Media Attached Locally!");
+        showToast(
+          file.type.startsWith('image')
+            ? "Image attached locally. It is too large for direct Firestore storage."
+            : "Video attached locally. Cloud video storage requires Firebase Storage."
+        );
       }
     }
 
     window.cardActiveBlobs = {};
 
     function applyMediaToCard(id, blobOrFile, type) {
+      const previous = window.cardActiveBlobs[id];
+      if (previous?.url && previous.url.startsWith("blob:")) {
+        URL.revokeObjectURL(previous.url);
+      }
       const url = URL.createObjectURL(blobOrFile);
       window.cardActiveBlobs[id] = { url: url, type: type, raw: blobOrFile };
 
@@ -1817,6 +1832,9 @@
       }
 
       if (confirm("Are you sure you want to permanently delete this media?")) {
+        if (media.url && media.url.startsWith("blob:")) {
+          URL.revokeObjectURL(media.url);
+        }
         delete window.cardActiveBlobs[id];
 
         if (localDB) {
@@ -2019,10 +2037,9 @@
         if (itemId) {
           playCopiedVideoAnimation(itemId);
         }
-        showToast("Prompt copied to clipboard!");
+        // "Prompt copied to clipboard!" toast message removed as requested
       } catch (err) {
         console.error("Clipboard copy failed:", err);
-        showToast("Copy failed. Allow clipboard access or use HTTPS.");
       }
     }
 
@@ -2621,8 +2638,12 @@
           }
         });
         if (customMovements.length) {
-          window.allVaultItems = [...customMovements, ...window.allVaultItems];
-          renderCards(window.allVaultItems);
+          const existingIds = new Set(window.allVaultItems.map((item) => item.id));
+          const newMovements = customMovements.filter((item) => !existingIds.has(item.id));
+          if (newMovements.length) {
+            window.allVaultItems = [...newMovements, ...window.allVaultItems];
+            renderCards(window.allVaultItems);
+          }
         }
       } catch (err) {
         console.error("Firestore load error:", err);
