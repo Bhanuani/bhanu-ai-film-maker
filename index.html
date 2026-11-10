@@ -503,7 +503,7 @@
 
     .card-details h3 { font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; }
 
-    /* IN-PLACE 3D PROMPT WRAPPER */
+    /* IN-PLACE PROMPT WRAPPER WITH SEAMLESS SCREEN-BLENDED VIDEO */
     .prompt-wrapper {
       position: relative;
       background: rgba(0, 0, 0, 0.4);
@@ -513,7 +513,6 @@
       overflow: hidden;
       display: flex;
       align-items: center;
-      perspective: 900px;
       transition: border-color 0.4s ease, box-shadow 0.4s ease;
     }
 
@@ -525,15 +524,11 @@
     .prompt-content {
       width: 100%;
       padding: 0.85rem 2.4rem 0.85rem 0.85rem;
-      transform-style: preserve-3d;
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease, filter 0.35s ease;
-      transform-origin: center center -50px;
+      transition: opacity 0.3s ease;
     }
 
     .prompt-wrapper.copied-active .prompt-content {
-      transform: perspective(700px) rotateX(75deg) scale(0.65) translateY(-10px);
       opacity: 0;
-      filter: blur(8px);
       pointer-events: none;
     }
 
@@ -553,51 +548,22 @@
     .prompt-box::-webkit-scrollbar { width: 4px; }
     .prompt-box::-webkit-scrollbar-thumb { background: rgba(0, 210, 255, 0.5); border-radius: 999px; }
 
-    .copied-cinematic-badge {
+    /* COPIED VIDEO OVERLAY - SEAMLESS SCREEN BLEND IN RED-CIRCLED AREA */
+    .copied-video-player {
       position: absolute;
       inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      background: radial-gradient(circle at center, rgba(0, 210, 255, 0.16) 0%, rgba(4, 7, 17, 0.94) 85%);
-      backdrop-filter: blur(10px);
-      color: #ffffff;
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 800;
-      letter-spacing: 2px;
-      opacity: 0;
-      transform: perspective(600px) rotateX(-45deg) scale(0.5);
-      pointer-events: none;
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      z-index: 10;
-    }
-
-    .prompt-wrapper.copied-active .copied-cinematic-badge {
-      opacity: 1;
-      transform: perspective(600px) rotateX(0deg) scale(1);
-    }
-
-    .copied-cat-3d-img {
-      width: 48px;
-      height: 48px;
+      width: 100%;
+      height: 100%;
       object-fit: contain;
-      filter: drop-shadow(0 0 15px rgba(0, 210, 255, 0.9));
-      animation: inPlaceIconOrbit 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      mix-blend-mode: screen;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 10;
+      transition: opacity 0.25s ease;
     }
 
-    @keyframes inPlaceIconOrbit {
-      0% { transform: scale(0.3) rotate(-30deg); opacity: 0; filter: drop-shadow(0 0 5px rgba(0,210,255,0.4)); }
-      50% { transform: scale(1.22) rotate(10deg); opacity: 1; filter: drop-shadow(0 0 25px rgba(0,210,255,1)); }
-      100% { transform: scale(1.05) rotate(0deg); opacity: 1; filter: drop-shadow(0 0 18px rgba(0,210,255,0.85)); }
-    }
-
-    .copied-cinematic-badge span {
-      font-size: 1.05rem;
-      background: linear-gradient(135deg, #ffffff 30%, #00d2ff 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 20px rgba(0, 210, 255, 0.7);
+    .prompt-wrapper.copied-active .copied-video-player {
+      opacity: 1;
     }
 
     .prompt-edit-btn {
@@ -1426,8 +1392,6 @@
     function renderCards(list) {
       if (!grid) return;
       grid.innerHTML = list.map(item => {
-        const iconSrc = categoryIconMap[item.category] || 'Camera-Movement.png';
-
         return `
         <div class="movement-card" id="card_${item.id}">
           <div class="card-video-box ${item.mediaURL ? 'has-media' : ''}" id="box_${item.id}" 
@@ -1487,10 +1451,8 @@
                   </button>
                 </div>
                 
-                <div class="copied-cinematic-badge" id="copied_badge_${item.id}">
-                  <img src="${iconSrc}" class="copied-cat-3d-img" alt="${item.category}" onerror="this.src='Camera-Movement.png'">
-                  <span>COPIED!</span>
-                </div>
+                <!-- Screen Blended Copied Video Player inside the red-circled area -->
+                <video id="copied_video_${item.id}" class="copied-video-player" muted playsinline preload="auto"></video>
               </div>
             </div>
             
@@ -2005,6 +1967,49 @@
       }
     }
 
+    // MULTI-TAP COPIED VIDEO TRACKER
+    const cardCopyClickCounters = {};
+    const cardCopyResetTimers = {};
+    const cardHideAnimationTimers = {};
+
+    function playCopiedVideoAnimation(itemId) {
+      if (!itemId) return;
+      const wrap = document.getElementById(`prompt_wrap_${itemId}`);
+      const vid = document.getElementById(`copied_video_${itemId}`);
+      if (!wrap || !vid) return;
+
+      // Increment click count for this specific card
+      cardCopyClickCounters[itemId] = (cardCopyClickCounters[itemId] || 0) + 1;
+      const currentClicks = cardCopyClickCounters[itemId];
+
+      // Reset the click count back to 0 after 3 seconds of inactivity
+      clearTimeout(cardCopyResetTimers[itemId]);
+      cardCopyResetTimers[itemId] = setTimeout(() => {
+        cardCopyClickCounters[itemId] = 0;
+      }, 3000);
+
+      // 1 time click -> Copied-1.mp4 | 2 or more times -> Copied-2.mp4
+      const selectedVideo = currentClicks === 1 ? 'Copied-1.mp4' : 'Copied-2.mp4';
+
+      if (!vid.src.endsWith(selectedVideo)) {
+        vid.src = selectedVideo;
+      }
+      vid.currentTime = 0;
+
+      wrap.classList.add('copied-active');
+      vid.play().catch(() => {});
+
+      clearTimeout(cardHideAnimationTimers[itemId]);
+      vid.onended = () => {
+        wrap.classList.remove('copied-active');
+      };
+
+      // Safeguard timeout to remove overlay after video finishes
+      cardHideAnimationTimers[itemId] = setTimeout(() => {
+        wrap.classList.remove('copied-active');
+      }, 2200);
+    }
+
     async function copyPromptText(text, itemId) {
       try {
         if (!navigator.clipboard || !navigator.clipboard.writeText) {
@@ -2012,11 +2017,7 @@
         }
         await navigator.clipboard.writeText(String(text ?? ""));
         if (itemId) {
-          const wrap = document.getElementById(`prompt_wrap_${itemId}`);
-          if (wrap) {
-            wrap.classList.add('copied-active');
-            setTimeout(() => wrap.classList.remove('copied-active'), 1300);
-          }
+          playCopiedVideoAnimation(itemId);
         }
         showToast("Prompt copied to clipboard!");
       } catch (err) {
