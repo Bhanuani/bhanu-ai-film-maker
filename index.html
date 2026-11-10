@@ -9,7 +9,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- EmailJS Library for Notifications -->
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
   <style>
@@ -81,6 +80,7 @@
       font-family: 'Space Grotesk', sans-serif;
       font-size: 1.35rem;
       font-weight: 800;
+      user-select: none;
     }
 
     .brand-logo .studio-pill {
@@ -129,7 +129,6 @@
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      position: relative;
     }
 
     .add-btn {
@@ -149,7 +148,7 @@
 
     .add-btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
-    .profile-pill {
+    .user-pill {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border-color);
       padding: 0.35rem 0.75rem;
@@ -159,11 +158,10 @@
       gap: 0.5rem;
       font-size: 0.82rem;
       font-weight: 700;
-      cursor: pointer;
       user-select: none;
     }
 
-    .profile-pill .avatar {
+    .user-pill .avatar {
       background: #00d2ff;
       color: #000;
       width: 26px;
@@ -175,61 +173,18 @@
       font-weight: 800;
     }
 
-    .profile-dropdown {
-      position: absolute;
-      top: 120%;
-      right: 0;
-      background: #0b1120;
-      border: 1px solid rgba(0, 210, 255, 0.3);
-      border-radius: 14px;
-      width: 280px;
-      padding: 16px;
-      box-shadow: 0 12px 35px rgba(0,0,0,0.8);
-      display: none;
-      flex-direction: column;
-      gap: 12px;
-      z-index: 1000;
-      backdrop-filter: blur(12px);
-    }
-
-    .profile-dropdown.show { display: flex; }
-
-    .profile-dropdown-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 12px;
-    }
-
-    .profile-avatar-large {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: var(--accent-cyan);
-      color: #000;
-      font-weight: 800;
-      display: grid;
-      place-items: center;
-      font-size: 1.1rem;
-    }
-
-    .profile-info h4 { font-size: 0.95rem; color: #fff; margin-bottom: 2px; }
-    .profile-info p { font-size: 0.76rem; color: var(--accent-cyan); word-break: break-all; }
-
-    .logout-btn-dropdown {
+    .logout-btn-header {
       background: rgba(239, 68, 68, 0.15);
       border: 1px solid rgba(239, 68, 68, 0.4);
       color: #ef4444;
-      padding: 0.45rem;
+      padding: 0.4rem 0.8rem;
       border-radius: 8px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
       cursor: pointer;
-      text-align: center;
       transition: all 0.2s;
     }
-    .logout-btn-dropdown:hover { background: #ef4444; color: #fff; }
+    .logout-btn-header:hover { background: #ef4444; color: #fff; }
 
     /* SIDEBAR */
     .sidebar-overlay {
@@ -317,10 +272,6 @@
       transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
-    .hero-banner-wrapper:hover .hero-foreground-video {
-      transform: scale(1.02);
-    }
-
     /* CATEGORIES BAR */
     .categories-bar-wrapper {
       position: relative;
@@ -341,7 +292,6 @@
     }
 
     .categories-bar::-webkit-scrollbar { height: 6px; }
-    .categories-bar::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.04); border-radius: 999px; }
     .categories-bar::-webkit-scrollbar-thumb { background: linear-gradient(90deg, #00d2ff 0%, #0088cc 100%); border-radius: 999px; }
 
     .cat-tab {
@@ -385,7 +335,6 @@
       animation: iconFloatContinuous 3s ease-in-out infinite alternate; 
       transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .cat-tab:hover .cat-3d-img, .cat-tab.active .cat-3d-img { transform: scale(1.22) rotate(-4deg); filter: drop-shadow(0 0 12px rgba(0, 210, 255, 0.7)); }
 
     @keyframes iconFloatContinuous { 0% { transform: translateY(0px) rotate(0deg); } 100% { transform: translateY(-4px) rotate(3deg); } }
 
@@ -401,22 +350,16 @@
     .card-video-box {
       width: 100%; aspect-ratio: 16 / 9; background: #000; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; border-bottom: 1px solid var(--border-color); cursor: pointer;
     }
-    .card-video-box video, .card-video-box img, .card-video-box iframe { width: 100%; height: 100%; object-fit: cover; display: none; transition: transform 0.3s ease; border: none; }
+    .card-video-box video, .card-video-box img, .card-video-box iframe { width: 100%; height: 100%; object-fit: cover; display: none; border: none; }
     .card-video-box video.active-media, .card-video-box img.active-media, .card-video-box iframe.active-media { display: block; }
-    .card-video-box:hover video.active-media, .card-video-box:hover img.active-media { transform: scale(1.04); }
 
-    /* MEDIA UPLOAD + SOCIAL MEDIA LINK OPTION */
     .upload-overlay {
       position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 0.6rem; background: rgba(8, 12, 22, 0.78); border: 2px dashed rgba(0, 210, 255, 0.3); border-radius: 10px; margin: 8px; transition: all 0.25s ease;
+      gap: 0.6rem; background: rgba(8, 12, 22, 0.78); border: 2px dashed rgba(0, 210, 255, 0.3); border-radius: 10px; margin: 8px;
     }
     .card-video-box.has-media .upload-overlay { display: none !important; }
-    .card-video-box.drag-over .upload-overlay { display: flex !important; background: rgba(0, 210, 255, 0.18); border-color: var(--accent-cyan); }
-    .upload-overlay i.cloud-icon { font-size: 1.8rem; color: var(--accent-cyan); }
-    .upload-overlay span.upload-txt { font-size: 0.82rem; color: #cbd5e1; font-weight: 600; text-align: center; padding: 0 10px; }
 
     .link-upload-pill {
-      margin-top: 2px;
       background: rgba(0, 210, 255, 0.1);
       border: 1px solid rgba(0, 210, 255, 0.4);
       color: var(--accent-cyan);
@@ -424,34 +367,16 @@
       border-radius: 999px;
       font-size: 0.74rem;
       font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
       cursor: pointer;
-      transition: all 0.2s;
     }
-    .link-upload-pill:hover {
-      background: var(--accent-cyan);
-      color: #040711;
-      transform: translateY(-1px);
-    }
-
-    .file-input { display: none; }
 
     .card-details { padding: 1.25rem; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; gap: 1rem; }
-    .card-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.25rem; }
+    .card-meta { display: flex; align-items: center; justify-content: space-between; }
     .tag-badge { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--accent-cyan); background: rgba(0, 210, 255, 0.08); padding: 0.2rem 0.5rem; border-radius: 6px; border: 1px solid rgba(0, 210, 255, 0.2); }
 
     .card-meta-actions { display: flex; align-items: center; gap: 7px; }
-    .meta-action-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.04); color: #94a3b8; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.82rem; transition: all 0.2s ease; }
-    .meta-action-btn:hover { transform: translateY(-2px); }
-    .meta-action-btn.edit-btn:hover { border-color: #f59e0b; color: #f59e0b; background: rgba(245, 158, 11, 0.15); }
-    .meta-action-btn.dl-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(0, 210, 255, 0.15); }
-    .meta-action-btn.del-btn:hover { border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.15); }
+    .meta-action-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.04); color: #94a3b8; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
 
-    .card-details h3 { font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; }
-
-    /* IN-PLACE 3D PROMPT WRAPPER */
     .prompt-wrapper {
       position: relative;
       background: rgba(0, 0, 0, 0.4);
@@ -461,120 +386,10 @@
       overflow: hidden;
       display: flex;
       align-items: center;
-      perspective: 900px;
-      transition: border-color 0.4s ease, box-shadow 0.4s ease;
     }
 
-    .prompt-wrapper.copied-active {
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 30px rgba(0, 210, 255, 0.45);
-    }
-
-    .prompt-content {
-      width: 100%;
-      padding: 0.85rem 2.4rem 0.85rem 0.85rem;
-      transform-style: preserve-3d;
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease, filter 0.35s ease;
-      transform-origin: center center -50px;
-    }
-
-    .prompt-wrapper.copied-active .prompt-content {
-      transform: perspective(700px) rotateX(75deg) scale(0.65) translateY(-10px);
-      opacity: 0;
-      filter: blur(8px);
-      pointer-events: none;
-    }
-
-    .prompt-box {
-      font-size: 0.86rem;
-      color: #cbd5e1;
-      line-height: 1.5;
-      max-height: 140px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      word-break: break-word;
-      padding-right: 4px;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(0, 210, 255, 0.6) rgba(255, 255, 255, 0.03);
-    }
-
-    .prompt-box::-webkit-scrollbar { width: 4px; }
-    .prompt-box::-webkit-scrollbar-thumb { background: rgba(0, 210, 255, 0.5); border-radius: 999px; }
-
-    .copied-cinematic-badge {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      background: radial-gradient(circle at center, rgba(0, 210, 255, 0.16) 0%, rgba(4, 7, 17, 0.94) 85%);
-      backdrop-filter: blur(10px);
-      color: #ffffff;
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 800;
-      letter-spacing: 2px;
-      opacity: 0;
-      transform: perspective(600px) rotateX(-45deg) scale(0.5);
-      pointer-events: none;
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      z-index: 10;
-    }
-
-    .prompt-wrapper.copied-active .copied-cinematic-badge {
-      opacity: 1;
-      transform: perspective(600px) rotateX(0deg) scale(1);
-    }
-
-    .copied-cat-3d-img {
-      width: 48px;
-      height: 48px;
-      object-fit: contain;
-      filter: drop-shadow(0 0 15px rgba(0, 210, 255, 0.9));
-      animation: inPlaceIconOrbit 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    }
-
-    @keyframes inPlaceIconOrbit {
-      0% { transform: scale(0.3) rotate(-30deg); opacity: 0; filter: drop-shadow(0 0 5px rgba(0,210,255,0.4)); }
-      50% { transform: scale(1.22) rotate(10deg); opacity: 1; filter: drop-shadow(0 0 25px rgba(0,210,255,1)); }
-      100% { transform: scale(1.05) rotate(0deg); opacity: 1; filter: drop-shadow(0 0 18px rgba(0,210,255,0.85)); }
-    }
-
-    .copied-cinematic-badge span {
-      font-size: 1.05rem;
-      background: linear-gradient(135deg, #ffffff 30%, #00d2ff 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 20px rgba(0, 210, 255, 0.7);
-    }
-
-    .prompt-edit-btn {
-      position: absolute;
-      bottom: 8px;
-      right: 8px;
-      width: 28px;
-      height: 28px;
-      border-radius: 7px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(13, 18, 31, 0.9);
-      color: #94a3b8;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 0.82rem;
-      transition: all 0.2s ease;
-      backdrop-filter: blur(6px);
-      z-index: 4;
-    }
-
-    .prompt-edit-btn:hover {
-      border-color: var(--accent-cyan);
-      color: var(--accent-cyan);
-      background: rgba(0, 210, 255, 0.15);
-      transform: scale(1.1);
-      box-shadow: 0 0 12px rgba(0, 210, 255, 0.4);
-    }
+    .prompt-content { width: 100%; padding: 0.85rem; }
+    .prompt-box { font-size: 0.86rem; color: #cbd5e1; line-height: 1.5; max-height: 140px; overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
 
     .copy-btn {
       width: 100%;
@@ -590,123 +405,7 @@
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
-      transition: all 0.2s;
     }
-    .copy-btn:hover { box-shadow: 0 0 18px rgba(0, 210, 255, 0.5); transform: translateY(-2px); }
-
-    /* LIGHTBOX POPUP */
-    #mediaLightbox { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.92); backdrop-filter: blur(16px); z-index: 1000000; display: none; align-items: center; justify-content: center; padding: 2rem; }
-    .lightbox-box { background: #090e1a; border: 1px solid rgba(0, 210, 255, 0.4); border-radius: 20px; max-width: 960px; width: 100%; overflow: hidden; display: flex; flex-direction: column; }
-    .lightbox-header { padding: 1.2rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
-    .lightbox-header h3 { font-size: 1.25rem; font-weight: 700; color: #fff; }
-    .lightbox-stage { width: 100%; height: 55vh; background: #000; display: flex; align-items: center; justify-content: center; }
-    .lightbox-stage video, .lightbox-stage img, .lightbox-stage iframe { width: 100%; height: 100%; object-fit: contain; border: none; }
-    
-    .lightbox-footer { 
-      padding: 1.2rem 1.5rem; 
-      display: flex; 
-      align-items: center; 
-      justify-content: space-between; 
-      border-top: 1px solid var(--border-color); 
-      gap: 1.5rem; 
-      flex-wrap: wrap; 
-    }
-    
-    .lightbox-prompt { font-size: 0.88rem; color: var(--text-muted); flex: 1; max-height: 100px; overflow-y: auto; white-space: pre-wrap; }
-    
-    .lightbox-actions {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .lightbox-actions .copy-btn {
-      width: auto;
-      padding: 0.75rem 1.35rem;
-      white-space: nowrap;
-    }
-
-    .lightbox-dl-btn { 
-      background: linear-gradient(135deg, #00d2ff 0%, #0099cc 100%); 
-      color: #040711; 
-      border: none; 
-      padding: 0.75rem 1.5rem; 
-      border-radius: 8px; 
-      font-weight: 800; 
-      cursor: pointer; 
-      display: inline-flex; 
-      align-items: center; 
-      gap: 0.5rem; 
-      white-space: nowrap; 
-      transition: all 0.2s; 
-    }
-    .lightbox-dl-btn:hover { box-shadow: 0 0 18px rgba(0, 210, 255, 0.6); transform: translateY(-2px); }
-
-    #toast { visibility: hidden; position: fixed; bottom: 2rem; right: 2rem; background: #00d2ff; color: #040711; padding: 0.75rem 1.4rem; border-radius: 999px; font-weight: 700; z-index: 100000; opacity: 0; transition: opacity 0.3s, transform 0.3s; transform: translateY(20px); }
-    #toast.show { visibility: visible; opacity: 1; transform: translateY(0); }
-
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.82); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 99999; }
-    .modal-box { background: #0d121f; border: 1px solid rgba(0, 210, 255, 0.3); border-radius: 16px; width: 92%; max-width: 620px; padding: 24px; color: #fff; max-height: 90vh; overflow-y: auto; }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
-    .close-btn { background: none; border: none; color: #94a3b8; font-size: 26px; cursor: pointer; }
-    .form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
-    .form-group label { font-size: 13px; color: #94a3b8; font-weight: 600; }
-    .form-group input, .form-group select, .form-group textarea { background: #161e2e; border: 1px solid #334155; color: #f8fafc; padding: 10px 14px; border-radius: 8px; font-size: 14px; outline: none; line-height: 1.5; font-family: inherit; }
-    .submit-btn { width: 100%; padding: 12px; background: var(--accent-cyan); border: none; border-radius: 8px; color: #040711; font-weight: 700; cursor: pointer; }
-
-    .themes-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
-    .theme-chip { background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: 10px; color: #cbd5e1; display: flex; justify-content: space-between; cursor: pointer; }
-   <div class="prompt-wrapper" id="prompt_wrap_${item.id}">
-                <div class="prompt-content" id="content_${item.id}">
-                  <p class="prompt-box" id="text_${item.id}">${item.prompt}</p>
-                  <button type="button" class="prompt-edit-btn" title="Edit Prompt Text" onclick="openEditPromptModal('${item.id}', event)">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                  </button>
-                </div>
-                
-                <div class="copied-cinematic-badge" id="copied_badge_${item.id}">
-                  <img src="${iconSrc}" class="copied-cat-3d-img" alt="${item.category}" onerror="this.src='Camera-Movement.png'">
-                  <span>COPIED!</span>
-                </div>
-              </div>
-            </div>
-            
-            <button class="copy-btn" onclick="copyCardPrompt('${item.id}')">
-              <i class="fa-solid fa-copy"></i> Copy Prompt
-            </button>
-    .angle-fast-cam { position: absolute; width: 280px; animation: cornerHop 2s steps(1) forwards; }
-    .angle-fast-cam img { width: 100%; filter: drop-shadow(0 0 35px rgba(0, 210, 255, 0.7)); }
-    @keyframes cornerHop { 0% { top: 12%; left: 10%; } 25% { top: 12%; right: 10%; left: auto; } 50% { bottom: 15%; right: 10%; top: auto; } 75% { bottom: 15%; left: 10%; top: auto; } 100% { top: 50%; left: 50%; transform: translate(-50%, -50%) scale(1.3); } }
-
-    .clapper-real-rig { display: flex; flex-direction: column; align-items: center; animation: clapHit 2s ease-out forwards; }
-    .clapper-real-rig img { width: 360px; filter: drop-shadow(0 20px 50px rgba(0, 210, 255, 0.6)); }
-    @keyframes clapHit { 0% { transform: scale(0.3); opacity: 0; } 35% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.2); opacity: 0; } }
-
-    .light-real-rig { display: flex; flex-direction: column; align-items: center; animation: studioFlash 2s ease forwards; }
-    .light-real-rig img { width: 380px; filter: drop-shadow(0 0 65px rgba(251, 191, 36, 0.85)); }
-    .light-glare { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(251, 191, 36, 0.6) 0%, transparent 80%); mix-blend-mode: screen; }
-    @keyframes studioFlash { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
-
-    .season-sky-lapse { position: absolute; inset: 0; animation: seasonLapseCycle 2s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-    @keyframes seasonLapseCycle { 0% { background: linear-gradient(180deg, #ec4899 0%, #10b981 100%); } 50% { background: linear-gradient(180deg, #f59e0b 0%, #0284c7 100%); } 100% { background: linear-gradient(180deg, #1e293b 0%, #94a3b8 100%); } }
-    .season-particles { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; gap: 30px; }
-
-    .smoke-rig-real { position: absolute; bottom: 15%; display: flex; align-items: center; animation: mistDrift 2s ease forwards; }
-    .smoke-rig-real img { width: 440px; }
-    @keyframes mistDrift { 0% { transform: translateX(-80px); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateX(60px); opacity: 0; } }
-
-    .lens-real-rig { display: flex; flex-direction: column; align-items: center; animation: lensRealZoom 2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    .lens-real-rig img { width: 420px; filter: drop-shadow(0 0 60px rgba(0, 210, 255, 0.9)); }
-    @keyframes lensRealZoom { 0% { transform: scale(0.3); opacity: 0; } 50% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(3.0); opacity: 0; } }
-
-    .master-writing-rig { position: relative; display: flex; align-items: center; justify-content: center; width: 480px; height: 320px; animation: masterRigPop 2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    .master-logo-canvas { width: 280px; filter: drop-shadow(0 0 40px rgba(0, 210, 255, 0.8)); }
-    .neon-quill-pen { position: absolute; top: 15%; left: 15%; font-size: 3.5rem; color: #00d2ff; filter: drop-shadow(0 0 25px #00d2ff); animation: penWritingMotion 2s ease-in-out forwards; }
-    @keyframes penWritingMotion { 0% { transform: translate(0, 0) scale(0.6); opacity: 0; } 50% { transform: translate(120px, 15px); opacity: 1; } 100% { transform: translate(320px, 0px) scale(1.4); opacity: 0; } }
-    @keyframes masterRigPop { 0% { transform: scale(0.4); opacity: 0; } 50% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.35); opacity: 0; } }
-
-    .stage-title { position: absolute; bottom: 12%; font-size: 1.5rem; font-family: 'Space Grotesk', sans-serif; font-weight: 800; color: #fff; text-transform: uppercase; background: rgba(4, 7, 17, 0.75); padding: 0.6rem 2rem; border-radius: 999px; border: 1px solid var(--accent-cyan); z-index: 20; }
 
     /* AUTHENTICATION GATE & FORGOT PASSWORD MODALS */
     .auth-gate-modal { position: fixed; inset: 0; background: rgba(3, 7, 18, 0.96); backdrop-filter: blur(25px); z-index: 1000000; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
@@ -714,13 +413,28 @@
     .auth-tabs { display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; }
     .auth-tab-btn { flex: 1; padding: 0.75rem; background: none; border: none; color: #94a3b8; font-weight: 700; cursor: pointer; border-bottom: 2px solid transparent; font-size: 0.9rem; }
     .auth-tab-btn.active { color: var(--accent-cyan); border-bottom-color: var(--accent-cyan); }
+    
+    .form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: 13px; color: #94a3b8; font-weight: 600; }
+    .form-group input { background: #161e2e; border: 1px solid #334155; color: #f8fafc; padding: 12px 14px; border-radius: 8px; font-size: 14px; outline: none; }
+    .submit-btn { width: 100%; padding: 12px; background: var(--accent-cyan); border: none; border-radius: 8px; color: #040711; font-weight: 700; cursor: pointer; font-size: 0.95rem; }
     .forgot-pass-link { font-size: 12px; color: var(--accent-cyan); text-align: right; cursor: pointer; margin-top: -8px; margin-bottom: 14px; display: block; text-decoration: none; }
     .forgot-pass-link:hover { text-decoration: underline; }
+
+    #toast { visibility: hidden; position: fixed; bottom: 2rem; right: 2rem; background: #00d2ff; color: #040711; padding: 0.75rem 1.4rem; border-radius: 999px; font-weight: 700; z-index: 1000000; opacity: 0; transition: opacity 0.3s; }
+    #toast.show { visibility: visible; opacity: 1; }
+
+    /* Lightbox */
+    #mediaLightbox { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.92); backdrop-filter: blur(16px); z-index: 100000; display: none; align-items: center; justify-content: center; padding: 2rem; }
+    .lightbox-box { background: #090e1a; border: 1px solid rgba(0, 210, 255, 0.4); border-radius: 20px; max-width: 960px; width: 100%; overflow: hidden; }
+    .lightbox-stage { width: 100%; height: 55vh; background: #000; display: flex; align-items: center; justify-content: center; }
+    .lightbox-stage video, .lightbox-stage iframe { width: 100%; height: 100%; border: none; }
+    .lightbox-footer { padding: 1.2rem 1.5rem; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-color); gap: 1.5rem; }
   </style>
 </head>
 <body>
 
-  <!-- AUTHENTICATION GATE (LOGIN / REGISTER / MOBILE OTP) -->
+  <!-- PORTAL AUTHENTICATION GATE (LOGIN / REGISTER / PHONE OTP) -->
   <div id="authGateModal" class="auth-gate-modal" style="display: none;">
     <div class="auth-card">
       <div style="text-align: center; margin-bottom: 1.5rem;">
@@ -733,7 +447,7 @@
         <button type="button" class="auth-tab-btn" id="tabPhoneBtn" onclick="switchAuthMode('phone')">Mobile (OTP)</button>
       </div>
 
-      <!-- EMAIL LOGIN & REGISTER -->
+      <!-- EMAIL LOGIN & REGISTRATION -->
       <form id="emailAuthForm">
         <div class="form-group">
           <label>Email Address</label>
@@ -747,7 +461,7 @@
         <button type="submit" class="submit-btn" id="emailSubmitBtn">Login / Register</button>
       </form>
 
-      <!-- MOBILE PHONE OTP FORM -->
+      <!-- MOBILE OTP FORM -->
       <form id="phoneAuthForm" style="display: none;">
         <div class="form-group">
           <label>Mobile Number (with Country Code)</label>
@@ -782,49 +496,9 @@
     </div>
   </div>
 
-  <div id="cinematicStage">
-    <div class="stage-backdrop"></div>
-    <div class="cinematic-scene" id="cinematicScene"></div>
-    <div class="stage-title" id="stageTitle">Cinematic View</div>
-  </div>
-
-  <div class="sidebar-overlay" id="sidebarOverlay"></div>
-  <aside class="sidebar-drawer" id="sidebarDrawer">
-    <div class="sidebar-header">
-      <div class="brand-logo" style="font-size: 1.15rem;">
-        <span>CINEMOTION</span>
-        <span class="studio-pill">STUDIO</span>
-      </div>
-      <button class="close-btn" id="closeSidebarBtn">&times;</button>
-    </div>
-    <div class="sidebar-menu">
-      <button class="sidebar-item" id="openThemesBtn">
-        <i class="fa-solid fa-palette"></i>
-        <span>10 Classic Themes</span>
-        <span class="sidebar-badge">10</span>
-      </button>
-
-      <button class="sidebar-item" onclick="triggerCinematicCategory('Camera Movement'); closeSidebar();">
-        <i class="fa-solid fa-film"></i>
-        <span>Directors Vault</span>
-      </button>
-
-      <button class="sidebar-item" onclick="openPromptLibrary(); closeSidebar();">
-        <i class="fa-solid fa-wand-magic-sparkles"></i>
-        <span>Visual Prompts Library</span>
-      </button>
-
-      <button class="sidebar-item" onclick="alert('Studio Settings: Resolution 4K, 24fps Standard Enabled.'); closeSidebar();">
-        <i class="fa-solid fa-sliders"></i>
-        <span>Studio Settings</span>
-      </button>
-    </div>
-  </aside>
-
   <header>
     <div class="header-inner">
       <div class="brand-group">
-        <button class="menu-btn" id="sidebarToggleBtn"><i class="fa-solid fa-bars"></i></button>
         <div class="brand-logo">
           <span>CINEMOTION</span>
           <span class="studio-pill">STUDIO</span>
@@ -837,32 +511,19 @@
       </div>
 
       <div class="header-actions">
-        <!-- Admin-Only Button: Regular users cannot see this -->
-        <button class="add-btn admin-only" id="addMovementBtn">
+        <!-- Admin-Only Button -->
+        <button class="add-btn admin-only" id="addMovementBtn" onclick="openLinkModalDirect()">
           <i class="fa-solid fa-plus"></i> Add Movement
         </button>
-        
-        <div class="profile-pill" id="profilePillBtn">
-          <div class="avatar" id="headerUserAvatar">BP</div>
-          <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; color: #94a3b8;"></i>
+
+        <div class="user-pill">
+          <div class="avatar" id="headerUserAvatar">U</div>
+          <span id="headerUserDisplay">User</span>
         </div>
 
-        <div class="profile-dropdown" id="profileDropdown">
-          <div class="profile-dropdown-header">
-            <div class="profile-avatar-large" id="profileAvatarLarge">BP</div>
-            <div class="profile-info">
-              <h4 id="profileDisplayName">BHANU PAKALA</h4>
-              <p id="profileDisplayEmail">bhanu.pakala03@gmail.com</p>
-            </div>
-          </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <span class="profile-badge" id="profileBadgeRole" style="font-size: 11px; color: var(--accent-cyan); font-weight: 700;">DIRECTOR</span>
-            <span style="font-size: 11px; color: #94a3b8;">Cinemotion AI</span>
-          </div>
-          <button type="button" class="logout-btn-dropdown" onclick="handleUserLogout()">
-            <i class="fa-solid fa-right-from-bracket"></i> Sign Out
-          </button>
-        </div>
+        <button type="button" class="logout-btn-header" onclick="handleUserLogout()">
+          <i class="fa-solid fa-right-from-bracket"></i> Log Out
+        </button>
       </div>
     </div>
   </header>
@@ -875,55 +536,41 @@
 
     <div class="categories-bar-wrapper">
       <div class="categories-bar">
-        <button class="cat-tab active" onclick="triggerCinematicCategory('All', this)">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="#00d2ff"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>
+        <button class="cat-tab active" onclick="filterCategory('All', this)">
           <span>All</span>
           <span class="count" id="count_All">136</span>
         </button>
-
-        <button class="cat-tab" onclick="triggerCinematicCategory('Camera Movement', this)">
+        <button class="cat-tab" onclick="filterCategory('Camera Movement', this)">
           <img src="Camera-Movement.png" class="cat-3d-img" alt="Camera Movement">
           <span>Camera Movement</span>
           <span class="count" id="count_Camera_Movement">44</span>
         </button>
-
-      function copyPromptText(text, itemId) {
-      navigator.clipboard.writeText(text).then(() => {
-        if (itemId) {
-          const wrap = document.getElementById(`prompt_wrap_${itemId}`);
-          if (wrap) {
-            wrap.classList.add('copied-active');
-            setTimeout(() => {
-              wrap.classList.remove('copied-active');
-            }, 1300);
-          }
-        }
-        showToast("Prompt copied to clipboard!");
-      });
-    }
-
-    window.copyCardPrompt = function(itemId) {
-      const textEl = document.getElementById(`text_${itemId}`);
-      const textToCopy = textEl ? textEl.innerText : '';
-      if (textToCopy) {
-        copyPromptText(textToCopy, itemId);
-      }
-    };
+        <button class="cat-tab" onclick="filterCategory('Camera Angles', this)">
+          <img src="Camera-Angles.png" class="cat-3d-img" alt="Camera Angles">
+          <span>Camera Angles</span>
+          <span class="count" id="count_Camera_Angles">12</span>
         </button>
-
-        <button class="cat-tab" onclick="triggerCinematicCategory('Atmosphere', this)">
+        <button class="cat-tab" onclick="filterCategory('Camera Shots', this)">
+          <img src="Camera-Shots.png" class="cat-3d-img" alt="Camera Shots">
+          <span>Camera Shots</span>
+          <span class="count" id="count_Camera_Shots">15</span>
+        </button>
+        <button class="cat-tab" onclick="filterCategory('Cinematic Lighting', this)">
+          <img src="Cinematic -lighting.png" class="cat-3d-img" alt="Cinematic Lighting">
+          <span>Cinematic Lighting</span>
+          <span class="count" id="count_Cinematic_Lighting">0</span>
+        </button>
+        <button class="cat-tab" onclick="filterCategory('Atmosphere', this)">
           <img src="Atmosphere.png" class="cat-3d-img" alt="Atmosphere">
           <span>Atmosphere</span>
           <span class="count" id="count_Atmosphere">60</span>
         </button>
-
-        <button class="cat-tab" onclick="triggerCinematicCategory('Camera Lens', this)">
+        <button class="cat-tab" onclick="filterCategory('Camera Lens', this)">
           <img src="Camera-lens.png" class="cat-3d-img" alt="Camera Lens">
           <span>Camera Lens</span>
           <span class="count" id="count_Camera_Lens">0</span>
         </button>
-
-        <button class="cat-tab" onclick="triggerCinematicCategory('Master Prompts', this)">
+        <button class="cat-tab" onclick="filterCategory('Master Prompts', this)">
           <img src="Master-prompt.png" class="cat-3d-img" alt="Master Prompts" onerror="this.src='Camera-Shots.png'">
           <span>Master Prompts</span>
           <span class="count" id="count_Master_Prompts">5</span>
@@ -937,124 +584,23 @@
   <!-- LIGHTBOX -->
   <div id="mediaLightbox">
     <div class="lightbox-box">
-      <div class="lightbox-header">
-        <h3 id="lightboxTitle"><i class="fa-solid fa-clapperboard" style="color: var(--accent-cyan);"></i> Movement Title</h3>
-        <button type="button" class="close-btn" id="closeLightboxBtn">&times;</button>
-      </div>
       <div class="lightbox-stage" id="lightboxStage"></div>
       <div class="lightbox-footer">
-        <div class="lightbox-prompt" id="lightboxPrompt">Prompt details...</div>
-        <div class="lightbox-actions">
-          <button type="button" class="copy-btn" id="lightboxCopyBtn">
-            <i class="fa-solid fa-copy"></i> Copy Prompt
-          </button>
-          <button type="button" class="lightbox-dl-btn" id="lightboxDownloadBtn">
-            <i class="fa-solid fa-download"></i> Download Media
-          </button>
+        <div class="lightbox-prompt" id="lightboxPrompt"></div>
+        <div style="display:flex; gap:10px;">
+          <button type="button" class="copy-btn" id="lightboxCopyBtn"><i class="fa-solid fa-copy"></i> Copy Prompt</button>
+          <button type="button" class="copy-btn" id="lightboxDownloadBtn"><i class="fa-solid fa-download"></i> Download Media</button>
+          <button type="button" class="copy-btn" onclick="document.getElementById('mediaLightbox').style.display='none'">&times; Close</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- EDIT PROMPT MODAL -->
-  <div id="editPromptModal" class="modal-overlay" style="display: none;">
-    <div class="modal-box">
-      <div class="modal-header">
-        <h3 style="margin: 0; font-size: 18px; color: var(--accent-cyan);"><i class="fa-solid fa-pen-to-square"></i> Edit Movement Prompt</h3>
-        <button type="button" id="closeEditPromptModalBtn" class="close-btn">&times;</button>
-      </div>
-      <form id="editPromptForm">
-        <input type="hidden" id="editPromptItemId">
-        <div class="form-group">
-          <label for="editPromptTitle">Prompt / Movement Name</label>
-          <input type="text" id="editPromptTitle" required />
-        </div>
-        <div class="form-group">
-          <label for="editPromptText">Prompt Description / AI Formula (Unlimited Lines & Text)</label>
-          <textarea id="editPromptText" rows="7" placeholder="Paste or type any size prompt with no restrictions..." required></textarea>
-        </div>
-        <button type="submit" id="saveEditPromptBtn" class="submit-btn">Update Prompt</button>
-      </form>
-    </div>
-  </div>
+  <div id="toast"><i class="fa-solid fa-circle-check"></i> <span id="toastMsg">Action Successful!</span></div>
 
-  <!-- LINK MODAL -->
-  <div id="linkModal" class="modal-overlay" style="display: none;">
-    <div class="modal-box" style="max-width: 500px;">
-      <div class="modal-header">
-        <h3 style="margin: 0; font-size: 18px; color: var(--accent-cyan);"><i class="fa-solid fa-link"></i> Add Media Link</h3>
-        <button type="button" id="closeLinkModalBtn" class="close-btn">&times;</button>
-      </div>
-      <form id="linkForm">
-        <input type="hidden" id="linkCardId">
-        <div class="form-group">
-          <label for="mediaUrlInput">Paste Link (Google Drive / YouTube / Direct MP4)</label>
-          <input type="url" id="mediaUrlInput" placeholder="https://drive.google.com/... or https://youtu.be/..." required />
-        </div>
-        <button type="submit" class="submit-btn">Save Link & Sync Everywhere</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- ADD MOVEMENT MODAL -->
-  <div id="movementModal" class="modal-overlay" style="display: none;">
-    <div class="modal-box">
-      <div class="modal-header">
-        <h3 style="margin: 0; font-size: 18px; color: var(--accent-cyan);"><i class="fa-solid fa-plus"></i> Add New Movement</h3>
-        <button type="button" id="closeModalBtn" class="close-btn">&times;</button>
-      </div>
-      <form id="movementForm">
-        <div class="form-group">
-          <label for="itemCategory">Category</label>
-          <select id="itemCategory" required>
-            <option value="Camera Movement">Camera Movement</option>
-            <option value="Camera Angles">Camera Angles</option>
-            <option value="Camera Shots">Camera Shots</option>
-            <option value="Cinematic Lighting">Cinematic Lighting</option>
-            <option value="Atmosphere">Atmosphere</option>
-            <option value="Camera Lens">Camera Lens</option>
-            <option value="Master Prompts">Master Prompts</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="itemTitle">Movement Name</label>
-          <input type="text" id="itemTitle" placeholder="e.g. Dolly Zoom, Dutch Angle" required />
-        </div>
-        <div class="form-group">
-          <label for="itemPrompt">Prompt Formula / Description (Unlimited Length)</label>
-          <textarea id="itemPrompt" rows="6" placeholder="Paste any length prompt without restriction..." required></textarea>
-        </div>
-        <div class="form-group">
-          <label for="itemMediaUrl">Media Link (Google Drive / Online URL)</label>
-          <input type="url" id="itemMediaUrl" placeholder="https://drive.google.com/file/d/.../view?usp=sharing" required />
-        </div>
-        <button type="submit" id="saveBtn" class="submit-btn">+ Save to Vault</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- THEMES MODAL -->
-  <div id="themesModal" class="modal-overlay" style="display: none;">
-    <div class="modal-box" style="max-width: 580px;">
-      <div class="modal-header">
-        <div>
-          <h3 style="margin: 0; font-size: 18px; color: var(--accent-cyan);"><i class="fa-solid fa-palette"></i> 10 Classic Master Themes</h3>
-          <p style="font-size: 12px; color: #94a3b8; margin-top: 4px;">Click any theme to copy tags</p>
-        </div>
-        <button type="button" id="closeThemesModalBtn" class="close-btn">&times;</button>
-      </div>
-      <div class="themes-grid" id="themesGrid"></div>
-    </div>
-  </div>
-
-  <div id="toast">
-    <i class="fa-solid fa-circle-check"></i>
-    <span id="toastMsg">Prompt copied to clipboard!</span>
-  </div>
-
-  <!-- SCRIPT -->
+  <!-- SCRIPT LOGIC (INCLUDES ALL 136 ITEMS) -->
   <script>
-    // 44 Core Movements
+    // 44 CAMERA MOVEMENTS
     const defaultMovements = [
       { id: "mov_1", name: "Slow Dolly In", category: "Camera Movement", prompt: "Slow dolly in, camera moves slowly forward toward the subject." },
       { id: "mov_2", name: "Slow Dolly Out", category: "Camera Movement", prompt: "Slow dolly out, camera moves slowly backwards away from the subject." },
@@ -1102,7 +648,7 @@
       { id: "mov_44", name: "Worm's Eye Tracking (Ground Level)", category: "Camera Movement", prompt: "Worm's eye view, low angle tracking, camera moves along the ground looking up." }
     ];
 
-    // 12 Camera Angles
+    // 12 CAMERA ANGLES
     const cameraAnglesFromPdf = [
       { id: "ang_1", name: "Eye-level Angle", category: "Camera Angles", prompt: "Eye-level angle, camera positioned at subject eye height, natural, neutral, realistic perspective, 8k" },
       { id: "ang_2", name: "Low Angle", category: "Camera Angles", prompt: "Low angle shot, camera looking upward at the subject, commanding power, dominance, grandeur, cinematic" },
@@ -1118,7 +664,7 @@
       { id: "ang_12", name: "Point-Of-View (POV)", category: "Camera Angles", prompt: "Point-of-view POV shot, camera represents first-person character vision, immersive perspective, subjective participation" }
     ];
 
-    // 15 Camera Shots
+    // 15 CAMERA SHOTS
     const cameraShotsFromPdf = [
       { id: "sht_1", name: "Extreme Long Shot (ELS) / Extreme Wide Shot (EWS)", category: "Camera Shots", prompt: "Extreme long shot ELS, extreme wide shot EWS, vast expansive landscape, subject appearing very small in distance, establish scale, atmosphere, and location, 8k" },
       { id: "sht_2", name: "Long Shot (LS) / Wide Shot (WS)", category: "Camera Shots", prompt: "Long shot LS, wide shot WS, full body of the subject in modern geometric architectural hall, substantial surroundings, movement and body language, cinematic" },
@@ -1137,7 +683,7 @@
       { id: "sht_15", name: "Tight Close-Up (TCU)", category: "Camera Shots", prompt: "Tight close-up TCU, tightly framed around eyes, nose, and lips, emotional vulnerability, intimacy and intense dramatic cinematic impact" }
     ];
 
-    // 60 Atmosphere Themes
+    // 60 ATMOSPHERE THEMES
     const atmosphereThemesFromPdf = [
       { id: "atm_1", name: "Golden Hour Glow", category: "Atmosphere", prompt: "Golden Hour Glow, soft warm golden sunlight at sunrise or sunset, cinematic lighting, 8k" },
       { id: "atm_2", name: "Blue Hour Twilight", category: "Atmosphere", prompt: "Blue Hour Twilight, cool deep blue atmospheric tones, early dawn or late dusk, moody ambience" },
@@ -1201,7 +747,7 @@
       { id: "atm_60", name: "Cinematic Drone Landscape", category: "Atmosphere", prompt: "Cinematic Drone Landscape, high-altitude aerial view of winding coastal cliff road at sunrise" }
     ];
 
-    // 5 Master Prompts
+    // 5 MASTER PROMPTS
     const masterPromptsList = [
       { id: "mst_1", name: "Recreate Master Prompt", category: "Master Prompts", prompt: "Analyze this video scene by scene and generate a detailed AI video prompt for each shot and frame - including camera angles, subject actions, lighting, environment, facial expressions, composition, transitions, and cinematic style. Make the prompts accurate enough to recreate the video as closely as possible. Include exact text in video." },
       { id: "mst_2", name: "Animation Prompt", category: "Master Prompts", prompt: "Animate sequence of events shown in 6-frame storyboard reference image. Single, continuous, seamless product showcase video of smartphone from Panel 1 to 6. Preserve composition, product styling, modern lighting. Smooth cinematic transitions (push-ins, slow orbits, match-cuts). No fast cuts, no background music, no text overlays." },
@@ -1210,108 +756,10 @@
       { id: "mst_5", name: "ChatGPT Prompts Library", category: "Master Prompts", prompt: "/magazine cover /product explosion /cinematic portrait /fashion editorial /luxury advertisement /product photography /movie poster /album cover /brand campaign /architecture photography /street photography /cinematic still /action scene /sci-fi scene /concept art /world building /cyberpunk city /golden hour /neon street /dream sequence /double exposure /product launch /product render" }
     ];
 
+    // Combined All Items (Total 136)
     window.allVaultItems = [...defaultMovements, ...cameraAnglesFromPdf, ...cameraShotsFromPdf, ...atmosphereThemesFromPdf, ...masterPromptsList];
     let currentCategory = "All";
 
-    const classicThemes = [
-      { name: "1. Film Noir Monochrome", tag: "35mm black and white film noir, high contrast, hard shadows, dramatic silhouette" },
-      { name: "2. Cyberpunk Neon Dusk", tag: "Blade runner cyberpunk style, cyan and magenta neon rim light, rainy reflections, 8k" },
-      { name: "3. Wes Anderson Symmetrical Pastel", tag: "Wes anderson pastel palette, direct front angle, centered symmetrical framing, retro 70s look" },
-      { name: "4. Christopher Nolan IMAX Epic", tag: "70mm IMAX cinematography, photorealistic, grand scale, cold steel blue tone, sharp detail" },
-      { name: "5. Vintage Kodachrome 1970s", tag: "1970s vintage 35mm film, warm grain, sun-faded saturation, organic halation, nostagia" },
-      { name: "6. Denis Villeneuve Desert Dust", tag: "Dune aesthetic, vast desert haze, muted terracotta and dusty ambient glow, monolithic scale" },
-      { name: "7. Golden Hour Sunburst", tag: "Warm golden hour sunlight, intense anamorphic lens flare, soft bokeh, cinematic romantic glow" },
-      { name: "8. Moody David Fincher Green", tag: "David fincher style, subdued desaturated colors, eerie yellow-green tint, clinical precision" },
-      { name: "9. Studio Ghibli Ethereal", tag: "Ghibli cinematic anime lighting, lush vibrant watercolor tones, dreamy clouds, magical realism" },
-      { name: "10. Dark Gothic Baroque", tag: "Rembrandt chiaroscuro, candlelight illumination, deep rich velvety shadows, gothic atmosphere" }
-    ];
-
-    const themesGrid = document.getElementById("themesGrid");
-    if (themesGrid) {
-      classicThemes.forEach((item) => {
-        const chip = document.createElement("div");
-        chip.className = "theme-chip";
-        chip.innerHTML = `<strong>${item.name}</strong> <i class="fa-solid fa-copy" style="color: var(--accent-cyan);"></i>`;
-        chip.onclick = () => {
-          copyPromptText(`[Theme: ${item.tag}]`);
-          document.getElementById("themesModal").style.display = "none";
-        };
-        themesGrid.appendChild(chip);
-      });
-    }
-
-    // VIDEO PLAYLIST
-    const heroVid = document.getElementById("heroVideo");
-    const heroVidBg = document.getElementById("heroVideoBg");
-
-    if (heroVid) {
-      const playlist = ["hero-banner-1.mp4", "hero-banner-2.mp4", "hero-banner-3.mp4"];
-      let playlistIndex = 0;
-
-      heroVid.addEventListener("ended", () => {
-        playlistIndex = (playlistIndex + 1) % playlist.length;
-        heroVid.src = playlist[playlistIndex];
-        if (heroVidBg) heroVidBg.src = playlist[playlistIndex];
-
-        heroVid.play().catch(e => console.log("Video transition:", e));
-        if (heroVidBg) heroVidBg.play().catch(() => {});
-      });
-
-      document.addEventListener("DOMContentLoaded", () => {
-        heroVid.muted = true;
-        if (heroVidBg) heroVidBg.muted = true;
-        heroVid.play().catch(() => {});
-        if (heroVidBg) heroVidBg.play().catch(() => {});
-      });
-    }
-
-    /* INDEXED-DB PERSISTENCE */
-    let localDB;
-    const dbReq = indexedDB.open("CinemotionMediaDB", 12);
-    dbReq.onupgradeneeded = (e) => {
-      localDB = e.target.result;
-      if (!localDB.objectStoreNames.contains("cardMedia")) {
-        localDB.createObjectStore("cardMedia", { keyPath: "id" });
-      }
-      if (!localDB.objectStoreNames.contains("promptEdits")) {
-        localDB.createObjectStore("promptEdits", { keyPath: "id" });
-      }
-    };
-    dbReq.onsuccess = (e) => {
-      localDB = e.target.result;
-      loadSavedPromptEdits();
-    };
-
-    function loadSavedPromptEdits() {
-      if (!localDB) return;
-      const tx = localDB.transaction("promptEdits", "readonly");
-      const store = tx.objectStore("promptEdits");
-      const req = store.getAll();
-      req.onsuccess = () => {
-        if (req.result && req.result.length > 0) {
-          req.result.forEach(edit => {
-            const item = window.allVaultItems.find(m => m.id === edit.id);
-            if (item) {
-              item.name = edit.name;
-              item.prompt = edit.prompt;
-            }
-          });
-        }
-        renderCards(window.allVaultItems);
-      };
-    }
-
-    const categoryIconMap = {
-      'Camera Movement': 'Camera-Movement.png',
-      'Camera Angles': 'Camera-Angles.png',
-      'Camera Shots': 'Camera-Shots.png',
-      'Cinematic Lighting': 'Cinematic -lighting.png',
-      'Atmosphere': 'Atmosphere.png',
-      'Camera Lens': 'Camera-lens.png',
-      'Master Prompts': 'Master-prompt.png'
-    };
-
-    // YouTube Continuous Loop Embed URL
     function getYoutubeEmbedUrl(url) {
       if (!url) return null;
       let videoId = null;
@@ -1320,7 +768,6 @@
       return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0` : null;
     }
 
-    // Google Drive Iframe Preview URL
     function getDriveEmbedUrl(url) {
       if (!url) return null;
       const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
@@ -1331,34 +778,18 @@
 
     function renderCards(list) {
       if (!grid) return;
-      grid.innerHTML = list.map(item => {
-        const iconSrc = categoryIconMap[item.category] || 'Camera-Movement.png';
-
-        return `
+      grid.innerHTML = list.map(item => `
         <div class="movement-card" id="card_${item.id}">
-          <div class="card-video-box ${item.mediaURL ? 'has-media' : ''}" id="box_${item.id}" 
-               onclick="handleCardMediaClick('${item.id}')"
-               ondragover="handleDragOver(event, '${item.id}')"
-               ondragleave="handleDragLeave(event, '${item.id}')"
-               ondrop="handleFileDrop(event, '${item.id}')">
-
+          <div class="card-video-box ${item.mediaURL ? 'has-media' : ''}" id="box_${item.id}" onclick="handleCardMediaClick('${item.id}')">
             <video id="vid_${item.id}" autoplay loop muted playsinline></video>
             <img id="img_${item.id}" alt="${item.name}">
             <iframe id="yt_${item.id}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
-            <!-- Admin-Only Overlay: Regular users cannot see this -->
             <div class="upload-overlay admin-only" id="overlay_${item.id}">
-              <div onclick="triggerFileInput(event, '${item.id}')" style="display: flex; flex-direction: column; align-items: center; gap: 0.2rem;">
-                <i class="fa-solid fa-cloud-arrow-up cloud-icon"></i>
-                <span class="upload-txt">Click, Drag & Drop or Paste Media (Ctrl+V)</span>
-              </div>
-              <div class="link-upload-pill" onclick="openLinkModal('${item.id}', event)">
-                <i class="fa-solid fa-link"></i>
-                <span>Paste Link (Drive / YT / Insta)</span>
+              <div class="link-upload-pill" onclick="promptMediaLink('${item.id}', event)">
+                <i class="fa-solid fa-link"></i> <span>Paste Link</span>
               </div>
             </div>
-
-            <input type="file" class="file-input" id="input_${item.id}" accept="video/*,image/*" onchange="handleFileInputChange(event, '${item.id}')">
           </div>
 
           <div class="card-details">
@@ -1366,286 +797,35 @@
               <div class="card-meta">
                 <span class="tag-badge">${item.category || 'Movement'}</span>
                 
-                <!-- Admin-Only Controls: Regular users cannot modify or delete -->
                 <div class="card-meta-actions admin-only">
-                  <button type="button" class="meta-action-btn edit-btn" title="Paste / Attach Link" onclick="openLinkModal('${item.id}', event)">
-                    <i class="fa-solid fa-cloud-arrow-up"></i>
-                  </button>
-
-                  <button type="button" class="meta-action-btn dl-btn" title="Download Media" onclick="downloadCardMedia('${item.id}', '${item.name.replace(/'/g, "\\'")}', event)">
-                    <i class="fa-solid fa-download"></i>
-                  </button>
-                  
-                  <button type="button" class="meta-action-btn del-btn" title="Delete Media" onclick="deleteCardMedia('${item.id}', event)">
+                  <button type="button" class="meta-action-btn" title="Delete" onclick="deleteCardMedia('${item.id}', event)">
                     <i class="fa-solid fa-trash"></i>
                   </button>
                 </div>
               </div>
 
-              <h3 id="title_${item.id}">${item.name}</h3>
+              <h3>${item.name}</h3>
               
-              <div class="prompt-wrapper" id="prompt_wrap_${item.id}">
-                <div class="prompt-content" id="content_${item.id}">
-                  <p class="prompt-box" id="text_${item.id}">${item.prompt}</p>
-                  <!-- Admin Only Prompt Edit Button -->
-                  <button type="button" class="prompt-edit-btn admin-only" title="Edit Prompt Text" onclick="openEditPromptModal('${item.id}', event)">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                  </button>
-                </div>
-                
-                <div class="copied-cinematic-badge" id="copied_badge_${item.id}">
-                  <img src="${iconSrc}" class="copied-cat-3d-img" alt="${item.category}" onerror="this.src='Camera-Movement.png'">
-                  <span>COPIED!</span>
+              <div class="prompt-wrapper">
+                <div class="prompt-content">
+                  <p class="prompt-box">${item.prompt}</p>
                 </div>
               </div>
             </div>
             
-            <!-- Standard User Allowed Control: Copy Prompt -->
-            <button class="copy-btn" onclick="copyPromptText('${item.prompt.replace(/'/g, "\\'")}', '${item.id}')">
+            <button class="copy-btn" onclick="copyPromptText('${item.prompt.replace(/'/g, "\\'")}')">
               <i class="fa-solid fa-copy"></i> Copy Prompt
             </button>
           </div>
         </div>
-      `;
-      }).join('');
+      `).join('');
 
       list.forEach(item => {
-        if (item.mediaURL) {
-          applyMediaUrlToCard(item.id, item.mediaURL, item.mediaType);
-        }
+        if (item.mediaURL) applyMediaUrlToCard(item.id, item.mediaURL, item.mediaType);
       });
-
-      if (localDB) {
-        const tx = localDB.transaction("cardMedia", "readonly");
-        const store = tx.objectStore("cardMedia");
-        list.forEach(item => {
-          const req = store.get(item.id);
-          req.onsuccess = () => {
-            if (req.result) {
-              if (req.result.fileBlob) {
-                applyMediaToCard(item.id, req.result.fileBlob, req.result.fileType);
-              } else if (req.result.mediaURL) {
-                applyMediaUrlToCard(item.id, req.result.mediaURL, req.result.fileType);
-              }
-            }
-          };
-        });
-      }
-
-      updateCounts();
-    }
-
-    // SOCIAL MEDIA / CLOUD LINK MODAL HANDLER
-    const linkModal = document.getElementById("linkModal");
-    const linkForm = document.getElementById("linkForm");
-    const linkCardId = document.getElementById("linkCardId");
-    const mediaUrlInput = document.getElementById("mediaUrlInput");
-    const closeLinkModalBtn = document.getElementById("closeLinkModalBtn");
-
-    window.openLinkModal = function(id, event) {
-      if (event) event.stopPropagation();
-      linkCardId.value = id;
-      mediaUrlInput.value = '';
-      linkModal.style.display = "flex";
-    };
-
-    if (closeLinkModalBtn) {
-      closeLinkModalBtn.onclick = () => { linkModal.style.display = "none"; };
-    }
-
-    window.addEventListener("click", (e) => {
-      if (e.target === linkModal) linkModal.style.display = "none";
-    });
-
-    if (linkForm) {
-      linkForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const id = linkCardId.value;
-        const url = mediaUrlInput.value.trim();
-
-        const isYoutube = url.includes('youtube.com') || url.includes('youtu.be');
-        const isDrive = url.includes('drive.google.com');
-        const mediaType = isYoutube ? 'youtube' : (isDrive ? 'drive' : 'video');
-
-        applyMediaUrlToCard(id, url, mediaType);
-
-        if (localDB) {
-          const tx = localDB.transaction("cardMedia", "readwrite");
-          tx.objectStore("cardMedia").put({ id: id, mediaURL: url, fileType: mediaType });
-        }
-
-        if (typeof window.saveMediaLinkToFirestore === 'function') {
-          window.saveMediaLinkToFirestore(id, url, mediaType);
-        } else {
-          showToast("Link Saved Locally!");
-        }
-
-        linkModal.style.display = "none";
-      });
-    }
-
-    // EDIT PROMPT MODAL HANDLERS
-    const editPromptModal = document.getElementById("editPromptModal");
-    const editPromptForm = document.getElementById("editPromptForm");
-    const editPromptItemId = document.getElementById("editPromptItemId");
-    const editPromptTitle = document.getElementById("editPromptTitle");
-    const editPromptText = document.getElementById("editPromptText");
-    const closeEditPromptModalBtn = document.getElementById("closeEditPromptModalBtn");
-
-    window.openEditPromptModal = function(id, event) {
-      if (event) event.stopPropagation();
-      const item = window.allVaultItems.find(m => m.id === id);
-      if (!item) return;
-
-      editPromptItemId.value = id;
-      editPromptTitle.value = item.name;
-      editPromptText.value = item.prompt;
-      editPromptModal.style.display = "flex";
-    };
-
-    if (closeEditPromptModalBtn) {
-      closeEditPromptModalBtn.onclick = () => { editPromptModal.style.display = "none"; };
-    }
-
-    window.addEventListener("click", (e) => {
-      if (e.target === editPromptModal) editPromptModal.style.display = "none";
-    });
-
-    if (editPromptForm) {
-      editPromptForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const id = editPromptItemId.value;
-        const newTitle = editPromptTitle.value.trim();
-        const newPrompt = editPromptText.value.trim();
-
-        const item = window.allVaultItems.find(m => m.id === id);
-        if (item) {
-          item.name = newTitle;
-          item.prompt = newPrompt;
-
-          const titleEl = document.getElementById(`title_${id}`);
-          const textEl = document.getElementById(`text_${id}`);
-          if (titleEl) titleEl.innerText = newTitle;
-          if (textEl) textEl.innerText = newPrompt;
-
-          if (localDB) {
-            const tx = localDB.transaction("promptEdits", "readwrite");
-            tx.objectStore("promptEdits").put({ id: id, name: newTitle, prompt: newPrompt });
-          }
-
-          showToast("Prompt Updated!");
-        }
-
-        editPromptModal.style.display = "none";
-      });
-    }
-
-    // DRAG & DROP HANDLERS
-    window.handleDragOver = function(e, id) {
-      e.preventDefault();
-      e.stopPropagation();
-      const box = document.getElementById(`box_${id}`);
-      if (box) box.classList.add('drag-over');
-    };
-
-    window.handleDragLeave = function(e, id) {
-      e.preventDefault();
-      e.stopPropagation();
-      const box = document.getElementById(`box_${id}`);
-      if (box) box.classList.remove('drag-over');
-    };
-
-    window.handleFileDrop = function(e, id) {
-      e.preventDefault();
-      e.stopPropagation();
-      const box = document.getElementById(`box_${id}`);
-      if (box) box.classList.remove('drag-over');
-
-      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
-        processUploadedFile(id, e.dataTransfer.files[0]);
-      }
-    };
-
-    window.triggerFileInput = function(e, id) {
-      e.stopPropagation();
-      const input = document.getElementById(`input_${id}`);
-      if (input) input.click();
-    };
-
-    window.handleFileInputChange = function(e, id) {
-      if (e.target.files && e.target.files[0]) {
-        processUploadedFile(id, e.target.files[0]);
-      }
-    };
-
-    // CLIPBOARD PASTE SUPPORT (IMAGE / VIDEO)
-    window.addEventListener('paste', (e) => {
-      const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
-      if (activeTag === 'input' || activeTag === 'textarea') return;
-
-      const clipboardItems = (e.clipboardData || e.originalEvent?.clipboardData)?.items;
-      if (!clipboardItems) return;
-
-      for (let i = 0; i < clipboardItems.length; i++) {
-        const item = clipboardItems[i];
-        if (item.kind === 'file' && (item.type.startsWith('image/') || item.type.startsWith('video/'))) {
-          const pastedFile = item.getAsFile();
-          if (pastedFile) {
-            e.preventDefault();
-            const targetId = window.allVaultItems && window.allVaultItems[0] ? window.allVaultItems[0].id : null;
-            if (targetId) {
-              processUploadedFile(targetId, pastedFile);
-            }
-            break;
-          }
-        }
-      }
-    });
-
-    function processUploadedFile(id, file) {
-      const type = file.type.startsWith('video') ? 'video' : 'image';
-      
-      applyMediaToCard(id, file, type);
-
-      if (localDB) {
-        const tx = localDB.transaction("cardMedia", "readwrite");
-        tx.objectStore("cardMedia").put({ id: id, fileBlob: file, fileType: type, fileName: file.name });
-      }
-
-      showToast("Media Attached Locally!");
     }
 
     window.cardActiveBlobs = {};
-
-    function applyMediaToCard(id, blobOrFile, type) {
-      const url = URL.createObjectURL(blobOrFile);
-      window.cardActiveBlobs[id] = { url: url, type: type, raw: blobOrFile };
-
-      const box = document.getElementById(`box_${id}`);
-      const vid = document.getElementById(`vid_${id}`);
-      const img = document.getElementById(`img_${id}`);
-      const yt = document.getElementById(`yt_${id}`);
-
-      if (box) box.classList.add('has-media');
-      if (yt) yt.classList.remove('active-media');
-
-      if (type === 'video') {
-        if (img) img.classList.remove('active-media');
-        if (vid) {
-          vid.src = url;
-          vid.loop = true;
-          vid.muted = true;
-          vid.classList.add('active-media');
-          vid.play().catch(() => {});
-        }
-      } else {
-        if (vid) vid.classList.remove('active-media');
-        if (img) {
-          img.src = url;
-          img.classList.add('active-media');
-        }
-      }
-    }
 
     function applyMediaUrlToCard(id, mediaURL, type) {
       window.cardActiveBlobs[id] = { url: mediaURL, type: type || 'video' };
@@ -1662,235 +842,20 @@
       if (isYoutube) {
         if (img) img.classList.remove('active-media');
         if (vid) vid.classList.remove('active-media');
-        if (yt) {
-          yt.src = getYoutubeEmbedUrl(mediaURL);
-          yt.classList.add('active-media');
-        }
+        if (yt) { yt.src = getYoutubeEmbedUrl(mediaURL); yt.classList.add('active-media'); }
       } else if (isDrive) {
-        // Google Drive Iframe Preview Player (100% Works without CORS issue)
         if (img) img.classList.remove('active-media');
         if (vid) vid.classList.remove('active-media');
-        if (yt) {
-          yt.src = getDriveEmbedUrl(mediaURL);
-          yt.classList.add('active-media');
-        }
+        if (yt) { yt.src = getDriveEmbedUrl(mediaURL); yt.classList.add('active-media'); }
       } else if (type === 'video') {
         if (img) img.classList.remove('active-media');
         if (yt) yt.classList.remove('active-media');
-        if (vid) {
-          vid.src = mediaURL;
-          vid.loop = true;
-          vid.muted = true;
-          vid.playsInline = true;
-          vid.classList.add('active-media');
-          vid.play().catch(() => {});
-        }
-      } else {
-        if (vid) vid.classList.remove('active-media');
-        if (yt) yt.classList.remove('active-media');
-        if (img) {
-          img.src = mediaURL;
-          img.classList.add('active-media');
-        }
+        if (vid) { vid.src = mediaURL; vid.loop = true; vid.muted = true; vid.classList.add('active-media'); vid.play().catch(()=>{}); }
       }
     }
 
-    window.editCardMedia = function(id, event) {
-      if (event) event.stopPropagation();
-      openLinkModal(id, event);
-    };
-
-    window.downloadCardMedia = function(id, name, event) {
-      if (event) event.stopPropagation();
-      const media = window.cardActiveBlobs[id];
-      if (!media || !media.url) {
-        alert("Please upload or attach a media link first to download.");
-        return;
-      }
-
-      if (media.type === 'youtube' || media.url.includes('youtube.com') || media.url.includes('youtu.be') || media.url.includes('drive.google.com')) {
-        window.open(media.url, '_blank');
-        return;
-      }
-
-      executeDownload(media.url, name, media.type);
-    };
-
-    function executeDownload(url, filename, type) {
-      const ext = type === 'video' ? '.mp4' : '.png';
-      const cleanName = (filename || 'cinemotion-media').toLowerCase().replace(/[^a-z0-9]/g, '-') + ext;
-
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = cleanName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-
-      showToast(`Download Started: ${cleanName}`);
-    }
-
-    window.deleteCardMedia = function(id, event) {
-      if (event) event.stopPropagation();
-      const media = window.cardActiveBlobs[id];
-      if (!media) {
-        alert("No media uploaded to delete in this card.");
-        return;
-      }
-
-      if (confirm("Are you sure you want to delete this media?")) {
-        delete window.cardActiveBlobs[id];
-
-        if (localDB) {
-          const tx = localDB.transaction("cardMedia", "readwrite");
-          tx.objectStore("cardMedia").delete(id);
-        }
-
-        const box = document.getElementById(`box_${id}`);
-        const vid = document.getElementById(`vid_${id}`);
-        const img = document.getElementById(`img_${id}`);
-        const yt = document.getElementById(`yt_${id}`);
-
-        if (box) box.classList.remove('has-media');
-
-        if (vid) {
-          vid.pause();
-          vid.removeAttribute('src');
-          vid.load();
-          vid.classList.remove('active-media');
-        }
-        if (img) {
-          img.removeAttribute('src');
-          img.classList.remove('active-media');
-        }
-        if (yt) {
-          yt.removeAttribute('src');
-          yt.classList.remove('active-media');
-        }
-
-        showToast("Media Deleted!");
-      }
-    };
-
-    // LIGHTBOX POPUP PLAYER
-    const mediaLightbox = document.getElementById("mediaLightbox");
-    const lightboxStage = document.getElementById("lightboxStage");
-    const lightboxTitle = document.getElementById("lightboxTitle");
-    const lightboxPrompt = document.getElementById("lightboxPrompt");
-    const lightboxCopyBtn = document.getElementById("lightboxCopyBtn");
-    const lightboxDownloadBtn = document.getElementById("lightboxDownloadBtn");
-    const closeLightboxBtn = document.getElementById("closeLightboxBtn");
-
-    window.activeLightboxItem = null;
-
-    window.handleCardMediaClick = function(id) {
-      const media = window.cardActiveBlobs[id];
-      const item = window.allVaultItems.find(m => m.id === id);
-
-      if (!media || !media.url) {
-        return;
-      }
-
-      window.activeLightboxItem = { id: id, item: item, media: media };
-
-      lightboxTitle.innerHTML = `<i class="fa-solid fa-clapperboard" style="color: var(--accent-cyan);"></i> ${item ? item.name : 'Media Preview'}`;
-      lightboxPrompt.innerText = item ? item.prompt : '';
-
-      lightboxStage.innerHTML = '';
-
-      const isYoutube = media.type === 'youtube' || media.url.includes('youtube.com') || media.url.includes('youtu.be');
-      const isDrive = media.type === 'drive' || media.url.includes('drive.google.com');
-
-      if (isYoutube) {
-        const iframe = document.createElement('iframe');
-        iframe.src = getYoutubeEmbedUrl(media.url);
-        iframe.allow = "autoplay; encrypted-media";
-        iframe.allowFullscreen = true;
-        lightboxStage.appendChild(iframe);
-      } else if (isDrive) {
-        const iframe = document.createElement('iframe');
-        iframe.src = getDriveEmbedUrl(media.url);
-        iframe.allow = "autoplay";
-        iframe.allowFullscreen = true;
-        lightboxStage.appendChild(iframe);
-      } else if (media.type === 'video') {
-        const v = document.createElement('video');
-        v.src = media.url;
-        v.controls = true;
-        v.autoplay = true;
-        v.loop = true;
-        v.playsInline = true;
-        lightboxStage.appendChild(v);
-      } else {
-        const i = document.createElement('img');
-        i.src = media.url;
-        i.alt = item ? item.name : 'Expanded Preview';
-        lightboxStage.appendChild(i);
-      }
-
-      mediaLightbox.style.display = 'flex';
-    };
-
-    if (closeLightboxBtn) {
-      closeLightboxBtn.onclick = () => {
-        mediaLightbox.style.display = 'none';
-        lightboxStage.innerHTML = '';
-      };
-    }
-
-    mediaLightbox.onclick = (e) => {
-      if (e.target === mediaLightbox) {
-        mediaLightbox.style.display = 'none';
-        lightboxStage.innerHTML = '';
-      }
-    };
-
-    if (lightboxCopyBtn) {
-      lightboxCopyBtn.onclick = () => {
-        if (window.activeLightboxItem && window.activeLightboxItem.item) {
-          copyPromptText(window.activeLightboxItem.item.prompt, window.activeLightboxItem.id);
-        }
-      };
-    }
-
-    if (lightboxDownloadBtn) {
-      lightboxDownloadBtn.onclick = () => {
-        if (window.activeLightboxItem) {
-          downloadCardMedia(window.activeLightboxItem.id, window.activeLightboxItem.item ? window.activeLightboxItem.item.name : 'Cinemotion-Media');
-        }
-      };
-    }
-
-    function updateCounts() {
-      const catCounts = {
-        'Camera Movement': 0, 'Camera Angles': 0, 'Camera Shots': 0, 'Cinematic Lighting': 0, 'Atmosphere': 0, 'Camera Lens': 0, 'Master Prompts': 0
-      };
-
-      window.allVaultItems.forEach(item => {
-        if (catCounts[item.category] !== undefined) catCounts[item.category]++;
-      });
-
-      const countAll = document.getElementById('count_All');
-      if (countAll) countAll.innerText = window.allVaultItems.length;
-
-      for (const [cat, count] of Object.entries(catCounts)) {
-        const idKey = 'count_' + cat.replace(/\s+/g, '_');
-        const el = document.getElementById(idKey);
-        if (el) el.innerText = count;
-      }
-    }
-
-    function copyPromptText(text, itemId) {
+    function copyPromptText(text) {
       navigator.clipboard.writeText(text).then(() => {
-        if (itemId) {
-          const wrap = document.getElementById(`prompt_wrap_${itemId}`);
-          if (wrap) {
-            wrap.classList.add('copied-active');
-            setTimeout(() => {
-              wrap.classList.remove('copied-active');
-            }, 1300);
-          }
-        }
         showToast("Prompt copied to clipboard!");
       });
     }
@@ -1902,133 +867,40 @@
       setTimeout(() => toast.classList.remove('show'), 2200);
     }
 
-    function filterCategory(cat, btn) {
-      if (btn) {
-        document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+    function handleCardMediaClick(id) {
+      const media = window.cardActiveBlobs[id];
+      const item = window.allVaultItems.find(m => m.id === id);
+      if (!media || !media.url) return;
+
+      const lightbox = document.getElementById("mediaLightbox");
+      const stage = document.getElementById("lightboxStage");
+      document.getElementById("lightboxPrompt").innerText = item ? item.prompt : '';
+      stage.innerHTML = '';
+
+      if (media.url.includes('drive.google.com')) {
+        stage.innerHTML = `<iframe src="${getDriveEmbedUrl(media.url)}" allow="autoplay" allowfullscreen></iframe>`;
+      } else if (media.url.includes('youtube.com') || media.url.includes('youtu.be')) {
+        stage.innerHTML = `<iframe src="${getYoutubeEmbedUrl(media.url)}" allow="autoplay" allowfullscreen></iframe>`;
+      } else {
+        stage.innerHTML = `<video src="${media.url}" controls autoplay loop></video>`;
       }
+      lightbox.style.display = 'flex';
+    }
+
+    function filterCategory(cat, btn) {
+      document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
       currentCategory = cat;
       filterCards();
     }
 
     function filterCards() {
-      const searchEl = document.getElementById('searchInput');
-      const q = searchEl ? searchEl.value.toLowerCase() : '';
+      const q = document.getElementById('searchInput').value.toLowerCase();
       let filtered = window.allVaultItems;
       if (currentCategory !== "All") filtered = filtered.filter(m => m.category === currentCategory);
       filtered = filtered.filter(m => m.name.toLowerCase().includes(q) || m.prompt.toLowerCase().includes(q));
       renderCards(filtered);
     }
-
-    function openPromptLibrary() {
-      alert("Opening Visual Prompts Library: 136 Director Prompts Loaded.");
-    }
-
-    let animTimeout;
-    function triggerCinematicCategory(category, btnElement) {
-      filterCategory(category, btnElement);
-
-      const stage = document.getElementById('cinematicStage');
-      const scene = document.getElementById('cinematicScene');
-      const title = document.getElementById('stageTitle');
-
-      if (!stage || !scene) return;
-
-      clearTimeout(animTimeout);
-      scene.innerHTML = '';
-      stage.style.display = 'flex';
-      title.innerText = category;
-
-      if (category === 'All') {
-        scene.innerHTML = `
-          <div class="all-orbit-scene">
-            <img src="Camera-Movement.png" class="all-orbit-icon" style="top: 0; left: 210px;">
-            <img src="Camera-Angles.png" class="all-orbit-icon" style="top: 80px; right: 20px;">
-            <img src="Camera-Shots.png" class="all-orbit-icon" style="bottom: 80px; right: 20px;">
-            <img src="Cinematic -lighting.png" class="all-orbit-icon" style="bottom: 0; left: 210px;">
-            <img src="Atmosphere.png" class="all-orbit-icon" style="bottom: 80px; left: 20px;">
-            <img src="Camera-lens.png" class="all-orbit-icon" style="top: 80px; left: 20px;">
-            <img src="Master-prompt.png" class="all-orbit-icon" style="top: 210px; left: 210px; filter: drop-shadow(0 0 35px #00d2ff);" onerror="this.src='Camera-Movement.png'">
-          </div>
-        `;
-      }
-      else if (category === 'Master Prompts') {
-        scene.innerHTML = `
-          <div class="master-writing-rig">
-            <img src="Master-prompt.png" class="master-logo-canvas" alt="Master Prompt Logo" onerror="this.src='Camera-Shots.png'">
-            <i class="fa-solid fa-pen-nib neon-quill-pen"></i>
-          </div>
-        `;
-      }
-      else if (category === 'Atmosphere') {
-        scene.innerHTML = `
-          <div class="season-sky-lapse"></div>
-          <div class="smoke-rig-real"><img src="Atmosphere.png" alt="Atmosphere Fan"></div>
-          <div class="season-particles">
-            <span>🌸</span><span>☀️</span><span>🍂</span><span>❄️</span>
-          </div>
-        `;
-      }
-      else if (category === 'Camera Movement') {
-        scene.innerHTML = `<div class="dolly-real-rig"><img src="Camera-Movement.png" alt="Dolly Camera"></div>`;
-      } 
-      else if (category === 'Camera Angles') {
-        scene.innerHTML = `<div class="angles-real-rig"><div class="angle-fast-cam"><img src="Camera-Angles.png" alt="Angle Camera"></div></div>`;
-      } 
-      else if (category === 'Camera Shots') {
-        scene.innerHTML = `<div class="clapper-real-rig"><img src="Camera-Shots.png" alt="Clapperboard Slate"></div>`;
-      } 
-      else if (category === 'Cinematic Lighting') {
-        scene.innerHTML = `<div class="light-glare"></div><div class="light-real-rig"><img src="Cinematic -lighting.png" alt="Studio Light"></div>`;
-      } 
-      else if (category === 'Camera Lens') {
-        scene.innerHTML = `<div class="lens-real-rig"><img src="Camera-lens.png" alt="Cinema Lens"></div>`;
-      }
-
-      animTimeout = setTimeout(() => {
-        stage.style.display = 'none';
-        scene.innerHTML = '';
-      }, 2000);
-    }
-
-    const sidebarToggleBtn = document.getElementById("sidebarToggleBtn");
-    const sidebarDrawer = document.getElementById("sidebarDrawer");
-    const sidebarOverlay = document.getElementById("sidebarOverlay");
-    const closeSidebarBtn = document.getElementById("closeSidebarBtn");
-    const openThemesBtn = document.getElementById("openThemesBtn");
-    const themesModal = document.getElementById("themesModal");
-    const closeThemesModalBtn = document.getElementById("closeThemesModalBtn");
-
-    function openSidebar() { if (sidebarDrawer) sidebarDrawer.classList.add("active"); if (sidebarOverlay) sidebarOverlay.classList.add("active"); }
-    function closeSidebar() { if (sidebarDrawer) sidebarDrawer.classList.remove("active"); if (sidebarOverlay) sidebarOverlay.classList.remove("active"); }
-
-    if (sidebarToggleBtn) sidebarToggleBtn.onclick = openSidebar;
-    if (closeSidebarBtn) closeSidebarBtn.onclick = closeSidebar;
-    if (sidebarOverlay) sidebarOverlay.onclick = closeSidebar;
-
-    if (openThemesBtn) {
-      openThemesBtn.onclick = () => { closeSidebar(); if (themesModal) themesModal.style.display = "flex"; };
-    }
-    if (closeThemesModalBtn) {
-      closeThemesModalBtn.onclick = () => { if (themesModal) themesModal.style.display = "none"; };
-    }
-
-    const profilePillBtn = document.getElementById("profilePillBtn");
-    const profileDropdown = document.getElementById("profileDropdown");
-
-    if (profilePillBtn) {
-      profilePillBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        if (profileDropdown) profileDropdown.classList.toggle("show");
-      });
-    }
-
-    window.addEventListener("click", (e) => {
-      if (profileDropdown && !profileDropdown.contains(e.target) && e.target !== profilePillBtn) {
-        profileDropdown.classList.remove("show");
-      }
-      if (themesModal && e.target === themesModal) themesModal.style.display = "none";
-    });
 
     window.openForgotPasswordModal = function() {
       document.getElementById("forgotPasswordModal").style.display = "flex";
@@ -2072,27 +944,18 @@
 
     const NOTIFY_RECEIVER_EMAIL = "prasadpakala10@gmail.com";
 
-    // SESSION PERSISTENCE (Won't ask for credentials unless user logs out)
+    // Session Persistence: Listen to state change
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         document.getElementById("authGateModal").style.display = "none";
-        
-        const displayName = user.email || user.phoneNumber || "Director";
-        document.getElementById("headerUserDisplay")?.innerText = displayName;
-        document.getElementById("profileDisplayName").innerText = displayName;
-        document.getElementById("profileDisplayEmail").innerText = user.email || user.phoneNumber || "";
-        
-        const firstLetter = (displayName[0] || "D").toUpperCase();
-        document.getElementById("headerUserAvatar").innerText = firstLetter;
-        document.getElementById("profileAvatarLarge").innerText = firstLetter;
+        document.getElementById("headerUserDisplay").innerText = user.email || user.phoneNumber || "User";
+        document.getElementById("headerUserAvatar").innerText = (user.email || user.phoneNumber || "U")[0].toUpperCase();
 
-        // Check if Admin securely via logged-in email
+        // Check if Admin securely
         if (user.email === "bhanu.pakala03@gmail.com") {
           document.body.classList.add("is-admin-active");
-          document.getElementById("profileBadgeRole").innerText = "MASTER DIRECTOR (ADMIN)";
         } else {
           document.body.classList.remove("is-admin-active");
-          document.getElementById("profileBadgeRole").innerText = "VAULT VIEWER";
         }
       } else {
         document.body.classList.remove("is-admin-active");
@@ -2115,7 +978,7 @@
             user_info: identifier,
             login_time: new Date().toLocaleString(),
             auth_type: method
-          }).catch(e => console.log("Email Notification alert:", e));
+          }).catch(e => console.log("Email Notification:", e));
         }
       } catch (err) {
         console.error("Login tracking error:", err);
@@ -2168,7 +1031,7 @@
 
       try {
         await sendPasswordResetEmail(auth, resetEmail);
-        alert("A password reset email has been sent to " + resetEmail + ". Check your inbox to set a new password.");
+        alert("A password reset email has been sent to " + resetEmail + ". Check your inbox to verify and update your password.");
         closeForgotPasswordModal();
       } catch (err) {
         alert("Error sending reset email: " + err.message);
@@ -2211,100 +1074,12 @@
       }
     };
 
-    // LOGOUT (Asks credentials again only after logout)
+    // LOGOUT
     window.handleUserLogout = async function() {
       if (confirm("Are you sure you want to log out?")) {
         await signOut(auth);
       }
     };
-
-    // Save Link to Cloud Firestore
-    window.saveMediaLinkToFirestore = async function(cardId, url, mediaType) {
-      const toast = document.getElementById('toast');
-      toast.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Saving Link to Cloud...</span>`;
-      toast.classList.add('show');
-
-      try {
-        await addDoc(collection(db, "movements"), {
-          linkedCardId: cardId,
-          mediaURL: url,
-          mediaType: mediaType,
-          createdAt: new Date().toISOString()
-        });
-
-        const item = window.allVaultItems.find(m => m.id === cardId);
-        if (item) {
-          item.mediaURL = url;
-          item.mediaType = mediaType;
-        }
-
-        toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Link Synced Everywhere!</span>`;
-        setTimeout(() => toast.classList.remove('show'), 2500);
-      } catch (err) {
-        console.error("Firestore Save Error:", err);
-        toast.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> <span>Cloud sync failed: ${err.message}</span>`;
-        setTimeout(() => toast.classList.remove('show'), 3500);
-      }
-    };
-
-    const addMovementBtn = document.getElementById("addMovementBtn");
-    const movementModal = document.getElementById("movementModal");
-    const closeModalBtn = document.getElementById("closeModalBtn");
-    const movementForm = document.getElementById("movementForm");
-    const saveBtn = document.getElementById("saveBtn");
-
-    if (addMovementBtn && movementModal) {
-      addMovementBtn.onclick = () => { movementModal.style.display = "flex"; };
-    }
-    if (closeModalBtn && movementModal) {
-      closeModalBtn.onclick = () => { movementModal.style.display = "none"; };
-    }
-    window.addEventListener("click", (e) => {
-      if (e.target === movementModal) movementModal.style.display = "none";
-    });
-
-    if (movementForm) {
-      movementForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const urlInput = document.getElementById("itemMediaUrl");
-        const url = urlInput.value.trim();
-        if (!url) return alert("Please enter a media link.");
-
-        const category = document.getElementById("itemCategory").value;
-        const title = document.getElementById("itemTitle").value;
-        const prompt = document.getElementById("itemPrompt").value;
-        const isDrive = url.includes("drive.google.com");
-        const isYoutube = url.includes("youtube.com") || url.includes("youtu.be");
-        const mediaType = isYoutube ? "youtube" : (isDrive ? "drive" : "video");
-
-        try {
-          if (saveBtn) saveBtn.disabled = true;
-
-          const movementData = {
-            name: title,
-            category: category,
-            prompt: prompt,
-            mediaURL: url,
-            mediaType: mediaType,
-            createdAt: new Date().toISOString()
-          };
-
-          const docRef = await addDoc(collection(db, "movements"), movementData);
-          movementData.id = docRef.id;
-
-          window.allVaultItems.unshift(movementData);
-          filterCards();
-
-          movementForm.reset();
-          if (saveBtn) saveBtn.disabled = false;
-          if (movementModal) movementModal.style.display = "none";
-          alert("New Movement saved successfully!");
-        } catch (err) {
-          alert("Save error: " + err.message);
-          if (saveBtn) saveBtn.disabled = false;
-        }
-      });
-    }
 
     // Load custom cloud synced movements from Firestore
     async function loadFirebaseMovements() {
