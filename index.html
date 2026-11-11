@@ -821,6 +821,104 @@
       .gemini-panel { top:70px; right:10px; bottom:10px; width:calc(100vw - 20px); max-height:none; }
     }
 
+  
+    /* CINEMOTION DESKTOP ALIGNMENT + FULLSCREEN LOOPING BACKGROUND */
+    @media (min-width: 1100px) {
+      .header-inner,
+      .vault-container {
+        width: 76%;
+        max-width: 1360px;
+      }
+      .vault-container {
+        padding-top: 1.25rem;
+      }
+      .movements-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1.25rem;
+      }
+    }
+
+    /* Keep the existing hero video as a fixed, full-viewport background.
+       Its original content position is removed so the cards sit over it. */
+    #heroBanner.hero-banner-wrapper {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      width: 100vw;
+      height: 100vh;
+      max-width: none;
+      margin: 0;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      background: #030711;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    #heroBanner .hero-ambient-backdrop {
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: blur(30px) brightness(.34) saturate(1.2);
+      opacity: .62;
+      transform: none;
+    }
+    #heroBanner .hero-foreground-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      opacity: .43;
+      filter: brightness(.62) saturate(.9);
+      transform: none;
+    }
+    #heroBanner::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      background: linear-gradient(180deg, rgba(3,7,17,.42), rgba(3,7,17,.68));
+      pointer-events: none;
+    }
+    body {
+      background: transparent;
+      position: relative;
+      isolation: isolate;
+    }
+    body > header,
+    body > .vault-container {
+      position: relative;
+      z-index: 1;
+    }
+    header {
+      background: rgba(4, 7, 17, .78);
+      backdrop-filter: blur(18px);
+    }
+
+    /* A click anywhere on the Welcome Back animation dismisses it. */
+    #welcomeBackOverlay {
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    @media (max-width: 1099px) {
+      .header-inner,
+      .vault-container {
+        width: 94%;
+      }
+      .movements-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 640px) {
+      .movements-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -1035,8 +1133,8 @@
 
   <div class="vault-container">
     <section class="hero-banner-wrapper" id="heroBanner">
-      <video id="heroVideoBg" class="hero-ambient-backdrop" autoplay muted playsinline loop preload="auto" src="hero-banner-1.mp4"></video>
-      <video id="heroVideo" class="hero-foreground-video" autoplay muted playsinline loop preload="auto" poster="bhanu-3d-header_2.png" src="hero-banner-1.mp4"></video>
+      <video id="heroVideoBg" class="hero-ambient-backdrop" autoplay muted playsinline loop preload="auto" src="hero-banner-3.mp4"></video>
+      <video id="heroVideo" class="hero-foreground-video" autoplay muted playsinline loop preload="auto" poster="bhanu-3d-header_2.png" src="hero-banner-3.mp4"></video>
     </section>
 
     <div class="categories-bar-wrapper">
@@ -2367,6 +2465,18 @@
 
     // TAB SWITCH "WELCOME BACK" TRIGGER - ONE-TIME PLAY, NO BOX
     let welcomeTimer;
+    function dismissWelcomeBack() {
+      const overlay = document.getElementById("welcomeBackOverlay");
+      const video = document.getElementById("welcomeVideo");
+      if (!overlay || !overlay.classList.contains("show")) return;
+      clearTimeout(welcomeTimer);
+      overlay.classList.remove("show");
+      if (video) {
+        video.pause();
+        try { video.currentTime = 0; } catch (_) {}
+      }
+    }
+    document.getElementById("welcomeBackOverlay")?.addEventListener("click", dismissWelcomeBack);
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
         const overlay = document.getElementById("welcomeBackOverlay");
