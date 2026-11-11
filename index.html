@@ -364,36 +364,20 @@
       box-shadow: 0 0 70px rgba(0, 210, 255, 0.4);
     }
 
-    .hero-ambient-backdrop {
+    .hero-foreground-video {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
       object-position: center;
-      filter: none;
-      opacity: 1;
-      pointer-events: none;
+      display: block;
       z-index: 1;
+      background: #000;
+      filter: none;
       transform: none;
     }
 
-    .hero-foreground-video {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      object-position: center;
-      display: block;
-      z-index: 2;
-      background: transparent;
-      filter: drop-shadow(0 0 24px rgba(0, 0, 0, 0.62));
-      transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    .hero-banner-wrapper:hover .hero-foreground-video {
-      transform: scale(1.02);
-    }
 
     /* CATEGORIES BAR */
     .categories-bar-wrapper {
@@ -1077,7 +1061,7 @@
 
   <div class="vault-container">
     <section class="hero-banner-wrapper" id="heroBanner">
-      <video id="heroVideoBg" class="hero-ambient-backdrop" autoplay muted playsinline loop preload="auto" aria-hidden="true" src="hero-banner-3.mp4"></video>
+      <!-- One continuous hero video: no duplicate background layer or split panels. -->
       <video id="heroVideo" class="hero-foreground-video" autoplay muted playsinline loop preload="auto" poster="bhanu-3d-header_2.png" src="hero-banner-3.mp4"></video>
     </section>
 
@@ -1442,23 +1426,16 @@
       });
     }
 
-    // SINGLE HERO VIDEO: use only hero-banner-3.mp4; no playlist rotation.
+    // SINGLE HERO VIDEO: exactly one video element inside the banner.
     const heroVid = document.getElementById("heroVideo");
-    const heroVidBg = document.getElementById("heroVideoBg");
     if (heroVid) {
-      heroVid.src = "hero-banner-3.mp4";
       heroVid.loop = true;
       heroVid.muted = true;
       heroVid.playsInline = true;
-      if (heroVidBg) {
-        heroVidBg.src = "hero-banner-3.mp4";
-        heroVidBg.loop = true;
-        heroVidBg.muted = true;
-        heroVidBg.playsInline = true;
-      }
       const startHeroVideo = () => {
-        heroVid.play().catch(() => {});
-        heroVidBg?.play().catch(() => {});
+        heroVid.play().catch((err) => {
+          console.warn("Hero video autoplay was blocked; playback can begin after user interaction.", err);
+        });
         document.getElementById("siteBackgroundVideo")?.play().catch(() => {});
       };
       if (document.readyState === "loading") {
