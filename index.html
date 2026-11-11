@@ -2658,26 +2658,53 @@
     try {
       app = initializeApp(firebaseConfig);
 
-      // Initialize App Check before Auth, Firestore, and Storage are used.
-      // Token auto-refresh keeps verified requests active during long sessions.
-      appCheck = initializeAppCheck(app, {
-        provider: new ReCaptchaEnterpriseProvider(APP_CHECK_SITE_KEY),
-        isTokenAutoRefreshEnabled: true
-      });
+      // App Check is initialized first, before any Firebase product is accessed.
+      // If its provider/key is not fully configured yet, keep the rest of the
+      // application running and report the issue instead of crashing this module.
+      try {
+        if (APP_CHECK_SITE_KEY && APP_CHECK_SITE_KEY.trim()) {
+          appCheck = initializeAppCheck(app, {
+            provider: new ReCaptchaEnterpriseProvider(APP_CHECK_SITE_KEY),
+            isTokenAutoRefreshEnabled: true
+          });
+          window.cinemotionAppCheckReady = true;
+          console.info("CINEMOTION: Firebase App Check initialization requested.");
+        } else {
+          window.cinemotionAppCheckReady = false;
+          console.warn("CINEMOTION: App Check site key is not configured.");
+        }
+      } catch (appCheckError) {
+        window.cinemotionAppCheckReady = false;
+        console.error("Firebase App Check initialization failed:", appCheckError);
+        // Do not throw here: App Check setup must not prevent Firebase Auth
+        // and the rest of the site from initializing.
+      }
 
       auth = getAuth(app);
       db = getFirestore(app);
       storage = getStorage(app);
-      // Gemini is accessed through Firebase AI Logic; no Gemini API key is exposed in this page.
-      const firebaseAI = getAI(app, { backend: new GoogleAIBackend() });
-      window.cinemotionGeminiModel = getGenerativeModel(firebaseAI, { model: "gemini-3.8-flash" });
-      console.info("CINEMOTION: Firebase App Check and Gemini AI Logic initialized.");
+
+      // Gemini uses Firebase AI Logic; no Gemini Developer API key is exposed
+      // in this public GitHub Pages file.
+      try {
+        const firebaseAI = getAI(app, { backend: new GoogleAIBackend() });
+        window.cinemotionGeminiModel = getGenerativeModel(firebaseAI, {
+          model: "gemini-3.8-flash"
+        });
+        console.info("CINEMOTION: Firebase AI Logic initialized.");
+      } catch (aiError) {
+        window.cinemotionGeminiModel = null;
+        console.error("Firebase AI Logic initialization failed:", aiError);
+      }
+
+      console.info("CINEMOTION: Firebase application initialized.");
     } catch (err) {
-      console.error("Firebase / App Check initialization failed:", err);
+      console.error("Firebase initialization failed:", err);
       showAuthMessage(
-        "Firebase initialization failed. Check the App Check site key and Firebase configuration. " +
-        (err.message || err)
+        "Firebase initialization failed. Check the Firebase configuration and network connection. " +
+        (err?.message || err)
       );
+      // Stop only when the Firebase app/auth/database core cannot initialize.
       throw err;
     }
 
@@ -3058,7 +3085,7 @@
         return;
       }
       if (!window.cinemotionGeminiModel) {
-        addGeminiMessage("Gemini is not initialized. Check Firebase AI Logic and App Check configuration.", "assistant", true);
+        addGeminiMessage("Gemini is not initialized. Check that Firebase AI Logic is enabled for this project and that App Check is correctly registered for this web app.", "assistant", true);
         return;
       }
 
