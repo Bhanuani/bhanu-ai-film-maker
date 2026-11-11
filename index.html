@@ -1862,8 +1862,8 @@
       const type = file.type.startsWith("video/") ? "video" : "image";
       applyMediaToCard(id, file, type);
 
-      // Keep a local copy for immediate preview/offline use, but cloud is the
-      // permanent shared copy. Firebase Storage handles files of all normal sizes.
+      // Keep a local copy for immediate preview/offline use; Cloudinary is the
+      // permanent shared media copy while Firebase remains Auth + Firestore.
       if (localDB) {
         const tx = localDB.transaction("cardMedia", "readwrite");
         tx.objectStore("cardMedia").put({
@@ -1873,16 +1873,16 @@
 
       if (typeof window.uploadMediaFileToFirebase === "function") {
         try {
-          showToast("Uploading media to Firebase Storage...");
+          showToast("Uploading media to Cloudinary...");
           const cloudUrl = await window.uploadMediaFileToFirebase(id, file, type);
           applyMediaUrlToCard(id, cloudUrl, type);
-          showToast("Media uploaded and synced to Firebase!");
+          showToast("Media uploaded to Cloudinary and synced!");
         } catch (err) {
-          console.error("Firebase Storage upload failed:", err);
+          console.error("Cloudinary upload failed:", err);
           showToast("Cloud upload failed. Local preview is retained: " + (err.message || err));
         }
       } else {
-        showToast("Firebase Storage is not ready. Media remains local only.");
+        showToast("Cloudinary upload service is not ready. Media remains local only.");
       }
     }
 
@@ -2617,7 +2617,8 @@
       deleteDoc,
       doc,
       orderBy,
-      setDoc
+      setDoc,
+      updateDoc
     } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
     import {
       getStorage,
@@ -2645,6 +2646,8 @@
     const EMAILJS_PUBLIC_KEY = "";
     const EMAILJS_SERVICE_ID = "";
     const EMAILJS_TEMPLATE_ID = "";
+    const CINEMOTION_MEDIA_API = "https://cinemotion-media-api.bhanu-pakala03.workers.dev";
+    const CINEMOTION_ADMIN_EMAIL = "bhanu.pakala03@gmail.com";
 
     const byId = (id) => document.getElementById(id);
     function showAuthMessage(message) {
@@ -2748,9 +2751,11 @@
 
         if (user.email === "bhanu.pakala03@gmail.com") {
           document.body.classList.add("is-admin-active");
+          const migrationBtn = document.getElementById("cloudinaryMigrationButton"); if (migrationBtn) migrationBtn.style.display = "block";
           if (byId("profileBadgeRole")) byId("profileBadgeRole").innerText = "MASTER DIRECTOR (ADMIN)";
         } else {
           document.body.classList.remove("is-admin-active");
+          const migrationBtn = document.getElementById("cloudinaryMigrationButton"); if (migrationBtn) migrationBtn.style.display = "none";
           if (byId("profileBadgeRole")) byId("profileBadgeRole").innerText = "VAULT VIEWER";
         }
         loadFirebaseMovements();
@@ -2925,25 +2930,42 @@
       catch (err) { showAuthMessage(explainFirebaseError(err, "Sign out")); }
     };
 
-    // FIREBASE STORAGE: upload original image/video files and save their public
-    // download URL + metadata in Firestore. Binary files do NOT belong in Firestore.
+    // CLOUDINARY MEDIA API: Firebase remains the source for Auth + Firestore.
+    // New media binaries go to Cloudinary; old Firebase Storage records remain readable.
+    async function callMediaApi(path, payload, file) {
+      if (!auth.currentUser) throw new Error("Please sign in before managing media.");
+      const token = await auth.currentUser.getIdToken(true);
+      const headers = { Authorization: `Bearer ${token}` };
+      let body = payload || {};
+      if (file) {
+        body = new FormData();
+        body.append("file", file, file.name || "media");
+        if (payload?.cardId) body.append("cardId", String(payload.cardId));
+      } else {
+        headers["Content-Type"] = "application/json";
+        body = JSON.stringify(payload || {});
+      }
+      const response = await fetch(`${CINEMOTION_MEDIA_API}${path}`, { method: "POST", headers, body });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || result.success === false) throw new Error(result.error || `Media API error (${response.status})`);
+      return result;
+    }
+
     window.uploadMediaFileToFirebase = async function(cardId, file, mediaType) {
-      if (!auth.currentUser) throw new Error("Please sign in before uploading.");
-      const safeName = String(file.name || "media").replace(/[^a-zA-Z0-9._-]/g, "_");
-      const path = `vault-media/${cardId}/${Date.now()}_${safeName}`;
-      const fileRef = storageRef(storage, path);
-      await uploadBytes(fileRef, file, {
-        contentType: file.type || (mediaType === "video" ? "video/mp4" : "image/jpeg"),
-        customMetadata: {
-          cardId: String(cardId),
-          uploadedBy: auth.currentUser.uid,
-          originalName: safeName
-        }
-      });
-      const downloadURL = await getDownloadURL(fileRef);
-      await window.saveMediaLinkToFirestore(cardId, downloadURL, mediaType, path);
-      return downloadURL;
+      // Keep the legacy function name so existing paste/upload UI continues to work.
+      const result = await callMediaApi("/upload", { cardId }, file);
+      await window.saveMediaLinkToFirestore(cardId, result.url, mediaType, null, result.public_id, result.resource_type);
+      return result.url;
     };
+
+    async function deleteCloudinaryAsset(data) {
+      if (!data?.cloudinaryPublicId) return true;
+      await callMediaApi("/delete", {
+        public_id: data.cloudinaryPublicId,
+        resource_type: data.cloudinaryResourceType || (data.mediaType === "video" ? "video" : "image")
+      });
+      return true;
+    }
 
     // Persist prompt edits for built-in cards in a separate collection.
     window.savePromptEditToFirestore = async function(itemId, name, prompt) {
@@ -2957,76 +2979,122 @@
       }, { merge: true });
     };
 
-    // FIREBASE PERMANENT DELETE: remove the actual Storage file and Firestore
-    // metadata. Do not silently report success if either cloud operation fails.
+    // HYBRID DELETE: Cloudinary for new assets; Firebase Storage for legacy assets.
     window.deleteMediaFromFirestore = async function(cardId) {
       if (!auth.currentUser) throw new Error("Please sign in before deleting cloud media.");
       const q = query(collection(db, "movements"), where("linkedCardId", "==", String(cardId)));
       const snapshot = await getDocs(q);
-
-      // Delete uploaded binary objects from Firebase Storage first.
+      // Delete binaries first. If any deletion fails, retain Firestore metadata for retry.
       for (const docSnap of snapshot.docs) {
         const data = docSnap.data();
+        if (data.cloudinaryPublicId) await deleteCloudinaryAsset(data);
         if (data.storagePath) {
-          try {
-            await deleteObject(storageRef(storage, data.storagePath));
-          } catch (storageErr) {
-            // Object-not-found is already deleted; all other errors must stop deletion.
-            if (storageErr?.code !== "storage/object-not-found") throw storageErr;
-          }
+          try { await deleteObject(storageRef(storage, data.storagePath)); }
+          catch (err) { if (err?.code !== "storage/object-not-found") throw err; }
         }
       }
-
-      // Then remove every Firestore record associated with this card.
-      for (const docSnap of snapshot.docs) {
-        await deleteDoc(doc(db, "movements", docSnap.id));
-      }
+      for (const docSnap of snapshot.docs) await deleteDoc(doc(db, "movements", docSnap.id));
       return true;
     };
 
-    // FIRESTORE SAVE FUNCTION
-    window.saveMediaLinkToFirestore = async function(cardId, url, mediaType, storagePath = null) {
+    // Save new Cloudinary media without disturbing legacy Firebase records unless replacing that card.
+    window.saveMediaLinkToFirestore = async function(cardId, url, mediaType, storagePath = null, cloudinaryPublicId = null, cloudinaryResourceType = null) {
       const toast = byId("toast");
-      if (toast) { toast.textContent = "Saving media to cloud..."; toast.classList.add("show"); }
+      if (toast) { toast.textContent = "Saving media metadata..."; toast.classList.add("show"); }
       try {
         if (!auth.currentUser) throw new Error("Please sign in before syncing media.");
         const q = query(collection(db, "movements"), where("linkedCardId", "==", String(cardId)));
         const snap = await getDocs(q);
-
-        // Replacing media should also remove the previous uploaded Storage files.
+        // Replacement is intentional: remove prior cloud objects from their original provider.
         for (const oldDoc of snap.docs) {
           const oldData = oldDoc.data();
+          if (oldData.cloudinaryPublicId) await deleteCloudinaryAsset(oldData);
           if (oldData.storagePath && oldData.storagePath !== storagePath) {
-            try {
-              await deleteObject(storageRef(storage, oldData.storagePath));
-            } catch (storageErr) {
-              if (storageErr?.code !== "storage/object-not-found") throw storageErr;
-            }
+            try { await deleteObject(storageRef(storage, oldData.storagePath)); }
+            catch (err) { if (err?.code !== "storage/object-not-found") throw err; }
           }
         }
-        for (const oldDoc of snap.docs) {
-          await deleteDoc(doc(db, "movements", oldDoc.id));
-        }
-
+        for (const oldDoc of snap.docs) await deleteDoc(doc(db, "movements", oldDoc.id));
         await addDoc(collection(db, "movements"), {
-          linkedCardId: cardId,
-          mediaURL: url,
-          mediaType,
+          linkedCardId: String(cardId), mediaURL: url, mediaType,
           storagePath: storagePath || null,
-          createdAt: new Date().toISOString(),
-          updatedBy: auth.currentUser.uid
+          cloudinaryPublicId: cloudinaryPublicId || null,
+          cloudinaryResourceType: cloudinaryResourceType || null,
+          createdAt: new Date().toISOString(), updatedBy: auth.currentUser.uid
         });
         const item = window.allVaultItems?.find(m => m.id === cardId);
         if (item) { item.mediaURL = url; item.mediaType = mediaType; }
-        if (toast) { toast.textContent = "Media synced to cloud!"; setTimeout(() => toast.classList.remove("show"), 2500); }
+        if (toast) { toast.textContent = "Media synced successfully!"; setTimeout(() => toast.classList.remove("show"), 2500); }
         return true;
       } catch (err) {
-        console.error("Firestore save error:", err);
+        console.error("Media metadata save error:", err);
         if (toast) { toast.textContent = "Cloud sync failed: " + (err.message || err); setTimeout(() => toast.classList.remove("show"), 4000); }
         throw err;
       }
     };
 
+    // ADMIN-ONLY, RESUMABLE MIGRATION: Firebase Storage -> Cloudinary.
+    // Each Firestore record is updated only after Cloudinary confirms the upload;
+    // the old Firebase object is deleted only after the new URL/public_id are saved.
+    window.migrateFirebaseMediaToCloudinary = async function() {
+      if (!auth.currentUser || auth.currentUser.email?.toLowerCase() !== CINEMOTION_ADMIN_EMAIL) {
+        throw new Error("Only the verified admin can run migration.");
+      }
+      const q = query(collection(db, "movements"), orderBy("createdAt", "asc"));
+      const snap = await getDocs(q);
+      const legacy = snap.docs.filter(d => { const x = d.data(); return !!x.linkedCardId && !!x.storagePath && !!x.mediaURL; });
+      if (!legacy.length) { alert("No legacy Firebase media records found to migrate."); return; }
+      if (!confirm(`Found ${legacy.length} Firebase media file(s). Migration uploads each to Cloudinary, updates Firestore, verifies the new record, then deletes the old Firebase file. Continue?`)) return;
+      let migrated = 0, failed = 0;
+      for (let i = 0; i < legacy.length; i++) {
+        const d = legacy[i]; const data = d.data();
+        try {
+          // Resume cleanup without re-uploading if Cloudinary metadata was saved in an earlier run.
+          let uploaded = data.cloudinaryPublicId ? {
+            url: data.mediaURL, public_id: data.cloudinaryPublicId,
+            resource_type: data.cloudinaryResourceType || (data.mediaType === "video" ? "video" : "image")
+          } : null;
+          if (!uploaded) {
+            uploaded = await callMediaApi("/migrate", {
+              cardId: data.linkedCardId, mediaURL: data.mediaURL, mediaType: data.mediaType
+            });
+            await updateDoc(doc(db, "movements", d.id), {
+              mediaURL: uploaded.url, cloudinaryPublicId: uploaded.public_id,
+              cloudinaryResourceType: uploaded.resource_type, migratedFrom: "firebase-storage",
+              migratedAt: new Date().toISOString(), migrationStatus: "cloudinary-verified"
+            });
+          }
+          // Re-read to ensure metadata is committed before deleting the original.
+          const verify = await getDocs(query(collection(db, "movements"), where("linkedCardId", "==", String(data.linkedCardId))));
+          const verified = verify.docs.some(x => x.id === d.id && x.data().cloudinaryPublicId === uploaded.public_id && x.data().mediaURL === uploaded.url);
+          if (!verified) throw new Error("Cloudinary metadata verification failed; original retained.");
+          if (data.storagePath) {
+            try { await deleteObject(storageRef(storage, data.storagePath)); }
+            catch (err) { if (err?.code !== "storage/object-not-found") throw err; }
+          }
+          await updateDoc(doc(db, "movements", d.id), { storagePath: null, migrationStatus: "completed" });
+          migrated++;
+        } catch (err) {
+          failed++; console.error("Migration failed for", d.id, err);
+          // Preserve original Firebase file and metadata on every failure.
+        }
+        if ((i + 1) % 5 === 0) console.info(`CINEMOTION migration: ${i + 1}/${legacy.length}; migrated ${migrated}; failed ${failed}`);
+      }
+      alert(`Migration finished. Migrated: ${migrated}. Failed/retained for retry: ${failed}. Total: ${legacy.length}.`);
+      await loadFirebaseMovements();
+    };
+
+    // Add a migration control only for the authenticated admin; does not alter page layout.
+    function ensureMigrationButton() {
+      if (document.getElementById("cloudinaryMigrationButton")) return;
+      const btn = document.createElement("button");
+      btn.id = "cloudinaryMigrationButton"; btn.className = "admin-only";
+      btn.textContent = "Migrate Firebase Media to Cloudinary";
+      btn.style.cssText = "position:fixed;right:18px;bottom:18px;z-index:99999;padding:12px 16px;border:1px solid #00d2ff;border-radius:10px;background:#071827;color:#fff;font-weight:700;cursor:pointer;display:none";
+      btn.addEventListener("click", async () => { btn.disabled = true; btn.textContent = "Migrating..."; try { await window.migrateFirebaseMediaToCloudinary(); } catch (e) { alert("Migration stopped: " + (e.message || e)); } finally { btn.disabled = false; btn.textContent = "Migrate Firebase Media to Cloudinary"; } });
+      document.body.appendChild(btn);
+    }
+    ensureMigrationButton();
 
     // Gemini AI Assistant UI, chat controls, and file attachments.
     const geminiPanel = byId("geminiPanel");
