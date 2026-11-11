@@ -884,6 +884,8 @@
         </div>
         <a class="forgot-pass-link" onclick="openForgotPasswordModal()">Forgot Password?</a>
         <button type="submit" class="submit-btn" id="emailSubmitBtn">Login</button>
+        <button type="button" class="submit-btn" id="resendVerificationBtn" style="display:none; margin-top:10px; background:#172235; color:#00d2ff; border:1px solid rgba(0,210,255,.45);" onclick="resendVerificationEmail()">Resend Verification Email</button>
+        <p id="verificationStatusText" style="display:none; margin-top:10px; color:#fbbf24; font-size:12px; line-height:1.5;"></p>
       </form>
 
       <!-- 2. NEW USER REGISTRATION FORM (4 STRICT FIELDS) -->
@@ -2745,8 +2747,33 @@
     }
 
     // Keep the login gate in sync with Firebase Authentication
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
       const gate = byId("authGateModal");
+      const resendBtn = byId("resendVerificationBtn");
+      const verificationText = byId("verificationStatusText");
+
+      // Refresh the user's verification state after returning from the email link.
+      if (user && user.email) {
+        try { await user.reload(); }
+        catch (refreshError) { console.warn("Could not refresh email verification state:", refreshError); }
+      }
+
+      // Never expose the vault to an unverified email account.
+      // Do not automatically resend verification emails here.
+      if (user && user.email && !user.emailVerified) {
+        document.body.classList.remove("is-admin-active");
+        if (gate) gate.style.display = "flex";
+        if (resendBtn) resendBtn.style.display = "block";
+        if (verificationText) {
+          verificationText.style.display = "block";
+          verificationText.textContent = "Your email is not verified. Check your inbox or click Resend Verification Email. If Firebase temporarily blocked requests, wait before retrying.";
+        }
+        return;
+      }
+
+      if (resendBtn) resendBtn.style.display = "none";
+      if (verificationText) verificationText.style.display = "none";
+
       if (user) {
         if (gate) gate.style.display = "none";
         const displayName = user.email || user.phoneNumber || "Director";
@@ -2829,17 +2856,12 @@
         await loginCredential.user.reload();
 
         if (!loginCredential.user.emailVerified) {
-          try {
-            await sendEmailVerification(loginCredential.user, {
-              url: window.location.origin,
-              handleCodeInApp: false
-            });
-            alert("Your email is not verified yet. A new verification email has been sent to " + email + ". Check Inbox, Spam and Promotions, verify the email, then log in again.");
-          } catch (mailError) {
-            console.error("Verification email resend failed:", mailError);
-            showAuthMessage(explainFirebaseError(mailError, "Sending verification email"));
+          if (byId("resendVerificationBtn")) byId("resendVerificationBtn").style.display = "block";
+          if (byId("verificationStatusText")) {
+            byId("verificationStatusText").style.display = "block";
+            byId("verificationStatusText").textContent = "Email verification is pending. Use the Resend Verification Email button only when needed. Check Inbox, Spam and Promotions.";
           }
-          await signOut(auth);
+          showAuthMessage("Please verify your email before entering CINEMOTION. No automatic email was sent, to avoid Firebase rate limits.");
           return;
         }
 
@@ -2850,6 +2872,44 @@
         if (submit) { submit.disabled = false; submit.textContent = "Login"; }
       }
     });
+
+    // User-triggered verification resend with a 60-second cooldown.
+    let verificationResendAllowedAt = 0;
+    window.resendVerificationEmail = async function() {
+      const user = auth.currentUser;
+      const button = byId("resendVerificationBtn");
+      if (!user || !user.email) {
+        showAuthMessage("Please log in with your email and password first.");
+        return;
+      }
+      if (user.emailVerified) {
+        showAuthMessage("Your email is already verified. Please log in again.");
+        return;
+      }
+      const remaining = Math.ceil((verificationResendAllowedAt - Date.now()) / 1000);
+      if (remaining > 0) {
+        showAuthMessage("Please wait " + remaining + " seconds before requesting another verification email.");
+        return;
+      }
+      try {
+        if (button) { button.disabled = true; button.textContent = "Sending..."; }
+        await sendEmailVerification(user, {
+          url: window.location.origin,
+          handleCodeInApp: false
+        });
+        verificationResendAllowedAt = Date.now() + 60000;
+        if (byId("verificationStatusText")) {
+          byId("verificationStatusText").style.display = "block";
+          byId("verificationStatusText").textContent = "Verification email sent. Check Inbox, Spam and Promotions. After verifying, return here and log in again.";
+        }
+        showAuthMessage("Verification email sent. Please check your inbox.");
+      } catch (err) {
+        console.error("Verification email resend failed:", err);
+        showAuthMessage(explainFirebaseError(err, "Resending verification email"));
+      } finally {
+        if (button) { button.disabled = false; button.textContent = "Resend Verification Email"; }
+      }
+    };
 
     // 2. New User Registration
     byId("registerAuthForm")?.addEventListener("submit", async (e) => {
