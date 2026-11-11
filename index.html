@@ -752,6 +752,43 @@
     }
     .gemini-panel.open { display: flex; }
     .gemini-panel-head { min-height: 66px; padding: 13px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,.09); }
+    .gemini-menu-toggle {
+      width:34px; height:34px; flex:0 0 auto; display:grid; place-items:center;
+      border:0; border-radius:9px; color:#dbe4f2; background:rgba(255,255,255,.07);
+      cursor:pointer; font-size:15px;
+    }
+    .gemini-menu-toggle:hover { background:rgba(155,114,203,.2); color:#fff; }
+    .gemini-panel-head { gap:10px; }
+    .gemini-menu-drawer {
+      position:absolute; z-index:8; top:66px; left:0; bottom:0; width:205px;
+      padding:16px 10px; background:#101827; border-right:1px solid rgba(155,114,203,.25);
+      box-shadow:12px 0 28px rgba(0,0,0,.28); transform:translateX(-105%);
+      transition:transform .22s ease; visibility:hidden;
+    }
+    .gemini-menu-drawer.open { transform:translateX(0); visibility:visible; }
+    .gemini-menu-title { padding:5px 10px 12px; color:#77869d; font-size:.62rem; font-weight:800; letter-spacing:.12em; }
+    .gemini-menu-item {
+      width:100%; display:flex; align-items:center; gap:11px; padding:12px 10px;
+      border:0; border-radius:10px; color:#e5eaf3; background:transparent;
+      text-align:left; font:600 .78rem 'Plus Jakarta Sans',sans-serif; cursor:pointer;
+    }
+    .gemini-menu-item:hover { background:rgba(255,255,255,.08); }
+    .gemini-menu-item i { width:17px; color:#a78bfa; text-align:center; }
+    .gemini-menu-item.gemini-clear-item i { color:#f28b82; }
+    .gemini-attachment-preview {
+      margin:8px 13px 0; padding:7px 10px; display:flex; align-items:center; gap:9px;
+      color:#dbeafe; background:rgba(66,133,244,.12); border:1px solid rgba(66,133,244,.28);
+      border-radius:10px; font-size:.72rem;
+    }
+    .gemini-attachment-preview[hidden] { display:none; }
+    .gemini-attachment-preview span { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .gemini-attachment-preview button { border:0; background:transparent; color:#cbd5e1; font-size:19px; cursor:pointer; }
+    .gemini-upload-btn {
+      width:35px; height:35px; flex:0 0 auto; display:grid; place-items:center;
+      border:1px solid rgba(155,114,203,.35); border-radius:10px;
+      color:#c4b5fd; background:rgba(155,114,203,.10); cursor:pointer;
+    }
+    .gemini-upload-btn:hover { background:rgba(155,114,203,.22); color:#fff; }
     .gemini-panel-brand { display:flex; align-items:center; gap:10px; }
     .gemini-panel-mark { width:29px; height:29px; }
     .gemini-panel-brand strong { display:block; color:#fff; font-size: .98rem; }
@@ -2360,6 +2397,9 @@
   <!-- CINEMOTION GEMINI AI ASSISTANT -->
   <section class="gemini-panel" id="geminiPanel" aria-label="Gemini AI Assistant" aria-hidden="true">
     <div class="gemini-panel-head">
+      <button type="button" class="gemini-menu-toggle" id="geminiMenuToggle" aria-label="Open Gemini menu" aria-expanded="false" title="Gemini menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
       <div class="gemini-panel-brand">
         <svg class="gemini-mark gemini-panel-mark" viewBox="0 0 24 24" aria-hidden="true">
           <defs>
@@ -2375,6 +2415,15 @@
       </div>
       <button type="button" class="gemini-close" id="geminiClose" aria-label="Close Gemini">&times;</button>
     </div>
+    <aside class="gemini-menu-drawer" id="geminiMenuDrawer" aria-hidden="true">
+      <div class="gemini-menu-title">CHAT OPTIONS</div>
+      <button type="button" class="gemini-menu-item" id="geminiNewChat">
+        <i class="fa-regular fa-pen-to-square"></i><span>New Chat</span>
+      </button>
+      <button type="button" class="gemini-menu-item gemini-clear-item" id="geminiClearChat">
+        <i class="fa-regular fa-trash-can"></i><span>Clear chat</span>
+      </button>
+    </aside>
     <div class="gemini-welcome" id="geminiWelcome">
       <svg class="gemini-welcome-mark" viewBox="0 0 24 24" aria-hidden="true">
         <defs><linearGradient id="geminiWelcomeGradient" x1="7%" y1="5%" x2="92%" y2="96%"><stop offset="0%" stop-color="#4285F4"/><stop offset="48%" stop-color="#9B72CB"/><stop offset="100%" stop-color="#D96570"/></linearGradient></defs>
@@ -2388,7 +2437,16 @@
       </div>
     </div>
     <div class="gemini-messages" id="geminiMessages" aria-live="polite"></div>
+    <div class="gemini-attachment-preview" id="geminiAttachmentPreview" hidden>
+      <i class="fa-solid fa-file"></i>
+      <span id="geminiAttachmentName"></span>
+      <button type="button" id="geminiRemoveAttachment" aria-label="Remove attachment">&times;</button>
+    </div>
     <form class="gemini-composer" id="geminiForm">
+      <input type="file" id="geminiFileInput" accept="image/*,application/pdf,text/plain,text/csv,application/json" hidden>
+      <button type="button" class="gemini-upload-btn" id="geminiUploadBtn" aria-label="Upload a file" title="Upload image, PDF or text file">
+        <i class="fa-solid fa-arrow-up-from-bracket"></i>
+      </button>
       <textarea id="geminiInput" rows="1" maxlength="12000" placeholder="Ask Gemini..." aria-label="Message Gemini"></textarea>
       <button type="submit" id="geminiSend" aria-label="Send message">
         <i class="fa-solid fa-arrow-up"></i>
@@ -2795,7 +2853,7 @@
     };
 
 
-    // Gemini AI Assistant UI and chat session.
+    // Gemini AI Assistant UI, chat controls, and file attachments.
     const geminiPanel = byId("geminiPanel");
     const geminiLauncher = byId("geminiLauncher");
     const geminiClose = byId("geminiClose");
@@ -2803,7 +2861,18 @@
     const geminiInput = byId("geminiInput");
     const geminiMessages = byId("geminiMessages");
     const geminiWelcome = byId("geminiWelcome");
+    const geminiMenuToggle = byId("geminiMenuToggle");
+    const geminiMenuDrawer = byId("geminiMenuDrawer");
+    const geminiNewChat = byId("geminiNewChat");
+    const geminiClearChat = byId("geminiClearChat");
+    const geminiFileInput = byId("geminiFileInput");
+    const geminiUploadBtn = byId("geminiUploadBtn");
+    const geminiAttachmentPreview = byId("geminiAttachmentPreview");
+    const geminiAttachmentName = byId("geminiAttachmentName");
+    const geminiRemoveAttachment = byId("geminiRemoveAttachment");
     let geminiChatSession = null;
+    let geminiSelectedFile = null;
+    const GEMINI_MAX_FILE_BYTES = 15 * 1024 * 1024;
 
     function openGeminiPanel() {
       if (!auth.currentUser) {
@@ -2817,6 +2886,30 @@
     function closeGeminiPanel() {
       geminiPanel?.classList.remove("open");
       geminiPanel?.setAttribute("aria-hidden", "true");
+      closeGeminiMenu();
+    }
+    function openGeminiMenu() {
+      geminiMenuDrawer?.classList.add("open");
+      geminiMenuDrawer?.setAttribute("aria-hidden", "false");
+      geminiMenuToggle?.setAttribute("aria-expanded", "true");
+    }
+    function closeGeminiMenu() {
+      geminiMenuDrawer?.classList.remove("open");
+      geminiMenuDrawer?.setAttribute("aria-hidden", "true");
+      geminiMenuToggle?.setAttribute("aria-expanded", "false");
+    }
+    function toggleGeminiMenu() {
+      if (geminiMenuDrawer?.classList.contains("open")) closeGeminiMenu();
+      else openGeminiMenu();
+    }
+    function resetGeminiConversation() {
+      geminiChatSession = null;
+      if (geminiMessages) geminiMessages.replaceChildren();
+      if (geminiWelcome) geminiWelcome.style.display = "";
+      if (geminiInput) geminiInput.value = "";
+      clearGeminiAttachment();
+      closeGeminiMenu();
+      geminiInput?.focus();
     }
     function addGeminiMessage(text, role, isError = false) {
       if (!geminiMessages) return;
@@ -2828,62 +2921,139 @@
       if (geminiWelcome) geminiWelcome.style.display = "none";
       return message;
     }
-    async function sendGeminiMessage(rawText) {
+    function clearGeminiAttachment() {
+      geminiSelectedFile = null;
+      if (geminiFileInput) geminiFileInput.value = "";
+      if (geminiAttachmentPreview) geminiAttachmentPreview.hidden = true;
+      if (geminiAttachmentName) geminiAttachmentName.textContent = "";
+    }
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const dataUrl = String(reader.result || "");
+          resolve(dataUrl.substring(dataUrl.indexOf(",") + 1));
+        };
+        reader.onerror = () => reject(new Error("Could not read the selected file."));
+        reader.readAsDataURL(file);
+      });
+    }
+    async function sendGeminiMessage(rawText, attachedFile = null) {
       const prompt = String(rawText || "").trim();
-      if (!prompt) return;
+      if (!prompt && !attachedFile) return;
       if (!auth.currentUser) {
         addGeminiMessage("Please sign in to use Gemini.", "assistant", true);
         return;
       }
       if (!window.cinemotionGeminiModel) {
-        addGeminiMessage("Gemini is not initialized. Check that Firebase AI Logic is enabled for the ai-film-making project and App Check is configured.", "assistant", true);
+        addGeminiMessage("Gemini is not initialized. Check Firebase AI Logic and App Check configuration.", "assistant", true);
         return;
       }
-      addGeminiMessage(prompt, "user");
+
+      const userLabel = attachedFile
+        ? `${prompt || "Please analyze this attached file."}\n\n📎 ${attachedFile.name}`
+        : prompt;
+      addGeminiMessage(userLabel, "user");
       const pending = addGeminiMessage("Gemini is thinking...", "assistant");
       const sendButton = byId("geminiSend");
       if (sendButton) sendButton.disabled = true;
       if (geminiInput) geminiInput.disabled = true;
+      if (geminiUploadBtn) geminiUploadBtn.disabled = true;
+
       try {
         if (!geminiChatSession) {
           geminiChatSession = window.cinemotionGeminiModel.startChat({
             history: [{
               role: "user",
-              parts: [{ text: "You are the creative AI assistant inside CINEMOTION STUDIO. Help with filmmaking, camera movements, camera angles, shot design, cinematic lighting, storyboards, image/video generation prompts, and creative production workflows. Give practical, detailed, well-structured answers. Preserve exact product geometry and user constraints when writing product prompts." }]
+              parts: [{ text: "You are the creative AI assistant inside CINEMOTION STUDIO. Help with filmmaking, camera movements, camera angles, shot design, cinematic lighting, storyboards, image/video generation prompts, and creative production workflows. Give practical, detailed, well-structured answers. Preserve exact product geometry and user constraints when writing product prompts. When a user attaches a file, inspect its contents and answer based on it." }]
             }, {
               role: "model",
-              parts: [{ text: "Understood. I am the CINEMOTION STUDIO creative assistant. I can help with cinematic direction, prompts, storyboards, and production workflows." }]
+              parts: [{ text: "Understood. I am the CINEMOTION STUDIO creative assistant. I can help with cinematic direction, prompts, storyboards, production workflows, and attached files." }]
             }]
           });
         }
-        const result = await geminiChatSession.sendMessage(prompt);
+
+        let messagePayload = prompt || "Please inspect the attached file and help me with it.";
+        if (attachedFile) {
+          const mimeType = attachedFile.type || "application/octet-stream";
+          if (mimeType.startsWith("text/") || mimeType === "application/json") {
+            const textContent = await attachedFile.text();
+            messagePayload += `\n\nAttached file: ${attachedFile.name}\n\n${textContent}`;
+          } else {
+            const base64Data = await fileToBase64(attachedFile);
+            messagePayload = [
+              { text: messagePayload },
+              { inlineData: { data: base64Data, mimeType } }
+            ];
+          }
+        }
+
+        const result = await geminiChatSession.sendMessage(messagePayload);
         const answer = result?.response?.text?.() || "Gemini returned an empty response.";
         if (pending) pending.textContent = answer;
       } catch (err) {
         console.error("Gemini request failed:", err);
         if (pending) {
           pending.classList.add("error");
-          pending.textContent = `Gemini request failed: ${err?.message || "Unknown error"}. Check Firebase AI Logic setup, App Check enforcement, and project API access.`;
+          pending.textContent = `Gemini request failed: ${err?.message || "Unknown error"}. Check Firebase AI Logic setup, App Check enforcement, and supported file type/size.`;
         }
       } finally {
         if (sendButton) sendButton.disabled = false;
         if (geminiInput) { geminiInput.disabled = false; geminiInput.focus(); }
+        if (geminiUploadBtn) geminiUploadBtn.disabled = false;
       }
     }
 
     geminiLauncher?.addEventListener("click", openGeminiPanel);
     geminiClose?.addEventListener("click", closeGeminiPanel);
+    geminiMenuToggle?.addEventListener("click", toggleGeminiMenu);
+    geminiNewChat?.addEventListener("click", () => {
+      resetGeminiConversation();
+      addGeminiMessage("New chat started. What would you like to create?", "assistant");
+    });
+    geminiClearChat?.addEventListener("click", () => {
+      resetGeminiConversation();
+    });
+    geminiUploadBtn?.addEventListener("click", () => geminiFileInput?.click());
+    geminiFileInput?.addEventListener("change", () => {
+      const file = geminiFileInput?.files?.[0];
+      if (!file) return;
+      const allowed = file.type.startsWith("image/") ||
+        file.type === "application/pdf" ||
+        file.type.startsWith("text/") ||
+        file.type === "application/json";
+      if (!allowed) {
+        clearGeminiAttachment();
+        addGeminiMessage("Unsupported file. Please attach an image, PDF, or text file.", "assistant", true);
+        return;
+      }
+      if (file.size > GEMINI_MAX_FILE_BYTES) {
+        clearGeminiAttachment();
+        addGeminiMessage("This file is larger than 15 MB. Please choose a smaller file.", "assistant", true);
+        return;
+      }
+      geminiSelectedFile = file;
+      if (geminiAttachmentName) geminiAttachmentName.textContent = file.name;
+      if (geminiAttachmentPreview) geminiAttachmentPreview.hidden = false;
+      geminiInput?.focus();
+    });
+    geminiRemoveAttachment?.addEventListener("click", clearGeminiAttachment);
     geminiForm?.addEventListener("submit", (event) => {
       event.preventDefault();
       const value = geminiInput?.value || "";
+      const file = geminiSelectedFile;
       if (geminiInput) geminiInput.value = "";
-      sendGeminiMessage(value);
+      clearGeminiAttachment();
+      sendGeminiMessage(value, file);
     });
     geminiInput?.addEventListener("keydown", (event) => {
       if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
         geminiForm?.requestSubmit();
       }
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeGeminiMenu();
     });
     document.querySelectorAll("[data-gemini-prompt]").forEach((button) => {
       button.addEventListener("click", () => {
