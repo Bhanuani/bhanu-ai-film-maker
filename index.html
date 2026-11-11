@@ -2602,6 +2602,7 @@
       onAuthStateChanged,
       signInWithEmailAndPassword,
       createUserWithEmailAndPassword,
+      sendEmailVerification,
       sendPasswordResetEmail,
       signInWithPhoneNumber,
       RecaptchaVerifier,
@@ -2675,6 +2676,12 @@
       }
       if (code === "auth/weak-password") {
         return "Password is too weak. Please meet all complexity criteria.";
+      }
+      if (code === "auth/too-many-requests") {
+        return "Firebase temporarily blocked repeated requests. Wait a few minutes and try again.";
+      }
+      if (code === "auth/missing-email") {
+        return "Enter your email address first.";
       }
       return `${action} failed: ${err?.message || "Unknown error"}`;
     }
@@ -2818,7 +2825,24 @@
       const submit = byId("emailSubmitBtn");
       if (submit) { submit.disabled = true; submit.textContent = "Please wait..."; }
       try {
-        await signInWithEmailAndPassword(auth, email, password);
+        const loginCredential = await signInWithEmailAndPassword(auth, email, password);
+        await loginCredential.user.reload();
+
+        if (!loginCredential.user.emailVerified) {
+          try {
+            await sendEmailVerification(loginCredential.user, {
+              url: window.location.origin,
+              handleCodeInApp: false
+            });
+            alert("Your email is not verified yet. A new verification email has been sent to " + email + ". Check Inbox, Spam and Promotions, verify the email, then log in again.");
+          } catch (mailError) {
+            console.error("Verification email resend failed:", mailError);
+            showAuthMessage(explainFirebaseError(mailError, "Sending verification email"));
+          }
+          await signOut(auth);
+          return;
+        }
+
         await notifyAdminOnLogin(email, "Email Login");
       } catch (err) {
         showAuthMessage(explainFirebaseError(err, "Login"));
@@ -2847,6 +2871,13 @@
 
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+
+        // Send Firebase's built-in verification email immediately after registration.
+        await sendEmailVerification(userCredential.user, {
+          url: window.location.origin,
+          handleCodeInApp: false
+        });
+
         await addDoc(collection(db, "registered_users"), {
           uid: userCredential.user.uid,
           email: email,
@@ -2855,7 +2886,8 @@
         });
 
         await notifyAdminOnLogin(email, `New User Registered (${jobStudy})`);
-        alert("Registration Successful! Welcome to Cinemotion Studio.");
+        alert("Registration successful. A verification email has been sent to " + email + ". Please verify it from your inbox (also check Spam/Promotions), then log in. Unverified email accounts cannot use admin-only media upload."); 
+        await signOut(auth);
       } catch (err) {
         showAuthMessage(explainFirebaseError(err, "Registration"));
       } finally {
