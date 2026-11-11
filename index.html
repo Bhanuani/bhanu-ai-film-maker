@@ -1521,7 +1521,7 @@
     });
 
     if (linkForm) {
-      linkForm.addEventListener("submit", (e) => {
+      linkForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const id = linkCardId?.value;
         const url = mediaUrlInput?.value.trim() || "";
@@ -1549,10 +1549,18 @@
           tx.objectStore("cardMedia").put({ id: id, mediaURL: url, fileType: mediaType });
         }
 
-        if (typeof window.saveMediaLinkToFirestore === 'function') {
-          window.saveMediaLinkToFirestore(id, url, mediaType);
+        if (typeof window.saveMediaLinkToFirestore === "function") {
+          try {
+            await window.saveMediaLinkToFirestore(id, url, mediaType);
+            showToast("Media link saved to Firebase!");
+          } catch (err) {
+            console.error("Media link cloud save failed:", err);
+            showToast("Cloud save failed: " + (err.message || err));
+            return;
+          }
         } else {
-          showToast("Link Saved Locally!");
+          showToast("Firebase is not ready. Link was not cloud-synced.");
+          return;
         }
 
         linkModal.style.display = "none";
@@ -2287,6 +2295,10 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
     import {
+      initializeAppCheck,
+      ReCaptchaEnterpriseProvider
+    } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app-check.js";
+    import {
       getAuth,
       onAuthStateChanged,
       signInWithEmailAndPassword,
@@ -2312,8 +2324,13 @@
       getStorage,
       ref as storageRef,
       uploadBytes,
-      getDownloadURL
+      getDownloadURL,
+      deleteObject
     } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js";
+
+    // Firebase App Check - reCAPTCHA Enterprise site key created for CINEMOTION STUDIO.
+    // Site keys are public client identifiers; never place a secret key in frontend code.
+    const APP_CHECK_SITE_KEY = "6LcimBouAAAAA07MzcnBsL70pdwFt4ZPs644Yala";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCbF3oQKFz0pFVZ5EdOzFbfrqhiWfKsqHk",
@@ -2360,14 +2377,27 @@
       return `${action} failed: ${err?.message || "Unknown error"}`;
     }
 
-    let app, auth, db, storage;
+    let app, auth, db, storage, appCheck;
     try {
       app = initializeApp(firebaseConfig);
+
+      // Initialize App Check before Auth, Firestore, and Storage are used.
+      // Token auto-refresh keeps verified requests active during long sessions.
+      appCheck = initializeAppCheck(app, {
+        provider: new ReCaptchaEnterpriseProvider(APP_CHECK_SITE_KEY),
+        isTokenAutoRefreshEnabled: true
+      });
+
       auth = getAuth(app);
       db = getFirestore(app);
       storage = getStorage(app);
+      console.info("CINEMOTION: Firebase App Check initialized.");
     } catch (err) {
-      showAuthMessage("Could not initialize Firebase: " + (err.message || err));
+      console.error("Firebase / App Check initialization failed:", err);
+      showAuthMessage(
+        "Firebase initialization failed. Check the App Check site key and Firebase configuration. " +
+        (err.message || err)
+      );
       throw err;
     }
 
@@ -2582,7 +2612,7 @@
         }
       });
       const downloadURL = await getDownloadURL(fileRef);
-      await window.saveMediaLinkToFirestore(cardId, downloadURL, mediaType);
+      await window.saveMediaLinkToFirestore(cardId, downloadURL, mediaType, path);
       return downloadURL;
     };
 
@@ -2606,6 +2636,15 @@
         const snapshot = await getDocs(q);
         const delPromises = [];
         snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          if (data.storagePath) {
+            delPromises.push(
+              deleteObject(storageRef(storage, data.storagePath)).catch((storageErr) => {
+                // A missing/previously deleted Storage object must not block Firestore cleanup.
+                console.warn("Storage object cleanup skipped:", storageErr);
+              })
+            );
+          }
           delPromises.push(deleteDoc(doc(db, "movements", docSnap.id)));
         });
         await Promise.all(delPromises);
@@ -2615,7 +2654,7 @@
     };
 
     // FIRESTORE SAVE FUNCTION
-    window.saveMediaLinkToFirestore = async function(cardId, url, mediaType) {
+    window.saveMediaLinkToFirestore = async function(cardId, url, mediaType, storagePath = null) {
       const toast = byId("toast");
       if (toast) { toast.textContent = "Saving media to cloud..."; toast.classList.add("show"); }
       try {
@@ -2630,7 +2669,9 @@
           linkedCardId: cardId,
           mediaURL: url,
           mediaType,
-          createdAt: new Date().toISOString()
+          storagePath: storagePath || null,
+          createdAt: new Date().toISOString(),
+          updatedBy: auth.currentUser.uid
         });
         const item = window.allVaultItems?.find(m => m.id === cardId);
         if (item) { item.mediaURL = url; item.mediaType = mediaType; }
