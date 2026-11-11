@@ -26,12 +26,35 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
+    html { background: #040711; }
     body {
-      background-color: var(--bg-dark);
+      background-color: transparent;
       color: var(--text-main);
       font-family: 'Plus Jakarta Sans', sans-serif;
       min-height: 100vh;
       overflow-x: hidden;
+    }
+    #siteBackgroundVideo {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      object-position: center;
+      z-index: -2;
+      pointer-events: none;
+      opacity: .34;
+      filter: brightness(.62) saturate(1.08);
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(4,7,17,.60), rgba(4,7,17,.78)),
+        radial-gradient(ellipse at 50% 15%, rgba(0,150,210,.10), transparent 62%);
     }
 
     /* Regular users cannot see admin editing/deleting options */
@@ -96,8 +119,8 @@
     }
 
     .header-inner {
-      max-width: 1720px;
-      width: 96%;
+      max-width: 1332px;
+      width: min(1332px, calc(100% - 32px));
       margin: 0 auto;
       padding: 0.85rem 0;
       display: flex;
@@ -311,11 +334,11 @@
     }
 
     /* VAULT LAYOUT CONTAINER */
-    .vault-container { 
-      max-width: 1720px; 
-      width: 96%;
-      margin: 0 auto; 
-      padding: 1.5rem 0 5rem; 
+    .vault-container {
+      max-width: 1332px;
+      width: min(1332px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 1.5rem 0 5rem;
     }
 
     /* HERO BANNER */
@@ -342,16 +365,17 @@
     }
 
     .hero-ambient-backdrop {
-      position: absolute;
-      inset: -25px;
-      width: calc(100% + 50px);
-      height: calc(100% + 50px);
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
       object-fit: cover;
-      filter: blur(45px) brightness(0.65) saturate(1.5);
-      opacity: 0.85;
+      object-position: center;
+      filter: brightness(.62) saturate(1.08);
+      opacity: .34;
       pointer-events: none;
-      z-index: 1;
-      transform: scale(1.1);
+      z-index: -2;
+      transform: none;
     }
 
     .hero-foreground-video {
@@ -438,11 +462,12 @@
     @keyframes iconFloatContinuous { 0% { transform: translateY(0px) rotate(0deg); } 100% { transform: translateY(-4px) rotate(3deg); } }
 
     /* CARD GRID */
-    .movements-grid { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); 
-      gap: 1.5rem; 
-      width: 100%; 
+    .movements-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1.25rem;
+      width: 100%;
+      align-items: stretch;
     }
 
     .movement-card {
@@ -821,107 +846,25 @@
       .gemini-panel { top:70px; right:10px; bottom:10px; width:calc(100vw - 20px); max-height:none; }
     }
 
-  
-    /* CINEMOTION DESKTOP ALIGNMENT + FULLSCREEN LOOPING BACKGROUND */
-    @media (min-width: 1100px) {
-      .header-inner,
-      .vault-container {
-        width: 76%;
-        max-width: 1360px;
-      }
-      .vault-container {
-        padding-top: 1.25rem;
-      }
-      .movements-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 1.25rem;
-      }
-    }
 
-    /* Keep the existing hero video as a fixed, full-viewport background.
-       Its original content position is removed so the cards sit over it. */
-    #heroBanner.hero-banner-wrapper {
-      position: fixed;
-      inset: 0;
-      z-index: -2;
-      width: 100vw;
-      height: 100vh;
-      max-width: none;
-      margin: 0;
-      border: 0;
-      border-radius: 0;
-      box-shadow: none;
-      background: #030711;
-      overflow: hidden;
-      pointer-events: none;
+    /* RESPONSIVE PROMPT GRID: four columns on desktop, adapting on smaller screens. */
+    @media (max-width: 1100px) {
+      .movements-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
-    #heroBanner .hero-ambient-backdrop {
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: blur(30px) brightness(.34) saturate(1.2);
-      opacity: .62;
-      transform: none;
+    @media (max-width: 820px) {
+      .movements-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .vault-container, .header-inner { width: calc(100% - 24px); }
     }
-    #heroBanner .hero-foreground-video {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-      opacity: .43;
-      filter: brightness(.62) saturate(.9);
-      transform: none;
+    @media (max-width: 520px) {
+      .movements-grid { grid-template-columns: 1fr; }
+      .vault-container { padding-top: 1rem; }
     }
-    #heroBanner::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: 3;
-      background: linear-gradient(180deg, rgba(3,7,17,.42), rgba(3,7,17,.68));
-      pointer-events: none;
-    }
-    body {
-      background: transparent;
-      position: relative;
-      isolation: isolate;
-    }
-    body > header,
-    body > .vault-container {
-      position: relative;
-      z-index: 1;
-    }
-    header {
-      background: rgba(4, 7, 17, .78);
-      backdrop-filter: blur(18px);
-    }
-
-    /* A click anywhere on the Welcome Back animation dismisses it. */
-    #welcomeBackOverlay {
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-
-    @media (max-width: 1099px) {
-      .header-inner,
-      .vault-container {
-        width: 94%;
-      }
-      .movements-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-    @media (max-width: 640px) {
-      .movements-grid {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-
   </style>
 </head>
 <body>
+  <video id="siteBackgroundVideo" autoplay muted playsinline loop preload="auto" aria-hidden="true">
+    <source src="hero-banner-3.mp4" type="video/mp4">
+  </video>
 
   <!-- TAB SWITCH WELCOME BACK OVERLAY (SEAMLESS FULLSCREEN, NO BOX) -->
   <div id="welcomeBackOverlay">
@@ -1133,7 +1076,6 @@
 
   <div class="vault-container">
     <section class="hero-banner-wrapper" id="heroBanner">
-      <video id="heroVideoBg" class="hero-ambient-backdrop" autoplay muted playsinline loop preload="auto" src="hero-banner-3.mp4"></video>
       <video id="heroVideo" class="hero-foreground-video" autoplay muted playsinline loop preload="auto" poster="bhanu-3d-header_2.png" src="hero-banner-3.mp4"></video>
     </section>
 
@@ -1498,29 +1440,30 @@
       });
     }
 
-    // VIDEO PLAYLIST
+    // SINGLE HERO VIDEO: use only hero-banner-3.mp4; no playlist rotation.
     const heroVid = document.getElementById("heroVideo");
     const heroVidBg = document.getElementById("heroVideoBg");
-
     if (heroVid) {
-      const playlist = ["hero-banner-1.mp4", "hero-banner-2.mp4", "hero-banner-3.mp4"];
-      let playlistIndex = 0;
-
-      heroVid.addEventListener("ended", () => {
-        playlistIndex = (playlistIndex + 1) % playlist.length;
-        heroVid.src = playlist[playlistIndex];
-        if (heroVidBg) heroVidBg.src = playlist[playlistIndex];
-
-        heroVid.play().catch(e => console.log("Video transition:", e));
-        if (heroVidBg) heroVidBg.play().catch(() => {});
-      });
-
-      document.addEventListener("DOMContentLoaded", () => {
-        heroVid.muted = true;
-        if (heroVidBg) heroVidBg.muted = true;
+      heroVid.src = "hero-banner-3.mp4";
+      heroVid.loop = true;
+      heroVid.muted = true;
+      heroVid.playsInline = true;
+      if (heroVidBg) {
+        heroVidBg.src = "hero-banner-3.mp4";
+        heroVidBg.loop = true;
+        heroVidBg.muted = true;
+        heroVidBg.playsInline = true;
+      }
+      const startHeroVideo = () => {
         heroVid.play().catch(() => {});
-        if (heroVidBg) heroVidBg.play().catch(() => {});
-      });
+        heroVidBg?.play().catch(() => {});
+        document.getElementById("siteBackgroundVideo")?.play().catch(() => {});
+      };
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", startHeroVideo, { once: true });
+      } else {
+        startHeroVideo();
+      }
     }
 
     /* INDEXED-DB PERSISTENCE */
@@ -2465,18 +2408,6 @@
 
     // TAB SWITCH "WELCOME BACK" TRIGGER - ONE-TIME PLAY, NO BOX
     let welcomeTimer;
-    function dismissWelcomeBack() {
-      const overlay = document.getElementById("welcomeBackOverlay");
-      const video = document.getElementById("welcomeVideo");
-      if (!overlay || !overlay.classList.contains("show")) return;
-      clearTimeout(welcomeTimer);
-      overlay.classList.remove("show");
-      if (video) {
-        video.pause();
-        try { video.currentTime = 0; } catch (_) {}
-      }
-    }
-    document.getElementById("welcomeBackOverlay")?.addEventListener("click", dismissWelcomeBack);
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
         const overlay = document.getElementById("welcomeBackOverlay");
@@ -2499,6 +2430,75 @@
         }
       }
     });
+
+
+    // Keep the full-screen background and hero preview on the exact same video timeline.
+    (() => {
+      const mainHero = document.getElementById("heroVideo");
+      const ambientHero = document.getElementById("heroVideoBg");
+      const fullScreenBg = document.getElementById("siteBackgroundVideo");
+      const videoLayers = [ambientHero, fullScreenBg].filter(Boolean);
+
+      if (!mainHero) return;
+      mainHero.loop = true;
+      mainHero.muted = true;
+      mainHero.playsInline = true;
+
+      const syncLayer = (layer) => {
+        if (!layer) return;
+        layer.loop = true;
+        layer.muted = true;
+        layer.playsInline = true;
+        layer.addEventListener("loadedmetadata", () => {
+          try { layer.currentTime = mainHero.currentTime || 0; } catch (_) {}
+          mainHero.play().catch(() => {});
+          layer.play().catch(() => {});
+        });
+      };
+      videoLayers.forEach(syncLayer);
+
+      let syncBusy = false;
+      const syncAll = () => {
+        if (syncBusy) return;
+        syncBusy = true;
+        videoLayers.forEach(layer => {
+          if (!layer || !Number.isFinite(layer.duration) || layer.readyState < 2) return;
+          if (Math.abs(layer.currentTime - mainHero.currentTime) > 0.30) {
+            try { layer.currentTime = mainHero.currentTime; } catch (_) {}
+          }
+          if (mainHero.paused && !layer.paused) layer.pause();
+          else if (!mainHero.paused && layer.paused) layer.play().catch(() => {});
+        });
+        syncBusy = false;
+      };
+      mainHero.addEventListener("play", () => videoLayers.forEach(v => v.play().catch(() => {})));
+      mainHero.addEventListener("pause", () => videoLayers.forEach(v => v.pause()));
+      mainHero.addEventListener("seeked", syncAll);
+      mainHero.addEventListener("timeupdate", syncAll);
+      mainHero.play().catch(() => {});
+      videoLayers.forEach(v => v.play().catch(() => {}));
+    })();
+
+
+    // Clicking anywhere while Welcome Back is visible stops the animation and opens the home screen.
+    (() => {
+      const overlay = document.getElementById("welcomeBackOverlay");
+      const video = document.getElementById("welcomeVideo");
+      if (!overlay) return;
+      const dismissWelcome = () => {
+        if (!overlay.classList.contains("show")) return;
+        overlay.classList.remove("show");
+        if (video) {
+          video.pause();
+          try { video.currentTime = 0; } catch (_) {}
+        }
+      };
+      overlay.addEventListener("click", dismissWelcome);
+      video?.addEventListener("click", dismissWelcome);
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") dismissWelcome();
+      });
+    })();
 
     renderCards(window.allVaultItems);
   </script>
