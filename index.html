@@ -732,6 +732,58 @@
     .auth-tab-btn.active { color: var(--accent-cyan); border-bottom-color: var(--accent-cyan); }
     .forgot-pass-link { font-size: 12px; color: var(--accent-cyan); text-align: right; cursor: pointer; margin-top: -8px; margin-bottom: 14px; display: block; text-decoration: none; }
     .forgot-pass-link:hover { text-decoration: underline; }
+
+    /* GEMINI AI ASSISTANT */
+    .gemini-launcher {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      min-height: 40px; padding: 7px 13px; border-radius: 999px;
+      border: 1px solid rgba(155,114,203,.48); background: rgba(255,255,255,.045);
+      color: #f8fafc; font: 700 .82rem 'Plus Jakarta Sans',sans-serif;
+      cursor: pointer; transition: .2s ease; white-space: nowrap;
+    }
+    .gemini-launcher:hover { border-color: #9b72cb; background: rgba(155,114,203,.13); transform: translateY(-1px); }
+    .gemini-mark { width: 23px; height: 23px; display: block; flex: 0 0 auto; }
+    .gemini-panel {
+      position: fixed; z-index: 1000001; top: 82px; right: 22px; bottom: 18px;
+      width: min(410px, calc(100vw - 28px)); max-height: 780px;
+      display: none; flex-direction: column; overflow: hidden;
+      background: #0c1220; border: 1px solid rgba(155,114,203,.38);
+      border-radius: 18px; box-shadow: 0 22px 70px rgba(0,0,0,.65);
+    }
+    .gemini-panel.open { display: flex; }
+    .gemini-panel-head { min-height: 66px; padding: 13px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,.09); }
+    .gemini-panel-brand { display:flex; align-items:center; gap:10px; }
+    .gemini-panel-mark { width:29px; height:29px; }
+    .gemini-panel-brand strong { display:block; color:#fff; font-size: .98rem; }
+    .gemini-panel-brand small { display:block; color:#94a3b8; font-size:.68rem; margin-top:2px; }
+    .gemini-close { width:34px; height:34px; border:0; border-radius:50%; background:rgba(255,255,255,.07); color:#cbd5e1; font-size:24px; cursor:pointer; }
+    .gemini-welcome { padding: 30px 22px 18px; text-align:center; }
+    .gemini-welcome-mark { width:38px; height:38px; margin-bottom:13px; }
+    .gemini-welcome h3 { font-size:1.08rem; color:#fff; margin-bottom:8px; }
+    .gemini-welcome p { font-size:.78rem; line-height:1.55; color:#94a3b8; }
+    .gemini-suggestions { display:grid; gap:8px; margin-top:18px; }
+    .gemini-suggestions button { text-align:left; color:#dbeafe; background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; font:500 .75rem 'Plus Jakarta Sans',sans-serif; cursor:pointer; }
+    .gemini-suggestions button:hover { border-color:#9b72cb; background:rgba(155,114,203,.1); }
+    .gemini-messages { flex:1; min-height:80px; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:12px; }
+    .gemini-message { max-width:92%; padding:11px 13px; border-radius:13px; font-size:.8rem; line-height:1.6; white-space:pre-wrap; overflow-wrap:anywhere; }
+    .gemini-message.user { align-self:flex-end; background:rgba(66,133,244,.2); border:1px solid rgba(66,133,244,.25); color:#eff6ff; }
+    .gemini-message.assistant { align-self:flex-start; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); color:#e2e8f0; }
+    .gemini-message.error { color:#fecaca; border-color:rgba(239,68,68,.3); }
+    .gemini-composer { margin:10px 13px 0; padding:8px 8px 8px 13px; display:flex; align-items:flex-end; gap:8px; background:#151d2d; border:1px solid rgba(255,255,255,.14); border-radius:14px; }
+    .gemini-composer:focus-within { border-color:#9b72cb; box-shadow:0 0 0 2px rgba(155,114,203,.12); }
+    .gemini-composer textarea { flex:1; resize:none; max-height:130px; border:0; outline:0; color:#fff; background:transparent; font: .82rem/1.5 'Plus Jakarta Sans',sans-serif; padding:6px 0; }
+    .gemini-composer textarea::placeholder { color:#8290a5; }
+    .gemini-composer button { width:35px; height:35px; flex:0 0 auto; border:0; border-radius:10px; color:white; background:linear-gradient(135deg,#4285f4,#9b72cb 65%,#d96570); cursor:pointer; }
+    .gemini-composer button:disabled { opacity:.45; cursor:wait; }
+    .gemini-disclaimer { text-align:center; color:#718096; font-size:.62rem; padding:8px 10px 11px; }
+    @media (max-width: 700px) {
+      .gemini-launcher { width:39px; min-width:39px; height:39px; padding:7px; gap:0; }
+      .gemini-launcher span { display:none; }
+      .gemini-mark { width:23px; height:23px; }
+      .header-actions { gap:.45rem; }
+      .gemini-panel { top:70px; right:10px; bottom:10px; width:calc(100vw - 20px); max-height:none; }
+    }
+
   </style>
 </head>
 <body>
@@ -904,6 +956,19 @@
         <!-- Admin-Only Button: Regular users cannot see this -->
         <button class="add-btn admin-only" id="addMovementBtn">
           <i class="fa-solid fa-plus"></i> Add Movement
+        </button>
+        <button type="button" class="gemini-launcher" id="geminiLauncher" aria-label="Open Gemini AI Assistant" title="Gemini AI Assistant">
+          <svg class="gemini-mark" viewBox="0 0 24 24" role="img" aria-label="Gemini">
+            <defs>
+              <linearGradient id="geminiGradient" x1="7%" y1="5%" x2="92%" y2="96%">
+                <stop offset="0%" stop-color="#4285F4"/>
+                <stop offset="48%" stop-color="#9B72CB"/>
+                <stop offset="100%" stop-color="#D96570"/>
+              </linearGradient>
+            </defs>
+            <path fill="url(#geminiGradient)" d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/>
+          </svg>
+          <span>Gemini</span>
         </button>
         
         <div class="profile-pill" id="profilePillBtn">
@@ -2291,13 +2356,55 @@
     renderCards(window.allVaultItems);
   </script>
 
+
+  <!-- CINEMOTION GEMINI AI ASSISTANT -->
+  <section class="gemini-panel" id="geminiPanel" aria-label="Gemini AI Assistant" aria-hidden="true">
+    <div class="gemini-panel-head">
+      <div class="gemini-panel-brand">
+        <svg class="gemini-mark gemini-panel-mark" viewBox="0 0 24 24" aria-hidden="true">
+          <defs>
+            <linearGradient id="geminiPanelGradient" x1="7%" y1="5%" x2="92%" y2="96%">
+              <stop offset="0%" stop-color="#4285F4"/>
+              <stop offset="48%" stop-color="#9B72CB"/>
+              <stop offset="100%" stop-color="#D96570"/>
+            </linearGradient>
+          </defs>
+          <path fill="url(#geminiPanelGradient)" d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/>
+        </svg>
+        <div><strong>Gemini</strong><small>Powered by Firebase AI Logic</small></div>
+      </div>
+      <button type="button" class="gemini-close" id="geminiClose" aria-label="Close Gemini">&times;</button>
+    </div>
+    <div class="gemini-welcome" id="geminiWelcome">
+      <svg class="gemini-welcome-mark" viewBox="0 0 24 24" aria-hidden="true">
+        <defs><linearGradient id="geminiWelcomeGradient" x1="7%" y1="5%" x2="92%" y2="96%"><stop offset="0%" stop-color="#4285F4"/><stop offset="48%" stop-color="#9B72CB"/><stop offset="100%" stop-color="#D96570"/></linearGradient></defs>
+        <path fill="url(#geminiWelcomeGradient)" d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/>
+      </svg>
+      <h3>How can I help you create?</h3>
+      <p>Ask about cinematic prompts, camera movements, shots, lighting, storyboards, or your CINEMOTION workflow.</p>
+      <div class="gemini-suggestions">
+        <button type="button" data-gemini-prompt="Create a cinematic camera movement prompt for a premium product reveal.">Create a product reveal prompt</button>
+        <button type="button" data-gemini-prompt="Suggest a cinematic lighting setup for a dramatic scene.">Suggest cinematic lighting</button>
+      </div>
+    </div>
+    <div class="gemini-messages" id="geminiMessages" aria-live="polite"></div>
+    <form class="gemini-composer" id="geminiForm">
+      <textarea id="geminiInput" rows="1" maxlength="12000" placeholder="Ask Gemini..." aria-label="Message Gemini"></textarea>
+      <button type="submit" id="geminiSend" aria-label="Send message">
+        <i class="fa-solid fa-arrow-up"></i>
+      </button>
+    </form>
+    <p class="gemini-disclaimer">Gemini can make mistakes. Review important information.</p>
+  </section>
+
   <!-- FIREBASE AUTH, FORGOT PASSWORD, PHONE OTP, AND FIRESTORE -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+    import { getAI, getGenerativeModel, GoogleAIBackend } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-ai.js";
     import {
       initializeAppCheck,
       ReCaptchaEnterpriseProvider
-    } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app-check.js";
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app-check.js";
     import {
       getAuth,
       onAuthStateChanged,
@@ -2307,7 +2414,7 @@
       signInWithPhoneNumber,
       RecaptchaVerifier,
       signOut
-    } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
     import {
       getFirestore,
       collection,
@@ -2319,14 +2426,14 @@
       doc,
       orderBy,
       setDoc
-    } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
     import {
       getStorage,
       ref as storageRef,
       uploadBytes,
       getDownloadURL,
       deleteObject
-    } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js";
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
 
     // Firebase App Check - reCAPTCHA Enterprise site key created for CINEMOTION STUDIO.
     // Site keys are public client identifiers; never place a secret key in frontend code.
@@ -2391,7 +2498,10 @@
       auth = getAuth(app);
       db = getFirestore(app);
       storage = getStorage(app);
-      console.info("CINEMOTION: Firebase App Check initialized.");
+      // Gemini is accessed through Firebase AI Logic; no Gemini API key is exposed in this page.
+      const firebaseAI = getAI(app, { backend: new GoogleAIBackend() });
+      window.cinemotionGeminiModel = getGenerativeModel(firebaseAI, { model: "gemini-3.8-flash" });
+      console.info("CINEMOTION: Firebase App Check and Gemini AI Logic initialized.");
     } catch (err) {
       console.error("Firebase / App Check initialization failed:", err);
       showAuthMessage(
@@ -2683,6 +2793,105 @@
         throw err;
       }
     };
+
+
+    // Gemini AI Assistant UI and chat session.
+    const geminiPanel = byId("geminiPanel");
+    const geminiLauncher = byId("geminiLauncher");
+    const geminiClose = byId("geminiClose");
+    const geminiForm = byId("geminiForm");
+    const geminiInput = byId("geminiInput");
+    const geminiMessages = byId("geminiMessages");
+    const geminiWelcome = byId("geminiWelcome");
+    let geminiChatSession = null;
+
+    function openGeminiPanel() {
+      if (!auth.currentUser) {
+        showAuthMessage("Please sign in to use Gemini.");
+        return;
+      }
+      geminiPanel?.classList.add("open");
+      geminiPanel?.setAttribute("aria-hidden", "false");
+      geminiInput?.focus();
+    }
+    function closeGeminiPanel() {
+      geminiPanel?.classList.remove("open");
+      geminiPanel?.setAttribute("aria-hidden", "true");
+    }
+    function addGeminiMessage(text, role, isError = false) {
+      if (!geminiMessages) return;
+      const message = document.createElement("div");
+      message.className = `gemini-message ${role}${isError ? " error" : ""}`;
+      message.textContent = text;
+      geminiMessages.appendChild(message);
+      geminiMessages.scrollTop = geminiMessages.scrollHeight;
+      if (geminiWelcome) geminiWelcome.style.display = "none";
+      return message;
+    }
+    async function sendGeminiMessage(rawText) {
+      const prompt = String(rawText || "").trim();
+      if (!prompt) return;
+      if (!auth.currentUser) {
+        addGeminiMessage("Please sign in to use Gemini.", "assistant", true);
+        return;
+      }
+      if (!window.cinemotionGeminiModel) {
+        addGeminiMessage("Gemini is not initialized. Check that Firebase AI Logic is enabled for the ai-film-making project and App Check is configured.", "assistant", true);
+        return;
+      }
+      addGeminiMessage(prompt, "user");
+      const pending = addGeminiMessage("Gemini is thinking...", "assistant");
+      const sendButton = byId("geminiSend");
+      if (sendButton) sendButton.disabled = true;
+      if (geminiInput) geminiInput.disabled = true;
+      try {
+        if (!geminiChatSession) {
+          geminiChatSession = window.cinemotionGeminiModel.startChat({
+            history: [{
+              role: "user",
+              parts: [{ text: "You are the creative AI assistant inside CINEMOTION STUDIO. Help with filmmaking, camera movements, camera angles, shot design, cinematic lighting, storyboards, image/video generation prompts, and creative production workflows. Give practical, detailed, well-structured answers. Preserve exact product geometry and user constraints when writing product prompts." }]
+            }, {
+              role: "model",
+              parts: [{ text: "Understood. I am the CINEMOTION STUDIO creative assistant. I can help with cinematic direction, prompts, storyboards, and production workflows." }]
+            }]
+          });
+        }
+        const result = await geminiChatSession.sendMessage(prompt);
+        const answer = result?.response?.text?.() || "Gemini returned an empty response.";
+        if (pending) pending.textContent = answer;
+      } catch (err) {
+        console.error("Gemini request failed:", err);
+        if (pending) {
+          pending.classList.add("error");
+          pending.textContent = `Gemini request failed: ${err?.message || "Unknown error"}. Check Firebase AI Logic setup, App Check enforcement, and project API access.`;
+        }
+      } finally {
+        if (sendButton) sendButton.disabled = false;
+        if (geminiInput) { geminiInput.disabled = false; geminiInput.focus(); }
+      }
+    }
+
+    geminiLauncher?.addEventListener("click", openGeminiPanel);
+    geminiClose?.addEventListener("click", closeGeminiPanel);
+    geminiForm?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const value = geminiInput?.value || "";
+      if (geminiInput) geminiInput.value = "";
+      sendGeminiMessage(value);
+    });
+    geminiInput?.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        geminiForm?.requestSubmit();
+      }
+    });
+    document.querySelectorAll("[data-gemini-prompt]").forEach((button) => {
+      button.addEventListener("click", () => {
+        openGeminiPanel();
+        sendGeminiMessage(button.getAttribute("data-gemini-prompt"));
+      });
+    });
+
 
     const addMovementBtn = byId("addMovementBtn");
     const movementModal = byId("movementModal");
