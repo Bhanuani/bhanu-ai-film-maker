@@ -1518,7 +1518,12 @@
       grid.innerHTML = list.map(item => {
         return `
         <div class="movement-card" id="card_${item.id}">
-          <div class="card-video-box ${item.mediaURL ? 'has-media' : ''}" id="box_${item.id}" 
+          <div class="card-video-box ${item.mediaURL ? 'has-media' : ''}" id="box_${item.id}"
+               data-card-id="${item.id}" tabindex="0" role="group"
+               aria-label="Media upload area for ${item.name}"
+               onpointerdown="setActiveUploadTarget('${item.id}')"
+               onpointerenter="setActiveUploadTarget('${item.id}')"
+               onfocus="setActiveUploadTarget('${item.id}')"
                onclick="handleCardMediaClick('${item.id}')"
                ondragover="handleDragOver(event, '${item.id}')"
                ondragleave="handleDragLeave(event, '${item.id}')"
@@ -1771,6 +1776,7 @@
     };
 
     window.handleFileDrop = function(e, id) {
+      window.setActiveUploadTarget?.(id);
       e.preventDefault();
       e.stopPropagation();
       const box = document.getElementById(`box_${id}`);
@@ -1782,41 +1788,71 @@
     };
 
     window.triggerFileInput = function(e, id) {
+      window.setActiveUploadTarget?.(id);
       e.stopPropagation();
       const input = document.getElementById(`input_${id}`);
       if (input) input.click();
     };
 
     window.handleFileInputChange = function(e, id) {
+      window.setActiveUploadTarget?.(id);
       if (e.target.files && e.target.files[0]) {
         processUploadedFile(id, e.target.files[0]);
       }
     };
 
-    // CLIPBOARD PASTE SUPPORT (IMAGE / VIDEO)
-    window.addEventListener('paste', (e) => {
-      const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
-      if (activeTag === 'input' || activeTag === 'textarea') return;
+    // CLIPBOARD PASTE SUPPORT: paste into the card the pointer/focus is on.
+    // This is delegated globally because cards are dynamically rendered.
+    window.activeUploadTargetId = window.activeUploadTargetId || null;
+
+    window.setActiveUploadTarget = function(id) {
+      if (id && document.getElementById(`box_${id}`)) {
+        window.activeUploadTargetId = id;
+      }
+    };
+
+    document.addEventListener("pointerover", (e) => {
+      const box = e.target.closest?.(".card-video-box[data-card-id]");
+      if (box) window.setActiveUploadTarget(box.dataset.cardId);
+    }, true);
+
+    document.addEventListener("focusin", (e) => {
+      const box = e.target.closest?.(".card-video-box[data-card-id]");
+      if (box) window.setActiveUploadTarget(box.dataset.cardId);
+    }, true);
+
+    window.addEventListener("paste", (e) => {
+      const activeElement = document.activeElement;
+      const activeTag = activeElement?.tagName?.toLowerCase() || "";
+      // Preserve normal text paste in editable fields (including Gemini/chat/forms).
+      if (activeTag === "input" || activeTag === "textarea" || activeElement?.isContentEditable) return;
 
       const clipboardItems = (e.clipboardData || e.originalEvent?.clipboardData)?.items;
       if (!clipboardItems) return;
 
+      const targetBox = activeElement?.closest?.(".card-video-box[data-card-id]");
+      const targetId = targetBox?.dataset?.cardId || window.activeUploadTargetId;
+      if (!targetId || !document.getElementById(`box_${targetId}`)) {
+        const hasMediaFile = Array.from(clipboardItems).some(item =>
+          item.kind === "file" && (item.type.startsWith("image/") || item.type.startsWith("video/"))
+        );
+        if (hasMediaFile) showToast("First click or move your cursor over the media upload box, then press Ctrl+V.");
+        return;
+      }
+
       for (let i = 0; i < clipboardItems.length; i++) {
         const item = clipboardItems[i];
-        if (item.kind === 'file' && (item.type.startsWith('image/') || item.type.startsWith('video/'))) {
+        if (item.kind === "file" && (item.type.startsWith("image/") || item.type.startsWith("video/"))) {
           const pastedFile = item.getAsFile();
           if (pastedFile) {
             e.preventDefault();
-            const targetId = window.allVaultItems && window.allVaultItems[0] ? window.allVaultItems[0].id : null;
-            if (targetId) {
-              processUploadedFile(targetId, pastedFile);
-            }
+            window.setActiveUploadTarget(targetId);
+            processUploadedFile(targetId, pastedFile);
             break;
           }
         }
       }
     });
-
     async function processUploadedFile(id, file) {
       if (!file || (!file.type.startsWith("image/") && !file.type.startsWith("video/"))) {
         showToast("Please upload a valid image or video file.");
@@ -1968,27 +2004,38 @@
       showToast(`Download Started: ${cleanName}`);
     }
 
-    // PERMANENT DELETE (DELETES FROM LOCAL DB AND FIRESTORE)
+    // PERMANENT DELETE: remove cloud media first, then clear local/UI state.
     window.deleteCardMedia = async function(id, event) {
       if (event) event.stopPropagation();
       const media = window.cardActiveBlobs[id];
-      if (!media) {
+      const targetItem = window.allVaultItems?.find(m => m.id === id);
+      if (!media && !targetItem?.mediaURL) {
         alert("No media uploaded to delete in this card.");
         return;
       }
 
-      if (confirm("Are you sure you want to permanently delete this media?")) {
-        if (media.url && media.url.startsWith("blob:")) {
-          URL.revokeObjectURL(media.url);
+      if (!confirm("Are you sure you want to permanently delete this media from Firebase and this device?")) return;
+
+      try {
+        if (typeof window.deleteMediaFromFirestore === "function") {
+          await window.deleteMediaFromFirestore(id);
+        } else {
+          throw new Error("Firebase delete service is not ready. Please try again.");
         }
+
+        // Cloud delete succeeded; now clear local blob and IndexedDB copy.
+        if (media?.url?.startsWith("blob:")) URL.revokeObjectURL(media.url);
         delete window.cardActiveBlobs[id];
 
         if (localDB) {
-          const tx = localDB.transaction("cardMedia", "readwrite");
-          tx.objectStore("cardMedia").delete(id);
+          await new Promise((resolve, reject) => {
+            const tx = localDB.transaction("cardMedia", "readwrite");
+            tx.objectStore("cardMedia").delete(id);
+            tx.oncomplete = resolve;
+            tx.onerror = () => reject(tx.error || new Error("Local media cleanup failed."));
+          });
         }
 
-        const targetItem = window.allVaultItems?.find(m => m.id === id);
         if (targetItem) {
           delete targetItem.mediaURL;
           delete targetItem.mediaType;
@@ -1999,30 +2046,28 @@
         const img = document.getElementById(`img_${id}`);
         const yt = document.getElementById(`yt_${id}`);
 
-        if (box) box.classList.remove('has-media');
+        if (box) box.classList.remove("has-media");
         if (vid) {
           vid.pause();
-          vid.removeAttribute('src');
+          vid.removeAttribute("src");
           vid.load();
-          vid.classList.remove('active-media');
+          vid.classList.remove("active-media");
         }
         if (img) {
-          img.removeAttribute('src');
-          img.classList.remove('active-media');
+          img.removeAttribute("src");
+          img.classList.remove("active-media");
         }
         if (yt) {
-          yt.removeAttribute('src');
-          yt.classList.remove('active-media');
+          yt.removeAttribute("src");
+          yt.classList.remove("active-media");
         }
 
-        if (typeof window.deleteMediaFromFirestore === 'function') {
-          await window.deleteMediaFromFirestore(id);
-        }
-
-        showToast("Media permanently deleted from Cloud & Local!");
+        showToast("Media permanently deleted from Firebase Storage, Firestore and this device.");
+      } catch (err) {
+        console.error("Permanent media deletion failed:", err);
+        showToast("Delete failed. Cloud/local media was kept where possible: " + (err.message || err));
       }
     };
-
     // LIGHTBOX POPUP PLAYER
     const mediaLightbox = document.getElementById("mediaLightbox");
     const lightboxStage = document.getElementById("lightboxStage");
@@ -2912,29 +2957,31 @@
       }, { merge: true });
     };
 
-    // FIRESTORE PERMANENT DELETE FUNCTION
+    // FIREBASE PERMANENT DELETE: remove the actual Storage file and Firestore
+    // metadata. Do not silently report success if either cloud operation fails.
     window.deleteMediaFromFirestore = async function(cardId) {
-      try {
-        if (!auth.currentUser) throw new Error("Please sign in before syncing media.");
-        const q = query(collection(db, "movements"), where("linkedCardId", "==", cardId));
-        const snapshot = await getDocs(q);
-        const delPromises = [];
-        snapshot.forEach((docSnap) => {
-          const data = docSnap.data();
-          if (data.storagePath) {
-            delPromises.push(
-              deleteObject(storageRef(storage, data.storagePath)).catch((storageErr) => {
-                // A missing/previously deleted Storage object must not block Firestore cleanup.
-                console.warn("Storage object cleanup skipped:", storageErr);
-              })
-            );
+      if (!auth.currentUser) throw new Error("Please sign in before deleting cloud media.");
+      const q = query(collection(db, "movements"), where("linkedCardId", "==", String(cardId)));
+      const snapshot = await getDocs(q);
+
+      // Delete uploaded binary objects from Firebase Storage first.
+      for (const docSnap of snapshot.docs) {
+        const data = docSnap.data();
+        if (data.storagePath) {
+          try {
+            await deleteObject(storageRef(storage, data.storagePath));
+          } catch (storageErr) {
+            // Object-not-found is already deleted; all other errors must stop deletion.
+            if (storageErr?.code !== "storage/object-not-found") throw storageErr;
           }
-          delPromises.push(deleteDoc(doc(db, "movements", docSnap.id)));
-        });
-        await Promise.all(delPromises);
-      } catch (err) {
-        console.error("Firestore permanent delete error:", err);
+        }
       }
+
+      // Then remove every Firestore record associated with this card.
+      for (const docSnap of snapshot.docs) {
+        await deleteDoc(doc(db, "movements", docSnap.id));
+      }
+      return true;
     };
 
     // FIRESTORE SAVE FUNCTION
@@ -2943,11 +2990,23 @@
       if (toast) { toast.textContent = "Saving media to cloud..."; toast.classList.add("show"); }
       try {
         if (!auth.currentUser) throw new Error("Please sign in before syncing media.");
-        const q = query(collection(db, "movements"), where("linkedCardId", "==", cardId));
+        const q = query(collection(db, "movements"), where("linkedCardId", "==", String(cardId)));
         const snap = await getDocs(q);
-        const delPromises = [];
-        snap.forEach((d) => delPromises.push(deleteDoc(doc(db, "movements", d.id))));
-        await Promise.all(delPromises);
+
+        // Replacing media should also remove the previous uploaded Storage files.
+        for (const oldDoc of snap.docs) {
+          const oldData = oldDoc.data();
+          if (oldData.storagePath && oldData.storagePath !== storagePath) {
+            try {
+              await deleteObject(storageRef(storage, oldData.storagePath));
+            } catch (storageErr) {
+              if (storageErr?.code !== "storage/object-not-found") throw storageErr;
+            }
+          }
+        }
+        for (const oldDoc of snap.docs) {
+          await deleteDoc(doc(db, "movements", oldDoc.id));
+        }
 
         await addDoc(collection(db, "movements"), {
           linkedCardId: cardId,
