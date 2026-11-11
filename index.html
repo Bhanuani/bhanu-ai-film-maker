@@ -365,17 +365,17 @@
     }
 
     .hero-ambient-backdrop {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
+      position: absolute;
+      inset: -2%;
+      width: 104%;
+      height: 104%;
       object-fit: cover;
       object-position: center;
-      filter: brightness(.62) saturate(1.08);
-      opacity: .34;
+      filter: blur(18px) brightness(.42) saturate(1.12);
+      opacity: .95;
       pointer-events: none;
-      z-index: -2;
-      transform: none;
+      z-index: 1;
+      transform: scale(1.03);
     }
 
     .hero-foreground-video {
@@ -386,7 +386,8 @@
       object-position: center;
       display: block;
       z-index: 2;
-      filter: drop-shadow(0 0 35px rgba(0, 0, 0, 0.95));
+      background: transparent;
+      filter: drop-shadow(0 0 24px rgba(0, 0, 0, 0.62));
       transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
@@ -1076,6 +1077,7 @@
 
   <div class="vault-container">
     <section class="hero-banner-wrapper" id="heroBanner">
+      <video id="heroVideoBg" class="hero-ambient-backdrop" autoplay muted playsinline loop preload="auto" aria-hidden="true" src="hero-banner-3.mp4"></video>
       <video id="heroVideo" class="hero-foreground-video" autoplay muted playsinline loop preload="auto" poster="bhanu-3d-header_2.png" src="hero-banner-3.mp4"></video>
     </section>
 
