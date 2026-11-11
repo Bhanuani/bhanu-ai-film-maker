@@ -1083,8 +1083,8 @@
           <textarea id="itemPrompt" rows="6" placeholder="Paste any length prompt without restriction..." required></textarea>
         </div>
         <div class="form-group">
-          <label for="itemMediaUrl">Media Link (Google Drive / Online URL)</label>
-          <input type="url" id="itemMediaUrl" placeholder="https://drive.google.com/file/d/.../view?usp=sharing" required />
+          <label for="itemMediaUrl">Media Link (Optional – Google Drive / YouTube / Online URL)</label>
+          <input type="url" id="itemMediaUrl" placeholder="Paste a media URL if available (optional)" />
         </div>
         <button type="submit" id="saveBtn" class="submit-btn">+ Save to Vault</button>
       </form>
@@ -1339,7 +1339,9 @@
       };
       dbReq.onsuccess = (e) => {
         localDB = e.target.result;
-        loadSavedPromptEdits();
+        // Firebase is the source of truth for prompt edits; do not let stale
+        // browser-only edits overwrite the latest cloud version.
+        renderCards(window.allVaultItems);
       };
       dbReq.onerror = (e) => console.error("IndexedDB initialization failed:", e.target.error);
     }
@@ -1585,17 +1587,24 @@
     });
 
     if (editPromptForm) {
-      editPromptForm.addEventListener("submit", (e) => {
+      editPromptForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const id = editPromptItemId.value;
         const newTitle = editPromptTitle.value.trim();
         const newPrompt = editPromptText.value.trim();
-
+        const saveEditButton = document.getElementById("saveEditPromptBtn");
         const item = window.allVaultItems.find(m => m.id === id);
-        if (item) {
+        if (!item) return;
+
+        if (saveEditButton) { saveEditButton.disabled = true; saveEditButton.textContent = "Syncing..."; }
+        try {
+          if (typeof window.savePromptEditToFirestore !== "function") {
+            throw new Error("Firebase is not ready. Please try again.");
+          }
+          await window.savePromptEditToFirestore(id, newTitle, newPrompt);
+
           item.name = newTitle;
           item.prompt = newPrompt;
-
           const titleEl = document.getElementById(`title_${id}`);
           const textEl = document.getElementById(`text_${id}`);
           if (titleEl) titleEl.innerText = newTitle;
@@ -1603,13 +1612,16 @@
 
           if (localDB) {
             const tx = localDB.transaction("promptEdits", "readwrite");
-            tx.objectStore("promptEdits").put({ id: id, name: newTitle, prompt: newPrompt });
+            tx.objectStore("promptEdits").put({ id, name: newTitle, prompt: newPrompt });
           }
-
-          showToast("Prompt Updated!");
+          showToast("Prompt saved to Firebase!");
+          editPromptModal.style.display = "none";
+        } catch (err) {
+          console.error("Prompt cloud save failed:", err);
+          showToast("Prompt cloud save failed: " + (err.message || err));
+        } finally {
+          if (saveEditButton) { saveEditButton.disabled = false; saveEditButton.textContent = "Update Prompt"; }
         }
-
-        editPromptModal.style.display = "none";
       });
     }
 
@@ -1675,32 +1687,36 @@
       }
     });
 
-    function processUploadedFile(id, file) {
-      const type = file.type.startsWith('video') ? 'video' : 'image';
-      applyMediaToCard(id, file, type);
-
-      if (localDB) {
-        const tx = localDB.transaction("cardMedia", "readwrite");
-        tx.objectStore("cardMedia").put({ id: id, fileBlob: file, fileType: type, fileName: file.name });
+    async function processUploadedFile(id, file) {
+      if (!file || (!file.type.startsWith("image/") && !file.type.startsWith("video/"))) {
+        showToast("Please upload a valid image or video file.");
+        return;
       }
 
-      // Base64 adds roughly 33% overhead; keep the original image comfortably below
-      // Firestore's 1 MiB document limit. Larger files remain available locally.
-      if (file.type.startsWith('image') && file.size <= 700000) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const base64Data = e.target.result;
-          if (typeof window.saveMediaLinkToFirestore === 'function') {
-            window.saveMediaLinkToFirestore(id, base64Data, 'image');
-          }
-        };
-        reader.readAsDataURL(file);
+      const type = file.type.startsWith("video/") ? "video" : "image";
+      applyMediaToCard(id, file, type);
+
+      // Keep a local copy for immediate preview/offline use, but cloud is the
+      // permanent shared copy. Firebase Storage handles files of all normal sizes.
+      if (localDB) {
+        const tx = localDB.transaction("cardMedia", "readwrite");
+        tx.objectStore("cardMedia").put({
+          id, fileBlob: file, fileType: type, fileName: file.name
+        });
+      }
+
+      if (typeof window.uploadMediaFileToFirebase === "function") {
+        try {
+          showToast("Uploading media to Firebase Storage...");
+          const cloudUrl = await window.uploadMediaFileToFirebase(id, file, type);
+          applyMediaUrlToCard(id, cloudUrl, type);
+          showToast("Media uploaded and synced to Firebase!");
+        } catch (err) {
+          console.error("Firebase Storage upload failed:", err);
+          showToast("Cloud upload failed. Local preview is retained: " + (err.message || err));
+        }
       } else {
-        showToast(
-          file.type.startsWith('image')
-            ? "Image attached locally. It is too large for direct Firestore storage."
-            : "Video attached locally. Cloud video storage requires Firebase Storage."
-        );
+        showToast("Firebase Storage is not ready. Media remains local only.");
       }
     }
 
@@ -2289,8 +2305,15 @@
       where,
       deleteDoc,
       doc,
-      orderBy
+      orderBy,
+      setDoc
     } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+    import {
+      getStorage,
+      ref as storageRef,
+      uploadBytes,
+      getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCbF3oQKFz0pFVZ5EdOzFbfrqhiWfKsqHk",
@@ -2337,11 +2360,12 @@
       return `${action} failed: ${err?.message || "Unknown error"}`;
     }
 
-    let app, auth, db;
+    let app, auth, db, storage;
     try {
       app = initializeApp(firebaseConfig);
       auth = getAuth(app);
       db = getFirestore(app);
+      storage = getStorage(app);
     } catch (err) {
       showAuthMessage("Could not initialize Firebase: " + (err.message || err));
       throw err;
@@ -2542,9 +2566,42 @@
       catch (err) { showAuthMessage(explainFirebaseError(err, "Sign out")); }
     };
 
+    // FIREBASE STORAGE: upload original image/video files and save their public
+    // download URL + metadata in Firestore. Binary files do NOT belong in Firestore.
+    window.uploadMediaFileToFirebase = async function(cardId, file, mediaType) {
+      if (!auth.currentUser) throw new Error("Please sign in before uploading.");
+      const safeName = String(file.name || "media").replace(/[^a-zA-Z0-9._-]/g, "_");
+      const path = `vault-media/${cardId}/${Date.now()}_${safeName}`;
+      const fileRef = storageRef(storage, path);
+      await uploadBytes(fileRef, file, {
+        contentType: file.type || (mediaType === "video" ? "video/mp4" : "image/jpeg"),
+        customMetadata: {
+          cardId: String(cardId),
+          uploadedBy: auth.currentUser.uid,
+          originalName: safeName
+        }
+      });
+      const downloadURL = await getDownloadURL(fileRef);
+      await window.saveMediaLinkToFirestore(cardId, downloadURL, mediaType);
+      return downloadURL;
+    };
+
+    // Persist prompt edits for built-in cards in a separate collection.
+    window.savePromptEditToFirestore = async function(itemId, name, prompt) {
+      if (!auth.currentUser) throw new Error("Please sign in before saving.");
+      await setDoc(doc(db, "promptEdits", String(itemId)), {
+        itemId: String(itemId),
+        name,
+        prompt,
+        updatedAt: new Date().toISOString(),
+        updatedBy: auth.currentUser.uid
+      }, { merge: true });
+    };
+
     // FIRESTORE PERMANENT DELETE FUNCTION
     window.deleteMediaFromFirestore = async function(cardId) {
       try {
+        if (!auth.currentUser) throw new Error("Please sign in before syncing media.");
         const q = query(collection(db, "movements"), where("linkedCardId", "==", cardId));
         const snapshot = await getDocs(q);
         const delPromises = [];
@@ -2560,8 +2617,9 @@
     // FIRESTORE SAVE FUNCTION
     window.saveMediaLinkToFirestore = async function(cardId, url, mediaType) {
       const toast = byId("toast");
-      if (toast) { toast.textContent = "Saving link to cloud..."; toast.classList.add("show"); }
+      if (toast) { toast.textContent = "Saving media to cloud..."; toast.classList.add("show"); }
       try {
+        if (!auth.currentUser) throw new Error("Please sign in before syncing media.");
         const q = query(collection(db, "movements"), where("linkedCardId", "==", cardId));
         const snap = await getDocs(q);
         const delPromises = [];
@@ -2576,10 +2634,12 @@
         });
         const item = window.allVaultItems?.find(m => m.id === cardId);
         if (item) { item.mediaURL = url; item.mediaType = mediaType; }
-        if (toast) { toast.textContent = "Link synced to cloud!"; setTimeout(() => toast.classList.remove("show"), 2500); }
+        if (toast) { toast.textContent = "Media synced to cloud!"; setTimeout(() => toast.classList.remove("show"), 2500); }
+        return true;
       } catch (err) {
         console.error("Firestore save error:", err);
         if (toast) { toast.textContent = "Cloud sync failed: " + (err.message || err); setTimeout(() => toast.classList.remove("show"), 4000); }
+        throw err;
       }
     };
 
@@ -2595,14 +2655,14 @@
 
     movementForm?.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const url = byId("itemMediaUrl")?.value.trim();
-      if (!url) return showAuthMessage("Please enter a media link.");
+      const url = byId("itemMediaUrl")?.value.trim() || "";
       const category = byId("itemCategory")?.value;
       const title = byId("itemTitle")?.value.trim();
       const prompt = byId("itemPrompt")?.value.trim();
+      if (!title || !prompt) return showAuthMessage("Please enter a movement name and prompt.");
       const isDrive = url.includes("drive.google.com");
       const isYoutube = url.includes("youtube.com") || url.includes("youtu.be");
-      const mediaType = isYoutube ? "youtube" : (isDrive ? "drive" : "video");
+      const mediaType = !url ? "" : (isYoutube ? "youtube" : (isDrive ? "drive" : "video"));
       try {
         if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = "Saving..."; }
         const movementData = { name: title, category, prompt, mediaURL: url, mediaType, createdAt: new Date().toISOString() };
@@ -2640,11 +2700,20 @@
         if (customMovements.length) {
           const existingIds = new Set(window.allVaultItems.map((item) => item.id));
           const newMovements = customMovements.filter((item) => !existingIds.has(item.id));
-          if (newMovements.length) {
-            window.allVaultItems = [...newMovements, ...window.allVaultItems];
-            renderCards(window.allVaultItems);
-          }
+          if (newMovements.length) window.allVaultItems = [...newMovements, ...window.allVaultItems];
         }
+
+        // Load cloud prompt edits and apply them to both built-in and custom cards.
+        const editsSnapshot = await getDocs(collection(db, "promptEdits"));
+        editsSnapshot.forEach((editDoc) => {
+          const edit = editDoc.data();
+          const item = window.allVaultItems.find(m => m.id === (edit.itemId || editDoc.id));
+          if (item) {
+            if (typeof edit.name === "string") item.name = edit.name;
+            if (typeof edit.prompt === "string") item.prompt = edit.prompt;
+          }
+        });
+        renderCards(window.allVaultItems);
       } catch (err) {
         console.error("Firestore load error:", err);
       }
