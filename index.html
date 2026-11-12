@@ -3,6 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#040711">
+  <link rel="icon" href="assets/cinemotion/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/cinemotion/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/cinemotion/favicon-16.png">
+  <link rel="apple-touch-icon" href="assets/cinemotion/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
   <title>CINEMOTION STUDIO - Master Directors Vault</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -152,6 +158,26 @@
       font-size: 1.35rem;
       font-weight: 800;
       user-select: none;
+    }
+
+    .brand-logo-mark {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
+      object-fit: contain;
+      display: block;
+      filter: drop-shadow(0 0 8px rgba(0, 210, 255, 0.22));
+    }
+    .sidebar-header .brand-logo-mark {
+      width: 34px;
+      height: 34px;
+      flex-basis: 34px;
+    }
+    @media (max-width: 520px) {
+      .brand-logo-mark { width: 34px; height: 34px; flex-basis: 34px; }
+      .brand-group { gap: 0.65rem; }
+      .brand-logo { gap: 0.35rem; font-size: 1.05rem; }
+      .brand-logo .studio-pill { font-size: 0.58rem; padding: 0.12rem 0.4rem; }
     }
 
     .brand-logo .studio-pill {
@@ -862,6 +888,7 @@
   <div id="authGateModal" class="auth-gate-modal" style="display: none;">
     <div class="auth-card">
       <div style="text-align: center; margin-bottom: 1.5rem;">
+        <img src="assets/cinemotion/icon-128.png" alt="CINEMOTION logo" style="width:76px;height:76px;object-fit:contain;display:block;margin:0 auto 10px;filter:drop-shadow(0 0 14px rgba(0,210,255,.25));">
         <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; color: #fff;">CINEMOTION STUDIO</h2>
         <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Director Vault Sign-In</p>
       </div>
@@ -973,6 +1000,7 @@
   <aside class="sidebar-drawer" id="sidebarDrawer">
     <div class="sidebar-header">
       <div class="brand-logo" style="font-size: 1.15rem;">
+        <img class="brand-logo-mark" src="assets/cinemotion/icon-128.png" alt="CINEMOTION logo">
         <span>CINEMOTION</span>
         <span class="studio-pill">STUDIO</span>
       </div>
@@ -1007,6 +1035,7 @@
       <div class="brand-group">
         <button class="menu-btn" id="sidebarToggleBtn"><i class="fa-solid fa-bars"></i></button>
         <div class="brand-logo">
+          <img class="brand-logo-mark" src="assets/cinemotion/icon-128.png" alt="CINEMOTION logo">
           <span>CINEMOTION</span>
           <span class="studio-pill">STUDIO</span>
         </div>
