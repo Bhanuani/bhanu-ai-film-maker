@@ -461,6 +461,11 @@
     }
     .cat-tab.active span.count { background: var(--accent-cyan); color: #000; }
 
+    .cat-emoji {
+      width:40px; height:40px; flex:0 0 40px; display:inline-grid; place-items:center;
+      font-size:25px; filter:drop-shadow(0 4px 8px rgba(0,0,0,.8));
+      animation:iconFloatContinuous 3s ease-in-out infinite alternate;
+    }
     .cat-3d-img {
       width: 40px; 
       height: 40px; 
@@ -719,7 +724,9 @@
     .cinematic-scene { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 10; }
 
     .all-orbit-scene { display: flex; align-items: center; justify-content: center; position: relative; width: 500px; height: 500px; animation: grandOrbitSpin 2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    .all-orbit-icon { position: absolute; width: 75px; height: 75px; object-fit: contain; filter: drop-shadow(0 0 20px rgba(0, 210, 255, 0.8)); }
+    .all-orbit-icon { position:absolute; width:75px; height:75px; display:grid; place-items:center; font-size:54px; filter:drop-shadow(0 0 20px rgba(0,210,255,.8)); }
+    .scene-emoji { display:block; font-size:clamp(100px,18vw,220px); line-height:1; filter:drop-shadow(0 0 35px rgba(0,210,255,.65)); }
+    .master-logo-canvas { display:block; font-size:150px; line-height:1; }
     @keyframes grandOrbitSpin { 0% { transform: scale(0.2) rotate(-90deg); opacity: 0; } 40% { transform: scale(1.1) rotate(20deg); opacity: 1; } 80% { transform: scale(1) rotate(0deg); opacity: 1; } 100% { transform: scale(1.4) rotate(45deg); opacity: 0; } }
 
     .dolly-real-rig { position: absolute; bottom: 22%; left: -500px; animation: realDollyTrack 2s cubic-bezier(0.2, 0.9, 0.3, 1) forwards; }
@@ -870,12 +877,95 @@
       .movements-grid { grid-template-columns: 1fr; }
       .vault-container { padding-top: 1rem; }
     }
+
+    /* CINEMOTION DIRECTOR WORKSPACE: prompt library + existing Gemini chat */
+    .director-library-head {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      padding: 14px 16px;
+      margin: 0 0 14px;
+      background: rgba(4, 7, 17, .96);
+      border: 1px solid rgba(0, 210, 255, .22);
+      border-radius: 14px;
+      backdrop-filter: blur(14px);
+    }
+    .director-library-head h2 { font: 800 1.05rem 'Space Grotesk', sans-serif; color: #fff; }
+    .director-library-head p { color: #94a3b8; font-size: .72rem; margin-top: 4px; }
+    .director-library-tools { display:flex; gap:8px; align-items:center; margin-top:10px; }
+    .director-library-tools input {
+      flex:1; min-width:0; padding:9px 12px; color:#fff;
+      background:#111a2b; border:1px solid rgba(255,255,255,.13);
+      border-radius:9px; outline:none; font: .78rem 'Plus Jakarta Sans',sans-serif;
+    }
+    .director-library-tools input:focus { border-color:var(--accent-cyan); }
+    .director-mobile-tabs { display:none; gap:6px; }
+    .director-mobile-tabs button {
+      border:1px solid rgba(255,255,255,.15); background:#111a2b; color:#cbd5e1;
+      border-radius:8px; padding:8px 10px; font-weight:700; font-size:.72rem;
+    }
+    .director-mobile-tabs button.active { color:#04101a; background:var(--accent-cyan); }
+    .use-gemini-btn {
+      display:none; width:100%; margin-top:7px; padding:9px 10px; border-radius:8px;
+      border:1px solid rgba(155,114,203,.45); background:rgba(155,114,203,.12);
+      color:#e9ddff; font:700 .78rem 'Plus Jakarta Sans',sans-serif; cursor:pointer;
+    }
+    .use-gemini-btn:hover { background:rgba(155,114,203,.25); border-color:#b794f4; }
+    body.director-mode { overflow:hidden; }
+    body.director-mode .vault-container {
+      position:fixed; z-index:101; left:0; top:82px; bottom:0;
+      width:50vw; max-width:none; margin:0; padding:14px 16px 28px;
+      overflow-y:auto; overscroll-behavior:contain;
+      border-right:1px solid rgba(0,210,255,.22);
+      background:rgba(4,7,17,.97);
+    }
+    body.director-mode .hero-banner-wrapper { display:none; }
+    body.director-mode .director-library-head { display:block; }
+    body.director-mode .categories-bar-wrapper { margin-bottom:14px; }
+    body.director-mode .cat-tab { font-size:.78rem; padding:7px 10px; gap:6px; }
+    body.director-mode .cat-emoji {
+      width:40px; height:40px; flex:0 0 40px; display:inline-grid; place-items:center;
+      font-size:25px; filter:drop-shadow(0 4px 8px rgba(0,0,0,.8));
+      animation:iconFloatContinuous 3s ease-in-out infinite alternate;
+    }
+    .cat-3d-img { width:25px; height:25px; }
+    body.director-mode .cat-tab span.count { font-size:.68rem; padding:2px 6px; }
+    body.director-mode .movements-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    body.director-mode .card-details { padding:10px; gap:9px; }
+    body.director-mode .card-details h3 { font-size:.88rem; }
+    body.director-mode .prompt-box { font-size:.72rem; max-height:110px; }
+    body.director-mode .card-video-box { aspect-ratio:16/9; }
+    body.director-mode .copy-btn { padding:9px 8px; font-size:.76rem; }
+    body.director-mode .use-gemini-btn { display:block; }
+    body.director-mode .gemini-panel,
+    body.director-mode .gemini-panel.open {
+      display:flex; position:fixed; z-index:102; top:82px; right:0; bottom:0;
+      left:auto; width:50vw; max-width:none; max-height:none; border-radius:0;
+      border-top:0; border-right:0; border-bottom:0; border-left:1px solid rgba(155,114,203,.35);
+    }
+    body.director-mode .search-box { display:none; }
+    body.director-mode .gemini-launcher { border-color:#9b72cb; background:rgba(155,114,203,.16); }
+    @media (max-width: 820px) {
+      body.director-mode .vault-container {
+        top:70px; width:100vw; border-right:0; padding:10px 12px 24px;
+      }
+      body.director-mode .gemini-panel,
+      body.director-mode .gemini-panel.open {
+        top:70px; width:100vw; border-left:0;
+      }
+      body.director-mode:not(.director-show-gemini) .gemini-panel { display:none; }
+      body.director-mode.director-show-gemini .vault-container { display:none; }
+      body.director-mode .director-mobile-tabs { display:flex; }
+      body.director-mode .movements-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      body.director-mode .director-library-head { padding:11px; }
+    }
+    @media (max-width: 520px) {
+      body.director-mode .movements-grid { grid-template-columns:1fr; }
+    }
   </style>
 </head>
 <body>
-  <video id="siteBackgroundVideo" autoplay muted playsinline loop preload="none" aria-hidden="true">
-    <source src="hero-banner-3.mp4" type="video/mp4">
-  </video>
 
   <!-- TAB SWITCH WELCOME BACK OVERLAY (SEAMLESS FULLSCREEN, NO BOX) -->
   <div id="welcomeBackOverlay">
@@ -1091,9 +1181,22 @@
   </header>
 
   <div class="vault-container">
+    <section class="director-library-head" id="directorLibraryHead">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+        <div><h2><i class="fa-solid fa-clapperboard" style="color:var(--accent-cyan);"></i> Director Prompt Library</h2>
+          <p id="directorLibraryStatus">Type in Gemini to find matching prompts and media.</p></div>
+        <div class="director-mobile-tabs" aria-label="Workspace panels">
+          <button type="button" id="directorLibraryTab" class="active">Library</button>
+          <button type="button" id="directorGeminiTab">Gemini</button>
+        </div>
+      </div>
+      <div class="director-library-tools">
+        <input type="search" id="directorLibrarySearch" placeholder="Search prompts, categories, camera terms..." aria-label="Search prompt library">
+      </div>
+    </section>
     <section class="hero-banner-wrapper" id="heroBanner">
       <!-- One continuous hero video: no duplicate background layer or split panels. -->
-      <video id="heroVideo" class="hero-foreground-video" autoplay muted playsinline loop preload="metadata" poster="bhanu-3d-header_2.png" src="hero-banner-3.mp4"></video>
+      <video id="heroVideo" class="hero-foreground-video" autoplay muted playsinline loop preload="none" poster="bhanu-3d-header_2.png" src="hero-banner-3.mp4"></video>
     </section>
 
     <div class="categories-bar-wrapper">
@@ -1105,43 +1208,43 @@
         </button>
 
         <button class="cat-tab" onclick="triggerCinematicCategory('Camera Movement', this)">
-          <img src="Camera-Movement.png" class="cat-3d-img" alt="Camera Movement">
+          <span class="cat-emoji" aria-hidden="true">🎥</span>
           <span>Camera Movement</span>
           <span class="count" id="count_Camera_Movement">44</span>
         </button>
 
         <button class="cat-tab" onclick="triggerCinematicCategory('Camera Angles', this)">
-          <img src="Camera-Angles.png" class="cat-3d-img" alt="Camera Angles">
+          <span class="cat-emoji" aria-hidden="true">📐</span>
           <span>Camera Angles</span>
           <span class="count" id="count_Camera_Angles">12</span>
         </button>
 
         <button class="cat-tab" onclick="triggerCinematicCategory('Camera Shots', this)">
-          <img src="Camera-Shots.png" class="cat-3d-img" alt="Camera Shots">
+          <span class="cat-emoji" aria-hidden="true">🎬</span>
           <span>Camera Shots</span>
           <span class="count" id="count_Camera_Shots">15</span>
         </button>
 
         <button class="cat-tab" onclick="triggerCinematicCategory('Cinematic Lighting', this)">
-          <img src="Cinematic -lighting.png" class="cat-3d-img" alt="Cinematic Lighting">
+          <span class="cat-emoji" aria-hidden="true">💡</span>
           <span>Cinematic Lighting</span>
           <span class="count" id="count_Cinematic_Lighting">0</span>
         </button>
 
         <button class="cat-tab" onclick="triggerCinematicCategory('Atmosphere', this)">
-          <img src="Atmosphere.png" class="cat-3d-img" alt="Atmosphere">
+          <span class="cat-emoji" aria-hidden="true">🌫️</span>
           <span>Atmosphere</span>
           <span class="count" id="count_Atmosphere">60</span>
         </button>
 
         <button class="cat-tab" onclick="triggerCinematicCategory('Camera Lens', this)">
-          <img src="Camera-lens.png" class="cat-3d-img" alt="Camera Lens">
+          <span class="cat-emoji" aria-hidden="true">🔭</span>
           <span>Camera Lens</span>
           <span class="count" id="count_Camera_Lens">0</span>
         </button>
 
         <button class="cat-tab" onclick="triggerCinematicCategory('Master Prompts', this)">
-          <img src="Master-prompt.png" class="cat-3d-img" alt="Master Prompts" onerror="this.src='Camera-Shots.png'">
+          <span class="cat-emoji" aria-hidden="true">📝</span>
           <span>Master Prompts</span>
           <span class="count" id="count_Master_Prompts">5</span>
         </button>
@@ -1518,15 +1621,6 @@
       };
     }
 
-    const categoryIconMap = {
-      'Camera Movement': 'Camera-Movement.png',
-      'Camera Angles': 'Camera-Angles.png',
-      'Camera Shots': 'Camera-Shots.png',
-      'Cinematic Lighting': 'Cinematic -lighting.png',
-      'Atmosphere': 'Atmosphere.png',
-      'Camera Lens': 'Camera-lens.png',
-      'Master Prompts': 'Master-prompt.png'
-    };
 
     function getYoutubeEmbedUrl(url) {
       if (!url) return null;
@@ -1619,6 +1713,9 @@
             <!-- Standard User Allowed Control: Copy Prompt -->
             <button class="copy-btn" onclick="copyCardPrompt('${item.id}')">
               <i class="fa-solid fa-copy"></i> Copy Prompt
+            </button>
+            <button type="button" class="use-gemini-btn" onclick="insertPromptIntoGemini('${item.id}')">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Use in Gemini
             </button>
           </div>
         </div>
@@ -2380,20 +2477,20 @@
       if (category === 'All') {
         scene.innerHTML = `
           <div class="all-orbit-scene">
-            <img src="Camera-Movement.png" class="all-orbit-icon" style="top: 0; left: 210px;">
-            <img src="Camera-Angles.png" class="all-orbit-icon" style="top: 80px; right: 20px;">
-            <img src="Camera-Shots.png" class="all-orbit-icon" style="bottom: 80px; right: 20px;">
-            <img src="Cinematic -lighting.png" class="all-orbit-icon" style="bottom: 0; left: 210px;">
-            <img src="Atmosphere.png" class="all-orbit-icon" style="bottom: 80px; left: 20px;">
-            <img src="Camera-lens.png" class="all-orbit-icon" style="top: 80px; left: 20px;">
-            <img src="Master-prompt.png" class="all-orbit-icon" style="top: 210px; left: 210px; filter: drop-shadow(0 0 35px #00d2ff);" onerror="this.src='Camera-Movement.png'">
+            <span class="all-orbit-icon" style="top:0;left:210px">🎥</span>
+            <span class="all-orbit-icon" style="top:80px;right:20px">📐</span>
+            <span class="all-orbit-icon" style="bottom:80px;right:20px">🎬</span>
+            <span class="all-orbit-icon" style="bottom:0;left:210px">💡</span>
+            <span class="all-orbit-icon" style="bottom:80px;left:20px">🌫️</span>
+            <span class="all-orbit-icon" style="top:80px;left:20px">🔭</span>
+            <span class="all-orbit-icon" style="top:210px;left:210px">📝</span>
           </div>
         `;
       }
       else if (category === 'Master Prompts') {
         scene.innerHTML = `
           <div class="master-writing-rig">
-            <img src="Master-prompt.png" class="master-logo-canvas" alt="Master Prompt Logo" onerror="this.src='Camera-Shots.png'">
+            <span class="master-logo-canvas" role="img" aria-label="Master Prompt">📝</span>
             <i class="fa-solid fa-pen-nib neon-quill-pen"></i>
           </div>
         `;
@@ -2401,26 +2498,26 @@
       else if (category === 'Atmosphere') {
         scene.innerHTML = `
           <div class="season-sky-lapse"></div>
-          <div class="smoke-rig-real"><img src="Atmosphere.png" alt="Atmosphere Fan"></div>
+          <div class="smoke-rig-real"><span class="scene-emoji" role="img" aria-label="Atmosphere">🌫️</span></div>
           <div class="season-particles">
             <span>🌸</span><span>☀️</span><span>🍂</span><span>❄️</span>
           </div>
         `;
       }
       else if (category === 'Camera Movement') {
-        scene.innerHTML = `<div class="dolly-real-rig"><img src="Camera-Movement.png" alt="Dolly Camera"></div>`;
+        scene.innerHTML = `<div class="dolly-real-rig"><span class="scene-emoji" role="img" aria-label="Camera Movement">🎥</span></div>`;
       } 
       else if (category === 'Camera Angles') {
-        scene.innerHTML = `<div class="angles-real-rig"><div class="angle-fast-cam"><img src="Camera-Angles.png" alt="Angle Camera"></div></div>`;
+        scene.innerHTML = `<div class="angles-real-rig"><div class="angle-fast-cam"><span class="scene-emoji" role="img" aria-label="Camera Angle">📐</span></div></div>`;
       } 
       else if (category === 'Camera Shots') {
-        scene.innerHTML = `<div class="clapper-real-rig"><img src="Camera-Shots.png" alt="Clapperboard Slate"></div>`;
+        scene.innerHTML = `<div class="clapper-real-rig"><span class="scene-emoji" role="img" aria-label="Camera Shot">🎬</span></div>`;
       } 
       else if (category === 'Cinematic Lighting') {
-        scene.innerHTML = `<div class="light-glare"></div><div class="light-real-rig"><img src="Cinematic -lighting.png" alt="Studio Light"></div>`;
+        scene.innerHTML = `<div class="light-glare"></div><div class="light-real-rig"><span class="scene-emoji" role="img" aria-label="Studio Light">💡</span></div>`;
       } 
       else if (category === 'Camera Lens') {
-        scene.innerHTML = `<div class="lens-real-rig"><img src="Camera-lens.png" alt="Cinema Lens"></div>`;
+        scene.innerHTML = `<div class="lens-real-rig"><span class="scene-emoji" role="img" aria-label="Cinema Lens">🔭</span></div>`;
       }
 
       animTimeout = setTimeout(() => {
@@ -2810,7 +2907,7 @@
       // Gemini uses Firebase AI Logic; no Gemini Developer API key is exposed
       // in this public GitHub Pages file.
       try {
-        const firebaseAI = getAI(app, { backend: new GoogleAIBackend() });
+        const firebaseAI = getAI(app, { backend: new GoogleAIBackend(), useLimitedUseAppCheckTokens: true });
         window.cinemotionGeminiModel = getGenerativeModel(firebaseAI, {
           model: "gemini-3.8-flash"
         });
@@ -2874,11 +2971,9 @@
 
         if (user.email === "bhanu.pakala03@gmail.com") {
           document.body.classList.add("is-admin-active");
-          const migrationBtn = document.getElementById("cloudinaryMigrationButton"); if (migrationBtn) migrationBtn.style.display = "block";
           if (byId("profileBadgeRole")) byId("profileBadgeRole").innerText = "MASTER DIRECTOR (ADMIN)";
         } else {
           document.body.classList.remove("is-admin-active");
-          const migrationBtn = document.getElementById("cloudinaryMigrationButton"); if (migrationBtn) migrationBtn.style.display = "none";
           if (byId("profileBadgeRole")) byId("profileBadgeRole").innerText = "VAULT VIEWER";
         }
         loadFirebaseMovements();
@@ -3265,18 +3360,6 @@
       await loadFirebaseMovements();
     };
 
-    // Add a migration control only for the authenticated admin; does not alter page layout.
-    function ensureMigrationButton() {
-      if (document.getElementById("cloudinaryMigrationButton")) return;
-      const btn = document.createElement("button");
-      btn.id = "cloudinaryMigrationButton"; btn.className = "admin-only";
-      btn.textContent = "Migrate Firebase Media to Cloudinary";
-      btn.style.cssText = "position:fixed;right:18px;bottom:18px;z-index:99999;padding:12px 16px;border:1px solid #00d2ff;border-radius:10px;background:#071827;color:#fff;font-weight:700;cursor:pointer;display:none";
-      btn.addEventListener("click", async () => { btn.disabled = true; btn.textContent = "Migrating..."; try { await window.migrateFirebaseMediaToCloudinary(); } catch (e) { alert("Migration stopped: " + (e.message || e)); } finally { btn.disabled = false; btn.textContent = "Migrate Firebase Media to Cloudinary"; } });
-      document.body.appendChild(btn);
-    }
-    ensureMigrationButton();
-
     // Gemini AI Assistant UI, chat controls, and file attachments.
     const geminiPanel = byId("geminiPanel");
     const geminiLauncher = byId("geminiLauncher");
@@ -3284,6 +3367,132 @@
     const geminiForm = byId("geminiForm");
     const geminiInput = byId("geminiInput");
     const geminiMessages = byId("geminiMessages");
+    const directorLibrarySearch = byId("directorLibrarySearch");
+    const directorLibraryStatus = byId("directorLibraryStatus");
+    const directorLibraryTab = byId("directorLibraryTab");
+    const directorGeminiTab = byId("directorGeminiTab");
+
+    function syncDirectorLibrary(rawQuery) {
+      const sourceText = String(rawQuery || "").toLowerCase();
+      const items = Array.isArray(window.allVaultItems) ? window.allVaultItems : [];
+
+      // Only react to recognised CINEMOTION library terms. Pick the last
+      // recognised term in the Gemini draft, not the whole sentence.
+      const keywordGroups = [
+        { category:"Camera Movement", display:"movement", terms:["camera movement","camera movements","movement","movements","dolly","tracking","track","truck","pan","tilt","crane","orbit","arc","push in","pull out","zoom in","zoom out","handheld","steadicam","gimbal","whip pan","follow shot"] },
+        { category:"Camera Angles", display:"angle", terms:["camera angle","camera angles","angles","angle","low angle","high angle","eye level","bird's eye","birds eye","worm's eye","worms eye","dutch angle","top angle","overhead angle","profile angle"] },
+        { category:"Camera Shots", display:"shot", terms:["camera shot","camera shots","shot types","shot type","close up","close-up","extreme close up","long shot","wide shot","medium shot","establishing shot","full shot","two shot","over the shoulder","pov shot","macro shot"] },
+        { category:"Cinematic Lighting", display:"lighting", terms:["cinematic lighting","lighting","light","lights","backlight","backlighting","rim light","rimlight","split light","key light","fill light","practical light","soft light","hard light","low key","high key","chiaroscuro","volumetric light","god rays","silhouette"] },
+        { category:"Camera Lens", display:"lens", terms:["camera lens","camera lenses","lens","lenses","focal length","wide lens","ultra wide","telephoto","prime lens","macro lens","anamorphic","35mm","50mm","85mm","24mm","fisheye","depth of field","bokeh","aperture"] },
+        { category:"Atmosphere", display:"atmosphere", terms:["atmosphere","environment","weather","mood","fog","mist","smoke","haze","rain","storm","snow","dust","embers","wind","golden hour","blue hour","night","sunrise","sunset"] },
+        { category:"Master Prompts", display:"master prompt", terms:["master prompt","master prompts","recreate prompt","animation prompt","image upscaling","colour recreation","color recreation"] }
+      ];
+
+      const matches = [];
+      for (const group of keywordGroups) {
+        for (const term of group.terms) {
+          const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+");
+          const regex = new RegExp("(^|[^a-z0-9])" + escaped + "(?=$|[^a-z0-9])", "gi");
+          let match;
+          while ((match = regex.exec(sourceText)) !== null) {
+            matches.push({
+              index: match.index + match[1].length,
+              length: match[0].length - match[1].length,
+              category: group.category,
+              display: group.display,
+              term
+            });
+            if (match[0].length === 0) regex.lastIndex++;
+          }
+        }
+      }
+
+      // No recognised library keyword: do not mirror the Gemini sentence
+      // into the search box and do not show unrelated results.
+      if (!matches.length) {
+        if (directorLibrarySearch) directorLibrarySearch.value = "";
+        currentCategory = "All";
+        document.querySelectorAll(".cat-tab").forEach(btn => btn.classList.remove("active"));
+        document.querySelector('.cat-tab[onclick*="\'All\'"]')?.classList.add("active");
+        renderCards([]);
+        if (directorLibraryStatus) directorLibraryStatus.textContent = "Type a library keyword such as lighting, angle, shot, lens, dolly, fog or rain.";
+        return;
+      }
+
+      // Last recognised keyword typed wins. Longer terms win if they start
+      // at the same position (e.g. "camera angle" over "angle").
+      matches.sort((a, b) => a.index - b.index || b.length - a.length);
+      const selected = matches[matches.length - 1];
+      const displayTerm = selected.display;
+
+      if (directorLibrarySearch) directorLibrarySearch.value = displayTerm;
+
+      const categoryItems = items.filter(item =>
+        String(item.category || "").toLowerCase() === selected.category.toLowerCase()
+      );
+
+      // If a category has data, show the complete category. If it is empty
+      // (e.g. Lighting/Lens in the current built-in library), search existing
+      // prompt titles and prompt text for the selected keyword instead.
+      let results = categoryItems;
+      if (!results.length) {
+        const termVariants = keywordGroups
+          .find(group => group.category === selected.category)?.terms || [selected.term];
+        const terms = termVariants.map(term => term.toLowerCase());
+        results = items.filter(item => {
+          const haystack = `${item.name || ""} ${item.category || ""} ${item.prompt || ""}`.toLowerCase();
+          return terms.some(term => {
+            const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+");
+            return new RegExp("(^|[^a-z0-9])" + escaped + "(?=$|[^a-z0-9])", "i").test(haystack);
+          });
+        });
+      }
+
+      currentCategory = "All";
+      document.querySelectorAll(".cat-tab").forEach(btn => btn.classList.remove("active"));
+      document.querySelector('.cat-tab[onclick*="\'All\'"]')?.classList.add("active");
+      renderCards(results);
+
+      if (directorLibraryStatus) {
+        const label = categoryItems.length ? selected.category : `${selected.category} keyword matches`;
+        directorLibraryStatus.textContent = `${results.length} result(s) for “${displayTerm}” · ${label}`;
+      }
+
+      const firstCard = grid?.querySelector(".movement-card");
+      if (firstCard && document.body.classList.contains("director-mode")) {
+        firstCard.scrollIntoView({ block:"nearest", behavior:"smooth" });
+      }
+    }
+
+    window.insertPromptIntoGemini = function(itemId) {
+      const item = window.allVaultItems?.find(entry => String(entry.id) === String(itemId));
+      if (!item || !geminiInput) return;
+      geminiInput.value = item.prompt || "";
+      geminiInput.focus();
+      geminiInput.dispatchEvent(new Event("input", { bubbles:true }));
+      if (directorLibraryStatus) directorLibraryStatus.textContent = `“${item.name}” added to Gemini. Review it, then press Send.`;
+      if (window.innerWidth <= 820) {
+        document.body.classList.add("director-show-gemini");
+        directorLibraryTab?.classList.remove("active");
+        directorGeminiTab?.classList.add("active");
+      }
+    };
+
+    geminiInput?.addEventListener("input", () => {
+      if (document.body.classList.contains("director-mode")) syncDirectorLibrary(geminiInput.value);
+    });
+    directorLibrarySearch?.addEventListener("input", () => syncDirectorLibrary(directorLibrarySearch.value));
+    directorLibraryTab?.addEventListener("click", () => {
+      document.body.classList.remove("director-show-gemini");
+      directorLibraryTab.classList.add("active");
+      directorGeminiTab?.classList.remove("active");
+    });
+    directorGeminiTab?.addEventListener("click", () => {
+      document.body.classList.add("director-show-gemini");
+      directorGeminiTab.classList.add("active");
+      directorLibraryTab?.classList.remove("active");
+      geminiInput?.focus();
+    });
     const geminiWelcome = byId("geminiWelcome");
     const geminiMenuToggle = byId("geminiMenuToggle");
     const geminiMenuDrawer = byId("geminiMenuDrawer");
@@ -3303,13 +3512,25 @@
         showAuthMessage("Please sign in to use Gemini.");
         return;
       }
+      document.body.classList.add("director-mode");
+      // On narrow screens the CSS intentionally shows one workspace pane at a time.
+      // The header Gemini button must switch to the Gemini pane, not hide it.
+      if (window.matchMedia("(max-width: 820px)").matches) {
+        document.body.classList.add("director-show-gemini");
+        directorGeminiTab?.classList.add("active");
+        directorLibraryTab?.classList.remove("active");
+      } else {
+        document.body.classList.remove("director-show-gemini");
+      }
       geminiPanel?.classList.add("open");
       geminiPanel?.setAttribute("aria-hidden", "false");
+      syncDirectorLibrary(geminiInput?.value || "");
       geminiInput?.focus();
     }
     function closeGeminiPanel() {
       geminiPanel?.classList.remove("open");
       geminiPanel?.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("director-mode", "director-show-gemini");
       closeGeminiMenu();
     }
     function openGeminiMenu() {
