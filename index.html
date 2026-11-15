@@ -873,14 +873,14 @@
   </style>
 </head>
 <body>
-  <video id="siteBackgroundVideo" autoplay muted playsinline loop preload="auto" aria-hidden="true">
+  <video id="siteBackgroundVideo" autoplay muted playsinline loop preload="none" aria-hidden="true">
     <source src="hero-banner-3.mp4" type="video/mp4">
   </video>
 
   <!-- TAB SWITCH WELCOME BACK OVERLAY (SEAMLESS FULLSCREEN, NO BOX) -->
   <div id="welcomeBackOverlay">
     <div class="welcome-video-container">
-      <video id="welcomeVideo" class="welcome-direct-video" muted playsinline preload="auto" src="welcome-back.mp4"></video>
+      <video id="welcomeVideo" class="welcome-direct-video" muted playsinline preload="none" src="welcome-back.mp4"></video>
     </div>
   </div>
 
@@ -1093,7 +1093,7 @@
   <div class="vault-container">
     <section class="hero-banner-wrapper" id="heroBanner">
       <!-- One continuous hero video: no duplicate background layer or split panels. -->
-      <video id="heroVideo" class="hero-foreground-video" autoplay muted playsinline loop preload="auto" poster="bhanu-3d-header_2.png" src="hero-banner-3.mp4"></video>
+      <video id="heroVideo" class="hero-foreground-video" autoplay muted playsinline loop preload="metadata" poster="bhanu-3d-header_2.png" src="hero-banner-3.mp4"></video>
     </section>
 
     <div class="categories-bar-wrapper">
@@ -1612,7 +1612,7 @@
                 </div>
                 
                 <!-- Screen Blended Copied Video Player inside the red-circled area (Now Edge-to-Edge Fill) -->
-                <video id="copied_video_${item.id}" class="copied-video-player" muted playsinline preload="auto"></video>
+                <video id="copied_video_${item.id}" class="copied-video-player" muted playsinline preload="none"></video>
               </div>
             </div>
             
@@ -1631,21 +1631,23 @@
         }
       });
 
-      if (localDB) {
+      if (localDB && list.length) {
+        // Read local card media in one IndexedDB request instead of one request per card.
         const tx = localDB.transaction("cardMedia", "readonly");
         const store = tx.objectStore("cardMedia");
-        list.forEach(item => {
-          const req = store.get(item.id);
-          req.onsuccess = () => {
-            if (req.result) {
-              if (req.result.fileBlob) {
-                applyMediaToCard(item.id, req.result.fileBlob, req.result.fileType);
-              } else if (req.result.mediaURL) {
-                applyMediaUrlToCard(item.id, req.result.mediaURL, req.result.fileType);
-              }
+        const req = store.getAll();
+        req.onsuccess = () => {
+          const mediaById = new Map((req.result || []).map(record => [record.id, record]));
+          list.forEach(item => {
+            const record = mediaById.get(item.id);
+            if (!record) return;
+            if (record.fileBlob) {
+              applyMediaToCard(item.id, record.fileBlob, record.fileType);
+            } else if (record.mediaURL) {
+              applyMediaUrlToCard(item.id, record.mediaURL, record.fileType);
             }
-          };
-        });
+          });
+        };
       }
 
       updateCounts();
@@ -3525,7 +3527,11 @@
     async function loadFirebaseMovements() {
       try {
         const q = query(collection(db, "movements"), orderBy("createdAt", "desc"));
-        const snapshot = await getDocs(q);
+        // Fetch movements and prompt edits together to avoid serial network round-trips.
+        const [snapshot, editsSnapshot] = await Promise.all([
+          getDocs(q),
+          getDocs(collection(db, "promptEdits"))
+        ]);
         const customMovements = [];
         snapshot.forEach((docSnap) => {
           const data = docSnap.data();
@@ -3545,8 +3551,7 @@
           if (newMovements.length) window.allVaultItems = [...newMovements, ...window.allVaultItems];
         }
 
-        // Load cloud prompt edits and apply them to both built-in and custom cards.
-        const editsSnapshot = await getDocs(collection(db, "promptEdits"));
+        // Apply the prompt edits fetched in parallel with the movements.
         editsSnapshot.forEach((editDoc) => {
           const edit = editDoc.data();
           const item = window.allVaultItems.find(m => m.id === (edit.itemId || editDoc.id));
