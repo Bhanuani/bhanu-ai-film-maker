@@ -4023,42 +4023,70 @@
     async function loadFirebaseMovements() {
       try {
         const q = query(collection(db, "movements"), orderBy("createdAt", "desc"));
-        const [snapshot, editsSnapshot, deletionsSnapshot] = await Promise.all([
-          getDocs(q),
-          getDocs(collection(db, "promptEdits")),
-          getDocs(collection(db, "promptDeletions"))
-        ]);
-        const deletedPromptIds = new Set(deletionsSnapshot.docs.map(docSnap => String(docSnap.id)));
-        window.allVaultItems = window.allVaultItems.filter(
+
+        // Load the main movement records first. Optional collections must never
+        // prevent the user's saved movements from appearing.
+        const snapshot = await getDocs(q);
+
+        let editsSnapshot = null;
+        try {
+          editsSnapshot = await getDocs(collection(db, "promptEdits"));
+        } catch (editError) {
+          console.warn("Could not load prompt edits; showing original saved prompts:", editError);
+        }
+
+        let deletionsSnapshot = null;
+        try {
+          deletionsSnapshot = await getDocs(collection(db, "promptDeletions"));
+        } catch (deletionError) {
+          // A missing read permission here must not block the movements collection.
+          console.warn("Could not load prompt deletion records; showing saved movements:", deletionError);
+        }
+
+        const deletedPromptIds = new Set(
+          (deletionsSnapshot?.docs || []).map(docSnap => String(docSnap.id))
+        );
+
+        window.allVaultItems = (window.allVaultItems || []).filter(
           item => !deletedPromptIds.has(String(item.id))
         );
+
         const customMovements = [];
         snapshot.forEach((docSnap) => {
           const data = docSnap.data();
-          if (data.name && !deletedPromptIds.has(String(docSnap.id))) customMovements.push({ id: docSnap.id, ...data });
-          else if (data.linkedCardId && data.mediaURL) {
+          if (data.name && !deletedPromptIds.has(String(docSnap.id))) {
+            customMovements.push({ id: docSnap.id, ...data });
+          } else if (data.linkedCardId && data.mediaURL) {
             const target = window.allVaultItems?.find(m => m.id === data.linkedCardId);
             if (target) {
               target.mediaURL = data.mediaURL;
               target.mediaType = data.mediaType;
-              if (typeof applyMediaUrlToCard === "function") applyMediaUrlToCard(target.id, data.mediaURL, data.mediaType);
+              if (typeof applyMediaUrlToCard === "function") {
+                applyMediaUrlToCard(target.id, data.mediaURL, data.mediaType);
+              }
             }
           }
         });
+
         if (customMovements.length) {
           const existingIds = new Set(window.allVaultItems.map((item) => item.id));
           const newMovements = customMovements.filter((item) => !existingIds.has(item.id));
-          if (newMovements.length) window.allVaultItems = [...newMovements, ...window.allVaultItems];
+          if (newMovements.length) {
+            window.allVaultItems = [...newMovements, ...window.allVaultItems];
+          }
         }
 
-        editsSnapshot.forEach((editDoc) => {
-          const edit = editDoc.data();
-          const item = window.allVaultItems.find(m => m.id === (edit.itemId || editDoc.id));
-          if (item) {
-            if (typeof edit.name === "string") item.name = edit.name;
-            if (typeof edit.prompt === "string") item.prompt = edit.prompt;
-          }
-        });
+        if (editsSnapshot) {
+          editsSnapshot.forEach((editDoc) => {
+            const edit = editDoc.data();
+            const item = window.allVaultItems.find(m => m.id === (edit.itemId || editDoc.id));
+            if (item) {
+              if (typeof edit.name === "string") item.name = edit.name;
+              if (typeof edit.prompt === "string") item.prompt = edit.prompt;
+            }
+          });
+        }
+
         renderCards(window.allVaultItems);
       } catch (err) {
         console.error("Firestore load error:", err);
