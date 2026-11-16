@@ -837,13 +837,15 @@
     .gemini-panel-brand strong { display:block; color:#fff; font-size: .98rem; }
     .gemini-panel-brand small { display:block; color:#94a3b8; font-size:.68rem; margin-top:2px; }
     .gemini-close { width:34px; height:34px; border:0; border-radius:50%; background:rgba(255,255,255,.07); color:#cbd5e1; font-size:24px; cursor:pointer; }
-    .gemini-welcome { padding: 30px 22px 18px; text-align:center; }
-    .gemini-welcome-mark { width:38px; height:38px; margin-bottom:13px; }
-    .gemini-welcome h3 { font-size:1.08rem; color:#fff; margin-bottom:8px; }
-    .gemini-welcome p { font-size:.78rem; line-height:1.55; color:#94a3b8; }
-    .gemini-suggestions { display:grid; gap:8px; margin-top:18px; }
-    .gemini-suggestions button { text-align:left; color:#dbeafe; background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; font:500 .75rem 'Plus Jakarta Sans',sans-serif; cursor:pointer; }
-    .gemini-suggestions button:hover { border-color:#9b72cb; background:rgba(155,114,203,.1); }
+    .gemini-welcome {
+      flex:1; min-height:0; width:100%; padding:18px 22px;
+      display:flex; align-items:center; justify-content:center; overflow:hidden;
+    }
+    .gemini-intro-video {
+      display:block; width:min(100%, 980px); max-height:100%;
+      aspect-ratio:16/9; object-fit:contain; background:#000;
+      border:0; border-radius:14px;
+    }
     .gemini-messages { flex:1; min-height:80px; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:12px; }
     .gemini-message { max-width:92%; padding:11px 13px; border-radius:13px; font-size:.9rem; line-height:1.65; white-space:pre-wrap; overflow-wrap:anywhere; }
     .gemini-message.user { align-self:flex-end; background:rgba(66,133,244,.2); border:1px solid rgba(66,133,244,.25); color:#eff6ff; }
@@ -2682,16 +2684,17 @@
       </button>
     </aside>
     <div class="gemini-welcome" id="geminiWelcome">
-      <svg class="gemini-welcome-mark" viewBox="0 0 24 24" aria-hidden="true">
-        <defs><linearGradient id="geminiWelcomeGradient" x1="7%" y1="5%" x2="92%" y2="96%"><stop offset="0%" stop-color="#4285F4"/><stop offset="48%" stop-color="#9B72CB"/><stop offset="100%" stop-color="#D96570"/></linearGradient></defs>
-        <path fill="url(#geminiWelcomeGradient)" d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/>
-      </svg>
-      <h3>How can I help you create?</h3>
-      <p>Ask about cinematic prompts, camera movements, shots, lighting, storyboards, or your CINEMOTION workflow.</p>
-      <div class="gemini-suggestions">
-        <button type="button" data-gemini-prompt="Create a cinematic camera movement prompt for a premium product reveal.">Create a product reveal prompt</button>
-        <button type="button" data-gemini-prompt="Suggest a cinematic lighting setup for a dramatic scene.">Suggest cinematic lighting</button>
-      </div>
+      <video
+        id="geminiIntroVideo"
+        class="gemini-intro-video"
+        poster="./Gemini-2-poster.jpg"
+        preload="auto"
+        muted
+        playsinline
+        webkit-playsinline
+        aria-label="CINEMOTION welcome animation">
+        <source src="./Gemini-2.mp4" type="video/mp4">
+      </video>
     </div>
     <div class="gemini-messages" id="geminiMessages" aria-live="polite"></div>
     <div class="gemini-attachment-preview" id="geminiAttachmentPreview" hidden>
@@ -3538,6 +3541,11 @@
     }
     function resetGeminiConversation() {
       geminiChatSession = null;
+      geminiIntroPlayedForChat = false;
+      if (geminiIntroVideo) {
+        geminiIntroVideo.pause();
+        try { geminiIntroVideo.currentTime = 0; } catch (_) {}
+      }
       if (geminiMessages) geminiMessages.replaceChildren();
       if (geminiWelcome) geminiWelcome.style.display = "";
       if (geminiInput) geminiInput.value = "";
@@ -3587,7 +3595,7 @@
       return "Hi! How can I help you?";
     }
 
-    async function sendGeminiMessage(rawText, attachedFile = null) {
+    async function sendGeminiMessageNow(rawText, attachedFile = null) {
       const prompt = String(rawText || "").trim();
       if (!prompt && !attachedFile) return;
       if (!auth.currentUser) {
@@ -3673,6 +3681,69 @@
 
           pending.textContent = friendlyError;
         }
+      } finally {
+        if (sendButton) sendButton.disabled = false;
+        if (geminiInput) { geminiInput.disabled = false; geminiInput.focus(); }
+        if (geminiUploadBtn) geminiUploadBtn.disabled = false;
+      }
+    }
+
+    // The welcome animation is shown as a still first frame when Gemini opens.
+    // On the first submitted message of each chat, play the 3-second intro,
+    // then start the Firebase Gemini request. Playback failure never blocks chat.
+    let geminiIntroPlayedForChat = false;
+    const geminiIntroVideo = byId("geminiIntroVideo");
+
+    async function playGeminiIntroOnce() {
+      if (geminiIntroPlayedForChat || !geminiIntroVideo) return;
+      geminiIntroPlayedForChat = true;
+
+      try {
+        geminiIntroVideo.pause();
+        geminiIntroVideo.currentTime = 0;
+        const playback = geminiIntroVideo.play();
+        if (playback && typeof playback.then === "function") await playback;
+
+        await new Promise(resolve => {
+          if (geminiIntroVideo.ended) return resolve();
+          const finish = () => {
+            geminiIntroVideo.removeEventListener("ended", finish);
+            geminiIntroVideo.removeEventListener("error", finish);
+            resolve();
+          };
+          geminiIntroVideo.addEventListener("ended", finish, { once:true });
+          geminiIntroVideo.addEventListener("error", finish, { once:true });
+        });
+      } catch (error) {
+        console.warn("CINEMOTION intro video could not play; continuing with Gemini.", error);
+      } finally {
+        geminiIntroVideo.pause();
+        try { geminiIntroVideo.currentTime = 0; } catch (_) {}
+      }
+    }
+
+    async function sendGeminiMessage(rawText, attachedFile = null) {
+      const prompt = String(rawText || "").trim();
+      if (!prompt && !attachedFile) return;
+
+      // Validate authentication/model before spending time on the intro animation.
+      if (!auth.currentUser) {
+        addGeminiMessage("Please sign in to use Gemini.", "assistant", true);
+        return;
+      }
+      if (!window.cinemotionGeminiModel) {
+        addGeminiMessage("Gemini is not initialized. Check Firebase AI Logic and App Check configuration.", "assistant", true);
+        return;
+      }
+
+      const sendButton = byId("geminiSend");
+      if (sendButton) sendButton.disabled = true;
+      if (geminiInput) geminiInput.disabled = true;
+      if (geminiUploadBtn) geminiUploadBtn.disabled = true;
+
+      try {
+        await playGeminiIntroOnce();
+        await sendGeminiMessageNow(prompt, attachedFile);
       } finally {
         if (sendButton) sendButton.disabled = false;
         if (geminiInput) { geminiInput.disabled = false; geminiInput.focus(); }
