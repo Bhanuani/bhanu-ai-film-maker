@@ -1755,46 +1755,112 @@
 
     window.handleUserLogout = () => signOut(auth);
 
-    // GEMINI AI INTEGRATION
+    // GEMINI AI INTEGRATION THROUGH CLOUDFLARE WORKER
+    // The Gemini API key stays in Cloudflare as the GEMINI_API_KEY Secret.
+    const GEMINI_WORKER_URL = "https://cinemotion-media-api.bhanu-pakala03.workers.dev/gemini";
     const geminiPanel = document.getElementById("geminiPanel");
-    document.getElementById("geminiLauncher")?.addEventListener("click", () => geminiPanel?.classList.toggle("open"));
-    document.getElementById("geminiClose")?.addEventListener("click", () => geminiPanel?.classList.remove("open"));
+    const geminiMessages = document.getElementById("geminiMessages");
+    const geminiForm = document.getElementById("geminiForm");
+    const geminiInput = document.getElementById("geminiInput");
+    const geminiSend = document.getElementById("geminiSend");
+
+    document.getElementById("geminiLauncher")?.addEventListener("click", () => {
+      geminiPanel?.classList.toggle("open");
+    });
+    document.getElementById("geminiClose")?.addEventListener("click", () => {
+      geminiPanel?.classList.remove("open");
+    });
 
     let conversationHistory = [];
 
+    function addGeminiMessage(text, role) {
+      if (!geminiMessages) return null;
+      const message = document.createElement("div");
+      message.className = `gemini-message ${role}`;
+      message.textContent = text;
+      geminiMessages.appendChild(message);
+      geminiMessages.scrollTo({
+        top: geminiMessages.scrollHeight,
+        behavior: "smooth"
+      });
+      return message;
+    }
+
     async function sendGeminiMessage(prompt) {
-      if (!prompt) return;
-      const msgs = document.getElementById("geminiMessages");
-      const userMsg = document.createElement("div"); userMsg.className = "gemini-message user"; userMsg.textContent = prompt; msgs.appendChild(userMsg);
-      
-      const aiMsg = document.createElement("div"); aiMsg.className = "gemini-message assistant"; aiMsg.textContent = "Thinking..."; msgs.appendChild(aiMsg);
+      if (!prompt || !prompt.trim()) return;
+
+      const user = auth.currentUser;
+      if (!user) {
+        addGeminiMessage("Please sign in before using Gemini.", "error");
+        document.getElementById("authGateModal")?.style.setProperty("display", "flex");
+        return;
+      }
+
+      addGeminiMessage(prompt, "user");
+      const aiMsg = addGeminiMessage("Thinking...", "assistant");
+
+      if (geminiSend) geminiSend.disabled = true;
+      conversationHistory.push({ role: "user", parts: [{ text: prompt }] });
 
       try {
-        conversationHistory.push({ role: "user", parts: [{ text: prompt }] });
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AQ.Ab8RN6KVPam0fUCBRQEPfAnDF-jUqidwswU8pbqGUiFFHe3kcA`;
-        const res = await fetch(url, {
+        // Send recent conversation context to the Worker as one prompt.
+        const historyText = conversationHistory.slice(-16).map(item => {
+          const text = item.parts?.map(part => part.text || "").join("") || "";
+          return `${item.role === "model" ? "Assistant" : "User"}: ${text}`;
+        }).join("\\n\\n");
+
+        const workerPrompt = historyText.length > 28000
+          ? historyText.slice(-28000)
+          : historyText;
+
+        // Firebase ID token is verified by the Cloudflare Worker.
+        const idToken = await user.getIdToken();
+
+        const res = await fetch(GEMINI_WORKER_URL, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ contents: conversationHistory })
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${idToken}`
+          },
+          body: JSON.stringify({ prompt: workerPrompt })
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data?.error?.message || "API connection failed");
-        
-        const replyText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
-        conversationHistory.push({ role: "model", parts: [{ text: replyText }] });
-        aiMsg.textContent = replyText;
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          throw new Error(data?.error || `Gemini request failed (${res.status})`);
+        }
+
+        if (!data?.success || !data?.text) {
+          throw new Error(data?.error || "Gemini returned an empty response");
+        }
+
+        conversationHistory.push({
+          role: "model",
+          parts: [{ text: data.text }]
+        });
+
+        aiMsg.textContent = data.text;
       } catch (err) {
+        // Remove the unanswered user turn so a retry does not duplicate it.
         conversationHistory.pop();
-        aiMsg.textContent = "Error: " + err.message;
+        aiMsg.classList.add("error");
+        aiMsg.textContent = "Error: " + (err?.message || "Gemini connection failed");
+      } finally {
+        if (geminiSend) geminiSend.disabled = false;
+        geminiMessages?.scrollTo({
+          top: geminiMessages.scrollHeight,
+          behavior: "smooth"
+        });
       }
     }
 
-    document.getElementById("geminiForm")?.addEventListener("submit", (e) => {
+    geminiForm?.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const input = document.getElementById("geminiInput");
-      const val = input.value.trim();
-      input.value = "";
-      sendGeminiMessage(val);
+      const value = geminiInput?.value.trim() || "";
+      if (!value || geminiSend?.disabled) return;
+      geminiInput.value = "";
+      await sendGeminiMessage(value);
     });
   </script>
 </body>
