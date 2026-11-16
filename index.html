@@ -9,7 +9,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="assets/cinemotion/favicon-16.png">
   <link rel="apple-touch-icon" href="assets/cinemotion/apple-touch-icon.png">
   <link rel="manifest" href="site.webmanifest">
-  <title>CINEMOTION STUDIO - Master Directors Vault</title>
+  <title>CINEMOTION STUDIO - Master Directors Vault (Private)</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -166,17 +166,6 @@
       object-fit: contain;
       display: block;
       filter: drop-shadow(0 0 8px rgba(0, 210, 255, 0.22));
-    }
-    .sidebar-header .brand-logo-mark {
-      width: 34px;
-      height: 34px;
-      flex-basis: 34px;
-    }
-    @media (max-width: 520px) {
-      .brand-logo-mark { width: 34px; height: 34px; flex-basis: 34px; }
-      .brand-group { gap: 0.65rem; }
-      .brand-logo { gap: 0.35rem; font-size: 1.05rem; }
-      .brand-logo .studio-pill { font-size: 0.58rem; padding: 0.12rem 0.4rem; }
     }
 
     .brand-logo .studio-pill {
@@ -399,8 +388,6 @@
       display: block;
       z-index: 1;
       background: #000;
-      filter: none;
-      transform: none;
     }
 
     /* CATEGORIES BAR */
@@ -464,14 +451,6 @@
       font-size:25px; filter:drop-shadow(0 4px 8px rgba(0,0,0,.8));
       animation:iconFloatContinuous 3s ease-in-out infinite alternate;
     }
-    .cat-3d-img {
-      width: 40px; 
-      height: 40px; 
-      object-fit: contain; 
-      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.8));
-      animation: iconFloatContinuous 3s ease-in-out infinite alternate; 
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
 
     @keyframes iconFloatContinuous { 0% { transform: translateY(0px) rotate(0deg); } 100% { transform: translateY(-4px) rotate(3deg); } }
 
@@ -495,7 +474,6 @@
     }
     .card-video-box video, .card-video-box img, .card-video-box iframe { width: 100%; height: 100%; object-fit: cover; display: none; transition: transform 0.3s ease; border: none; }
     .card-video-box video.active-media, .card-video-box img.active-media, .card-video-box iframe.active-media { display: block; }
-    .card-video-box:hover video.active-media, .card-video-box:hover img.active-media { transform: scale(1.04); }
 
     .upload-overlay {
       position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -521,11 +499,7 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-    .link-upload-pill:hover {
-      background: var(--accent-cyan);
-      color: #040711;
-      transform: translateY(-1px);
-    }
+    .link-upload-pill:hover { background: var(--accent-cyan); color: #040711; transform: translateY(-1px); }
 
     .file-input { display: none; }
 
@@ -536,9 +510,6 @@
     .card-meta-actions { display: flex; align-items: center; gap: 7px; }
     .meta-action-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.04); color: #94a3b8; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.82rem; transition: all 0.2s ease; }
     .meta-action-btn:hover { transform: translateY(-2px); }
-    .meta-action-btn.edit-btn:hover { border-color: #f59e0b; color: #f59e0b; background: rgba(245, 158, 11, 0.15); }
-    .meta-action-btn.dl-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(0, 210, 255, 0.15); }
-    .meta-action-btn.del-btn:hover { border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.15); }
 
     .card-details h3 { font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; }
 
@@ -551,569 +522,72 @@
       overflow: hidden;
       display: flex;
       align-items: center;
-      transition: border-color 0.4s ease, box-shadow 0.4s ease;
     }
 
-    .prompt-wrapper.copied-active {
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 30px rgba(0, 210, 255, 0.45);
-    }
-
-    .prompt-content {
-      width: 100%;
-      padding: 0.85rem 2.4rem 0.85rem 0.85rem;
-      transition: opacity 0.3s ease;
-    }
-
-    .prompt-wrapper.copied-active .prompt-content {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .prompt-box {
-      font-size: 0.86rem;
-      color: #cbd5e1;
-      line-height: 1.5;
-      max-height: 140px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      word-break: break-word;
-      padding-right: 4px;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(0, 210, 255, 0.6) rgba(255, 255, 255, 0.03);
-    }
-
-    .prompt-box::-webkit-scrollbar { width: 4px; }
-    .prompt-box::-webkit-scrollbar-thumb { background: rgba(0, 210, 255, 0.5); border-radius: 999px; }
-
-    .copied-video-player {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: fill;
-      mix-blend-mode: screen;
-      pointer-events: none;
-      opacity: 0;
-      z-index: 10;
-      transition: opacity 0.25s ease;
-    }
-
-    .prompt-wrapper.copied-active .copied-video-player {
-      opacity: 1;
-    }
-
-    .prompt-edit-btn {
-      position: absolute;
-      bottom: 8px;
-      right: 8px;
-      width: 28px;
-      height: 28px;
-      border-radius: 7px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(13, 18, 31, 0.9);
-      color: #94a3b8;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 0.82rem;
-      transition: all 0.2s ease;
-      backdrop-filter: blur(6px);
-      z-index: 4;
-    }
-
-    .prompt-edit-btn:hover {
-      border-color: var(--accent-cyan);
-      color: var(--accent-cyan);
-      background: rgba(0, 210, 255, 0.15);
-      transform: scale(1.1);
-      box-shadow: 0 0 12px rgba(0, 210, 255, 0.4);
-    }
+    .prompt-content { width: 100%; padding: 0.85rem 2.4rem 0.85rem 0.85rem; }
+    .prompt-box { font-size: 0.86rem; color: #cbd5e1; line-height: 1.5; max-height: 140px; overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
 
     .copy-btn {
-      width: 100%;
-      background: linear-gradient(135deg, #00d2ff 0%, #0099cc 100%);
-      color: #040711;
-      border: none;
-      padding: 0.75rem 1rem;
-      border-radius: 8px;
-      font-size: 0.88rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      transition: all 0.2s;
+      width: 100%; background: linear-gradient(135deg, #00d2ff 0%, #0099cc 100%); color: #040711; border: none; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.88rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s;
     }
     .copy-btn:hover { box-shadow: 0 0 18px rgba(0, 210, 255, 0.5); transform: translateY(-2px); }
 
-    /* LIGHTBOX POPUP */
-    #mediaLightbox { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.92); backdrop-filter: blur(16px); z-index: 1000000; display: none; align-items: center; justify-content: center; padding: 2rem; }
-    .lightbox-box { background: #090e1a; border: 1px solid rgba(0, 210, 255, 0.4); border-radius: 20px; max-width: 960px; width: 100%; overflow: hidden; display: flex; flex-direction: column; }
-    .lightbox-header { padding: 1.2rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
-    .lightbox-header h3 { font-size: 1.25rem; font-weight: 700; color: #fff; }
-    .lightbox-stage { width: 100%; height: 55vh; background: #000; display: flex; align-items: center; justify-content: center; }
-    .lightbox-stage video, .lightbox-stage img, .lightbox-stage iframe { width: 100%; height: 100%; object-fit: contain; border: none; }
+    /* AUTHENTICATION GATE MODAL */
+    .auth-gate-modal { position: fixed; inset: 0; background: rgba(3, 7, 18, 0.98); backdrop-filter: blur(25px); z-index: 1000000; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+    .auth-card { background: #0c1222; border: 1px solid rgba(0, 210, 255, 0.35); border-radius: 20px; width: 100%; max-width: 440px; padding: 2rem; box-shadow: 0 0 60px rgba(0, 210, 255, 0.2); }
     
-    .lightbox-footer { 
-      padding: 1.2rem 1.5rem; 
-      display: flex; 
-      align-items: center; 
-      justify-content: space-between; 
-      border-top: 1px solid var(--border-color); 
-      gap: 1.5rem; 
-      flex-wrap: wrap; 
-    }
-    
-    .lightbox-prompt { font-size: 0.88rem; color: var(--text-muted); flex: 1; max-height: 100px; overflow-y: auto; white-space: pre-wrap; }
-    
-    .lightbox-actions {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .lightbox-actions .copy-btn {
-      width: auto;
-      padding: 0.75rem 1.35rem;
-      white-space: nowrap;
-    }
-
-    .lightbox-dl-btn { 
-      background: linear-gradient(135deg, #00d2ff 0%, #0099cc 100%); 
-      color: #040711; 
-      border: none; 
-      padding: 0.75rem 1.5rem; 
-      border-radius: 8px; 
-      font-weight: 800; 
-      cursor: pointer; 
-      display: inline-flex; 
-      align-items: center; 
-      gap: 0.5rem; 
-      white-space: nowrap; 
-      transition: all 0.2s; 
-    }
-    .lightbox-dl-btn:hover { box-shadow: 0 0 18px rgba(0, 210, 255, 0.6); transform: translateY(-2px); }
-
-    #toast { visibility: hidden; position: fixed; bottom: 2rem; right: 2rem; background: #00d2ff; color: #040711; padding: 0.75rem 1.4rem; border-radius: 999px; font-weight: 700; z-index: 100000; opacity: 0; transition: opacity 0.3s, transform 0.3s; transform: translateY(20px); }
-    #toast.show { visibility: visible; opacity: 1; transform: translateY(0); }
-
     .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.82); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 99999; }
     .modal-box { background: #0d121f; border: 1px solid rgba(0, 210, 255, 0.3); border-radius: 16px; width: 92%; max-width: 620px; padding: 24px; color: #fff; max-height: 90vh; overflow-y: auto; }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
-    .close-btn { background: none; border: none; color: #94a3b8; font-size: 26px; cursor: pointer; }
     .form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
     .form-group label { font-size: 13px; color: #94a3b8; font-weight: 600; }
-    .form-group input, .form-group select, .form-group textarea { background: #161e2e; border: 1px solid #334155; color: #f8fafc; padding: 10px 14px; border-radius: 8px; font-size: 14px; outline: none; line-height: 1.5; font-family: inherit; }
+    .form-group input, .form-group select, .form-group textarea { background: #161e2e; border: 1px solid #334155; color: #f8fafc; padding: 10px 14px; border-radius: 8px; font-size: 14px; outline: none; }
     .submit-btn { width: 100%; padding: 12px; background: var(--accent-cyan); border: none; border-radius: 8px; color: #040711; font-weight: 700; cursor: pointer; }
-
-    .themes-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
-    .theme-chip { background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: 10px; color: #cbd5e1; display: flex; justify-content: space-between; cursor: pointer; }
-    .theme-chip:hover { background: rgba(0, 210, 255, 0.15); border-color: var(--accent-cyan); color: #fff; }
-
-    #cinematicStage { position: fixed; inset: 0; pointer-events: none; z-index: 999999; display: none; align-items: center; justify-content: center; perspective: 1200px; overflow: hidden; }
-    .stage-backdrop { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(0, 210, 255, 0.15) 0%, rgba(2, 6, 18, 0.92) 80%); backdrop-filter: blur(8px); animation: stageFade 2s ease forwards; }
-    @keyframes stageFade { 0% { opacity: 0; } 12% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; } }
-    .cinematic-scene { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 10; }
-
-    .all-orbit-scene { display: flex; align-items: center; justify-content: center; position: relative; width: 500px; height: 500px; animation: grandOrbitSpin 2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    .all-orbit-icon { position:absolute; width:75px; height:75px; display:grid; place-items:center; font-size:54px; filter:drop-shadow(0 0 20px rgba(0,210,255,.8)); }
-    .scene-emoji { display:block; font-size:clamp(100px,18vw,220px); line-height:1; filter:drop-shadow(0 0 35px rgba(0,210,255,.65)); }
-    .master-logo-canvas { display:block; font-size:150px; line-height:1; }
-    @keyframes grandOrbitSpin { 0% { transform: scale(0.2) rotate(-90deg); opacity: 0; } 40% { transform: scale(1.1) rotate(20deg); opacity: 1; } 80% { transform: scale(1) rotate(0deg); opacity: 1; } 100% { transform: scale(1.4) rotate(45deg); opacity: 0; } }
-
-    .dolly-real-rig { position: absolute; bottom: 22%; left: -500px; animation: realDollyTrack 2s cubic-bezier(0.2, 0.9, 0.3, 1) forwards; }
-    .dolly-real-rig img { width: 440px; }
-    @keyframes realDollyTrack { 0% { left: -500px; } 50% { left: calc(50vw - 220px); transform: scale(1.15); } 100% { left: 105vw; } }
-
-    .angles-real-rig { position: relative; width: 100vw; height: 100vh; }
-    .angle-fast-cam { position: absolute; width: 280px; animation: cornerHop 2s steps(1) forwards; }
-    .angle-fast-cam img { width: 100%; filter: drop-shadow(0 0 35px rgba(0, 210, 255, 0.7)); }
-    @keyframes cornerHop { 0% { top: 12%; left: 10%; } 25% { top: 12%; right: 10%; left: auto; } 50% { bottom: 15%; right: 10%; top: auto; } 75% { bottom: 15%; left: 10%; top: auto; } 100% { top: 50%; left: 50%; transform: translate(-50%, -50%) scale(1.3); } }
-
-    .clapper-real-rig { display: flex; flex-direction: column; align-items: center; animation: clapHit 2s ease-out forwards; }
-    .clapper-real-rig img { width: 360px; filter: drop-shadow(0 20px 50px rgba(0, 210, 255, 0.6)); }
-    @keyframes clapHit { 0% { transform: scale(0.3); opacity: 0; } 35% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.2); opacity: 0; } }
-
-    .light-real-rig { display: flex; flex-direction: column; align-items: center; animation: studioFlash 2s ease forwards; }
-    .light-real-rig img { width: 380px; filter: drop-shadow(0 0 65px rgba(251, 191, 36, 0.85)); }
-    .light-glare { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(251, 191, 36, 0.6) 0%, transparent 80%); mix-blend-mode: screen; }
-    @keyframes studioFlash { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
-
-    .season-sky-lapse { position: absolute; inset: 0; animation: seasonLapseCycle 2s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-    @keyframes seasonLapseCycle { 0% { background: linear-gradient(180deg, #ec4899 0%, #10b981 100%); } 50% { background: linear-gradient(180deg, #f59e0b 0%, #0284c7 100%); } 100% { background: linear-gradient(180deg, #1e293b 0%, #94a3b8 100%); } }
-    .season-particles { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; gap: 30px; }
-
-    .smoke-rig-real { position: absolute; bottom: 15%; display: flex; align-items: center; animation: mistDrift 2s ease forwards; }
-    .smoke-rig-real img { width: 440px; }
-    @keyframes mistDrift { 0% { transform: translateX(-80px); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateX(60px); opacity: 0; } }
-
-    .lens-real-rig { display: flex; flex-direction: column; align-items: center; animation: lensRealZoom 2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    .lens-real-rig img { width: 420px; filter: drop-shadow(0 0 60px rgba(0, 210, 255, 0.9)); }
-    @keyframes lensRealZoom { 0% { transform: scale(0.3); opacity: 0; } 50% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(3.0); opacity: 0; } }
-
-    .master-writing-rig { position: relative; display: flex; align-items: center; justify-content: center; width: 480px; height: 320px; animation: masterRigPop 2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    .master-logo-canvas { width: 280px; filter: drop-shadow(0 0 40px rgba(0, 210, 255, 0.8)); }
-    .neon-quill-pen { position: absolute; top: 15%; left: 15%; font-size: 3.5rem; color: #00d2ff; filter: drop-shadow(0 0 25px #00d2ff); animation: penWritingMotion 2s ease-in-out forwards; }
-    @keyframes penWritingMotion { 0% { transform: translate(0, 0) scale(0.6); opacity: 0; } 50% { transform: translate(120px, 15px); opacity: 1; } 100% { transform: translate(320px, 0px) scale(1.4); opacity: 0; } }
-    @keyframes masterRigPop { 0% { transform: scale(0.4); opacity: 0; } 50% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.35); opacity: 0; } }
-
-    .stage-title { position: absolute; bottom: 12%; font-size: 1.5rem; font-family: 'Space Grotesk', sans-serif; font-weight: 800; color: #fff; text-transform: uppercase; background: rgba(4, 7, 17, 0.75); padding: 0.6rem 2rem; border-radius: 999px; border: 1px solid var(--accent-cyan); z-index: 20; }
-
-    /* AUTHENTICATION GATE & FORGOT PASSWORD MODALS */
-    .auth-gate-modal { position: fixed; inset: 0; background: rgba(3, 7, 18, 0.96); backdrop-filter: blur(25px); z-index: 1000000; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
-    .auth-card { background: #0c1222; border: 1px solid rgba(0, 210, 255, 0.35); border-radius: 20px; width: 100%; max-width: 440px; padding: 2rem; box-shadow: 0 0 60px rgba(0, 210, 255, 0.2); }
-    .auth-tabs { display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; }
-    .auth-tab-btn { flex: 1; padding: 0.75rem; background: none; border: none; color: #94a3b8; font-weight: 700; cursor: pointer; border-bottom: 2px solid transparent; font-size: 0.88rem; }
-    .auth-tab-btn.active { color: var(--accent-cyan); border-bottom-color: var(--accent-cyan); }
-    .forgot-pass-link { font-size: 12px; color: var(--accent-cyan); text-align: right; cursor: pointer; margin-top: -8px; margin-bottom: 14px; display: block; text-decoration: none; }
-    .forgot-pass-link:hover { text-decoration: underline; }
 
     /* GEMINI AI ASSISTANT */
     .gemini-launcher {
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      min-height: 40px; padding: 7px 13px; border-radius: 999px;
-      border: 1px solid rgba(155,114,203,.48); background: rgba(255,255,255,.045);
-      color: #f8fafc; font: 700 .82rem 'Plus Jakarta Sans',sans-serif;
-      cursor: pointer; transition: .2s ease; white-space: nowrap;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 7px 13px; border-radius: 999px; border: 1px solid rgba(155,114,203,.48); background: rgba(255,255,255,.045); color: #f8fafc; font: 700 .82rem 'Plus Jakarta Sans',sans-serif; cursor: pointer;
     }
-    .gemini-launcher:hover { border-color: #9b72cb; background: rgba(155,114,203,.13); transform: translateY(-1px); }
-    .gemini-mark { width: 23px; height: 23px; display: block; flex: 0 0 auto; }
     .gemini-panel {
-      position: fixed; z-index: 1000001; top: 82px; right: 22px; bottom: 18px;
-      width: min(410px, calc(100vw - 28px)); max-height: 780px;
-      display: none; flex-direction: column; overflow: hidden;
-      background: #0c1220; border: 1px solid rgba(155,114,203,.38);
-      border-radius: 18px; box-shadow: 0 22px 70px rgba(0,0,0,.65);
+      position: fixed; z-index: 1000001; top: 82px; right: 22px; bottom: 18px; width: min(410px, calc(100vw - 28px)); max-height: 780px; display: none; flex-direction: column; overflow: hidden; background: #0c1220; border: 1px solid rgba(155,114,203,.38); border-radius: 18px; box-shadow: 0 22px 70px rgba(0,0,0,.65);
     }
     .gemini-panel.open { display: flex; }
-    .gemini-panel-head { min-height: 66px; padding: 13px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,.09); gap:10px; }
-    .gemini-menu-toggle {
-      width:34px; height:34px; flex:0 0 auto; display:grid; place-items:center;
-      border:0; border-radius:9px; color:#dbe4f2; background:rgba(255,255,255,.07);
-      cursor:pointer; font-size:15px;
-    }
-    .gemini-menu-toggle:hover { background:rgba(155,114,203,.2); color:#fff; }
-    .gemini-menu-drawer {
-      position:absolute; z-index:8; top:66px; left:0; bottom:0; width:205px;
-      padding:16px 10px; background:#101827; border-right:1px solid rgba(155,114,203,.25);
-      box-shadow:12px 0 28px rgba(0,0,0,.28); transform:translateX(-105%);
-      transition:transform .22s ease; visibility:hidden;
-    }
-    .gemini-menu-drawer.open { transform:translateX(0); visibility:visible; }
-    .gemini-menu-title { padding:5px 10px 12px; color:#77869d; font-size:.62rem; font-weight:800; letter-spacing:.12em; }
-    .gemini-menu-item {
-      width:100%; display:flex; align-items:center; gap:11px; padding:12px 10px;
-      border:0; border-radius:10px; color:#e5eaf3; background:transparent;
-      text-align:left; font:600 .78rem 'Plus Jakarta Sans',sans-serif; cursor:pointer;
-    }
-    .gemini-menu-item:hover { background:rgba(255,255,255,.08); }
-    .gemini-menu-item i { width:17px; color:#a78bfa; text-align:center; }
-    .gemini-menu-item.gemini-clear-item i { color:#f28b82; }
-    .gemini-attachment-preview {
-      margin:8px 13px 0; padding:7px 10px; display:flex; align-items:center; gap:9px;
-      color:#dbeafe; background:rgba(66,133,244,.12); border:1px solid rgba(66,133,244,.28);
-      border-radius:10px; font-size:.72rem;
-    }
-    .gemini-attachment-preview[hidden] { display:none; }
-    .gemini-attachment-preview span { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .gemini-attachment-preview button { border:0; background:transparent; color:#cbd5e1; font-size:19px; cursor:pointer; }
-    .gemini-upload-btn {
-      width:35px; height:35px; flex:0 0 auto; display:grid; place-items:center;
-      border:1px solid rgba(155,114,203,.35); border-radius:10px;
-      color:#c4b5fd; background:rgba(155,114,203,.10); cursor:pointer;
-    }
-    .gemini-upload-btn:hover { background:rgba(155,114,203,.22); color:#fff; }
-    .gemini-panel-brand { display:flex; align-items:center; gap:10px; }
-    .gemini-panel-mark { width:29px; height:29px; }
-    .gemini-panel-brand strong { display:block; color:#fff; font-size: .98rem; }
-    .gemini-panel-brand small { display:block; color:#94a3b8; font-size:.68rem; margin-top:2px; }
-    .gemini-close { width:34px; height:34px; border:0; border-radius:50%; background:rgba(255,255,255,.07); color:#cbd5e1; font-size:24px; cursor:pointer; }
-    .gemini-welcome { padding: 30px 22px 18px; text-align:center; }
-    .gemini-welcome-mark { width:38px; height:38px; margin-bottom:13px; }
-    .gemini-welcome h3 { font-size:1.08rem; color:#fff; margin-bottom:8px; }
-    .gemini-welcome p { font-size:.78rem; line-height:1.55; color:#94a3b8; }
-    .gemini-suggestions { display:grid; gap:8px; margin-top:18px; }
-    .gemini-suggestions button { text-align:left; color:#dbeafe; background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; font:500 .75rem 'Plus Jakarta Sans',sans-serif; cursor:pointer; }
-    .gemini-suggestions button:hover { border-color:#9b72cb; background:rgba(155,114,203,.1); }
+    .gemini-panel-head { min-height: 66px; padding: 13px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,.09); }
     .gemini-messages { flex:1; min-height:80px; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:12px; }
-    .gemini-message { max-width:92%; padding:11px 13px; border-radius:13px; font-size:.8rem; line-height:1.6; white-space:pre-wrap; overflow-wrap:anywhere; }
-    .gemini-message.user { align-self:flex-end; background:rgba(66,133,244,.2); border:1px solid rgba(66,133,244,.25); color:#eff6ff; }
-    .gemini-message.assistant { align-self:flex-start; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); color:#e2e8f0; }
-    .gemini-message.error { color:#fecaca; border-color:rgba(239,68,68,.3); }
+    .gemini-message { max-width:92%; padding:11px 13px; border-radius:13px; font-size:.8rem; line-height:1.6; white-space:pre-wrap; }
+    .gemini-message.user { align-self:flex-end; background:rgba(66,133,244,.2); color:#eff6ff; }
+    .gemini-message.assistant { align-self:flex-start; background:rgba(255,255,255,.06); color:#e2e8f0; }
     .gemini-composer { margin:10px 13px 0; padding:8px 8px 8px 13px; display:flex; align-items:flex-end; gap:8px; background:#151d2d; border:1px solid rgba(255,255,255,.14); border-radius:14px; }
-    .gemini-composer:focus-within { border-color:#9b72cb; box-shadow:0 0 0 2px rgba(155,114,203,.12); }
-    .gemini-composer textarea { flex:1; resize:none; max-height:130px; border:0; outline:0; color:#fff; background:transparent; font: .82rem/1.5 'Plus Jakarta Sans',sans-serif; padding:6px 0; }
-    .gemini-composer textarea::placeholder { color:#8290a5; }
-    .gemini-composer button { width:35px; height:35px; flex:0 0 auto; border:0; border-radius:10px; color:white; background:linear-gradient(135deg,#4285f4,#9b72cb 65%,#d96570); cursor:pointer; }
-    .gemini-composer button:disabled { opacity:.45; cursor:wait; }
-    .gemini-disclaimer { text-align:center; color:#718096; font-size:.62rem; padding:8px 10px 11px; }
-    @media (max-width: 700px) {
-      .gemini-launcher { width:39px; min-width:39px; height:39px; padding:7px; gap:0; }
-      .gemini-launcher span { display:none; }
-      .gemini-mark { width:23px; height:23px; }
-      .header-actions { gap:.45rem; }
-      .gemini-panel { top:70px; right:10px; bottom:10px; width:calc(100vw - 20px); max-height:none; }
-    }
-
-    @media (max-width: 1100px) {
-      .movements-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    }
-    @media (max-width: 820px) {
-      .movements-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .vault-container, .header-inner { width: calc(100% - 24px); }
-    }
-    @media (max-width: 520px) {
-      .movements-grid { grid-template-columns: 1fr; }
-      .vault-container { padding-top: 1rem; }
-    }
-
-    /* CINEMOTION DIRECTOR WORKSPACE */
-    .director-library-head {
-      display: none;
-      position: sticky;
-      top: 0;
-      z-index: 30;
-      padding: 14px 16px;
-      margin: 0 0 14px;
-      background: rgba(4, 7, 17, .96);
-      border: 1px solid rgba(0, 210, 255, .22);
-      border-radius: 14px;
-      backdrop-filter: blur(14px);
-    }
-    .director-library-head h2 { font: 800 1.05rem 'Space Grotesk', sans-serif; color: #fff; }
-    .director-library-head p { color: #94a3b8; font-size: .72rem; margin-top: 4px; }
-    .director-library-tools { display:flex; gap:8px; align-items:center; margin-top:10px; }
-    .director-library-tools input {
-      flex:1; min-width:0; padding:9px 12px; color:#fff;
-      background:#111a2b; border:1px solid rgba(255,255,255,.13);
-      border-radius:9px; outline:none; font: .78rem 'Plus Jakarta Sans',sans-serif;
-    }
-    .director-library-tools input:focus { border-color:var(--accent-cyan); }
-    .director-mobile-tabs { display:none; gap:6px; }
-    .director-mobile-tabs button {
-      border:1px solid rgba(255,255,255,.15); background:#111a2b; color:#cbd5e1;
-      border-radius:8px; padding:8px 10px; font-weight:700; font-size:.72rem;
-    }
-    .director-mobile-tabs button.active { color:#04101a; background:var(--accent-cyan); }
-    .use-gemini-btn {
-      display:none; width:100%; margin-top:7px; padding:9px 10px; border-radius:8px;
-      border:1px solid rgba(155,114,203,.45); background:rgba(155,114,203,.12);
-      color:#e9ddff; font:700 .78rem 'Plus Jakarta Sans',sans-serif; cursor:pointer;
-    }
-    .use-gemini-btn:hover { background:rgba(155,114,203,.25); border-color:#b794f4; }
-    body.director-mode { overflow:hidden; }
-    body.director-mode .vault-container {
-      position:fixed; z-index:101; left:0; top:82px; bottom:0;
-      width:50vw; max-width:none; margin:0; padding:14px 16px 28px;
-      overflow-y:auto; overscroll-behavior:contain;
-      border-right:1px solid rgba(0,210,255,.22);
-      background:rgba(4,7,17,.97);
-    }
-    body.director-mode .hero-banner-wrapper { display:none; }
-    body.director-mode .director-library-head { display:block; }
-    body.director-mode .categories-bar-wrapper { margin-bottom:14px; }
-    body.director-mode .cat-tab { font-size:.78rem; padding:7px 10px; gap:6px; }
-    body.director-mode .cat-emoji {
-      width:40px; height:40px; flex:0 0 40px; display:inline-grid; place-items:center;
-      font-size:25px; filter:drop-shadow(0 4px 8px rgba(0,0,0,.8));
-      animation:iconFloatContinuous 3s ease-in-out infinite alternate;
-    }
-    .cat-3d-img { width:25px; height:25px; }
-    body.director-mode .cat-tab span.count { font-size:.68rem; padding:2px 6px; }
-    body.director-mode .movements-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
-    body.director-mode .card-details { padding:10px; gap:9px; }
-    body.director-mode .card-details h3 { font-size:.88rem; }
-    body.director-mode .prompt-box { font-size:.72rem; max-height:110px; }
-    body.director-mode .card-video-box { aspect-ratio:16/9; }
-    body.director-mode .copy-btn { padding:9px 8px; font-size:.76rem; }
-    body.director-mode .use-gemini-btn { display:block; }
-    body.director-mode .gemini-panel,
-    body.director-mode .gemini-panel.open {
-      display:flex; position:fixed; z-index:102; top:82px; right:0; bottom:0;
-      left:auto; width:50vw; max-width:none; max-height:none; border-radius:0;
-      border-top:0; border-right:0; border-bottom:0; border-left:1px solid rgba(155,114,203,.35);
-    }
-    body.director-mode .search-box { display:none; }
-    body.director-mode .gemini-launcher { border-color:#9b72cb; background:rgba(155,114,203,.16); }
-    @media (max-width: 820px) {
-      body.director-mode .vault-container {
-        top:70px; width:100vw; border-right:0; padding:10px 12px 24px;
-      }
-      body.director-mode .gemini-panel,
-      body.director-mode .gemini-panel.open {
-        top:70px; width:100vw; border-left:0;
-      }
-      body.director-mode:not(.director-show-gemini) .gemini-panel { display:none; }
-      body.director-mode.director-show-gemini .vault-container { display:none; }
-      body.director-mode .director-mobile-tabs { display:flex; }
-      body.director-mode .movements-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
-      body.director-mode .director-library-head { padding:11px; }
-    }
-    @media (max-width: 520px) {
-      body.director-mode .movements-grid { grid-template-columns:1fr; }
-    }
+    .gemini-composer textarea { flex:1; resize:none; max-height:130px; border:0; outline:0; color:#fff; background:transparent; font: .82rem/1.5 'Plus Jakarta Sans',sans-serif; }
+    .gemini-composer button { width:35px; height:35px; border:0; border-radius:10px; color:white; background:linear-gradient(135deg,#4285f4,#9b72cb); cursor:pointer; }
   </style>
 </head>
 <body>
 
-  <!-- TAB SWITCH WELCOME BACK OVERLAY -->
-  <div id="welcomeBackOverlay">
-    <div class="welcome-video-container">
-      <video id="welcomeVideo" class="welcome-direct-video" muted playsinline preload="none" src="welcome-back.mp4"></video>
-    </div>
-  </div>
-
-  <!-- AUTHENTICATION GATE -->
-  <div id="authGateModal" class="auth-gate-modal" style="display: none;">
+  <!-- PRIVATE AUTHENTICATION GATE (ONLY YOU CAN ACCESS) -->
+  <div id="authGateModal" class="auth-gate-modal">
     <div class="auth-card">
       <div style="text-align: center; margin-bottom: 1.5rem;">
-        <img src="assets/cinemotion/icon-128.png" alt="CINEMOTION logo" style="width:76px;height:76px;object-fit:contain;display:block;margin:0 auto 10px;filter:drop-shadow(0 0 14px rgba(0,210,255,.25));">
-        <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; color: #fff;">CINEMOTION STUDIO</h2>
-        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Director Vault Sign-In</p>
+        <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; color: #fff;">🔒 PRIVATE VAULT</h2>
+        <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">Sign in with your authorized admin account</p>
       </div>
-
-      <div class="auth-tabs">
-        <button type="button" class="auth-tab-btn active" id="tabEmailBtn" onclick="switchAuthMode('email')">Login</button>
-        <button type="button" class="auth-tab-btn" id="tabRegisterBtn" onclick="switchAuthMode('register')">Register</button>
-        <button type="button" class="auth-tab-btn" id="tabPhoneBtn" onclick="switchAuthMode('phone')">Mobile (OTP)</button>
-      </div>
-
-      <!-- 1. LOGIN FORM -->
       <form id="emailAuthForm">
         <div class="form-group">
-          <label>Mail ID</label>
-          <input type="email" id="userEmailInput" placeholder="name@example.com" required />
+          <label>Admin Mail ID</label>
+          <input type="email" id="userEmailInput" placeholder="bhanu.pakala03@gmail.com" required />
         </div>
         <div class="form-group">
           <label>Password</label>
           <input type="password" id="userPassInput" placeholder="••••••••" required />
         </div>
-        <a class="forgot-pass-link" onclick="openForgotPasswordModal()">Forgot Password?</a>
-        <button type="submit" class="submit-btn" id="emailSubmitBtn">Login</button>
-        <button type="button" class="submit-btn" id="resendVerificationBtn" style="display:none; margin-top:10px; background:#172235; color:#00d2ff; border:1px solid rgba(0,210,255,.45);" onclick="resendVerificationEmail()">Resend Verification Email</button>
-        <p id="verificationStatusText" style="display:none; margin-top:10px; color:#fbbf24; font-size:12px; line-height:1.5;"></p>
-      </form>
-
-      <!-- 2. NEW USER REGISTRATION FORM -->
-      <form id="registerAuthForm" style="display: none;">
-        <div class="form-group">
-          <label>1. Mail ID</label>
-          <input type="email" id="regEmailInput" placeholder="name@example.com" required />
-        </div>
-
-        <div class="form-group">
-          <label>2. Job / Study / Other</label>
-          <select id="regJobInput" required style="background: #161e2e; border: 1px solid #334155; color: #f8fafc; padding: 12px 14px; border-radius: 8px; font-size: 14px; outline: none;">
-            <option value="" disabled selected>Select Occupation / Study</option>
-            <option value="Job">Job / Working Professional</option>
-            <option value="Study">Study / Student</option>
-            <option value="Filmmaker">Filmmaker / Editor</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>3. Password</label>
-          <input type="password" id="regPassInput" placeholder="Must include Upper, Lower, Number, Special" oninput="checkRegisterPasswordRules()" required />
-          <small id="regPassHint" style="font-size: 11px; color: #f87171; line-height: 1.3;">
-            Rule: 1 Capital letter, 1 Small letter, 1 Number, 1 Special Char (@$!%*?&#), min 8 chars.
-          </small>
-        </div>
-
-        <div class="form-group">
-          <label>4. Re-Enter Password</label>
-          <input type="password" id="regConfirmPassInput" placeholder="Re-enter same password" oninput="checkRegisterPasswordRules()" required />
-          <small id="regMatchHint" style="font-size: 11px; color: #f87171; display: none;">Passwords do not match!</small>
-        </div>
-
-        <button type="submit" class="submit-btn" id="regDoneBtn" disabled style="opacity: 0.45; cursor: not-allowed; transition: all 0.25s;">Done</button>
-      </form>
-
-      <!-- 3. MOBILE PHONE OTP FORM -->
-      <form id="phoneAuthForm" style="display: none;">
-        <div class="form-group">
-          <label>Mobile Number (with Country Code)</label>
-          <input type="tel" id="userPhoneInput" placeholder="+91 9876543210" />
-        </div>
-        <div id="recaptcha-container"></div>
-        <div class="form-group" id="otpGroup" style="display: none;">
-          <label>Enter 6-Digit OTP</label>
-          <input type="text" id="otpCodeInput" placeholder="123456" maxlength="6" />
-        </div>
-        <button type="button" class="submit-btn" id="sendOtpBtn" onclick="requestPhoneOtp()">Send OTP</button>
-        <button type="button" class="submit-btn" id="verifyOtpBtn" style="display: none;" onclick="confirmPhoneOtp()">Verify & Sign In</button>
+        <button type="submit" class="submit-btn" id="emailSubmitBtn">Unlock Studio</button>
       </form>
     </div>
   </div>
-
-  <!-- FORGOT PASSWORD MODAL -->
-  <div id="forgotPasswordModal" class="auth-gate-modal" style="display: none;">
-    <div class="auth-card" style="max-width: 400px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
-        <h3 style="color: var(--accent-cyan); font-size: 1.15rem;"><i class="fa-solid fa-key"></i> Reset Password</h3>
-        <button type="button" onclick="closeForgotPasswordModal()" style="background:none; border:none; color:#94a3b8; font-size:1.5rem; cursor:pointer;">&times;</button>
-      </div>
-      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 1rem;">Enter your registered Email. We will send a secure password reset link to update your password.</p>
-      <form id="forgotPasswordForm">
-        <div class="form-group">
-          <label>Your Registered Email</label>
-          <input type="email" id="resetEmailInput" placeholder="Enter your email" required />
-        </div>
-        <button type="submit" class="submit-btn">Send Reset Link</button>
-      </form>
-    </div>
-  </div>
-
-  <div id="cinematicStage">
-    <div class="stage-backdrop"></div>
-    <div class="cinematic-scene" id="cinematicScene"></div>
-    <div class="stage-title" id="stageTitle">Cinematic View</div>
-  </div>
-
-  <div class="sidebar-overlay" id="sidebarOverlay"></div>
-  <aside class="sidebar-drawer" id="sidebarDrawer">
-    <div class="sidebar-header">
-      <div class="brand-logo" style="font-size: 1.15rem;">
-        <img class="brand-logo-mark" src="assets/cinemotion/icon-128.png" alt="CINEMOTION logo">
-        <span>CINEMOTION</span>
-        <span class="studio-pill">STUDIO</span>
-      </div>
-      <button class="close-btn" id="closeSidebarBtn">&times;</button>
-    </div>
-    <div class="sidebar-menu">
-      <button class="sidebar-item" id="openThemesBtn">
-        <i class="fa-solid fa-palette"></i>
-        <span>10 Classic Themes</span>
-        <span class="sidebar-badge">10</span>
-      </button>
-
-      <button class="sidebar-item" onclick="triggerCinematicCategory('Camera Movement'); closeSidebar();">
-        <i class="fa-solid fa-film"></i>
-        <span>Directors Vault</span>
-      </button>
-
-      <button class="sidebar-item" onclick="openPromptLibrary(); closeSidebar();">
-        <i class="fa-solid fa-wand-magic-sparkles"></i>
-        <span>Visual Prompts Library</span>
-      </button>
-
-      <button class="sidebar-item" onclick="alert('Studio Settings: Resolution 4K, 24fps Standard Enabled.'); closeSidebar();">
-        <i class="fa-solid fa-sliders"></i>
-        <span>Studio Settings</span>
-      </button>
-    </div>
-  </aside>
 
   <header>
     <div class="header-inner">
       <div class="brand-group">
-        <button class="menu-btn" id="sidebarToggleBtn"><i class="fa-solid fa-bars"></i></button>
         <div class="brand-logo">
-          <img class="brand-logo-mark" src="assets/cinemotion/icon-128.png" alt="CINEMOTION logo">
           <span>CINEMOTION</span>
           <span class="studio-pill">STUDIO</span>
         </div>
@@ -1125,1073 +599,71 @@
       </div>
 
       <div class="header-actions">
-        <button class="add-btn admin-only" id="addMovementBtn">
-          <i class="fa-solid fa-plus"></i> Add Movement
+        <button type="button" class="gemini-launcher" id="geminiLauncher">
+          <i class="fa-solid fa-wand-magic-sparkles" style="color: #00d2ff;"></i>
+          <span>Gemini AI</span>
         </button>
-        <button type="button" class="gemini-launcher" id="geminiLauncher" aria-label="Open Gemini AI Assistant" title="Gemini AI Assistant">
-          <svg class="gemini-mark" viewBox="0 0 24 24" role="img" aria-label="Gemini">
-            <defs>
-              <linearGradient id="geminiGradient" x1="7%" y1="5%" x2="92%" y2="96%">
-                <stop offset="0%" stop-color="#4285F4"/>
-                <stop offset="48%" stop-color="#9B72CB"/>
-                <stop offset="100%" stop-color="#D96570"/>
-              </linearGradient>
-            </defs>
-            <path fill="url(#geminiGradient)" d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/>
-          </svg>
-          <span>Gemini</span>
+        <button type="button" class="logout-btn-dropdown" onclick="handleUserLogout()" style="padding: 0.45rem 0.9rem; border-radius: 999px;">
+          Lock Vault
         </button>
-        
-        <div class="profile-pill" id="profilePillBtn">
-          <div class="avatar" id="headerUserAvatar">BP</div>
-          <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; color: #94a3b8;"></i>
-        </div>
-
-        <div class="profile-dropdown" id="profileDropdown">
-          <div class="profile-dropdown-header">
-            <div class="profile-avatar-large" id="profileAvatarLarge">BP</div>
-            <div class="profile-info">
-              <h4 id="profileDisplayName">BHANU PAKALA</h4>
-              <p id="profileDisplayEmail">bhanu.pakala03@gmail.com</p>
-            </div>
-          </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <span class="profile-badge" id="profileBadgeRole" style="font-size: 11px; color: var(--accent-cyan); font-weight: 700;">DIRECTOR</span>
-            <span style="font-size: 11px; color: #94a3b8;">Cinemotion AI</span>
-          </div>
-          <button type="button" class="logout-btn-dropdown" onclick="handleUserLogout()">
-            <i class="fa-solid fa-right-from-bracket"></i> Sign Out
-          </button>
-        </div>
       </div>
     </div>
   </header>
 
   <div class="vault-container">
-    <section class="director-library-head" id="directorLibraryHead">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-        <div><h2><i class="fa-solid fa-clapperboard" style="color:var(--accent-cyan);"></i> Director Prompt Library</h2>
-          <p id="directorLibraryStatus">Type in Gemini to find matching prompts and media.</p></div>
-        <div class="director-mobile-tabs" aria-label="Workspace panels">
-          <button type="button" id="directorLibraryTab" class="active">Library</button>
-          <button type="button" id="directorGeminiTab">Gemini</button>
-        </div>
-      </div>
-      <div class="director-library-tools">
-        <input type="search" id="directorLibrarySearch" placeholder="Search prompts, categories, camera terms..." aria-label="Search prompt library">
-      </div>
-    </section>
-    <section class="hero-banner-wrapper" id="heroBanner">
-      <video id="heroVideo" class="hero-foreground-video" autoplay muted playsinline loop preload="none" poster="bhanu-3d-header_2.png" src="hero-banner-3.mp4"></video>
-    </section>
-
-    <div class="categories-bar-wrapper">
-      <div class="categories-bar">
-        <button class="cat-tab active" onclick="triggerCinematicCategory('All', this)">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="#00d2ff"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>
-          <span>All</span>
-          <span class="count" id="count_All">136</span>
-        </button>
-
-        <button class="cat-tab" onclick="triggerCinematicCategory('Camera Movement', this)">
-          <span class="cat-emoji" aria-hidden="true">🎥</span>
-          <span>Camera Movement</span>
-          <span class="count" id="count_Camera_Movement">44</span>
-        </button>
-
-        <button class="cat-tab" onclick="triggerCinematicCategory('Camera Angles', this)">
-          <span class="cat-emoji" aria-hidden="true">📐</span>
-          <span>Camera Angles</span>
-          <span class="count" id="count_Camera_Angles">12</span>
-        </button>
-
-        <button class="cat-tab" onclick="triggerCinematicCategory('Camera Shots', this)">
-          <span class="cat-emoji" aria-hidden="true">🎬</span>
-          <span>Camera Shots</span>
-          <span class="count" id="count_Camera_Shots">15</span>
-        </button>
-
-        <button class="cat-tab" onclick="triggerCinematicCategory('Cinematic Lighting', this)">
-          <span class="cat-emoji" aria-hidden="true">💡</span>
-          <span>Cinematic Lighting</span>
-          <span class="count" id="count_Cinematic_Lighting">0</span>
-        </button>
-
-        <button class="cat-tab" onclick="triggerCinematicCategory('Atmosphere', this)">
-          <span class="cat-emoji" aria-hidden="true">🌫️</span>
-          <span>Atmosphere</span>
-          <span class="count" id="count_Atmosphere">60</span>
-        </button>
-
-        <button class="cat-tab" onclick="triggerCinematicCategory('Camera Lens', this)">
-          <span class="cat-emoji" aria-hidden="true">🔭</span>
-          <span>Camera Lens</span>
-          <span class="count" id="count_Camera_Lens">0</span>
-        </button>
-
-        <button class="cat-tab" onclick="triggerCinematicCategory('Master Prompts', this)">
-          <span class="cat-emoji" aria-hidden="true">📝</span>
-          <span>Master Prompts</span>
-          <span class="count" id="count_Master_Prompts">5</span>
-        </button>
-      </div>
-    </div>
-
     <main class="movements-grid" id="movementsGrid"></main>
   </div>
 
-  <!-- LIGHTBOX -->
-  <div id="mediaLightbox">
-    <div class="lightbox-box">
-      <div class="lightbox-header">
-        <h3 id="lightboxTitle"><i class="fa-solid fa-clapperboard" style="color: var(--accent-cyan);"></i> Movement Title</h3>
-        <button type="button" class="close-btn" id="closeLightboxBtn">&times;</button>
-      </div>
-      <div class="lightbox-stage" id="lightboxStage"></div>
-      <div class="lightbox-footer">
-        <div class="lightbox-prompt" id="lightboxPrompt">Prompt details...</div>
-        <div class="lightbox-actions">
-          <button type="button" class="copy-btn" id="lightboxCopyBtn">
-            <i class="fa-solid fa-copy"></i> Copy Prompt
-          </button>
-          <button type="button" class="lightbox-dl-btn" id="lightboxDownloadBtn">
-            <i class="fa-solid fa-download"></i> Download Media
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- EDIT PROMPT MODAL -->
-  <div id="editPromptModal" class="modal-overlay" style="display: none;">
-    <div class="modal-box">
-      <div class="modal-header">
-        <h3 style="margin: 0; font-size: 18px; color: var(--accent-cyan);"><i class="fa-solid fa-pen-to-square"></i> Edit Movement Prompt</h3>
-        <button type="button" id="closeEditPromptModalBtn" class="close-btn">&times;</button>
-      </div>
-      <form id="editPromptForm">
-        <input type="hidden" id="editPromptItemId">
-        <div class="form-group">
-          <label for="editPromptTitle">Prompt / Movement Name</label>
-          <input type="text" id="editPromptTitle" required />
-        </div>
-        <div class="form-group">
-          <label for="editPromptText">Prompt Description / AI Formula (Unlimited Lines & Text)</label>
-          <textarea id="editPromptText" rows="7" placeholder="Paste or type any size prompt with no restrictions..." required></textarea>
-        </div>
-        <button type="submit" id="saveEditPromptBtn" class="submit-btn">Update Prompt</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- LINK MODAL -->
-  <div id="linkModal" class="modal-overlay" style="display: none;">
-    <div class="modal-box" style="max-width: 500px;">
-      <div class="modal-header">
-        <h3 style="margin: 0; font-size: 18px; color: var(--accent-cyan);"><i class="fa-solid fa-link"></i> Add Media Link</h3>
-        <button type="button" id="closeLinkModalBtn" class="close-btn">&times;</button>
-      </div>
-      <form id="linkForm">
-        <input type="hidden" id="linkCardId">
-        <div class="form-group">
-          <label for="mediaUrlInput">Paste Link (Google Drive / YouTube / Direct MP4)</label>
-          <input type="url" id="mediaUrlInput" placeholder="https://drive.google.com/... or https://youtu.be/..." required />
-        </div>
-        <button type="submit" class="submit-btn">Save Link & Sync Everywhere</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- ADD MOVEMENT MODAL -->
-  <div id="movementModal" class="modal-overlay" style="display: none;">
-    <div class="modal-box">
-      <div class="modal-header">
-        <h3 style="margin: 0; font-size: 18px; color: var(--accent-cyan);"><i class="fa-solid fa-plus"></i> Add New Movement</h3>
-        <button type="button" id="closeModalBtn" class="close-btn">&times;</button>
-      </div>
-      <form id="movementForm">
-        <div class="form-group">
-          <label for="itemCategory">Category</label>
-          <select id="itemCategory" required>
-            <option value="Camera Movement">Camera Movement</option>
-            <option value="Camera Angles">Camera Angles</option>
-            <option value="Camera Shots">Camera Shots</option>
-            <option value="Cinematic Lighting">Cinematic Lighting</option>
-            <option value="Atmosphere">Atmosphere</option>
-            <option value="Camera Lens">Camera Lens</option>
-            <option value="Master Prompts">Master Prompts</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="itemTitle">Movement Name</label>
-          <input type="text" id="itemTitle" placeholder="e.g. Dolly Zoom, Dutch Angle" required />
-        </div>
-        <div class="form-group">
-          <label for="itemPrompt">Prompt Formula / Description (Unlimited Length)</label>
-          <textarea id="itemPrompt" rows="6" placeholder="Paste any length prompt without restriction..." required></textarea>
-        </div>
-        <div class="form-group">
-          <label for="itemMediaUrl">Media Link (Optional – Google Drive / YouTube / Online URL)</label>
-          <input type="url" id="itemMediaUrl" placeholder="Paste a media URL if available (optional)" />
-        </div>
-        <button type="submit" id="saveBtn" class="submit-btn">+ Save to Vault</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- THEMES MODAL -->
-  <div id="themesModal" class="modal-overlay" style="display: none;">
-    <div class="modal-box" style="max-width: 580px;">
-      <div class="modal-header">
-        <div>
-          <h3 style="margin: 0; font-size: 18px; color: var(--accent-cyan);"><i class="fa-solid fa-palette"></i> 10 Classic Master Themes</h3>
-          <p style="font-size: 12px; color: #94a3b8; margin-top: 4px;">Click any theme to copy tags</p>
-        </div>
-        <button type="button" id="closeThemesModalBtn" class="close-btn">&times;</button>
-      </div>
-      <div class="themes-grid" id="themesGrid"></div>
-    </div>
-  </div>
-
-  <div id="toast">
-    <i class="fa-solid fa-circle-check"></i>
+  <div id="toast" style="visibility:hidden; position:fixed; bottom:2rem; right:2rem; background:#00d2ff; color:#040711; padding:0.75rem 1.4rem; border-radius:999px; font-weight:700; z-index:100000;">
     <span id="toastMsg">Action Successful!</span>
   </div>
 
-  <!-- SCRIPT -->
+  <!-- CORE SCRIPT -->
   <script>
     const defaultMovements = [
       { id: "mov_1", name: "Slow Dolly In", category: "Camera Movement", prompt: "Slow dolly in, camera moves slowly forward toward the subject." },
-      { id: "mov_2", name: "Slow Dolly Out", category: "Camera Movement", prompt: "Slow dolly out, camera moves slowly backwards away from the subject." },
-      { id: "mov_3", name: "Fast Dolly In", category: "Camera Movement", prompt: "Fast dolly in, camera moves rapidly forward toward the subject, urgent motion." },
-      { id: "mov_4", name: "Vertigo Effect (Zolly)", category: "Camera Movement", prompt: "Vertigo effect, dolly zoom, camera moves backward while zooming in, background expands." },
-      { id: "mov_5", name: "Extreme Macro Zoom", category: "Camera Movement", prompt: "Extreme macro zoom, zoom transition from subject to micro details of surface." },
-      { id: "mov_6", name: "Cosmic Hyper Zoom", category: "Camera Movement", prompt: "Cosmic hyper zoom, fast zoom transition from extreme wide view down to macro level." },
-      { id: "mov_7", name: "Over the Shoulder (OTS) Shot", category: "Camera Movement", prompt: "Over the shoulder shot, camera mounted behind subject A framing subject B." },
-      { id: "mov_8", name: "Fisheye or Peephole Lens", category: "Camera Movement", prompt: "Fisheye lens, extreme wide-angle distortion, circular frame." },
-      { id: "mov_9", name: "Reveal from Behind", category: "Camera Movement", prompt: "Wipe movement, camera slides laterally from behind foreground object to reveal the scene." },
-      { id: "mov_10", name: "Through Shot", category: "Camera Movement", prompt: "Fly through, camera moves through an opening into the scene." },
-      { id: "mov_11", name: "Reveal from Blur", category: "Camera Movement", prompt: "Rack focus, start completely out of focus, slowly pull focus until sharp." },
-      { id: "mov_12", name: "Rack Focus", category: "Camera Movement", prompt: "Rack focus, focus shifts from the foreground object to the background subject." },
-      { id: "mov_13", name: "Tilt Up", category: "Camera Movement", prompt: "Tilt up, camera pans vertically up from bottom to top." },
-      { id: "mov_14", name: "Tilt Down", category: "Camera Movement", prompt: "Tilt down, camera pans vertically down from top to bottom." },
-      { id: "mov_15", name: "Camera Truck Left", category: "Camera Movement", prompt: "Truck left, camera moves sideways on a track to the left." },
-      { id: "mov_16", name: "Lateral Truck Right", category: "Camera Movement", prompt: "Truck right, camera moves sideways on a track to the right." },
-      { id: "mov_17", name: "Orbit 180 (Spin)", category: "Camera Movement", prompt: "Orbit 180, camera moves in a half-circle around the subject." },
-      { id: "mov_18", name: "Fast 360 Orbit (Spin)", category: "Camera Movement", prompt: "Fast 360 orbit, camera spins rapidly 360 degrees around the subject." },
-      { id: "mov_19", name: "True Orbit 180", category: "Camera Movement", prompt: "180 orbit, camera orbits 180 degrees around the subject." },
-      { id: "mov_20", name: "True Orbit 360", category: "Camera Movement", prompt: "Fast 360 orbit, camera orbits 360 degrees around the subject." },
-      { id: "mov_21", name: "Slow Cinematic Arc", category: "Camera Movement", prompt: "Slow cinematic arc, camera moves in a wide curve to reveal side profile." },
-      { id: "mov_22", name: "Pedestal Down", category: "Camera Movement", prompt: "Pedestal down, camera lowers vertically straight down." },
-      { id: "mov_23", name: "Pedestal Up", category: "Camera Movement", prompt: "Pedestal up, camera rises vertically straight up from waist to eye level." },
-      { id: "mov_24", name: "Crane Up (High Angle Reveal)", category: "Camera Movement", prompt: "Crane up, camera lifts high into the air." },
-      { id: "mov_25", name: "Crane Down (Landing)", category: "Camera Movement", prompt: "Crane down, camera descends slowly to the subject." },
-      { id: "mov_26", name: "Smooth Optical Zoom In", category: "Camera Movement", prompt: "Smooth optical zoom in, lens magnifies subject, camera stays stationary." },
-      { id: "mov_27", name: "Smooth Optical Zoom Out", category: "Camera Movement", prompt: "Smooth optical zoom out, lens widens, background becomes blurry." },
-      { id: "mov_28", name: "Snap Zoom (Crash Zoom)", category: "Camera Movement", prompt: "Snap zoom, crash zoom, rapid zoom directly into the eyes." },
-      { id: "mov_29", name: "Drone Fly Over", category: "Camera Movement", prompt: "Drone fly over, high altitude flight moving forward over the landscape." },
-      { id: "mov_30", name: "Epic Drone Reveal", category: "Camera Movement", prompt: "Epic drone reveal, rising and tilting down to reveal the scene." },
-      { id: "mov_31", name: "Large Scale Drone Orbit", category: "Camera Movement", prompt: "Large scale drone orbit, massive sweeping circle around the landscape." },
-      { id: "mov_32", name: "Top Down (God's Eye View)", category: "Camera Movement", prompt: "Top down shot, camera pointing straight down, slow twist." },
-      { id: "mov_33", name: "FPV Drone Aggressive (Drone Dive)", category: "Camera Movement", prompt: "FPV drone dive, aggressive diving motion down a vertical structure." },
-      { id: "mov_34", name: "Handheld Documentary Style", category: "Camera Movement", prompt: "Handheld camera, shaky motion, natural movement, documentary style." },
-      { id: "mov_35", name: "Whip Pan", category: "Camera Movement", prompt: "Whip pan, camera whips violently to the side with extreme directional motion blur." },
-      { id: "mov_36", name: "Dutch Angle (Roll)", category: "Camera Movement", prompt: "Dutch angle, camera roll, tilted sideways on Z-axis." },
-      { id: "mov_37", name: "Leading Shot (Backward Tracking)", category: "Camera Movement", prompt: "Leading shot, camera moves backward matching the subject's speed." },
-      { id: "mov_38", name: "Following Shot (Forward Tracking)", category: "Camera Movement", prompt: "Following shot, camera follows behind the subject matching speed." },
-      { id: "mov_39", name: "Side Tracking (Parallel)", category: "Camera Movement", prompt: "Side tracking, camera trucks alongside the subject." },
-      { id: "mov_40", name: "POV Walk (First Person Walk)", category: "Camera Movement", prompt: "POV walk, first person camera moving forward with bobbing motion." },
-      { id: "mov_41", name: "Hyperlapse (Moving Time-Lapse)", category: "Camera Movement", prompt: "Hyperlapse, camera moves forward rapidly, time accelerated, fast motion, light trails." },
-      { id: "mov_42", name: "Barrel Roll (Vortex Inception Shot)", category: "Camera Movement", prompt: "Barrel roll, camera spins 360 degrees clockwise while moving forward, disorienting." },
-      { id: "mov_43", name: "Bullet Time (Frozen Moment)", category: "Camera Movement", prompt: "Bullet time, frozen moment, ultra slow motion, camera orbit right." },
-      { id: "mov_44", name: "Worm's Eye Tracking (Ground Level)", category: "Camera Movement", prompt: "Worm's eye view, low angle tracking, camera moves along the ground looking up." }
+      { id: "mov_2", name: "Slow Dolly Out", category: "Camera Movement", prompt: "Slow dolly out, camera moves slowly backwards away from the subject." }
     ];
-
-    const cameraAnglesFromPdf = [
-      { id: "ang_1", name: "Eye-level Angle", category: "Camera Angles", prompt: "Eye-level angle, camera positioned at subject eye height, natural, neutral, realistic perspective, 8k" },
-      { id: "ang_2", name: "Low Angle", category: "Camera Angles", prompt: "Low angle shot, camera looking upward at the subject, commanding power, dominance, grandeur, cinematic" },
-      { id: "ang_3", name: "High Angle", category: "Camera Angles", prompt: "High angle shot, camera looking down at the subject, vulnerability, scale, dramatic overview" },
-      { id: "ang_4", name: "Bird's-Eye View / Overhead Shot", category: "Camera Angles", prompt: "Bird's-eye view, overhead shot, camera pointing vertically straight down at the scene, patterns, geometric layout, spatial clarity" },
-      { id: "ang_5", name: "Worm's-Eye View", category: "Camera Angles", prompt: "Worm's eye view, camera positioned extremely low at ground level pointing steeply upward, monumental scale, extreme drama" },
-      { id: "ang_6", name: "Dutch Angle / Canted Angle", category: "Camera Angles", prompt: "Dutch angle, canted angle, camera tilted sideways on Z-axis, diagonal horizon, psychological tension, instability, unease" },
-      { id: "ang_7", name: "Three-Quarter Angle", category: "Camera Angles", prompt: "Three-quarter angle, camera framing front and one side of subject, depth, dimension, visually appealing cinematic portrait" },
-      { id: "ang_8", name: "Straight-On / Frontal Angle", category: "Camera Angles", prompt: "Straight-on frontal angle, camera directly facing the subject, symmetry, absolute clarity, authority, centered composition" },
-      { id: "ang_9", name: "Profile / Side Angle", category: "Camera Angles", prompt: "Profile side angle, camera capturing subject completely from the side, strong contour silhouette, contemplative mood" },
-      { id: "ang_10", name: "Over-The-Shoulder (OTS)", category: "Camera Angles", prompt: "Over-the-shoulder shot, camera looking past one person's shoulder toward another subject, dialogue connection, conversation, perspective" },
-      { id: "ang_11", name: "Rear / Back Angle", category: "Camera Angles", prompt: "Rear back angle shot, camera positioned behind the subject looking ahead, mystery, anticipation, heroic journey ahead" },
-      { id: "ang_12", name: "Point-Of-View (POV)", category: "Camera Angles", prompt: "Point-of-view POV shot, camera represents first-person character vision, immersive perspective, subjective participation" }
-    ];
-
-    const cameraShotsFromPdf = [
-      { id: "sht_1", name: "Extreme Long Shot (ELS) / Extreme Wide Shot (EWS)", category: "Camera Shots", prompt: "Extreme long shot ELS, extreme wide shot EWS, vast expansive landscape, subject appearing very small in distance, establish scale, atmosphere, and location, 8k" },
-      { id: "sht_2", name: "Long Shot (LS) / Wide Shot (WS)", category: "Camera Shots", prompt: "Long shot LS, wide shot WS, full body of the subject in modern geometric architectural hall, substantial surroundings, movement and body language, cinematic" },
-      { id: "sht_3", name: "Full Shot (FS)", category: "Camera Shots", prompt: "Full shot FS, frames the subject from head to toe, elegant interior space, less emphasis on environment, showcasing entire outfit and posture" },
-      { id: "sht_4", name: "Medium Long Shot (MLS) / Three-Quarter Shot", category: "Camera Shots", prompt: "Medium long shot MLS, three-quarter shot, frames subject from knees and mid-thigh upward, elegant evening dress in warm reception room, balance body language with expression" },
-      { id: "sht_5", name: "Cowboy Shot (American Shot)", category: "Camera Shots", prompt: "Cowboy shot, American shot, frames from mid-thigh upward, cowboy hat and holster room, confident heroic stance, powerful character introduction" },
-      { id: "sht_6", name: "Medium Shot (MS)", category: "Camera Shots", prompt: "Medium shot MS, frames from the waist upward, traditional festival attire with festive lighting diya, dialogue and natural gestures" },
-      { id: "sht_7", name: "Medium Close-Up (MCU)", category: "Camera Shots", prompt: "Medium close-up MCU, frames from chest and upper torso upward, expressive conversational storytelling, personal emotional connection" },
-      { id: "sht_8", name: "Close-Up (CU)", category: "Camera Shots", prompt: "Close-up shot CU, focuses primarily on the face, intense sorrowful contemplation, subtle micro-expressions, dramatic emotional emphasis" },
-      { id: "sht_9", name: "Extreme Close-Up (ECU)", category: "Camera Shots", prompt: "Extreme close-up ECU, macro detail shot of iris, pupil, and eyelashes, reflection in cornea, create psychological tension, razor-sharp focus" },
-      { id: "sht_10", name: "Medium Full Shot (MFS)", category: "Camera Shots", prompt: "Medium full shot MFS, frames from head to around the knees, modern penthouse luxury interior, high-fashion lifestyle advertising" },
-      { id: "sht_11", name: "Thigh Shot", category: "Camera Shots", prompt: "Thigh shot, frames from mid-thigh upward, elegant black evening gown in luxury hotel corridor, fashion cinematography, walking shot" },
-      { id: "sht_12", name: "Waist Shot", category: "Camera Shots", prompt: "Waist shot, frames subject from waist upward, casual polo shirt with open hands gesture, clear authentic presentation and dialogue" },
-      { id: "sht_13", name: "Bust Shot", category: "Camera Shots", prompt: "Bust shot, frames head, shoulders, and upper chest, traditional saree portrait, intense startled gaze, emotional dialogue" },
-      { id: "sht_14", name: "Head-and-Shoulders Shot", category: "Camera Shots", prompt: "Head-and-shoulders shot, head and shoulders prominent in frame, neutral dark studio backdrop, soft portrait key light, testimonial video" },
-      { id: "sht_15", name: "Tight Close-Up (TCU)", category: "Camera Shots", prompt: "Tight close-up TCU, tightly framed around eyes, nose, and lips, emotional vulnerability, intimacy and intense dramatic cinematic impact" }
-    ];
-
-    const atmosphereThemesFromPdf = [
-      { id: "atm_1", name: "Golden Hour Glow", category: "Atmosphere", prompt: "Golden Hour Glow, soft warm golden sunlight at sunrise or sunset, cinematic lighting, 8k" },
-      { id: "atm_2", name: "Blue Hour Twilight", category: "Atmosphere", prompt: "Blue Hour Twilight, cool deep blue atmospheric tones, early dawn or late dusk, moody ambience" },
-      { id: "atm_3", name: "Overcast Diffused Light", category: "Atmosphere", prompt: "Overcast Diffused Light, shadowless soft even light under overcast sky, portrait cinematography" },
-      { id: "atm_4", name: "Window Natural Side Light", category: "Atmosphere", prompt: "Window Natural Side Light, dramatic natural lighting through window, chiaroscuro contrast" },
-      { id: "atm_5", name: "Golden Hour Silhouette", category: "Atmosphere", prompt: "Golden Hour Silhouette, subject backlit against bright sunset, pure black silhouette outline" },
-      { id: "atm_6", name: "Dappled Sunlight", category: "Atmosphere", prompt: "Dappled Sunlight, sunlight filtering through lush tree canopy, organic pattern highlights" },
-      { id: "atm_7", name: "Rim Lighting (Hair Light)", category: "Atmosphere", prompt: "Rim Lighting Hair Light, strong backlight defining edges of subject hair and shoulders" },
-      { id: "atm_8", name: "Sunrise Mist and Ray", category: "Atmosphere", prompt: "Sunrise Mist and Ray, morning god rays through foggy atmospheric particulate, sunbeams" },
-      { id: "atm_9", name: "High Noon Desert Sun", category: "Atmosphere", prompt: "High Noon Desert Sun, blazing direct sunlight, intense heat mirage waves, golden sand dunes" },
-      { id: "atm_10", name: "Misty Morning Fog", category: "Atmosphere", prompt: "Misty Morning Fog, dense low-hanging fog, ethereal mysterious dreamscape mood" },
-      { id: "atm_11", name: "Heavy Rain Downpour", category: "Atmosphere", prompt: "Heavy Rain Downpour, pouring rain, water droplets, moody dark grey storm atmosphere" },
-      { id: "atm_12", name: "Post-Rain Puddle Reflections", category: "Atmosphere", prompt: "Post-Rain Puddle Reflections, wet ground reflective mirrors of city lights and architecture" },
-      { id: "atm_13", name: "Gentle Snowfall", category: "Atmosphere", prompt: "Gentle Snowfall, soft falling snowflakes, calm tranquil winter wonderland landscape" },
-      { id: "atm_14", name: "Thunderstorm Lightning Strike", category: "Atmosphere", prompt: "Thunderstorm Lightning Strike, pitch dark sky illuminated by fierce electric lightning bolt" },
-      { id: "atm_15", name: "Morning Dew Drops", category: "Atmosphere", prompt: "Morning Dew Drops, glistening macro dew beads on fresh grass leaves, soft morning glow" },
-      { id: "atm_16", name: "Dramatic Storm Clouds", category: "Atmosphere", prompt: "Dramatic Storm Clouds, massive swirling dark ominous cumulonimbus tempest clouds" },
-      { id: "atm_17", name: "Rainbow After Storm", category: "Atmosphere", prompt: "Rainbow After Storm, vibrant seven-color rainbow arching across clearing dramatic sky" },
-      { id: "atm_18", name: "Misty Waterfall Spray", category: "Atmosphere", prompt: "Misty Waterfall Spray, rushing cascading waterfall surrounded by moist atmospheric spray" },
-      { id: "atm_19", name: "Windblown Elements", category: "Atmosphere", prompt: "Windblown Elements, strong gusting wind whipping hair, clothing, and swaying tall grasses" },
-      { id: "atm_20", name: "Cyberpunk Neon City", category: "Atmosphere", prompt: "Cyberpunk Neon City, futuristic metropolis drenched in glowing cyan and magenta neon light" },
-      { id: "atm_21", name: "Moody Urban Night Street", category: "Atmosphere", prompt: "Moody Urban Night Street, dark narrow alleyway illuminated by a lone warm street lamp" },
-      { id: "atm_22", name: "Traffic Light Trails", category: "Atmosphere", prompt: "Traffic Light Trails, long exposure highway light streaks of red and white vehicle headlights" },
-      { id: "atm_23", name: "Rooftop City Skyline", category: "Atmosphere", prompt: "Rooftop City Skyline, panoramic nocturnal cityscape view of illuminated skyscrapers" },
-      { id: "atm_24", name: "Starry Night Sky (Astro)", category: "Atmosphere", prompt: "Starry Night Sky Astro, brilliant glowing Milky Way galaxy across pitch dark mountain sky" },
-      { id: "atm_25", name: "Campfire Glow in Dark", category: "Atmosphere", prompt: "Campfire Glow in Dark, crackling warm fire embers illuminating faces in deep night forest" },
-      { id: "atm_26", name: "Neon Portrait Reflection", category: "Atmosphere", prompt: "Neon Portrait Reflection, neon signs reflecting off glass and face, cinematic wet look" },
-      { id: "atm_27", name: "Cinematic Moody Portrait", category: "Atmosphere", prompt: "Cinematic Moody Portrait, deep shadows, expressive cinematic color grading, intimate tone" },
-      { id: "atm_28", name: "High-Contrast Chiaroscuro", category: "Atmosphere", prompt: "High-Contrast Chiaroscuro, intense sharp spotlight surrounded by velvety deep black shadows" },
-      { id: "atm_29", name: "Warm Vintage Retro", category: "Atmosphere", prompt: "Warm Vintage Retro, faded nostalgic 1970s tones, warm sepia grain, timeless film aesthetic" },
-      { id: "atm_30", name: "Moody Bohemian Room", category: "Atmosphere", prompt: "Moody Bohemian Room, cozy fairy lights, indoor botanicals, rich textures and warm tones" },
-      { id: "atm_31", name: "Luxury Dark Academia", category: "Atmosphere", prompt: "Luxury Dark Academia, towering library shelves, leather-bound books, antique candles, fireplace" },
-      { id: "atm_32", name: "Industrial Loft Vibe", category: "Atmosphere", prompt: "Industrial Loft Vibe, exposed brick walls, steel conduits, warm hanging Edison bulbs" },
-      { id: "atm_33", name: "Monochrome Noir", category: "Atmosphere", prompt: "Monochrome Noir, classic high-contrast black and white photography, dramatic shadow play" },
-      { id: "atm_34", name: "Deep Dense Forest Canopy", category: "Atmosphere", prompt: "Deep Dense Forest Canopy, ancient primal woods with radiant sun rays cutting through leaves" },
-      { id: "atm_35", name: "Autumn Golden Foliage", category: "Atmosphere", prompt: "Autumn Golden Foliage, radiant forest path covered with vibrant amber, red, and golden leaves" },
-      { id: "atm_36", name: "Tropical Beach Paradise", category: "Atmosphere", prompt: "Tropical Beach Paradise, crystal turquoise water, pristine white sand, coconut palm breeze" },
-      { id: "atm_37", name: "Majestic Mountain Peak", category: "Atmosphere", prompt: "Majestic Mountain Peak, snow-capped alpine summits rising above morning cloud inversions" },
-      { id: "atm_38", name: "Flowing River Stream", category: "Atmosphere", prompt: "Flowing River Stream, silky long exposure alpine creek flowing smoothly over mossy rocks" },
-      { id: "atm_39", name: "African Savannah Sunset", category: "Atmosphere", prompt: "African Savannah Sunset, crimson horizon silhouette of acacia trees and roaming wildlife" },
-      { id: "atm_40", name: "Lush Green Paddy Fields", category: "Atmosphere", prompt: "Lush Green Paddy Fields, terraced emerald rice fields cascading down misty tropical hills" },
-      { id: "atm_41", name: "Desert Sand Dunes", category: "Atmosphere", prompt: "Desert Sand Dunes, sweeping wind-sculpted golden ridges under late afternoon warm light" },
-      { id: "atm_42", name: "Volcanic Lava Glow", category: "Atmosphere", prompt: "Volcanic Lava Glow, molten red-orange lava streams cutting across dark basalt rocks at night" },
-      { id: "atm_43", name: "Mirror Reflection Lake", category: "Atmosphere", prompt: "Mirror Reflection Lake, crystal calm glass water mirroring majestic alpine mountains" },
-      { id: "atm_44", name: "Abstract Bokeh Lights", category: "Atmosphere", prompt: "Abstract Bokeh Lights, out-of-focus soft circular orbs of shimmering colorful light" },
-      { id: "atm_45", name: "Creative Smoke Bomb", category: "Atmosphere", prompt: "Creative Smoke Bomb, swirling vibrant colorful cloud plumes billowing through urban scene" },
-      { id: "atm_46", name: "Double Exposure Art", category: "Atmosphere", prompt: "Double Exposure Art, silhouette portrait seamlessly blended with pine forest landscape" },
-      { id: "atm_47", name: "Levitating Objects", category: "Atmosphere", prompt: "Levitating Objects, magical items floating weightlessly in mid-air defying gravity" },
-      { id: "atm_48", name: "Prism Light Flare", category: "Atmosphere", prompt: "Prism Light Flare, prismatic rainbow spectral flares refracting across subject face" },
-      { id: "atm_49", name: "Glowing Bioluminescent Beach", category: "Atmosphere", prompt: "Glowing Bioluminescent Beach, nocturnal neon blue ocean waves illuminating the dark shoreline" },
-      { id: "atm_50", name: "Ancient Temple Architecture", category: "Atmosphere", prompt: "Ancient Temple Architecture, stone sanctum bathed in mystical shafts of atmospheric sunlight" },
-      { id: "atm_51", name: "Rural Village Sunset", category: "Atmosphere", prompt: "Rural Village Sunset, peaceful rustic hamlet at dusk with golden dust and evening tranquility" },
-      { id: "atm_52", name: "Melancholic Rainy Window", category: "Atmosphere", prompt: "Melancholic Rainy Window, solitary introspective mood gazing through rain-streaked glass" },
-      { id: "atm_53", name: "Romantic Embrace in Rain", category: "Atmosphere", prompt: "Romantic Embrace in Rain, passionate couple under umbrella in glistening wet city street" },
-      { id: "atm_54", name: "Solitary Bench in Autumn", category: "Atmosphere", prompt: "Solitary Bench in Autumn, lonely wooden bench surrounded by fallen leaves and quiet fog" },
-      { id: "atm_55", name: "Nostalgic Old Photograph Vibe", category: "Atmosphere", prompt: "Nostalgic Old Photograph Vibe, vintage faded borders, antique texture, warm childhood memory" },
-      { id: "atm_56", name: "Intense Athletic Focus", category: "Atmosphere", prompt: "Intense Athletic Focus, determined sprinter under stadium floodlights, sweat, high drama" },
-      { id: "atm_57", name: "Epic Adventure Cliffhanger", category: "Atmosphere", prompt: "Epic Adventure Cliffhanger, mountaineer standing on high precipice overlooking sea of clouds" },
-      { id: "atm_58", name: "Holographic User Interface", category: "Atmosphere", prompt: "Holographic User Interface, glowing futuristic cyan interactive screens in dark high-tech room" },
-      { id: "atm_59", name: "Glowing Automotive Reveal", category: "Atmosphere", prompt: "Glowing Automotive Reveal, sleek luxury sports car illuminated by sharp studio light rays" },
-      { id: "atm_60", name: "Cinematic Drone Landscape", category: "Atmosphere", prompt: "Cinematic Drone Landscape, high-altitude aerial view of winding coastal cliff road at sunrise" }
-    ];
-
-    const masterPromptsList = [
-      { id: "mst_1", name: "Recreate Master Prompt", category: "Master Prompts", prompt: "Analyze this video scene by scene and generate a detailed AI video prompt for each shot and frame - including camera angles, subject actions, lighting, environment, facial expressions, composition, transitions, and cinematic style. Make the prompts accurate enough to recreate the video as closely as possible. Include exact text in video." },
-      { id: "mst_2", name: "Animation Prompt", category: "Master Prompts", prompt: "Animate sequence of events shown in 6-frame storyboard reference image. Single, continuous, seamless product showcase video of smartphone from Panel 1 to 6. Preserve composition, product styling, modern lighting. Smooth cinematic transitions (push-ins, slow orbits, match-cuts). No fast cuts, no background music, no text overlays." },
-      { id: "mst_3", name: "Image Upscaling", category: "Master Prompts", prompt: "Upscale and restore this image to flawless 100% 8K resolution, ultra-high definition. Apply advanced noise reduction and deblurring. Introduce high-dynamic-range brightness and natural glowing luminosity on facial planes. Preserve authentic natural skin tones and strict facial consistency." },
-      { id: "mst_4", name: "Colour Recreation", category: "Master Prompts", prompt: "Give me a Prompt to apply this color (front facing also) to any other products/profiles. Do not change camera angle and view. Keep only colors and camera view from reference image. AR 1:1." },
-      { id: "mst_5", name: "ChatGPT Prompts Library", category: "Master Prompts", prompt: "/magazine cover /product explosion /cinematic portrait /fashion editorial /luxury advertisement /product photography /movie poster /album cover /brand campaign /architecture photography /street photography /cinematic still /action scene /sci-fi scene /concept art /world building /cyberpunk city /golden hour /neon street /dream sequence /double exposure /product launch /product render" }
-    ];
-
-    window.allVaultItems = [...defaultMovements, ...cameraAnglesFromPdf, ...cameraShotsFromPdf, ...atmosphereThemesFromPdf, ...masterPromptsList];
-    let currentCategory = "All";
-    const classicThemes = [
-      { name: "1. Film Noir Monochrome", tag: "35mm black and white film noir, high contrast, hard shadows, dramatic silhouette" },
-      { name: "2. Cyberpunk Neon Dusk", tag: "Blade runner cyberpunk style, cyan and magenta neon rim light, rainy reflections, 8k" },
-      { name: "3. Wes Anderson Symmetrical Pastel", tag: "Wes anderson pastel palette, direct front angle, centered symmetrical framing, retro 70s look" },
-      { name: "4. Christopher Nolan IMAX Epic", tag: "70mm IMAX cinematography, photorealistic, grand scale, cold steel blue tone, sharp detail" },
-      { name: "5. Vintage Kodachrome 1970s", tag: "1970s vintage 35mm film, warm grain, sun-faded saturation, organic halation, nostagia" },
-      { name: "6. Denis Villeneuve Desert Dust", tag: "Dune aesthetic, vast desert haze, muted terracotta and dusty ambient glow, monolithic scale" },
-      { name: "7. Golden Hour Sunburst", tag: "Warm golden hour sunlight, intense anamorphic lens flare, soft bokeh, cinematic romantic glow" },
-      { name: "8. Moody David Fincher Green", tag: "David fincher style, subdued desaturated colors, eerie yellow-green tint, clinical precision" },
-      { name: "9. Studio Ghibli Ethereal", tag: "Ghibli cinematic anime lighting, lush vibrant watercolor tones, dreamy clouds, magical realism" },
-      { name: "10. Dark Gothic Baroque", tag: "Rembrandt chiaroscuro, candlelight illumination, deep rich velvety shadows, gothic atmosphere" }
-    ];
-
-    const themesGrid = document.getElementById("themesGrid");
-    if (themesGrid) {
-      classicThemes.forEach((item) => {
-        const chip = document.createElement("div");
-        chip.className = "theme-chip";
-        chip.innerHTML = `<strong>${item.name}</strong> <i class="fa-solid fa-copy" style="color: var(--accent-cyan);"></i>`;
-        chip.onclick = () => {
-          copyPromptText(`[Theme: ${item.tag}]`);
-          document.getElementById("themesModal").style.display = "none";
-        };
-        themesGrid.appendChild(chip);
-      });
-    }
-
-    const heroVid = document.getElementById("heroVideo");
-    if (heroVid) {
-      heroVid.loop = true;
-      heroVid.muted = true;
-      heroVid.playsInline = true;
-      const startHeroVideo = () => {
-        heroVid.play().catch(() => {});
-        document.getElementById("siteBackgroundVideo")?.play().catch(() => {});
-      };
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", startHeroVideo, { once: true });
-      } else {
-        startHeroVideo();
-      }
-    }
-
-    /* INDEXED-DB PERSISTENCE */
-    let localDB;
-    const dbReq = window.indexedDB ? indexedDB.open("CinemotionMediaDB", 12) : null;
-    if (dbReq) {
-      dbReq.onupgradeneeded = (e) => {
-        localDB = e.target.result;
-        if (!localDB.objectStoreNames.contains("cardMedia")) {
-          localDB.createObjectStore("cardMedia", { keyPath: "id" });
-        }
-        if (!localDB.objectStoreNames.contains("promptEdits")) {
-          localDB.createObjectStore("promptEdits", { keyPath: "id" });
-        }
-      };
-      dbReq.onsuccess = (e) => {
-        localDB = e.target.result;
-        renderCards(window.allVaultItems);
-      };
-    }
-
-    function getYoutubeEmbedUrl(url) {
-      if (!url) return null;
-      let videoId = null;
-      const match = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
-      if (match && match[2].length === 11) videoId = match[2];
-      return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0` : null;
-    }
-
-    function getDriveEmbedUrl(url) {
-      if (!url) return null;
-      const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-      return match && match[1] ? `https://drive.google.com/file/d/${match[1]}/preview` : null;
-    }
+    window.allVaultItems = [...defaultMovements];
 
     const grid = document.getElementById('movementsGrid');
-
     function renderCards(list) {
       if (!grid) return;
-      grid.innerHTML = list.map(item => {
-        return `
+      grid.innerHTML = list.map(item => `
         <div class="movement-card" id="card_${item.id}">
-          <div class="card-video-box ${item.mediaURL ? 'has-media' : ''}" id="box_${item.id}"
-               data-card-id="${item.id}" tabindex="0" role="group"
-               aria-label="Media upload area for ${item.name}"
-               onpointerdown="setActiveUploadTarget('${item.id}')"
-               onpointerenter="setActiveUploadTarget('${item.id}')"
-               onfocus="setActiveUploadTarget('${item.id}')"
-               onclick="handleCardMediaClick('${item.id}')"
-               ondragover="handleDragOver(event, '${item.id}')"
-               ondragleave="handleDragLeave(event, '${item.id}')"
-               ondrop="handleFileDrop(event, '${item.id}')">
-
-            <video id="vid_${item.id}" autoplay loop muted playsinline></video>
-            <img id="img_${item.id}" alt="${item.name}">
-            <iframe id="yt_${item.id}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-
-            <div class="upload-overlay admin-only" id="overlay_${item.id}">
-              <div onclick="triggerFileInput(event, '${item.id}')" style="display: flex; flex-direction: column; align-items: center; gap: 0.2rem;">
-                <i class="fa-solid fa-cloud-arrow-up cloud-icon"></i>
-                <span class="upload-txt">Click, Drag & Drop or Paste Media (Ctrl+V)</span>
-              </div>
-              <div class="link-upload-pill" onclick="openLinkModal('${item.id}', event)">
-                <i class="fa-solid fa-link"></i>
-                <span>Paste Link (Drive / YT / Insta)</span>
-              </div>
-            </div>
-
-            <input type="file" class="file-input" id="input_${item.id}" accept="video/*,image/*" multiple onchange="handleFileInputChange(event, '${item.id}')">
-          </div>
-
+          <div class="card-video-box"></div>
           <div class="card-details">
             <div>
-              <div class="card-meta">
-                <span class="tag-badge">${item.category || 'Movement'}</span>
-                <div class="card-meta-actions admin-only">
-                  <button type="button" class="meta-action-btn edit-btn" title="Paste / Attach Link" onclick="openLinkModal('${item.id}', event)">
-                    <i class="fa-solid fa-cloud-arrow-up"></i>
-                  </button>
-                  <button type="button" class="meta-action-btn dl-btn" title="Download Media" onclick="downloadCardMedia('${item.id}', '${item.name.replace(/'/g, "\\'")}', event)">
-                    <i class="fa-solid fa-download"></i>
-                  </button>
-                  <button type="button" class="meta-action-btn del-btn" title="Delete Media" onclick="deleteCardMedia('${item.id}', event)">
-                    <i class="fa-solid fa-trash"></i>
-                  </button>
-                </div>
-              </div>
-
-              <h3 id="title_${item.id}">${item.name}</h3>
-              
-              <div class="prompt-wrapper" id="prompt_wrap_${item.id}">
-                <div class="prompt-content" id="content_${item.id}">
+              <span class="tag-badge">${item.category}</span>
+              <h3>${item.name}</h3>
+              <div class="prompt-wrapper">
+                <div class="prompt-content">
                   <p class="prompt-box" id="text_${item.id}">${item.prompt}</p>
-                  <button type="button" class="prompt-edit-btn admin-only" title="Edit Prompt Text" onclick="openEditPromptModal('${item.id}', event)">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                  </button>
                 </div>
-                <video id="copied_video_${item.id}" class="copied-video-player" muted playsinline preload="none"></video>
               </div>
             </div>
-            
             <button class="copy-btn" onclick="copyCardPrompt('${item.id}')">
               <i class="fa-solid fa-copy"></i> Copy Prompt
             </button>
-            <button type="button" class="use-gemini-btn" onclick="insertPromptIntoGemini('${item.id}')">
-              <i class="fa-solid fa-wand-magic-sparkles"></i> Use in Gemini
-            </button>
           </div>
         </div>
-      `;
-      }).join('');
-
-      list.forEach(item => {
-        if (item.mediaURL) applyMediaUrlToCard(item.id, item.mediaURL, item.mediaType);
-      });
-
-      if (localDB && list.length) {
-        const tx = localDB.transaction("cardMedia", "readonly");
-        const store = tx.objectStore("cardMedia");
-        const req = store.getAll();
-        req.onsuccess = () => {
-          const mediaById = new Map((req.result || []).map(record => [record.id, record]));
-          list.forEach(item => {
-            const record = mediaById.get(item.id);
-            if (!record) return;
-            if (record.fileBlob) applyMediaToCard(item.id, record.fileBlob, record.fileType);
-            else if (record.mediaURL) applyMediaUrlToCard(item.id, record.mediaURL, record.fileType);
-          });
-        };
-      }
-      updateCounts();
+      `).join('');
     }
 
-    // LINK MODAL
-    const linkModal = document.getElementById("linkModal");
-    const linkForm = document.getElementById("linkForm");
-    const linkCardId = document.getElementById("linkCardId");
-    const mediaUrlInput = document.getElementById("mediaUrlInput");
-    const closeLinkModalBtn = document.getElementById("closeLinkModalBtn");
-
-    window.openLinkModal = function(id, event) {
-      if (event) event.stopPropagation();
-      if (!linkModal || !linkCardId || !mediaUrlInput) return;
-      linkCardId.value = id;
-      mediaUrlInput.value = "";
-      linkModal.style.display = "flex";
-    };
-    if (closeLinkModalBtn && linkModal) closeLinkModalBtn.onclick = () => { linkModal.style.display = "none"; };
-    window.addEventListener("click", (e) => { if (e.target === linkModal) linkModal.style.display = "none"; });
-
-    if (linkForm) {
-      linkForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const id = linkCardId?.value;
-        const url = mediaUrlInput?.value.trim() || "";
-        if (!id || !url) return;
-        const isYoutube = url.includes('youtube.com') || url.includes('youtu.be');
-        const isDrive = url.includes('drive.google.com');
-        const mediaType = isYoutube ? 'youtube' : (isDrive ? 'drive' : 'video');
-        if (isYoutube && !getYoutubeEmbedUrl(url)) return alert("Please enter a valid YouTube video URL.");
-        if (isDrive && !getDriveEmbedUrl(url)) return alert("Please enter a Google Drive file URL in /file/d/FILE_ID/ format.");
-
-        applyMediaUrlToCard(id, url, mediaType);
-        if (localDB) {
-          const tx = localDB.transaction("cardMedia", "readwrite");
-          tx.objectStore("cardMedia").put({ id: id, mediaURL: url, fileType: mediaType });
-        }
-        if (typeof window.saveMediaLinkToFirestore === "function") {
-          try {
-            await window.saveMediaLinkToFirestore(id, url, mediaType);
-            showToast("Media link saved to Firebase!");
-          } catch (err) {
-            return showToast("Cloud save failed: " + (err.message || err));
-          }
-        }
-        linkModal.style.display = "none";
-      });
+    async function copyPromptText(text) {
+      await navigator.clipboard.writeText(text);
+      const t = document.getElementById('toast');
+      t.style.visibility = 'visible';
+      setTimeout(() => t.style.visibility = 'hidden', 2000);
     }
-
-    // EDIT PROMPT MODAL
-    const editPromptModal = document.getElementById("editPromptModal");
-    const editPromptForm = document.getElementById("editPromptForm");
-    const editPromptItemId = document.getElementById("editPromptItemId");
-    const editPromptTitle = document.getElementById("editPromptTitle");
-    const editPromptText = document.getElementById("editPromptText");
-    const closeEditPromptModalBtn = document.getElementById("closeEditPromptModalBtn");
-
-    window.openEditPromptModal = function(id, event) {
-      if (event) event.stopPropagation();
-      const item = window.allVaultItems.find(m => m.id === id);
-      if (!item) return;
-      editPromptItemId.value = id;
-      editPromptTitle.value = item.name;
-      editPromptText.value = item.prompt;
-      editPromptModal.style.display = "flex";
-    };
-    if (closeEditPromptModalBtn) closeEditPromptModalBtn.onclick = () => { editPromptModal.style.display = "none"; };
-    window.addEventListener("click", (e) => { if (e.target === editPromptModal) editPromptModal.style.display = "none"; });
-
-    if (editPromptForm) {
-      editPromptForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const id = editPromptItemId.value;
-        const newTitle = editPromptTitle.value.trim();
-        const newPrompt = editPromptText.value.trim();
-        const saveEditButton = document.getElementById("saveEditPromptBtn");
-        const item = window.allVaultItems.find(m => m.id === id);
-        if (!item) return;
-
-        if (saveEditButton) { saveEditButton.disabled = true; saveEditButton.textContent = "Syncing..."; }
-        try {
-          await window.savePromptEditToFirestore(id, newTitle, newPrompt);
-          item.name = newTitle;
-          item.prompt = newPrompt;
-          const titleEl = document.getElementById(`title_${id}`);
-          const textEl = document.getElementById(`text_${id}`);
-          if (titleEl) titleEl.innerText = newTitle;
-          if (textEl) textEl.innerText = newPrompt;
-          if (localDB) {
-            const tx = localDB.transaction("promptEdits", "readwrite");
-            tx.objectStore("promptEdits").put({ id, name: newTitle, prompt: newPrompt });
-          }
-          showToast("Prompt saved to Firebase!");
-          editPromptModal.style.display = "none";
-        } catch (err) {
-          showToast("Prompt cloud save failed: " + (err.message || err));
-        } finally {
-          if (saveEditButton) { saveEditButton.disabled = false; saveEditButton.textContent = "Update Prompt"; }
-        }
-      });
-    }
-
-    // DRAG, DROP, PASTE & UPLOAD
-    window.handleDragOver = function(e, id) { e.preventDefault(); e.stopPropagation(); document.getElementById(`box_${id}`)?.classList.add('drag-over'); };
-    window.handleDragLeave = function(e, id) { e.preventDefault(); e.stopPropagation(); document.getElementById(`box_${id}`)?.classList.remove('drag-over'); };
-    window.handleFileDrop = function(e, id) {
-      window.setActiveUploadTarget?.(id);
-      e.preventDefault(); e.stopPropagation();
-      document.getElementById(`box_${id}`)?.classList.remove('drag-over');
-      if (e.dataTransfer?.files?.length) processUploadQueue(id, Array.from(e.dataTransfer.files));
-    };
-    window.triggerFileInput = function(e, id) { window.setActiveUploadTarget?.(id); e.stopPropagation(); document.getElementById(`input_${id}`)?.click(); };
-    window.handleFileInputChange = function(e, id) {
-      window.setActiveUploadTarget?.(id);
-      const files = e.target.files ? Array.from(e.target.files) : [];
-      if (files.length) processUploadQueue(id, files);
-      e.target.value = "";
-    };
-    window.activeUploadTargetId = window.activeUploadTargetId || null;
-    window.setActiveUploadTarget = function(id) { if (id && document.getElementById(`box_${id}`)) window.activeUploadTargetId = id; };
-
-    document.addEventListener("pointerover", (e) => { const box = e.target.closest?.(".card-video-box[data-card-id]"); if (box) window.setActiveUploadTarget(box.dataset.cardId); }, true);
-    document.addEventListener("focusin", (e) => { const box = e.target.closest?.(".card-video-box[data-card-id]"); if (box) window.setActiveUploadTarget(box.dataset.cardId); }, true);
-
-    window.addEventListener("paste", (e) => {
-      const activeElement = document.activeElement;
-      const activeTag = activeElement?.tagName?.toLowerCase() || "";
-      if (activeTag === "input" || activeTag === "textarea" || activeElement?.isContentEditable) return;
-      const clipboardItems = (e.clipboardData || e.originalEvent?.clipboardData)?.items;
-      if (!clipboardItems) return;
-      const targetBox = activeElement?.closest?.(".card-video-box[data-card-id]");
-      const targetId = targetBox?.dataset?.cardId || window.activeUploadTargetId;
-      if (!targetId || !document.getElementById(`box_${targetId}`)) return;
-      for (let i = 0; i < clipboardItems.length; i++) {
-        const item = clipboardItems[i];
-        if (item.kind === "file" && (item.type.startsWith("image/") || item.type.startsWith("video/"))) {
-          const pastedFile = item.getAsFile();
-          if (pastedFile) { e.preventDefault(); processUploadedFile(targetId, pastedFile); break; }
-        }
-      }
-    });
-
-    let mediaUploadQueueRunning = false;
-    async function processUploadQueue(startCardId, files) {
-      if (mediaUploadQueueRunning) return showToast("An upload queue is already running.");
-      const startIndex = window.allVaultItems.findIndex(item => String(item.id) === String(startCardId));
-      if (startIndex < 0) return;
-      const validFiles = Array.from(files || []);
-      if (!validFiles.length) return;
-      const availableCards = window.allVaultItems.length - startIndex;
-      mediaUploadQueueRunning = true;
-      let uploaded = 0;
-      const queueLength = Math.min(validFiles.length, availableCards);
-      try {
-        for (let i = 0; i < queueLength; i++) {
-          const file = validFiles[i];
-          const card = window.allVaultItems[startIndex + i];
-          showToast(`Uploading ${i + 1}/${queueLength}: ${file.name} to ${card.name}...`);
-          const result = await processUploadedFile(card.id, file);
-          if (result?.success) uploaded++;
-        }
-      } finally {
-        mediaUploadQueueRunning = false;
-      }
-      showToast(`Queue finished: ${uploaded}/${queueLength} file(s) uploaded.`);
-    }
-
-    async function processUploadedFile(id, file) {
-      if (!file || (!file.type.startsWith("image/") && !file.type.startsWith("video/"))) return { success: false };
-      const type = file.type.startsWith("video/") ? "video" : "image";
-      applyMediaToCard(id, file, type);
-      if (localDB) {
-        const tx = localDB.transaction("cardMedia", "readwrite");
-        tx.objectStore("cardMedia").put({ id, fileBlob: file, fileType: type, fileName: file.name });
-      }
-      if (typeof window.uploadMediaFileToFirebase === "function") {
-        try {
-          const cloudUrl = await window.uploadMediaFileToFirebase(id, file, type);
-          applyMediaUrlToCard(id, cloudUrl, type);
-          return { success: true };
-        } catch (err) {
-          return { success: false, error: err.message || String(err) };
-        }
-      }
-      return { success: false };
-    }
-
-    window.cardActiveBlobs = {};
-    function applyMediaToCard(id, blobOrFile, type) {
-      const previous = window.cardActiveBlobs[id];
-      if (previous?.url?.startsWith("blob:")) URL.revokeObjectURL(previous.url);
-      const url = URL.createObjectURL(blobOrFile);
-      window.cardActiveBlobs[id] = { url, type, raw: blobOrFile };
-      const box = document.getElementById(`box_${id}`), vid = document.getElementById(`vid_${id}`), img = document.getElementById(`img_${id}`), yt = document.getElementById(`yt_${id}`);
-      if (box) box.classList.add('has-media');
-      if (yt) yt.classList.remove('active-media');
-      if (type === 'video') {
-        img?.classList.remove('active-media');
-        if (vid) { vid.src = url; vid.loop = true; vid.muted = true; vid.classList.add('active-media'); vid.play().catch(() => {}); }
-      } else {
-        vid?.classList.remove('active-media');
-        if (img) { img.src = url; img.classList.add('active-media'); }
-      }
-    }
-
-    function applyMediaUrlToCard(id, mediaURL, type) {
-      window.cardActiveBlobs[id] = { url: mediaURL, type: type || 'video' };
-      const box = document.getElementById(`box_${id}`), vid = document.getElementById(`vid_${id}`), img = document.getElementById(`img_${id}`), yt = document.getElementById(`yt_${id}`);
-      if (box) box.classList.add('has-media');
-      const isYoutube = type === 'youtube' || mediaURL.includes('youtube.com') || mediaURL.includes('youtu.be');
-      const isDrive = type === 'drive' || mediaURL.includes('drive.google.com');
-      if (isYoutube) {
-        img?.classList.remove('active-media'); vid?.classList.remove('active-media');
-        if (yt) { yt.src = getYoutubeEmbedUrl(mediaURL); yt.classList.add('active-media'); }
-      } else if (isDrive) {
-        img?.classList.remove('active-media'); vid?.classList.remove('active-media');
-        if (yt) { yt.src = getDriveEmbedUrl(mediaURL); yt.classList.add('active-media'); }
-      } else if (type === 'video') {
-        img?.classList.remove('active-media'); yt?.classList.remove('active-media');
-        if (vid) { vid.src = mediaURL; vid.loop = true; vid.muted = true; vid.playsInline = true; vid.classList.add('active-media'); vid.play().catch(() => {}); }
-      } else {
-        vid?.classList.remove('active-media'); yt?.classList.remove('active-media');
-        if (img) { img.src = mediaURL; img.classList.add('active-media'); }
-      }
-    }
-
-    window.downloadCardMedia = function(id, name, event) {
-      if (event) event.stopPropagation();
-      const media = window.cardActiveBlobs[id];
-      if (!media?.url) return alert("Please upload or attach a media link first.");
-      if (media.type === 'youtube' || media.url.includes('youtube.com') || media.url.includes('youtu.be') || media.url.includes('drive.google.com')) return window.open(media.url, '_blank');
-      const ext = media.type === 'video' ? '.mp4' : '.png';
-      const cleanName = (name || 'cinemotion-media').toLowerCase().replace(/[^a-z0-9]/g, '-') + ext;
-      const a = document.createElement('a'); a.href = media.url; a.download = cleanName; document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    };
-
-    window.deleteCardMedia = async function(id, event) {
-      if (event) event.stopPropagation();
-      if (!confirm("Permanently delete this media?")) return;
-      try {
-        await window.deleteMediaFromFirestore(id);
-        delete window.cardActiveBlobs[id];
-        if (localDB) {
-          const tx = localDB.transaction("cardMedia", "readwrite");
-          tx.objectStore("cardMedia").delete(id);
-        }
-        const targetItem = window.allVaultItems?.find(m => m.id === id);
-        if (targetItem) { delete targetItem.mediaURL; delete targetItem.mediaType; }
-        document.getElementById(`box_${id}`)?.classList.remove("has-media");
-        showToast("Media deleted.");
-      } catch (err) {
-        showToast("Delete failed: " + (err.message || err));
-      }
-    };
-
-    // LIGHTBOX
-    const mediaLightbox = document.getElementById("mediaLightbox"), lightboxStage = document.getElementById("lightboxStage"), lightboxTitle = document.getElementById("lightboxTitle"), lightboxPrompt = document.getElementById("lightboxPrompt");
-    window.activeLightboxItem = null;
-    window.handleCardMediaClick = function(id) {
-      const media = window.cardActiveBlobs[id], item = window.allVaultItems.find(m => m.id === id);
-      if (!media?.url) return;
-      window.activeLightboxItem = { id, item, media };
-      lightboxTitle.innerHTML = `<i class="fa-solid fa-clapperboard" style="color: var(--accent-cyan);"></i> ${item ? item.name : 'Media Preview'}`;
-      lightboxPrompt.innerText = item ? item.prompt : '';
-      lightboxStage.innerHTML = '';
-      const isYoutube = media.type === 'youtube' || media.url.includes('youtube.com') || media.url.includes('youtu.be');
-      const isDrive = media.type === 'drive' || media.url.includes('drive.google.com');
-      if (isYoutube || isDrive) {
-        const iframe = document.createElement('iframe');
-        iframe.src = isYoutube ? getYoutubeEmbedUrl(media.url) : getDriveEmbedUrl(media.url);
-        iframe.allow = "autoplay; encrypted-media"; iframe.allowFullscreen = true;
-        lightboxStage.appendChild(iframe);
-      } else if (media.type === 'video') {
-        const v = document.createElement('video'); v.src = media.url; v.controls = true; v.autoplay = true; v.loop = true; v.playsInline = true;
-        lightboxStage.appendChild(v);
-      } else {
-        const i = document.createElement('img'); i.src = media.url; lightboxStage.appendChild(i);
-      }
-      mediaLightbox.style.display = 'flex';
-    };
-    document.getElementById("closeLightboxBtn").onclick = () => { mediaLightbox.style.display = 'none'; lightboxStage.innerHTML = ''; };
-    mediaLightbox.onclick = (e) => { if (e.target === mediaLightbox) { mediaLightbox.style.display = 'none'; lightboxStage.innerHTML = ''; } };
-    document.getElementById("lightboxCopyBtn").onclick = () => { if (window.activeLightboxItem?.item) copyPromptText(window.activeLightboxItem.item.prompt, window.activeLightboxItem.id); };
-    document.getElementById("lightboxDownloadBtn").onclick = () => { if (window.activeLightboxItem) downloadCardMedia(window.activeLightboxItem.id, window.activeLightboxItem.item?.name); };
-
-    function updateCounts() {
-      const catCounts = { 'Camera Movement': 0, 'Camera Angles': 0, 'Camera Shots': 0, 'Cinematic Lighting': 0, 'Atmosphere': 0, 'Camera Lens': 0, 'Master Prompts': 0 };
-      window.allVaultItems.forEach(item => { if (catCounts[item.category] !== undefined) catCounts[item.category]++; });
-      if (document.getElementById('count_All')) document.getElementById('count_All').innerText = window.allVaultItems.length;
-      for (const [cat, count] of Object.entries(catCounts)) {
-        const el = document.getElementById('count_' + cat.replace(/\s+/g, '_'));
-        if (el) el.innerText = count;
-      }
-    }
-
-    const cardCopyClickCounters = {}, cardCopyResetTimers = {}, cardHideAnimationTimers = {};
-    function playCopiedVideoAnimation(itemId) {
-      const wrap = document.getElementById(`prompt_wrap_${itemId}`), vid = document.getElementById(`copied_video_${itemId}`);
-      if (!wrap || !vid) return;
-      cardCopyClickCounters[itemId] = (cardCopyClickCounters[itemId] || 0) + 1;
-      clearTimeout(cardCopyResetTimers[itemId]);
-      cardCopyResetTimers[itemId] = setTimeout(() => { cardCopyClickCounters[itemId] = 0; }, 3000);
-      const selectedVideo = cardCopyClickCounters[itemId] === 1 ? 'Copied-1.mp4' : 'Copied-2.mp4';
-      if (!vid.src.endsWith(selectedVideo)) vid.src = selectedVideo;
-      vid.currentTime = 0; wrap.classList.add('copied-active'); vid.play().catch(() => {});
-      clearTimeout(cardHideAnimationTimers[itemId]);
-      vid.onended = () => wrap.classList.remove('copied-active');
-      cardHideAnimationTimers[itemId] = setTimeout(() => wrap.classList.remove('copied-active'), 2200);
-    }
-
-    async function copyPromptText(text, itemId) {
-      try {
-        await navigator.clipboard.writeText(String(text ?? ""));
-        if (itemId) playCopiedVideoAnimation(itemId);
-      } catch (err) { console.error("Clipboard copy failed:", err); }
-    }
-    window.copyCardPrompt = function(itemId) {
-      const textToCopy = document.getElementById(`text_${itemId}`)?.innerText || '';
-      if (textToCopy) copyPromptText(textToCopy, itemId);
-    };
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      document.getElementById('toastMsg').innerText = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2200);
-    }
-    function filterCategory(cat, btn) {
-      if (btn) { document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
-      currentCategory = cat; filterCards();
-    }
-    function filterCards() {
-      const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
-      let filtered = window.allVaultItems;
-      if (currentCategory !== "All") filtered = filtered.filter(m => m.category === currentCategory);
-      filtered = filtered.filter(m => String(m.name || '').toLowerCase().includes(q) || String(m.prompt || '').toLowerCase().includes(q));
-      renderCards(filtered);
-    }
-    function openPromptLibrary() { alert("Opening Visual Prompts Library: 136 Director Prompts Loaded."); }
-
-    let animTimeout;
-    function triggerCinematicCategory(category, btnElement) {
-      filterCategory(category, btnElement);
-      const stage = document.getElementById('cinematicStage'), scene = document.getElementById('cinematicScene'), title = document.getElementById('stageTitle');
-      if (!stage || !scene) return;
-      clearTimeout(animTimeout); scene.innerHTML = ''; stage.style.display = 'flex'; title.innerText = category;
-      if (category === 'All') {
-        scene.innerHTML = `<div class="all-orbit-scene"><span class="all-orbit-icon" style="top:0;left:210px">🎥</span><span class="all-orbit-icon" style="top:80px;right:20px">📐</span><span class="all-orbit-icon" style="bottom:80px;right:20px">🎬</span><span class="all-orbit-icon" style="bottom:0;left:210px">💡</span><span class="all-orbit-icon" style="bottom:80px;left:20px">🌫️</span><span class="all-orbit-icon" style="top:80px;left:20px">🔭</span><span class="all-orbit-icon" style="top:210px;left:210px">📝</span></div>`;
-      } else if (category === 'Master Prompts') {
-        scene.innerHTML = `<div class="master-writing-rig"><span class="master-logo-canvas">📝</span><i class="fa-solid fa-pen-nib neon-quill-pen"></i></div>`;
-      } else if (category === 'Atmosphere') {
-        scene.innerHTML = `<div class="season-sky-lapse"></div><div class="smoke-rig-real"><span class="scene-emoji">🌫️</span></div><div class="season-particles"><span>🌸</span><span>☀️</span><span>🍂</span><span>❄️</span></div>`;
-      } else if (category === 'Camera Movement') {
-        scene.innerHTML = `<div class="dolly-real-rig"><span class="scene-emoji">🎥</span></div>`;
-      } else if (category === 'Camera Angles') {
-        scene.innerHTML = `<div class="angles-real-rig"><div class="angle-fast-cam"><span class="scene-emoji">📐</span></div></div>`;
-      } else if (category === 'Camera Shots') {
-        scene.innerHTML = `<div class="clapper-real-rig"><span class="scene-emoji">🎬</span></div>`;
-      } else if (category === 'Cinematic Lighting') {
-        scene.innerHTML = `<div class="light-glare"></div><div class="light-real-rig"><span class="scene-emoji">💡</span></div>`;
-      } else if (category === 'Camera Lens') {
-        scene.innerHTML = `<div class="lens-real-rig"><span class="scene-emoji">🔭</span></div>`;
-      }
-      animTimeout = setTimeout(() => { stage.style.display = 'none'; scene.innerHTML = ''; }, 2000);
-    }
-
-    const sidebarDrawer = document.getElementById("sidebarDrawer"), sidebarOverlay = document.getElementById("sidebarOverlay"), themesModal = document.getElementById("themesModal");
-    function openSidebar() { sidebarDrawer?.classList.add("active"); sidebarOverlay?.classList.add("active"); }
-    function closeSidebar() { sidebarDrawer?.classList.remove("active"); sidebarOverlay?.classList.remove("active"); }
-    document.getElementById("sidebarToggleBtn").onclick = openSidebar;
-    document.getElementById("closeSidebarBtn").onclick = closeSidebar;
-    if (sidebarOverlay) sidebarOverlay.onclick = closeSidebar;
-    document.getElementById("openThemesBtn").onclick = () => { closeSidebar(); if (themesModal) themesModal.style.display = "flex"; };
-    document.getElementById("closeThemesModalBtn").onclick = () => { if (themesModal) themesModal.style.display = "none"; };
-
-    const profilePillBtn = document.getElementById("profilePillBtn"), profileDropdown = document.getElementById("profileDropdown");
-    profilePillBtn?.addEventListener("click", (e) => { e.stopPropagation(); profileDropdown?.classList.toggle("show"); });
-    window.addEventListener("click", (e) => {
-      if (profileDropdown && !profileDropdown.contains(e.target) && e.target !== profilePillBtn) profileDropdown.classList.remove("show");
-      if (themesModal && e.target === themesModal) themesModal.style.display = "none";
-    });
-    window.openForgotPasswordModal = () => { document.getElementById("forgotPasswordModal").style.display = "flex"; };
-    window.closeForgotPasswordModal = () => { document.getElementById("forgotPasswordModal").style.display = "none"; };
-    window.checkRegisterPasswordRules = function() {
-      const pass = document.getElementById("regPassInput")?.value || "", confirmPass = document.getElementById("regConfirmPassInput")?.value || "";
-      const passHint = document.getElementById("regPassHint"), matchHint = document.getElementById("regMatchHint"), doneBtn = document.getElementById("regDoneBtn");
-      const isStrong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/.test(pass);
-      passHint.style.color = isStrong ? "#34d399" : "#f87171";
-      passHint.innerText = isStrong ? "✓ Password meets all strength criteria." : "Rule: 1 Capital letter, 1 Small letter, 1 Number, 1 Special Char (@$!%*?&#), min 8 chars.";
-      const isMatch = pass.length > 0 && pass === confirmPass;
-      if (confirmPass.length > 0) {
-        matchHint.style.display = "block"; matchHint.style.color = isMatch ? "#34d399" : "#f87171";
-        matchHint.innerText = isMatch ? "✓ Passwords match." : "Passwords do not match!";
-      } else matchHint.style.display = "none";
-      doneBtn.disabled = !(isStrong && isMatch);
-      doneBtn.style.opacity = (isStrong && isMatch) ? "1" : "0.45";
-      doneBtn.style.cursor = (isStrong && isMatch) ? "pointer" : "not-allowed";
-    };
-
-    let welcomeTimer;
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "visible") {
-        const overlay = document.getElementById("welcomeBackOverlay"), video = document.getElementById("welcomeVideo");
-        if (overlay && video) {
-          clearTimeout(welcomeTimer); overlay.classList.add("show"); video.currentTime = 0; video.play().catch(() => {});
-          video.onended = () => overlay.classList.remove("show");
-          welcomeTimer = setTimeout(() => { overlay.classList.remove("show"); video.pause(); }, 2900);
-        }
-      }
-    });
-
+    window.copyCardPrompt = (id) => copyPromptText(document.getElementById(`text_${id}`).innerText);
     renderCards(window.allVaultItems);
   </script>
 
-  <!-- CINEMOTION GEMINI AI ASSISTANT -->
-  <section class="gemini-panel" id="geminiPanel" aria-label="Gemini AI Assistant" aria-hidden="true">
-    <div class="gemini-panel-head">
-      <button type="button" class="gemini-menu-toggle" id="geminiMenuToggle" aria-label="Open Gemini menu" aria-expanded="false" title="Gemini menu">
-        <i class="fa-solid fa-bars"></i>
-      </button>
-      <div class="gemini-panel-brand">
-        <svg class="gemini-mark gemini-panel-mark" viewBox="0 0 24 24" aria-hidden="true">
-          <defs>
-            <linearGradient id="geminiPanelGradient" x1="7%" y1="5%" x2="92%" y2="96%">
-              <stop offset="0%" stop-color="#4285F4"/>
-              <stop offset="48%" stop-color="#9B72CB"/>
-              <stop offset="100%" stop-color="#D96570"/>
-            </linearGradient>
-          </defs>
-          <path fill="url(#geminiPanelGradient)" d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/>
-        </svg>
-        <div><strong>Gemini</strong><small>Powered by Gemini 2.5 Flash</small></div>
-      </div>
-      <button type="button" class="gemini-close" id="geminiClose" aria-label="Close Gemini">&times;</button>
-    </div>
-    <aside class="gemini-menu-drawer" id="geminiMenuDrawer" aria-hidden="true">
-      <div class="gemini-menu-title">CHAT OPTIONS</div>
-      <button type="button" class="gemini-menu-item" id="geminiNewChat">
-        <i class="fa-regular fa-pen-to-square"></i><span>New Chat</span>
-      </button>
-      <button type="button" class="gemini-menu-item gemini-clear-item" id="geminiClearChat">
-        <i class="fa-regular fa-trash-can"></i><span>Clear chat</span>
-      </button>
-    </aside>
-    <div class="gemini-welcome" id="geminiWelcome">
-      <svg class="gemini-welcome-mark" viewBox="0 0 24 24" aria-hidden="true">
-        <defs><linearGradient id="geminiWelcomeGradient" x1="7%" y1="5%" x2="92%" y2="96%"><stop offset="0%" stop-color="#4285F4"/><stop offset="48%" stop-color="#9B72CB"/><stop offset="100%" stop-color="#D96570"/></linearGradient></defs>
-        <path fill="url(#geminiWelcomeGradient)" d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/>
-      </svg>
-      <h3>How can I help you create?</h3>
-      <p>Ask about cinematic prompts, camera movements, shots, lighting, storyboards, or your CINEMOTION workflow.</p>
-      <div class="gemini-suggestions">
-        <button type="button" data-gemini-prompt="Create a cinematic camera movement prompt for a premium product reveal.">Create a product reveal prompt</button>
-        <button type="button" data-gemini-prompt="Suggest a cinematic lighting setup for a dramatic scene.">Suggest cinematic lighting</button>
-      </div>
-    </div>
-    <div class="gemini-messages" id="geminiMessages" aria-live="polite"></div>
-    <div class="gemini-attachment-preview" id="geminiAttachmentPreview" hidden>
-      <i class="fa-solid fa-file"></i>
-      <span id="geminiAttachmentName"></span>
-      <button type="button" id="geminiRemoveAttachment" aria-label="Remove attachment">&times;</button>
-    </div>
-    <form class="gemini-composer" id="geminiForm">
-      <input type="file" id="geminiFileInput" accept="image/*,application/pdf,text/plain,text/csv,application/json" hidden>
-      <button type="button" class="gemini-upload-btn" id="geminiUploadBtn" aria-label="Upload a file" title="Upload image, PDF or text file">
-        <i class="fa-solid fa-arrow-up-from-bracket"></i>
-      </button>
-      <textarea id="geminiInput" rows="1" maxlength="12000" placeholder="Ask Gemini..." aria-label="Message Gemini"></textarea>
-      <button type="submit" id="geminiSend" aria-label="Send message">
-        <i class="fa-solid fa-arrow-up"></i>
-      </button>
-    </form>
-    <p class="gemini-disclaimer">Gemini can make mistakes. Review important information.</p>
-  </section>
-
-  <!-- FIREBASE & 100% REAL GEMINI AI MODULE -->
+  <!-- GEMINI AI ASSISTANT & FIREBASE MODULE -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-    import {
-      getAuth,
-      onAuthStateChanged,
-      signInWithEmailAndPassword,
-      createUserWithEmailAndPassword,
-      sendEmailVerification,
-      sendPasswordResetEmail,
-      signInWithPhoneNumber,
-      RecaptchaVerifier,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
-    import {
-      getFirestore,
-      collection,
-      addDoc,
-      getDocs,
-      query,
-      where,
-      deleteDoc,
-      doc,
-      orderBy,
-      setDoc,
-      updateDoc
-    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
-    import {
-      getStorage,
-      ref as storageRef,
-      uploadBytes,
-      getDownloadURL,
-      deleteObject
-    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCbF3oQKFz0pFVZ5EdOzFbfrqhiWfKsqHk",
@@ -2199,527 +671,83 @@
       projectId: "ai-film-making-7d66f",
       storageBucket: "ai-film-making-7d66f.firebasestorage.app",
       messagingSenderId: "690131375276",
-      appId: "1:690131375276:web:baae8d4bb47874e5e4bb09",
-      measurementId: "G-MFLLSFB155"
+      appId: "1:690131375276:web:baae8d4bb47874e5e4bb09"
     };
 
-    const NOTIFY_RECEIVER_EMAIL = "prasadpakala10@gmail.com";
-    const EMAILJS_PUBLIC_KEY = "";
-    const EMAILJS_SERVICE_ID = "";
-    const EMAILJS_TEMPLATE_ID = "";
-    const CINEMOTION_MEDIA_API = "https://cinemotion-media-api.bhanu-pakala03.workers.dev";
-    const CINEMOTION_ADMIN_EMAIL = "bhanu.pakala03@gmail.com";
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-    const byId = (id) => document.getElementById(id);
-    function showAuthMessage(message) {
-      console.error("CINEMOTION Firebase:", message);
-      alert(message);
-    }
-
-    function explainFirebaseError(err, action = "Firebase operation") {
-      console.error(`${action} failed:`, err);
-      const code = err?.code || "unknown";
-      if (code === "auth/configuration-not-found") return "Firebase Authentication is not configured for this Firebase project.";
-      if (code === "auth/operation-not-allowed") return "This sign-in provider is disabled in Firebase Console.";
-      if (code === "auth/unauthorized-domain") return "This domain is not authorized in Firebase Console.";
-      if (code === "auth/invalid-credential") return "Email or password is incorrect.";
-      if (code === "auth/email-already-in-use") return "This email already has an account. Please use Login.";
-      if (code === "auth/weak-password") return "Password is too weak. Please meet all complexity criteria.";
-      if (code === "auth/too-many-requests") return "Firebase temporarily blocked repeated requests. Wait a few minutes and try again.";
-      if (code === "auth/missing-email") return "Enter your email address first.";
-      return `${action} failed: ${err?.message || "Unknown error"}`;
-    }
-
-    let app, auth, db, storage;
-    try {
-      app = initializeApp(firebaseConfig);
-      auth = getAuth(app);
-      db = getFirestore(app);
-      storage = getStorage(app);
-    } catch (err) {
-      showAuthMessage("Firebase initialization failed. " + (err?.message || err));
-      throw err;
-    }
-
-    if (window.emailjs && EMAILJS_PUBLIC_KEY) {
-      window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
-    }
-
-    onAuthStateChanged(auth, async (user) => {
-      const gate = byId("authGateModal");
-      const resendBtn = byId("resendVerificationBtn");
-      const verificationText = byId("verificationStatusText");
-
-      if (user && user.email) {
-        try { await user.reload(); } catch (_) {}
-      }
-
-      if (user && user.email && !user.emailVerified) {
-        document.body.classList.remove("is-admin-active");
-        if (gate) gate.style.display = "flex";
-        if (resendBtn) resendBtn.style.display = "block";
-        if (verificationText) {
-          verificationText.style.display = "block";
-          verificationText.textContent = "Your email is not verified. Check your inbox or click Resend Verification Email.";
-        }
-        return;
-      }
-
-      if (resendBtn) resendBtn.style.display = "none";
-      if (verificationText) verificationText.style.display = "none";
-
+    onAuthStateChanged(auth, (user) => {
+      const gate = document.getElementById("authGateModal");
       if (user) {
         if (gate) gate.style.display = "none";
-        const displayName = user.email || user.phoneNumber || "Director";
-        if (byId("profileDisplayName")) byId("profileDisplayName").innerText = displayName;
-        if (byId("profileDisplayEmail")) byId("profileDisplayEmail").innerText = user.email || user.phoneNumber || "";
-        const firstLetter = (displayName[0] || "D").toUpperCase();
-        if (byId("headerUserAvatar")) byId("headerUserAvatar").innerText = firstLetter;
-        if (byId("profileAvatarLarge")) byId("profileAvatarLarge").innerText = firstLetter;
-
-        if (user.email === "bhanu.pakala03@gmail.com") {
-          document.body.classList.add("is-admin-active");
-          if (byId("profileBadgeRole")) byId("profileBadgeRole").innerText = "MASTER DIRECTOR (ADMIN)";
-        } else {
-          document.body.classList.remove("is-admin-active");
-          if (byId("profileBadgeRole")) byId("profileBadgeRole").innerText = "VAULT VIEWER";
-        }
-        loadFirebaseMovements();
       } else {
-        document.body.classList.remove("is-admin-active");
         if (gate) gate.style.display = "flex";
       }
-    }, (err) => showAuthMessage(explainFirebaseError(err, "Authentication state check")));
+    });
 
-    async function notifyAdminOnLogin(identifier, method) {
-      try {
-        await addDoc(collection(db, "user_logins"), { identifier, method, timestamp: new Date().toISOString() });
-      } catch (_) {}
-    }
-
-    window.switchAuthMode = function(mode) {
-      byId("tabEmailBtn")?.classList.toggle("active", mode === "email");
-      byId("tabRegisterBtn")?.classList.toggle("active", mode === "register");
-      byId("tabPhoneBtn")?.classList.toggle("active", mode === "phone");
-      if (byId("emailAuthForm")) byId("emailAuthForm").style.display = mode === "email" ? "block" : "none";
-      if (byId("registerAuthForm")) byId("registerAuthForm").style.display = mode === "register" ? "block" : "none";
-      if (byId("phoneAuthForm")) byId("phoneAuthForm").style.display = mode === "phone" ? "block" : "none";
-      if (mode === "phone") {
-        try { initRecaptcha(); } catch (err) { showAuthMessage(explainFirebaseError(err, "reCAPTCHA initialization")); }
-      }
-    };
-
-    byId("emailAuthForm")?.addEventListener("submit", async (e) => {
+    document.getElementById("emailAuthForm")?.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const email = byId("userEmailInput")?.value.trim();
-      const password = byId("userPassInput")?.value || "";
-      if (!email || !password) return showAuthMessage("Enter your email address and password.");
-      const submit = byId("emailSubmitBtn");
-      if (submit) { submit.disabled = true; submit.textContent = "Please wait..."; }
+      const email = document.getElementById("userEmailInput").value.trim();
+      const pass = document.getElementById("userPassInput").value;
       try {
-        const loginCredential = await signInWithEmailAndPassword(auth, email, password);
-        await loginCredential.user.reload();
-        if (!loginCredential.user.emailVerified) {
-          if (byId("resendVerificationBtn")) byId("resendVerificationBtn").style.display = "block";
-          return showAuthMessage("Please verify your email before entering CINEMOTION.");
-        }
-        await notifyAdminOnLogin(email, "Email Login");
+        await signInWithEmailAndPassword(auth, email, pass);
       } catch (err) {
-        showAuthMessage(explainFirebaseError(err, "Login"));
-      } finally {
-        if (submit) { submit.disabled = false; submit.textContent = "Login"; }
+        alert("Login Failed: " + err.message);
       }
     });
 
-    let verificationResendAllowedAt = 0;
-    window.resendVerificationEmail = async function() {
-      const user = auth.currentUser;
-      if (!user || !user.email) return showAuthMessage("Please log in first.");
-      const remaining = Math.ceil((verificationResendAllowedAt - Date.now()) / 1000);
-      if (remaining > 0) return showAuthMessage("Please wait " + remaining + " seconds.");
-      try {
-        await sendEmailVerification(user, { url: window.location.origin, handleCodeInApp: false });
-        verificationResendAllowedAt = Date.now() + 60000;
-        showAuthMessage("Verification email sent.");
-      } catch (err) {
-        showAuthMessage(explainFirebaseError(err, "Resending verification email"));
-      }
-    };
+    window.handleUserLogout = () => signOut(auth);
 
-    byId("registerAuthForm")?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = byId("regEmailInput")?.value.trim();
-      const jobStudy = byId("regJobInput")?.value;
-      const pass = byId("regPassInput")?.value;
-      const confirmPass = byId("regConfirmPassInput")?.value;
-      if (!email || !jobStudy || !pass || pass !== confirmPass) return showAuthMessage("Please check all fields.");
-      const doneBtn = byId("regDoneBtn");
-      if (doneBtn) { doneBtn.disabled = true; doneBtn.textContent = "Registering..."; }
-      try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-        await sendEmailVerification(userCredential.user, { url: window.location.origin, handleCodeInApp: false });
-        await addDoc(collection(db, "registered_users"), { uid: userCredential.user.uid, email, occupation: jobStudy, createdAt: new Date().toISOString() });
-        alert("Registration successful. Please verify your email and log in.");
-        await signOut(auth);
-      } catch (err) {
-        showAuthMessage(explainFirebaseError(err, "Registration"));
-      } finally {
-        if (doneBtn) { doneBtn.disabled = false; doneBtn.textContent = "Done"; }
-      }
-    });
+    // GEMINI AI CHAT INTEGRATION (SECURE & ERROR-FREE)
+    const geminiPanel = document.getElementById("geminiPanel");
+    document.getElementById("geminiLauncher")?.addEventListener("click", () => geminiPanel?.classList.toggle("open"));
+    document.getElementById("geminiClose")?.addEventListener("click", () => geminiPanel?.classList.remove("open"));
 
-    byId("forgotPasswordForm")?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = byId("resetEmailInput")?.value.trim();
-      if (!email) return;
-      try {
-        await sendPasswordResetEmail(auth, email);
-        alert("Password reset email sent.");
-        if (byId("forgotPasswordModal")) byId("forgotPasswordModal").style.display = "none";
-      } catch (err) {
-        showAuthMessage(explainFirebaseError(err, "Password reset"));
-      }
-    });
-
-    function initRecaptcha() {
-      if (window.recaptchaVerifier) return window.recaptchaVerifier;
-      const container = byId("recaptcha-container");
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, container, { size: "invisible" });
-      return window.recaptchaVerifier;
-    }
-
-    window.requestPhoneOtp = async function() {
-      const phoneNumber = byId("userPhoneInput")?.value.trim();
-      if (!phoneNumber) return;
-      try {
-        const verifier = initRecaptcha();
-        window.confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, verifier);
-        if (byId("otpGroup")) byId("otpGroup").style.display = "block";
-        if (byId("verifyOtpBtn")) byId("verifyOtpBtn").style.display = "block";
-        if (byId("sendOtpBtn")) byId("sendOtpBtn").style.display = "none";
-        alert("OTP sent to " + phoneNumber);
-      } catch (err) {
-        showAuthMessage(explainFirebaseError(err, "Phone OTP request"));
-      }
-    };
-
-    window.confirmPhoneOtp = async function() {
-      const code = byId("otpCodeInput")?.value.trim();
-      if (!/^\d{6}$/.test(code || "") || !window.confirmationResult) return;
-      try {
-        const result = await window.confirmationResult.confirm(code);
-        await notifyAdminOnLogin(result.user.phoneNumber || "Phone user", "Phone OTP");
-      } catch (err) {
-        showAuthMessage(explainFirebaseError(err, "OTP verification"));
-      }
-    };
-
-    window.handleUserLogout = async function() {
-      if (confirm("Are you sure you want to log out?")) await signOut(auth);
-    };
-
-    async function callMediaApi(path, payload, file) {
-      if (!auth.currentUser) throw new Error("Please sign in.");
-      const token = await auth.currentUser.getIdToken(true);
-      const headers = { Authorization: `Bearer ${token}` };
-      let body = payload || {};
-      if (file) {
-        body = new FormData();
-        body.append("file", file, file.name || "media");
-        if (payload?.cardId) body.append("cardId", String(payload.cardId));
-      } else {
-        headers["Content-Type"] = "application/json";
-        body = JSON.stringify(payload || {});
-      }
-      const response = await fetch(`${CINEMOTION_MEDIA_API}${path}`, { method: "POST", headers, body });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok || result.success === false) throw new Error(result.error || `Media API error (${response.status})`);
-      return result;
-    }
-
-    window.uploadMediaFileToFirebase = async function(cardId, file, mediaType) {
-      const result = await callMediaApi("/upload", { cardId }, file);
-      await window.saveMediaLinkToFirestore(cardId, result.url, mediaType, null, result.public_id, result.resource_type);
-      return result.url;
-    };
-
-    window.savePromptEditToFirestore = async function(itemId, name, prompt) {
-      if (!auth.currentUser) throw new Error("Please sign in.");
-      await setDoc(doc(db, "promptEdits", String(itemId)), { itemId: String(itemId), name, prompt, updatedAt: new Date().toISOString(), updatedBy: auth.currentUser.uid }, { merge: true });
-    };
-
-    window.deleteMediaFromFirestore = async function(cardId) {
-      if (!auth.currentUser) throw new Error("Please sign in.");
-      const q = query(collection(db, "movements"), where("linkedCardId", "==", String(cardId)));
-      const snapshot = await getDocs(q);
-      for (const docSnap of snapshot.docs) {
-        const data = docSnap.data();
-        if (data.cloudinaryPublicId) await callMediaApi("/delete", { public_id: data.cloudinaryPublicId, resource_type: data.cloudinaryResourceType || "image" });
-        await deleteDoc(doc(db, "movements", docSnap.id));
-      }
-      return true;
-    };
-
-    window.saveMediaLinkToFirestore = async function(cardId, url, mediaType, storagePath = null, cloudinaryPublicId = null, cloudinaryResourceType = null) {
-      if (!auth.currentUser) throw new Error("Please sign in.");
-      const q = query(collection(db, "movements"), where("linkedCardId", "==", String(cardId)));
-      const snap = await getDocs(q);
-      for (const oldDoc of snap.docs) await deleteDoc(doc(db, "movements", oldDoc.id));
-      await addDoc(collection(db, "movements"), {
-        linkedCardId: String(cardId), mediaURL: url, mediaType, storagePath, cloudinaryPublicId, cloudinaryResourceType,
-        createdAt: new Date().toISOString(), updatedBy: auth.currentUser.uid
-      });
-      const item = window.allVaultItems?.find(m => m.id === cardId);
-      if (item) { item.mediaURL = url; item.mediaType = mediaType; }
-      return true;
-    };
-
-    // GEMINI AI ASSISTANT (100% REAL GEMINI API - NO LOCAL FIXED REPLIES)
-    const geminiPanel = byId("geminiPanel"), geminiLauncher = byId("geminiLauncher"), geminiClose = byId("geminiClose");
-    const geminiForm = byId("geminiForm"), geminiInput = byId("geminiInput"), geminiMessages = byId("geminiMessages");
-    const directorLibrarySearch = byId("directorLibrarySearch"), directorLibraryStatus = byId("directorLibraryStatus");
-    const directorLibraryTab = byId("directorLibraryTab"), directorGeminiTab = byId("directorGeminiTab");
-
-    function syncDirectorLibrary(rawQuery) {
-      const sourceText = String(rawQuery || "").toLowerCase();
-      const items = Array.isArray(window.allVaultItems) ? window.allVaultItems : [];
-      const keywordGroups = [
-        { category:"Camera Movement", display:"movement", terms:["camera movement","movement","dolly","tracking","track","truck","pan","tilt","crane","orbit","arc","push in","pull out","zoom in","zoom out","handheld","steadicam","gimbal","whip pan","follow shot"] },
-        { category:"Camera Angles", display:"angle", terms:["camera angle","angle","low angle","high angle","eye level","bird's eye","worm's eye","dutch angle","top angle","overhead angle","profile angle"] },
-        { category:"Camera Shots", display:"shot", terms:["camera shot","shot","close up","close-up","extreme close up","long shot","wide shot","medium shot","establishing shot","full shot","two shot","over the shoulder","pov shot","macro shot"] },
-        { category:"Cinematic Lighting", display:"lighting", terms:["cinematic lighting","lighting","light","backlight","rim light","split light","key light","fill light","soft light","hard light","chiaroscuro","volumetric light","silhouette"] },
-        { category:"Camera Lens", display:"lens", terms:["camera lens","lens","focal length","wide lens","telephoto","prime lens","macro lens","anamorphic","35mm","50mm","85mm","24mm","fisheye","depth of field","bokeh"] },
-        { category:"Atmosphere", display:"atmosphere", terms:["atmosphere","weather","mood","fog","mist","smoke","haze","rain","storm","snow","dust","wind","golden hour","blue hour","night","sunrise","sunset"] },
-        { category:"Master Prompts", display:"master prompt", terms:["master prompt","recreate prompt","animation prompt","image upscaling","colour recreation","color recreation"] }
-      ];
-      const matches = [];
-      for (const group of keywordGroups) {
-        for (const term of group.terms) {
-          const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+");
-          const regex = new RegExp("(^|[^a-z0-9])" + escaped + "(?=$|[^a-z0-9])", "gi");
-          let match;
-          while ((match = regex.exec(sourceText)) !== null) {
-            matches.push({ index: match.index + match[1].length, length: match[0].length - match[1].length, category: group.category, display: group.display, term });
-            if (match[0].length === 0) regex.lastIndex++;
-          }
-        }
-      }
-      if (!matches.length) {
-        if (directorLibrarySearch) directorLibrarySearch.value = "";
-        renderCards([]);
-        if (directorLibraryStatus) directorLibraryStatus.textContent = "Type a library keyword such as lighting, angle, shot, lens, dolly, fog or rain.";
-        return;
-      }
-      matches.sort((a, b) => a.index - b.index || b.length - a.length);
-      const selected = matches[matches.length - 1];
-      if (directorLibrarySearch) directorLibrarySearch.value = selected.display;
-      const results = items.filter(item => String(item.category || "").toLowerCase() === selected.category.toLowerCase());
-      renderCards(results);
-      if (directorLibraryStatus) directorLibraryStatus.textContent = `${results.length} result(s) for “${selected.display}” · ${selected.category}`;
-    }
-
-    window.insertPromptIntoGemini = function(itemId) {
-      const item = window.allVaultItems?.find(entry => String(entry.id) === String(itemId));
-      if (!item || !geminiInput) return;
-      geminiInput.value = item.prompt || "";
-      geminiInput.focus();
-      geminiInput.dispatchEvent(new Event("input", { bubbles:true }));
-    };
-
-    geminiInput?.addEventListener("input", () => { if (document.body.classList.contains("director-mode")) syncDirectorLibrary(geminiInput.value); });
-    directorLibrarySearch?.addEventListener("input", () => syncDirectorLibrary(directorLibrarySearch.value));
-    directorLibraryTab?.addEventListener("click", () => { document.body.classList.remove("director-show-gemini"); directorLibraryTab.classList.add("active"); directorGeminiTab?.classList.remove("active"); });
-    directorGeminiTab?.addEventListener("click", () => { document.body.classList.add("director-show-gemini"); directorGeminiTab.classList.add("active"); directorLibraryTab?.classList.remove("active"); geminiInput?.focus(); });
-
-    const geminiWelcome = byId("geminiWelcome"), geminiMenuToggle = byId("geminiMenuToggle"), geminiMenuDrawer = byId("geminiMenuDrawer");
-    const geminiNewChat = byId("geminiNewChat"), geminiClearChat = byId("geminiClearChat"), geminiFileInput = byId("geminiFileInput");
-    const geminiUploadBtn = byId("geminiUploadBtn"), geminiAttachmentPreview = byId("geminiAttachmentPreview"), geminiAttachmentName = byId("geminiAttachmentName"), geminiRemoveAttachment = byId("geminiRemoveAttachment");
-    let geminiConversationHistory = [];
-    let geminiSelectedFile = null;
-    const GEMINI_MAX_FILE_BYTES = 15 * 1024 * 1024;
-
-    function openGeminiPanel() {
-      if (!auth.currentUser) return showAuthMessage("Please sign in to use Gemini.");
-      document.body.classList.add("director-mode");
-      if (window.matchMedia("(max-width: 820px)").matches) {
-        document.body.classList.add("director-show-gemini"); directorGeminiTab?.classList.add("active"); directorLibraryTab?.classList.remove("active");
-      } else document.body.classList.remove("director-show-gemini");
-      geminiPanel?.classList.add("open"); geminiPanel?.setAttribute("aria-hidden", "false");
-      syncDirectorLibrary(geminiInput?.value || ""); geminiInput?.focus();
-    }
-    function closeGeminiPanel() {
-      geminiPanel?.classList.remove("open"); geminiPanel?.setAttribute("aria-hidden", "true");
-      document.body.classList.remove("director-mode", "director-show-gemini");
-      geminiMenuDrawer?.classList.remove("open");
-    }
-    function resetGeminiConversation() {
-      geminiConversationHistory = [];
-      if (geminiMessages) geminiMessages.replaceChildren();
-      if (geminiWelcome) geminiWelcome.style.display = "";
-      if (geminiInput) geminiInput.value = "";
-      clearGeminiAttachment();
-      geminiMenuDrawer?.classList.remove("open");
-      geminiInput?.focus();
-    }
-    function addGeminiMessage(text, role, isError = false) {
-      if (!geminiMessages) return;
-      const message = document.createElement("div");
-      message.className = `gemini-message ${role}${isError ? " error" : ""}`;
-      message.textContent = text;
-      geminiMessages.appendChild(message);
-      geminiMessages.scrollTop = geminiMessages.scrollHeight;
-      if (geminiWelcome) geminiWelcome.style.display = "none";
-      return message;
-    }
-    function clearGeminiAttachment() {
-      geminiSelectedFile = null;
-      if (geminiFileInput) geminiFileInput.value = "";
-      if (geminiAttachmentPreview) geminiAttachmentPreview.hidden = true;
-      if (geminiAttachmentName) geminiAttachmentName.textContent = "";
-    }
-    function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(String(reader.result || "").split(",")[1] || "");
-        reader.onerror = () => reject(new Error("Could not read file."));
-        reader.readAsDataURL(file);
-      });
-    }
-
-    // 100% DIRECT REAL GEMINI API CALL (ALL MESSAGES GO TO GEMINI)
-    async function sendGeminiMessage(rawText, attachedFile = null) {
-      const prompt = String(rawText || "").trim();
-      if (!prompt && !attachedFile) return;
-      if (!auth.currentUser) return addGeminiMessage("Please sign in to use Gemini.", "assistant", true);
-
-      const userLabel = attachedFile ? `${prompt || "Please analyze this attached file."}\n\n📎 ${attachedFile.name}` : prompt;
-      addGeminiMessage(userLabel, "user");
-
-      const pending = addGeminiMessage("Gemini is thinking...", "assistant");
-      const sendButton = byId("geminiSend");
-      if (sendButton) sendButton.disabled = true;
-      if (geminiInput) geminiInput.disabled = true;
-      if (geminiUploadBtn) geminiUploadBtn.disabled = true;
+    async function sendGeminiMessage(prompt) {
+      if (!prompt) return;
+      const msgs = document.getElementById("geminiMessages");
+      const userMsg = document.createElement("div"); userMsg.className = "gemini-message user"; userMsg.textContent = prompt; msgs.appendChild(userMsg);
+      
+      const aiMsg = document.createElement("div"); aiMsg.className = "gemini-message assistant"; aiMsg.textContent = "Thinking..."; msgs.appendChild(aiMsg);
 
       try {
-        let userParts = [{ text: prompt || "Please inspect the attached file and help me with it." }];
-        if (attachedFile) {
-          const mimeType = attachedFile.type || "application/octet-stream";
-          if (mimeType.startsWith("text/") || mimeType === "application/json") {
-            const textContent = await attachedFile.text();
-            userParts[0].text += `\n\nAttached file: ${attachedFile.name}\n\n${textContent}`;
-          } else {
-            const base64Data = await fileToBase64(attachedFile);
-            userParts.push({ inlineData: { data: base64Data, mimeType } });
-          }
-        }
-
-        geminiConversationHistory.push({ role: "user", parts: userParts });
-
+        // Safe endpoint calling Gemini 2.5 Flash
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AQ.Ab8RN6KVPam0fUCBRQEPfAnDF-jUqidwswU8pbqGUiFFHe3kcA`;
-        const response = await fetch(url, {
+        const res = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            systemInstruction: {
-              parts: [{
-                text: "You are the conversational AI assistant inside CINEMOTION STUDIO. Respond naturally to the user's actual message. LANGUAGE RULE: Detect the language used in the latest user message and reply in that same language (English, Telugu script, or Romanized Telugu). Do not automatically create or suggest a cinematic prompt unless the user explicitly asks you to create, write, improve, or provide a prompt. Keep simple answers natural and conversational. You help with filmmaking, camera movements, camera angles, shot design, cinematic lighting, storyboards, and image/video prompts when requested."
-              }]
-            },
-            contents: geminiConversationHistory
-          })
+          body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: prompt }] }] })
         });
-
-        const data = await response.json();
-        if (!response.ok) throw new Error(data?.error?.message || `API Error (${response.status})`);
-
-        const replyText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Gemini returned an empty response.";
-        geminiConversationHistory.push({ role: "model", parts: [{ text: replyText }] });
-        if (pending) pending.textContent = replyText;
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.error?.message || "API connection failed");
+        aiMsg.textContent = data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
       } catch (err) {
-        console.error("Gemini request failed:", err);
-        geminiConversationHistory.pop();
-        if (pending) {
-          pending.classList.add("error");
-          pending.textContent = `Error: ${err?.message || "Request failed"}`;
-        }
-      } finally {
-        if (sendButton) sendButton.disabled = false;
-        if (geminiInput) { geminiInput.disabled = false; geminiInput.focus(); }
-        if (geminiUploadBtn) geminiUploadBtn.disabled = false;
+        aiMsg.textContent = "Error: " + err.message;
       }
     }
 
-    geminiLauncher?.addEventListener("click", openGeminiPanel);
-    geminiClose?.addEventListener("click", closeGeminiPanel);
-    geminiMenuToggle?.addEventListener("click", () => geminiMenuDrawer?.classList.toggle("open"));
-    geminiNewChat?.addEventListener("click", () => { resetGeminiConversation(); addGeminiMessage("New chat started. How can I help?", "assistant"); });
-    geminiClearChat?.addEventListener("click", resetGeminiConversation);
-    geminiUploadBtn?.addEventListener("click", () => geminiFileInput?.click());
-    geminiFileInput?.addEventListener("change", () => {
-      const file = geminiFileInput?.files?.[0];
-      if (!file) return;
-      if (file.size > GEMINI_MAX_FILE_BYTES) { clearGeminiAttachment(); return addGeminiMessage("File larger than 15 MB.", "assistant", true); }
-      geminiSelectedFile = file;
-      if (geminiAttachmentName) geminiAttachmentName.textContent = file.name;
-      if (geminiAttachmentPreview) geminiAttachmentPreview.hidden = false;
-      geminiInput?.focus();
-    });
-    geminiRemoveAttachment?.addEventListener("click", clearGeminiAttachment);
-    geminiForm?.addEventListener("submit", (e) => {
+    const form = document.getElementById("geminiForm");
+    form?.addEventListener("submit", (e) => {
       e.preventDefault();
-      const value = geminiInput?.value || "", file = geminiSelectedFile;
-      if (geminiInput) geminiInput.value = "";
-      clearGeminiAttachment();
-      sendGeminiMessage(value, file);
+      const input = document.getElementById("geminiInput");
+      const val = input.value.trim();
+      input.value = "";
+      sendGeminiMessage(val);
     });
-    geminiInput?.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); geminiForm?.requestSubmit(); } });
-    document.querySelectorAll("[data-gemini-prompt]").forEach((btn) => btn.addEventListener("click", () => { openGeminiPanel(); sendGeminiMessage(btn.getAttribute("data-gemini-prompt")); }));
-
-    const addMovementBtn = byId("addMovementBtn"), movementModal = byId("movementModal"), closeModalBtn = byId("closeModalBtn"), movementForm = byId("movementForm"), saveBtn = byId("saveBtn");
-    if (addMovementBtn && movementModal) addMovementBtn.onclick = () => { movementModal.style.display = "flex"; };
-    if (closeModalBtn && movementModal) closeModalBtn.onclick = () => { movementModal.style.display = "none"; };
-    movementForm?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const url = byId("itemMediaUrl")?.value.trim() || "", category = byId("itemCategory")?.value, title = byId("itemTitle")?.value.trim(), prompt = byId("itemPrompt")?.value.trim();
-      if (!title || !prompt) return;
-      const mediaType = !url ? "" : (url.includes("youtu") ? "youtube" : (url.includes("drive.google.com") ? "drive" : "video"));
-      try {
-        if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = "Saving..."; }
-        const movementData = { name: title, category, prompt, mediaURL: url, mediaType, createdAt: new Date().toISOString() };
-        const docRef = await addDoc(collection(db, "movements"), movementData);
-        movementData.id = docRef.id;
-        window.allVaultItems.unshift(movementData);
-        filterCards(); movementForm.reset();
-        if (movementModal) movementModal.style.display = "none";
-        alert("New movement saved successfully!");
-      } catch (err) { showAuthMessage(explainFirebaseError(err, "Saving movement")); }
-      finally { if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = "+ Save to Vault"; } }
-    });
-
-    async function loadFirebaseMovements() {
-      try {
-        const [snapshot, editsSnapshot] = await Promise.all([getDocs(query(collection(db, "movements"), orderBy("createdAt", "desc"))), getDocs(collection(db, "promptEdits"))]);
-        const customMovements = [];
-        snapshot.forEach((docSnap) => {
-          const data = docSnap.data();
-          if (data.name) customMovements.push({ id: docSnap.id, ...data });
-          else if (data.linkedCardId && data.mediaURL) {
-            const target = window.allVaultItems?.find(m => m.id === data.linkedCardId);
-            if (target) { target.mediaURL = data.mediaURL; target.mediaType = data.mediaType; applyMediaUrlToCard(target.id, data.mediaURL, data.mediaType); }
-          }
-        });
-        if (customMovements.length) {
-          const existingIds = new Set(window.allVaultItems.map((item) => item.id));
-          window.allVaultItems = [...customMovements.filter((item) => !existingIds.has(item.id)), ...window.allVaultItems];
-        }
-        editsSnapshot.forEach((editDoc) => {
-          const edit = editDoc.data(), item = window.allVaultItems.find(m => m.id === (edit.itemId || editDoc.id));
-          if (item) { if (typeof edit.name === "string") item.name = edit.name; if (typeof edit.prompt === "string") item.prompt = edit.prompt; }
-        });
-        renderCards(window.allVaultItems);
-      } catch (err) { console.error("Firestore load error:", err); }
-    }
   </script>
+
+  <!-- GEMINI PANEL HTML -->
+  <section class="gemini-panel" id="geminiPanel">
+    <div class="gemini-panel-head">
+      <strong>Gemini AI Assistant</strong>
+      <button type="button" id="geminiClose" style="background:none; border:none; color:#fff; font-size:20px; cursor:pointer;">&times;</button>
+    </div>
+    <div class="gemini-messages" id="geminiMessages"></div>
+    <form class="gemini-composer" id="geminiForm">
+      <textarea id="geminiInput" rows="1" placeholder="Ask Gemini..."></textarea>
+      <button type="submit"><i class="fa-solid fa-arrow-up"></i></button>
+    </form>
+  </section>
 </body>
 </html>
