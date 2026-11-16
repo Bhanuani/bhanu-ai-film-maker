@@ -589,13 +589,13 @@
     .prompt-box::-webkit-scrollbar { width: 4px; }
     .prompt-box::-webkit-scrollbar-thumb { background: rgba(0, 210, 255, 0.5); border-radius: 999px; }
 
-    /* COPIED VIDEO OVERLAY - FULLY EXPANDED TO FILL CIRCLED AREA WITHOUT BLACK GAPS */
+    /* COPIED VIDEO OVERLAY */
     .copied-video-player {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
-      object-fit: fill; /* Fills entire container edge-to-edge eliminating empty black side regions */
+      object-fit: fill;
       mix-blend-mode: screen;
       pointer-events: none;
       opacity: 0;
@@ -865,7 +865,7 @@
     }
 
 
-    /* RESPONSIVE PROMPT GRID: four columns on desktop, adapting on smaller screens. */
+    /* RESPONSIVE PROMPT GRID */
     @media (max-width: 1100px) {
       .movements-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
@@ -878,7 +878,7 @@
       .vault-container { padding-top: 1rem; }
     }
 
-    /* CINEMOTION DIRECTOR WORKSPACE: prompt library + existing Gemini chat */
+    /* CINEMOTION DIRECTOR WORKSPACE */
     .director-library-head {
       display: none;
       position: sticky;
@@ -967,14 +967,14 @@
 </head>
 <body>
 
-  <!-- TAB SWITCH WELCOME BACK OVERLAY (SEAMLESS FULLSCREEN, NO BOX) -->
+  <!-- TAB SWITCH WELCOME BACK OVERLAY -->
   <div id="welcomeBackOverlay">
     <div class="welcome-video-container">
       <video id="welcomeVideo" class="welcome-direct-video" muted playsinline preload="none" src="welcome-back.mp4"></video>
     </div>
   </div>
 
-  <!-- AUTHENTICATION GATE (LOGIN / REGISTER WITH 4 FIELDS & RULES / MOBILE OTP) -->
+  <!-- AUTHENTICATION GATE -->
   <div id="authGateModal" class="auth-gate-modal" style="display: none;">
     <div class="auth-card">
       <div style="text-align: center; margin-bottom: 1.5rem;">
@@ -1005,15 +1005,13 @@
         <p id="verificationStatusText" style="display:none; margin-top:10px; color:#fbbf24; font-size:12px; line-height:1.5;"></p>
       </form>
 
-      <!-- 2. NEW USER REGISTRATION FORM (4 STRICT FIELDS) -->
+      <!-- 2. NEW USER REGISTRATION FORM -->
       <form id="registerAuthForm" style="display: none;">
-        <!-- Field 1: Mail ID -->
         <div class="form-group">
           <label>1. Mail ID</label>
           <input type="email" id="regEmailInput" placeholder="name@example.com" required />
         </div>
 
-        <!-- Field 2: Job / Study / Other -->
         <div class="form-group">
           <label>2. Job / Study / Other</label>
           <select id="regJobInput" required style="background: #161e2e; border: 1px solid #334155; color: #f8fafc; padding: 12px 14px; border-radius: 8px; font-size: 14px; outline: none;">
@@ -1025,7 +1023,6 @@
           </select>
         </div>
 
-        <!-- Field 3: Password (Must be Capital, Small, Special Char, Number) -->
         <div class="form-group">
           <label>3. Password</label>
           <input type="password" id="regPassInput" placeholder="Must include Upper, Lower, Number, Special" oninput="checkRegisterPasswordRules()" required />
@@ -1034,14 +1031,12 @@
           </small>
         </div>
 
-        <!-- Field 4: Re-Enter Password -->
         <div class="form-group">
           <label>4. Re-Enter Password</label>
           <input type="password" id="regConfirmPassInput" placeholder="Re-enter same password" oninput="checkRegisterPasswordRules()" required />
           <small id="regMatchHint" style="font-size: 11px; color: #f87171; display: none;">Passwords do not match!</small>
         </div>
 
-        <!-- Done Button: Activates ONLY when password meets rules and matches exactly -->
         <button type="submit" class="submit-btn" id="regDoneBtn" disabled style="opacity: 0.45; cursor: not-allowed; transition: all 0.25s;">Done</button>
       </form>
 
@@ -1137,7 +1132,6 @@
       </div>
 
       <div class="header-actions">
-        <!-- Admin-Only Button: Regular users cannot see this -->
         <button class="add-btn admin-only" id="addMovementBtn">
           <i class="fa-solid fa-plus"></i> Add Movement
         </button>
@@ -1195,7 +1189,6 @@
       </div>
     </section>
     <section class="hero-banner-wrapper" id="heroBanner">
-      <!-- One continuous hero video: no duplicate background layer or split panels. -->
       <video id="heroVideo" class="hero-foreground-video" autoplay muted playsinline loop preload="none" poster="bhanu-3d-header_2.png" src="hero-banner-3.mp4"></video>
     </section>
 
@@ -1374,7 +1367,6 @@
 
   <!-- SCRIPT -->
   <script>
-    // 44 Core Movements
     const defaultMovements = [
       { id: "mov_1", name: "Slow Dolly In", category: "Camera Movement", prompt: "Slow dolly in, camera moves slowly forward toward the subject." },
       { id: "mov_2", name: "Slow Dolly Out", category: "Camera Movement", prompt: "Slow dolly out, camera moves slowly backwards away from the subject." },
@@ -1422,7 +1414,6 @@
       { id: "mov_44", name: "Worm's Eye Tracking (Ground Level)", category: "Camera Movement", prompt: "Worm's eye view, low angle tracking, camera moves along the ground looking up." }
     ];
 
-    // 12 Camera Angles
     const cameraAnglesFromPdf = [
       { id: "ang_1", name: "Eye-level Angle", category: "Camera Angles", prompt: "Eye-level angle, camera positioned at subject eye height, natural, neutral, realistic perspective, 8k" },
       { id: "ang_2", name: "Low Angle", category: "Camera Angles", prompt: "Low angle shot, camera looking upward at the subject, commanding power, dominance, grandeur, cinematic" },
@@ -1438,7 +1429,6 @@
       { id: "ang_12", name: "Point-Of-View (POV)", category: "Camera Angles", prompt: "Point-of-view POV shot, camera represents first-person character vision, immersive perspective, subjective participation" }
     ];
 
-    // 15 Camera Shots
     const cameraShotsFromPdf = [
       { id: "sht_1", name: "Extreme Long Shot (ELS) / Extreme Wide Shot (EWS)", category: "Camera Shots", prompt: "Extreme long shot ELS, extreme wide shot EWS, vast expansive landscape, subject appearing very small in distance, establish scale, atmosphere, and location, 8k" },
       { id: "sht_2", name: "Long Shot (LS) / Wide Shot (WS)", category: "Camera Shots", prompt: "Long shot LS, wide shot WS, full body of the subject in modern geometric architectural hall, substantial surroundings, movement and body language, cinematic" },
@@ -1457,7 +1447,6 @@
       { id: "sht_15", name: "Tight Close-Up (TCU)", category: "Camera Shots", prompt: "Tight close-up TCU, tightly framed around eyes, nose, and lips, emotional vulnerability, intimacy and intense dramatic cinematic impact" }
     ];
 
-    // 60 Atmosphere Themes
     const atmosphereThemesFromPdf = [
       { id: "atm_1", name: "Golden Hour Glow", category: "Atmosphere", prompt: "Golden Hour Glow, soft warm golden sunlight at sunrise or sunset, cinematic lighting, 8k" },
       { id: "atm_2", name: "Blue Hour Twilight", category: "Atmosphere", prompt: "Blue Hour Twilight, cool deep blue atmospheric tones, early dawn or late dusk, moody ambience" },
@@ -1521,7 +1510,6 @@
       { id: "atm_60", name: "Cinematic Drone Landscape", category: "Atmosphere", prompt: "Cinematic Drone Landscape, high-altitude aerial view of winding coastal cliff road at sunrise" }
     ];
 
-    // 5 Master Prompts
     const masterPromptsList = [
       { id: "mst_1", name: "Recreate Master Prompt", category: "Master Prompts", prompt: "Analyze this video scene by scene and generate a detailed AI video prompt for each shot and frame - including camera angles, subject actions, lighting, environment, facial expressions, composition, transitions, and cinematic style. Make the prompts accurate enough to recreate the video as closely as possible. Include exact text in video." },
       { id: "mst_2", name: "Animation Prompt", category: "Master Prompts", prompt: "Animate sequence of events shown in 6-frame storyboard reference image. Single, continuous, seamless product showcase video of smartphone from Panel 1 to 6. Preserve composition, product styling, modern lighting. Smooth cinematic transitions (push-ins, slow orbits, match-cuts). No fast cuts, no background music, no text overlays." },
@@ -1560,7 +1548,6 @@
       });
     }
 
-    // SINGLE HERO VIDEO: exactly one video element inside the banner.
     const heroVid = document.getElementById("heroVideo");
     if (heroVid) {
       heroVid.loop = true;
@@ -1595,32 +1582,10 @@
       };
       dbReq.onsuccess = (e) => {
         localDB = e.target.result;
-        // Firebase is the source of truth for prompt edits; do not let stale
-        // browser-only edits overwrite the latest cloud version.
         renderCards(window.allVaultItems);
       };
       dbReq.onerror = (e) => console.error("IndexedDB initialization failed:", e.target.error);
     }
-
-    function loadSavedPromptEdits() {
-      if (!localDB) return;
-      const tx = localDB.transaction("promptEdits", "readonly");
-      const store = tx.objectStore("promptEdits");
-      const req = store.getAll();
-      req.onsuccess = () => {
-        if (req.result && req.result.length > 0) {
-          req.result.forEach(edit => {
-            const item = window.allVaultItems.find(m => m.id === edit.id);
-            if (item) {
-              item.name = edit.name;
-              item.prompt = edit.prompt;
-            }
-          });
-        }
-        renderCards(window.allVaultItems);
-      };
-    }
-
 
     function getYoutubeEmbedUrl(url) {
       if (!url) return null;
@@ -1658,7 +1623,6 @@
             <img id="img_${item.id}" alt="${item.name}">
             <iframe id="yt_${item.id}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
-            <!-- Admin-Only Overlay: Regular users cannot see this -->
             <div class="upload-overlay admin-only" id="overlay_${item.id}">
               <div onclick="triggerFileInput(event, '${item.id}')" style="display: flex; flex-direction: column; align-items: center; gap: 0.2rem;">
                 <i class="fa-solid fa-cloud-arrow-up cloud-icon"></i>
@@ -1678,7 +1642,6 @@
               <div class="card-meta">
                 <span class="tag-badge">${item.category || 'Movement'}</span>
                 
-                <!-- Admin-Only Controls: Regular users cannot modify or delete -->
                 <div class="card-meta-actions admin-only">
                   <button type="button" class="meta-action-btn edit-btn" title="Paste / Attach Link" onclick="openLinkModal('${item.id}', event)">
                     <i class="fa-solid fa-cloud-arrow-up"></i>
@@ -1699,18 +1662,15 @@
               <div class="prompt-wrapper" id="prompt_wrap_${item.id}">
                 <div class="prompt-content" id="content_${item.id}">
                   <p class="prompt-box" id="text_${item.id}">${item.prompt}</p>
-                  <!-- Admin Only Prompt Edit Button -->
                   <button type="button" class="prompt-edit-btn admin-only" title="Edit Prompt Text" onclick="openEditPromptModal('${item.id}', event)">
                     <i class="fa-solid fa-pen-to-square"></i>
                   </button>
                 </div>
                 
-                <!-- Screen Blended Copied Video Player inside the red-circled area (Now Edge-to-Edge Fill) -->
                 <video id="copied_video_${item.id}" class="copied-video-player" muted playsinline preload="none"></video>
               </div>
             </div>
             
-            <!-- Standard User Allowed Control: Copy Prompt -->
             <button class="copy-btn" onclick="copyCardPrompt('${item.id}')">
               <i class="fa-solid fa-copy"></i> Copy Prompt
             </button>
@@ -1729,7 +1689,6 @@
       });
 
       if (localDB && list.length) {
-        // Read local card media in one IndexedDB request instead of one request per card.
         const tx = localDB.transaction("cardMedia", "readonly");
         const store = tx.objectStore("cardMedia");
         const req = store.getAll();
@@ -1760,7 +1719,6 @@
     window.openLinkModal = function(id, event) {
       if (event) event.stopPropagation();
       if (!linkModal || !linkCardId || !mediaUrlInput) {
-        console.error("Link modal is missing required HTML elements.");
         showToast("Unable to open the media-link form.");
         return;
       }
@@ -1811,7 +1769,6 @@
             await window.saveMediaLinkToFirestore(id, url, mediaType);
             showToast("Media link saved to Firebase!");
           } catch (err) {
-            console.error("Media link cloud save failed:", err);
             showToast("Cloud save failed: " + (err.message || err));
             return;
           }
@@ -1882,7 +1839,6 @@
           showToast("Prompt saved to Firebase!");
           editPromptModal.style.display = "none";
         } catch (err) {
-          console.error("Prompt cloud save failed:", err);
           showToast("Prompt cloud save failed: " + (err.message || err));
         } finally {
           if (saveEditButton) { saveEditButton.disabled = false; saveEditButton.textContent = "Update Prompt"; }
@@ -1931,8 +1887,6 @@
       e.target.value = "";
     };
 
-    // CLIPBOARD PASTE SUPPORT: paste into the card the pointer/focus is on.
-    // This is delegated globally because cards are dynamically rendered.
     window.activeUploadTargetId = window.activeUploadTargetId || null;
 
     window.setActiveUploadTarget = function(id) {
@@ -1954,7 +1908,6 @@
     window.addEventListener("paste", (e) => {
       const activeElement = document.activeElement;
       const activeTag = activeElement?.tagName?.toLowerCase() || "";
-      // Preserve normal text paste in editable fields (including Gemini/chat/forms).
       if (activeTag === "input" || activeTag === "textarea" || activeElement?.isContentEditable) return;
 
       const clipboardItems = (e.clipboardData || e.originalEvent?.clipboardData)?.items;
@@ -1983,6 +1936,7 @@
         }
       }
     });
+
     let mediaUploadQueueRunning = false;
 
     async function processUploadQueue(startCardId, files) {
@@ -2030,7 +1984,6 @@
       }
 
       if (failures.length) {
-        console.error("Media upload queue failures:", failures);
         const skippedMessage = validFiles.length > queueLength
           ? ` ${validFiles.length - queueLength} file(s) skipped because there were not enough cards.`
           : "";
@@ -2051,8 +2004,6 @@
       const type = file.type.startsWith("video/") ? "video" : "image";
       applyMediaToCard(id, file, type);
 
-      // Keep a local copy for immediate preview/offline use; Cloudinary is the
-      // permanent shared media copy while Firebase remains Auth + Firestore.
       if (localDB) {
         const tx = localDB.transaction("cardMedia", "readwrite");
         tx.objectStore("cardMedia").put({
@@ -2066,7 +2017,6 @@
           applyMediaUrlToCard(id, cloudUrl, type);
           return { success: true };
         } catch (err) {
-          console.error(`Cloudinary upload failed for ${file.name} (card ${id}):`, err);
           return { success: false, error: err.message || String(err) };
         }
       }
@@ -2192,7 +2142,6 @@
       showToast(`Download Started: ${cleanName}`);
     }
 
-    // PERMANENT DELETE: remove cloud media first, then clear local/UI state.
     window.deleteCardMedia = async function(id, event) {
       if (event) event.stopPropagation();
       const media = window.cardActiveBlobs[id];
@@ -2211,7 +2160,6 @@
           throw new Error("Firebase delete service is not ready. Please try again.");
         }
 
-        // Cloud delete succeeded; now clear local blob and IndexedDB copy.
         if (media?.url?.startsWith("blob:")) URL.revokeObjectURL(media.url);
         delete window.cardActiveBlobs[id];
 
@@ -2252,10 +2200,10 @@
 
         showToast("Media permanently deleted from Firebase Storage, Firestore and this device.");
       } catch (err) {
-        console.error("Permanent media deletion failed:", err);
-        showToast("Delete failed. Cloud/local media was kept where possible: " + (err.message || err));
+        showToast("Delete failed: " + (err.message || err));
       }
     };
+
     // LIGHTBOX POPUP PLAYER
     const mediaLightbox = document.getElementById("mediaLightbox");
     const lightboxStage = document.getElementById("lightboxStage");
@@ -2271,9 +2219,7 @@
       const media = window.cardActiveBlobs[id];
       const item = window.allVaultItems.find(m => m.id === id);
 
-      if (!media || !media.url) {
-        return;
-      }
+      if (!media || !media.url) return;
 
       window.activeLightboxItem = { id: id, item: item, media: media };
 
@@ -2364,7 +2310,6 @@
       }
     }
 
-    // MULTI-TAP COPIED VIDEO TRACKER
     const cardCopyClickCounters = {};
     const cardCopyResetTimers = {};
     const cardHideAnimationTimers = {};
@@ -2375,17 +2320,14 @@
       const vid = document.getElementById(`copied_video_${itemId}`);
       if (!wrap || !vid) return;
 
-      // Increment click count for this specific card
       cardCopyClickCounters[itemId] = (cardCopyClickCounters[itemId] || 0) + 1;
       const currentClicks = cardCopyClickCounters[itemId];
 
-      // Reset the click count back to 0 after 3 seconds of inactivity
       clearTimeout(cardCopyResetTimers[itemId]);
       cardCopyResetTimers[itemId] = setTimeout(() => {
         cardCopyClickCounters[itemId] = 0;
       }, 3000);
 
-      // 1 time click -> Copied-1.mp4 | 2 or more times -> Copied-2.mp4
       const selectedVideo = currentClicks === 1 ? 'Copied-1.mp4' : 'Copied-2.mp4';
 
       if (!vid.src.endsWith(selectedVideo)) {
@@ -2401,7 +2343,6 @@
         wrap.classList.remove('copied-active');
       };
 
-      // Safeguard timeout to remove overlay after video finishes
       cardHideAnimationTimers[itemId] = setTimeout(() => {
         wrap.classList.remove('copied-active');
       }, 2200);
@@ -2410,13 +2351,12 @@
     async function copyPromptText(text, itemId) {
       try {
         if (!navigator.clipboard || !navigator.clipboard.writeText) {
-          throw new Error("Clipboard access is unavailable. Use HTTPS or localhost.");
+          throw new Error("Clipboard access is unavailable.");
         }
         await navigator.clipboard.writeText(String(text ?? ""));
         if (itemId) {
           playCopiedVideoAnimation(itemId);
         }
-        // "Prompt copied to clipboard!" toast message removed as requested
       } catch (err) {
         console.error("Clipboard copy failed:", err);
       }
@@ -2573,7 +2513,6 @@
       document.getElementById("forgotPasswordModal").style.display = "none";
     };
 
-    // Live validation for Register Password Rules and Match
     window.checkRegisterPasswordRules = function() {
       const pass = document.getElementById("regPassInput")?.value || "";
       const confirmPass = document.getElementById("regConfirmPassInput")?.value || "";
@@ -2581,7 +2520,6 @@
       const matchHint = document.getElementById("regMatchHint");
       const doneBtn = document.getElementById("regDoneBtn");
 
-      // Rule: At least 1 Uppercase, 1 Lowercase, 1 Number, 1 Special Char (@$!%*?&#), min 8 chars
       const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
       const isStrong = passRegex.test(pass);
 
@@ -2618,7 +2556,6 @@
       }
     };
 
-    // TAB SWITCH "WELCOME BACK" TRIGGER - ONE-TIME PLAY, NO BOX
     let welcomeTimer;
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
@@ -2643,8 +2580,6 @@
       }
     });
 
-
-    // Keep the full-screen background and hero preview on the exact same video timeline.
     (() => {
       const mainHero = document.getElementById("heroVideo");
       const ambientHero = document.getElementById("heroVideoBg");
@@ -2691,8 +2626,6 @@
       videoLayers.forEach(v => v.play().catch(() => {}));
     })();
 
-
-    // Clicking anywhere while Welcome Back is visible stops the animation and opens the home screen.
     (() => {
       const overlay = document.getElementById("welcomeBackOverlay");
       const video = document.getElementById("welcomeVideo");
@@ -2817,8 +2750,6 @@
       deleteObject
     } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
 
-    // Firebase App Check - reCAPTCHA Enterprise site key created for CINEMOTION STUDIO.
-    // Site keys are public client identifiers; never place a secret key in frontend code.
     const APP_CHECK_SITE_KEY = "6LcimBouAAAAAO7MzcnBsL70pdwFt4ZPs644Yala";
 
     const firebaseConfig = {
@@ -2847,30 +2778,14 @@
     function explainFirebaseError(err, action = "Firebase operation") {
       console.error(`${action} failed:`, err);
       const code = err?.code || "unknown";
-      if (code === "auth/configuration-not-found") {
-        return "Firebase Authentication is not configured for this Firebase project.";
-      }
-      if (code === "auth/operation-not-allowed") {
-        return "This sign-in provider is disabled in Firebase Console.";
-      }
-      if (code === "auth/unauthorized-domain") {
-        return "This domain is not authorized in Firebase Console.";
-      }
-      if (code === "auth/invalid-credential") {
-        return "Email or password is incorrect.";
-      }
-      if (code === "auth/email-already-in-use") {
-        return "This email already has an account. Please use Login.";
-      }
-      if (code === "auth/weak-password") {
-        return "Password is too weak. Please meet all complexity criteria.";
-      }
-      if (code === "auth/too-many-requests") {
-        return "Firebase temporarily blocked repeated requests. Wait a few minutes and try again.";
-      }
-      if (code === "auth/missing-email") {
-        return "Enter your email address first.";
-      }
+      if (code === "auth/configuration-not-found") return "Firebase Authentication is not configured for this Firebase project.";
+      if (code === "auth/operation-not-allowed") return "This sign-in provider is disabled in Firebase Console.";
+      if (code === "auth/unauthorized-domain") return "This domain is not authorized in Firebase Console.";
+      if (code === "auth/invalid-credential") return "Email or password is incorrect.";
+      if (code === "auth/email-already-in-use") return "This email already has an account. Please use Login.";
+      if (code === "auth/weak-password") return "Password is too weak. Please meet all complexity criteria.";
+      if (code === "auth/too-many-requests") return "Firebase temporarily blocked repeated requests. Wait a few minutes and try again.";
+      if (code === "auth/missing-email") return "Enter your email address first.";
       return `${action} failed: ${err?.message || "Unknown error"}`;
     }
 
@@ -2878,9 +2793,6 @@
     try {
       app = initializeApp(firebaseConfig);
 
-      // App Check is initialized first, before any Firebase product is accessed.
-      // If its provider/key is not fully configured yet, keep the rest of the
-      // application running and report the issue instead of crashing this module.
       try {
         if (APP_CHECK_SITE_KEY && APP_CHECK_SITE_KEY.trim()) {
           appCheck = initializeAppCheck(app, {
@@ -2888,43 +2800,42 @@
             isTokenAutoRefreshEnabled: true
           });
           window.cinemotionAppCheckReady = true;
-          console.info("CINEMOTION: Firebase App Check initialization requested.");
         } else {
           window.cinemotionAppCheckReady = false;
-          console.warn("CINEMOTION: App Check site key is not configured.");
         }
       } catch (appCheckError) {
         window.cinemotionAppCheckReady = false;
         console.error("Firebase App Check initialization failed:", appCheckError);
-        // Do not throw here: App Check setup must not prevent Firebase Auth
-        // and the rest of the site from initializing.
       }
 
       auth = getAuth(app);
       db = getFirestore(app);
       storage = getStorage(app);
 
-      // Gemini uses Firebase AI Logic; no Gemini Developer API key is exposed
-      // in this public GitHub Pages file.
+      // OPTIMIZED GEMINI INITIALIZATION (Fast response + 60s timeout + System Instruction)
       try {
-        const firebaseAI = getAI(app, { backend: new GoogleAIBackend(), useLimitedUseAppCheckTokens: true });
-        window.cinemotionGeminiModel = getGenerativeModel(firebaseAI, {
-          model: "gemini-3.8-flash"
-        });
-        console.info("CINEMOTION: Firebase AI Logic initialized.");
+        const firebaseAI = getAI(app, { backend: new GoogleAIBackend() });
+        window.cinemotionGeminiModel = getGenerativeModel(
+          firebaseAI,
+          {
+            model: "gemini-3.8-flash",
+            systemInstruction: {
+              parts: [{
+                text: "You are the conversational AI assistant inside CINEMOTION STUDIO. Respond naturally to the user's actual message. LANGUAGE RULE: Detect the language used in the latest user message and reply in that same language. If the user writes in English, answer in English. If the user writes in Telugu (including Telugu written with English/Roman letters), answer in Telugu; when the user writes Romanized Telugu, prefer clear, natural Romanized Telugu unless they use Telugu script. If the user mixes Telugu and English, reply in the dominant language while keeping familiar technical terms in English where useful. Do not switch languages unless the user asks you to. IMPORTANT: Do not automatically create, suggest, or expand a cinematic prompt. Only write or generate an image/video/filmmaking prompt when the user explicitly asks you to create, write, improve, or provide a prompt. For greetings such as 'hi', 'hello', or 'good morning', reply with a brief friendly greeting in the user's language and ask how you can help; do not generate a prompt. For general questions, answer the question directly in plain conversational language in the user's language. Keep simple answers concise (usually 1-3 sentences) and do not add a cinematic prompt unless explicitly requested. You may help with filmmaking, camera movements, camera angles, shot design, cinematic lighting, storyboards, image/video prompts, and creative production workflows when requested. Preserve exact product geometry and user constraints when writing product prompts. When a user attaches a file, inspect its contents and answer based on it."
+              }]
+            }
+          },
+          { timeout: 60000 }
+        );
+        console.info("CINEMOTION: Firebase AI Logic initialized with 60s timeout.");
       } catch (aiError) {
         window.cinemotionGeminiModel = null;
         console.error("Firebase AI Logic initialization failed:", aiError);
       }
 
-      console.info("CINEMOTION: Firebase application initialized.");
     } catch (err) {
       console.error("Firebase initialization failed:", err);
-      showAuthMessage(
-        "Firebase initialization failed. Check the Firebase configuration and network connection. " +
-        (err?.message || err)
-      );
-      // Stop only when the Firebase app/auth/database core cannot initialize.
+      showAuthMessage("Firebase initialization failed. " + (err?.message || err));
       throw err;
     }
 
@@ -2932,20 +2843,16 @@
       window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
     }
 
-    // Keep the login gate in sync with Firebase Authentication
     onAuthStateChanged(auth, async (user) => {
       const gate = byId("authGateModal");
       const resendBtn = byId("resendVerificationBtn");
       const verificationText = byId("verificationStatusText");
 
-      // Refresh the user's verification state after returning from the email link.
       if (user && user.email) {
         try { await user.reload(); }
         catch (refreshError) { console.warn("Could not refresh email verification state:", refreshError); }
       }
 
-      // Never expose the vault to an unverified email account.
-      // Do not automatically resend verification emails here.
       if (user && user.email && !user.emailVerified) {
         document.body.classList.remove("is-admin-active");
         if (gate) gate.style.display = "flex";
@@ -3026,7 +2933,6 @@
       }
     };
 
-    // 1. Existing User Login
     byId("emailAuthForm")?.addEventListener("submit", async (e) => {
       e.preventDefault();
       const email = byId("userEmailInput")?.value.trim();
@@ -3057,7 +2963,6 @@
       }
     });
 
-    // User-triggered verification resend with a 60-second cooldown.
     let verificationResendAllowedAt = 0;
     window.resendVerificationEmail = async function() {
       const user = auth.currentUser;
@@ -3088,14 +2993,12 @@
         }
         showAuthMessage("Verification email sent. Please check your inbox.");
       } catch (err) {
-        console.error("Verification email resend failed:", err);
         showAuthMessage(explainFirebaseError(err, "Resending verification email"));
       } finally {
         if (button) { button.disabled = false; button.textContent = "Resend Verification Email"; }
       }
     };
 
-    // 2. New User Registration
     byId("registerAuthForm")?.addEventListener("submit", async (e) => {
       e.preventDefault();
       const email = byId("regEmailInput")?.value.trim();
@@ -3116,7 +3019,6 @@
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
 
-        // Send Firebase's built-in verification email immediately after registration.
         await sendEmailVerification(userCredential.user, {
           url: window.location.origin,
           handleCodeInApp: false
@@ -3139,7 +3041,6 @@
       }
     });
 
-    // 3. Forgot Password Form
     byId("forgotPasswordForm")?.addEventListener("submit", async (e) => {
       e.preventDefault();
       const email = byId("resetEmailInput")?.value.trim();
@@ -3153,7 +3054,6 @@
       }
     });
 
-    // 4. Phone OTP
     function initRecaptcha() {
       if (window.recaptchaVerifier) return window.recaptchaVerifier;
       const container = byId("recaptcha-container");
@@ -3199,15 +3099,12 @@
       }
     };
 
-    // Logout
     window.handleUserLogout = async function() {
       if (!confirm("Are you sure you want to log out?")) return;
       try { await signOut(auth); }
       catch (err) { showAuthMessage(explainFirebaseError(err, "Sign out")); }
     };
 
-    // CLOUDINARY MEDIA API: Firebase remains the source for Auth + Firestore.
-    // New media binaries go to Cloudinary; old Firebase Storage records remain readable.
     async function callMediaApi(path, payload, file) {
       if (!auth.currentUser) throw new Error("Please sign in before managing media.");
       const token = await auth.currentUser.getIdToken(true);
@@ -3228,7 +3125,6 @@
     }
 
     window.uploadMediaFileToFirebase = async function(cardId, file, mediaType) {
-      // Keep the legacy function name so existing paste/upload UI continues to work.
       const result = await callMediaApi("/upload", { cardId }, file);
       await window.saveMediaLinkToFirestore(cardId, result.url, mediaType, null, result.public_id, result.resource_type);
       return result.url;
@@ -3243,7 +3139,6 @@
       return true;
     }
 
-    // Persist prompt edits for built-in cards in a separate collection.
     window.savePromptEditToFirestore = async function(itemId, name, prompt) {
       if (!auth.currentUser) throw new Error("Please sign in before saving.");
       await setDoc(doc(db, "promptEdits", String(itemId)), {
@@ -3255,12 +3150,10 @@
       }, { merge: true });
     };
 
-    // HYBRID DELETE: Cloudinary for new assets; Firebase Storage for legacy assets.
     window.deleteMediaFromFirestore = async function(cardId) {
       if (!auth.currentUser) throw new Error("Please sign in before deleting cloud media.");
       const q = query(collection(db, "movements"), where("linkedCardId", "==", String(cardId)));
       const snapshot = await getDocs(q);
-      // Delete binaries first. If any deletion fails, retain Firestore metadata for retry.
       for (const docSnap of snapshot.docs) {
         const data = docSnap.data();
         if (data.cloudinaryPublicId) await deleteCloudinaryAsset(data);
@@ -3273,7 +3166,6 @@
       return true;
     };
 
-    // Save new Cloudinary media without disturbing legacy Firebase records unless replacing that card.
     window.saveMediaLinkToFirestore = async function(cardId, url, mediaType, storagePath = null, cloudinaryPublicId = null, cloudinaryResourceType = null) {
       const toast = byId("toast");
       if (toast) { toast.textContent = "Saving media metadata..."; toast.classList.add("show"); }
@@ -3281,7 +3173,6 @@
         if (!auth.currentUser) throw new Error("Please sign in before syncing media.");
         const q = query(collection(db, "movements"), where("linkedCardId", "==", String(cardId)));
         const snap = await getDocs(q);
-        // Replacement is intentional: remove prior cloud objects from their original provider.
         for (const oldDoc of snap.docs) {
           const oldData = oldDoc.data();
           if (oldData.cloudinaryPublicId) await deleteCloudinaryAsset(oldData);
@@ -3303,15 +3194,11 @@
         if (toast) { toast.textContent = "Media synced successfully!"; setTimeout(() => toast.classList.remove("show"), 2500); }
         return true;
       } catch (err) {
-        console.error("Media metadata save error:", err);
         if (toast) { toast.textContent = "Cloud sync failed: " + (err.message || err); setTimeout(() => toast.classList.remove("show"), 4000); }
         throw err;
       }
     };
 
-    // ADMIN-ONLY, RESUMABLE MIGRATION: Firebase Storage -> Cloudinary.
-    // Each Firestore record is updated only after Cloudinary confirms the upload;
-    // the old Firebase object is deleted only after the new URL/public_id are saved.
     window.migrateFirebaseMediaToCloudinary = async function() {
       if (!auth.currentUser || auth.currentUser.email?.toLowerCase() !== CINEMOTION_ADMIN_EMAIL) {
         throw new Error("Only the verified admin can run migration.");
@@ -3325,7 +3212,6 @@
       for (let i = 0; i < legacy.length; i++) {
         const d = legacy[i]; const data = d.data();
         try {
-          // Resume cleanup without re-uploading if Cloudinary metadata was saved in an earlier run.
           let uploaded = data.cloudinaryPublicId ? {
             url: data.mediaURL, public_id: data.cloudinaryPublicId,
             resource_type: data.cloudinaryResourceType || (data.mediaType === "video" ? "video" : "image")
@@ -3340,7 +3226,6 @@
               migratedAt: new Date().toISOString(), migrationStatus: "cloudinary-verified"
             });
           }
-          // Re-read to ensure metadata is committed before deleting the original.
           const verify = await getDocs(query(collection(db, "movements"), where("linkedCardId", "==", String(data.linkedCardId))));
           const verified = verify.docs.some(x => x.id === d.id && x.data().cloudinaryPublicId === uploaded.public_id && x.data().mediaURL === uploaded.url);
           if (!verified) throw new Error("Cloudinary metadata verification failed; original retained.");
@@ -3352,9 +3237,7 @@
           migrated++;
         } catch (err) {
           failed++; console.error("Migration failed for", d.id, err);
-          // Preserve original Firebase file and metadata on every failure.
         }
-        if ((i + 1) % 5 === 0) console.info(`CINEMOTION migration: ${i + 1}/${legacy.length}; migrated ${migrated}; failed ${failed}`);
       }
       alert(`Migration finished. Migrated: ${migrated}. Failed/retained for retry: ${failed}. Total: ${legacy.length}.`);
       await loadFirebaseMovements();
@@ -3376,8 +3259,6 @@
       const sourceText = String(rawQuery || "").toLowerCase();
       const items = Array.isArray(window.allVaultItems) ? window.allVaultItems : [];
 
-      // Only react to recognised CINEMOTION library terms. Pick the last
-      // recognised term in the Gemini draft, not the whole sentence.
       const keywordGroups = [
         { category:"Camera Movement", display:"movement", terms:["camera movement","camera movements","movement","movements","dolly","tracking","track","truck","pan","tilt","crane","orbit","arc","push in","pull out","zoom in","zoom out","handheld","steadicam","gimbal","whip pan","follow shot"] },
         { category:"Camera Angles", display:"angle", terms:["camera angle","camera angles","angles","angle","low angle","high angle","eye level","bird's eye","birds eye","worm's eye","worms eye","dutch angle","top angle","overhead angle","profile angle"] },
@@ -3407,8 +3288,6 @@
         }
       }
 
-      // No recognised library keyword: do not mirror the Gemini sentence
-      // into the search box and do not show unrelated results.
       if (!matches.length) {
         if (directorLibrarySearch) directorLibrarySearch.value = "";
         currentCategory = "All";
@@ -3419,8 +3298,6 @@
         return;
       }
 
-      // Last recognised keyword typed wins. Longer terms win if they start
-      // at the same position (e.g. "camera angle" over "angle").
       matches.sort((a, b) => a.index - b.index || b.length - a.length);
       const selected = matches[matches.length - 1];
       const displayTerm = selected.display;
@@ -3431,9 +3308,6 @@
         String(item.category || "").toLowerCase() === selected.category.toLowerCase()
       );
 
-      // If a category has data, show the complete category. If it is empty
-      // (e.g. Lighting/Lens in the current built-in library), search existing
-      // prompt titles and prompt text for the selected keyword instead.
       let results = categoryItems;
       if (!results.length) {
         const termVariants = keywordGroups
@@ -3513,8 +3387,6 @@
         return;
       }
       document.body.classList.add("director-mode");
-      // On narrow screens the CSS intentionally shows one workspace pane at a time.
-      // The header Gemini button must switch to the Gemini pane, not hide it.
       if (window.matchMedia("(max-width: 820px)").matches) {
         document.body.classList.add("director-show-gemini");
         directorGeminiTab?.classList.add("active");
@@ -3583,7 +3455,7 @@
         reader.readAsDataURL(file);
       });
     }
-    // Answer very simple greetings locally: no network request or model wait is needed.
+
     function getInstantGreetingReply(text) {
       const value = String(text || "").trim().toLowerCase()
         .replace(/[.!?,;:]+$/g, "")
@@ -3615,7 +3487,6 @@
         : prompt;
       addGeminiMessage(userLabel, "user");
 
-      // Greetings such as "Hi" do not need a Gemini API call.
       if (!attachedFile) {
         const instantReply = getInstantGreetingReply(prompt);
         if (instantReply) {
@@ -3632,15 +3503,7 @@
 
       try {
         if (!geminiChatSession) {
-          geminiChatSession = window.cinemotionGeminiModel.startChat({
-            history: [{
-              role: "user",
-              parts: [{ text: "You are the conversational AI assistant inside CINEMOTION STUDIO. Respond naturally to the user's actual message. LANGUAGE RULE: Detect the language used in the latest user message and reply in that same language. If the user writes in English, answer in English. If the user writes in Telugu (including Telugu written with English/Roman letters), answer in Telugu; when the user writes Romanized Telugu, prefer clear, natural Romanized Telugu unless they use Telugu script. If the user mixes Telugu and English, reply in the dominant language while keeping familiar technical terms in English where useful. Do not switch languages unless the user asks you to. IMPORTANT: Do not automatically create, suggest, or expand a cinematic prompt. Only write or generate an image/video/filmmaking prompt when the user explicitly asks you to create, write, improve, or provide a prompt. For greetings such as 'hi', 'hello', or 'good morning', reply with a brief friendly greeting in the user's language and ask how you can help; do not generate a prompt. For general questions, answer the question directly in plain conversational language in the user's language. Keep simple answers concise (usually 1-3 sentences) and do not add a cinematic prompt unless explicitly requested. You may help with filmmaking, camera movements, camera angles, shot design, cinematic lighting, storyboards, image/video prompts, and creative production workflows when requested. Preserve exact product geometry and user constraints when writing product prompts. When a user attaches a file, inspect its contents and answer based on it." }]
-            }, {
-              role: "model",
-              parts: [{ text: "Understood. I will reply in the same language as the user and will only create cinematic prompts when explicitly asked." }]
-            }]
-          });
+          geminiChatSession = window.cinemotionGeminiModel.startChat();
         }
 
         let messagePayload = prompt || "Please inspect the attached file and help me with it.";
@@ -3658,7 +3521,6 @@
           }
         }
 
-        // Stream text as it is generated so the user sees the first words sooner.
         const result = await geminiChatSession.sendMessageStream(messagePayload);
         let streamedText = "";
         if (result?.stream && pending) {
@@ -3745,7 +3607,6 @@
       });
     });
 
-
     const addMovementBtn = byId("addMovementBtn");
     const movementModal = byId("movementModal");
     const closeModalBtn = byId("closeModalBtn");
@@ -3786,7 +3647,6 @@
     async function loadFirebaseMovements() {
       try {
         const q = query(collection(db, "movements"), orderBy("createdAt", "desc"));
-        // Fetch movements and prompt edits together to avoid serial network round-trips.
         const [snapshot, editsSnapshot] = await Promise.all([
           getDocs(q),
           getDocs(collection(db, "promptEdits"))
@@ -3810,7 +3670,6 @@
           if (newMovements.length) window.allVaultItems = [...newMovements, ...window.allVaultItems];
         }
 
-        // Apply the prompt edits fetched in parallel with the movements.
         editsSnapshot.forEach((editDoc) => {
           const edit = editDoc.data();
           const item = window.allVaultItems.find(m => m.id === (edit.itemId || editDoc.id));
