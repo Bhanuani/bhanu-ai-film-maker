@@ -1412,7 +1412,7 @@
       { id: "ang_2", name: "Low Angle", category: "Camera Angles", prompt: "Low angle shot, camera looking upward at the subject, commanding power, dominance, grandeur, cinematic" },
       { id: "ang_3", name: "High Angle", category: "Camera Angles", prompt: "High angle shot, camera looking down at the subject, vulnerability, scale, dramatic overview" },
       { id: "ang_4", name: "Bird's-Eye View / Overhead Shot", category: "Camera Angles", prompt: "Bird's-eye view, overhead shot, camera pointing vertically straight down at the scene, patterns, geometric layout, spatial clarity" },
-      { id: "ang_5", name: "Worm's-Eye View", category: "Camera Angles", prompt: "Worm's-eye view, camera positioned extremely low at ground level pointing steeply upward, monumental scale, extreme drama" },
+      { id: "ang_5", name: "Worm's-Eye View", category: "Camera Angles", prompt: "Worm's eye view, camera positioned extremely low at ground level pointing steeply upward, monumental scale, extreme drama" },
       { id: "ang_6", name: "Dutch Angle / Canted Angle", category: "Camera Angles", prompt: "Dutch angle, canted angle, camera tilted sideways on Z-axis, diagonal horizon, psychological tension, instability, unease" },
       { id: "ang_7", name: "Three-Quarter Angle", category: "Camera Angles", prompt: "Three-quarter angle, camera framing front and one side of subject, depth, dimension, visually appealing cinematic portrait" },
       { id: "ang_8", name: "Straight-On / Frontal Angle", category: "Camera Angles", prompt: "Straight-on frontal angle, camera directly facing the subject, symmetry, absolute clarity, authority, centered composition" },
@@ -2616,7 +2616,7 @@
 
         geminiConversationHistory.push({ role: "user", parts: userParts });
 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${firebaseConfig.apiKey}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AQ.Ab8RN6KVPam0fUCBRQEPfAnDF-jUqidwswU8pbqGUiFFHe3kcA`;
         const response = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
