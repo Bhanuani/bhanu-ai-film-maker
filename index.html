@@ -80,14 +80,16 @@
       align-items: center;
       justify-content: center;
       opacity: 0;
+      visibility: hidden;
       pointer-events: none;
       transition: opacity 0.4s ease;
       overflow: hidden;
     }
 
     #welcomeBackOverlay.show {
-      opacity: 1;
-      pointer-events: auto;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
     }
 
     .welcome-video-container {
@@ -564,8 +566,33 @@
 
     .prompt-content {
       width: 100%;
-      padding: 0.85rem 2.4rem 0.85rem 0.85rem;
+      padding: 0.85rem;
       transition: opacity 0.3s ease;
+    }
+
+    .prompt-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      min-height: 40px;
+    }
+    .prompt-action-btn {
+      width: 30px;
+      height: 30px;
+      flex: 0 0 30px;
+      font-size: 0.82rem;
+      border-radius: 8px;
+    }
+    .prompt-action-btn.edit-btn:hover {
+      border-color: #f59e0b;
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.15);
+    }
+    .prompt-action-btn.del-btn:hover {
+      border-color: #ef4444;
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.15);
     }
 
     .prompt-wrapper.copied-active .prompt-content {
@@ -607,33 +634,7 @@
       opacity: 1;
     }
 
-    .prompt-edit-btn {
-      position: absolute;
-      bottom: 8px;
-      right: 8px;
-      width: 28px;
-      height: 28px;
-      border-radius: 7px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(13, 18, 31, 0.9);
-      color: #94a3b8;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 0.82rem;
-      transition: all 0.2s ease;
-      backdrop-filter: blur(6px);
-      z-index: 4;
-    }
-
-    .prompt-edit-btn:hover {
-      border-color: var(--accent-cyan);
-      color: var(--accent-cyan);
-      background: rgba(0, 210, 255, 0.15);
-      transform: scale(1.1);
-      box-shadow: 0 0 12px rgba(0, 210, 255, 0.4);
-    }
+    .prompt-edit-btn { display: none !important; }
 
     .copy-btn {
       width: 100%;
@@ -1667,16 +1668,20 @@
               <div class="prompt-wrapper" id="prompt_wrap_${item.id}">
                 <div class="prompt-content" id="content_${item.id}">
                   <p class="prompt-box" id="text_${item.id}">${item.prompt}</p>
-                  <button type="button" class="prompt-edit-btn admin-only" title="Edit Prompt Text" onclick="openEditPromptModal('${item.id}', event)">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                  </button>
                 </div>
-                
                 <video id="copied_video_${item.id}" class="copied-video-player" muted playsinline preload="none"></video>
               </div>
+              <div class="prompt-actions admin-only" aria-label="Prompt actions">
+                <button type="button" class="meta-action-btn edit-btn prompt-action-btn" title="Edit Prompt" aria-label="Edit prompt" onclick="openEditPromptModal('${item.id}', event)">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button type="button" class="meta-action-btn del-btn prompt-action-btn" title="Delete Prompt" aria-label="Delete prompt" onclick="deletePromptCard('${item.id}', event)">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
             </div>
-            
-            <button class="copy-btn" onclick="copyCardPrompt('${item.id}')">
+
+                        <button class="copy-btn" onclick="copyCardPrompt('${item.id}')">
               <i class="fa-solid fa-copy"></i> Copy Prompt
             </button>
             <button type="button" class="use-gemini-btn" onclick="insertPromptIntoGemini('${item.id}')">
@@ -1850,6 +1855,45 @@
         }
       });
     }
+
+    window.deletePromptCard = async function(id, event) {
+      if (event) { event.preventDefault(); event.stopPropagation(); }
+      if (!document.body.classList.contains("is-admin-active")) {
+        showToast("Only the verified administrator can delete prompts.");
+        return;
+      }
+      const item = window.allVaultItems?.find(entry => String(entry.id) === String(id));
+      if (!item) { showToast("This prompt could not be found."); return; }
+      const confirmed = window.confirm(
+        `Delete “${item.name}” permanently?\n\nThis prompt will be removed from its category and stay deleted after refresh.`
+      );
+      if (!confirmed) return;
+
+      const button = event?.currentTarget;
+      if (button) { button.disabled = true; button.style.opacity = "0.55"; button.style.cursor = "wait"; }
+      try {
+        if (typeof window.deletePromptFromFirestore !== "function") {
+          throw new Error("Firebase is not ready. Please try again.");
+        }
+        await window.deletePromptFromFirestore(id);
+        window.allVaultItems = window.allVaultItems.filter(entry => String(entry.id) !== String(id));
+        if (localDB) {
+          await new Promise((resolve, reject) => {
+            const tx = localDB.transaction("promptEdits", "readwrite");
+            tx.objectStore("promptEdits").delete(String(id));
+            tx.oncomplete = resolve;
+            tx.onerror = () => reject(tx.error || new Error("Local prompt cleanup failed."));
+          });
+        }
+        filterCards();
+        updateCounts();
+        showToast("Prompt permanently deleted.");
+      } catch (err) {
+        console.error("Prompt deletion failed:", err);
+        showToast("Prompt delete failed: " + (err.message || err));
+        if (button) { button.disabled = false; button.style.opacity = ""; button.style.cursor = ""; }
+      }
+    };
 
     // DRAG & DROP HANDLERS
     window.handleDragOver = function(e, id) {
@@ -2562,29 +2606,26 @@
       }
     };
 
-    let welcomeTimer;
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "visible") {
-        const overlay = document.getElementById("welcomeBackOverlay");
-        const video = document.getElementById("welcomeVideo");
-
-        if (overlay && video) {
-          clearTimeout(welcomeTimer);
-          overlay.classList.add("show");
-          video.currentTime = 0;
-          video.play().catch(() => {});
-
-          video.onended = () => {
-            overlay.classList.remove("show");
-          };
-
-          welcomeTimer = setTimeout(() => {
-            overlay.classList.remove("show");
-            video.pause();
-          }, 2900);
+    // Prevent a dark welcome-back layer from covering the page on tab/site return.
+    (() => {
+      const overlay = document.getElementById("welcomeBackOverlay");
+      const video = document.getElementById("welcomeVideo");
+      const clearWelcomeLayer = () => {
+        if (overlay) {
+          overlay.classList.remove("show");
+          overlay.style.opacity = "0";
+          overlay.style.pointerEvents = "none";
+          overlay.style.visibility = "hidden";
         }
-      }
-    });
+        if (video && !video.paused) video.pause();
+      };
+      clearWelcomeLayer();
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") clearWelcomeLayer();
+      });
+      window.addEventListener("pageshow", clearWelcomeLayer);
+      window.addEventListener("focus", clearWelcomeLayer);
+    })();
 
     (() => {
       const mainHero = document.getElementById("heroVideo");
@@ -3240,6 +3281,21 @@
         updatedAt: new Date().toISOString(),
         updatedBy: auth.currentUser.uid
       }, { merge: true });
+    };
+
+    // A tombstone keeps deleted built-in prompts deleted after reloads and on other devices.
+    window.deletePromptFromFirestore = async function(itemId) {
+      requireVerifiedAdmin();
+      const id = String(itemId);
+      await setDoc(doc(db, "promptDeletions", id), {
+        itemId: id,
+        deletedAt: new Date().toISOString(),
+        deletedBy: auth.currentUser.uid
+      }, { merge: true });
+
+      // The tombstone hides built-in and custom cards on every client after reload.
+      await deleteDoc(doc(db, "promptEdits", id));
+      return true;
     };
 
     window.deleteMediaFromFirestore = async function(cardId) {
@@ -3967,14 +4023,19 @@
     async function loadFirebaseMovements() {
       try {
         const q = query(collection(db, "movements"), orderBy("createdAt", "desc"));
-        const [snapshot, editsSnapshot] = await Promise.all([
+        const [snapshot, editsSnapshot, deletionsSnapshot] = await Promise.all([
           getDocs(q),
-          getDocs(collection(db, "promptEdits"))
+          getDocs(collection(db, "promptEdits")),
+          getDocs(collection(db, "promptDeletions"))
         ]);
+        const deletedPromptIds = new Set(deletionsSnapshot.docs.map(docSnap => String(docSnap.id)));
+        window.allVaultItems = window.allVaultItems.filter(
+          item => !deletedPromptIds.has(String(item.id))
+        );
         const customMovements = [];
         snapshot.forEach((docSnap) => {
           const data = docSnap.data();
-          if (data.name) customMovements.push({ id: docSnap.id, ...data });
+          if (data.name && !deletedPromptIds.has(String(docSnap.id))) customMovements.push({ id: docSnap.id, ...data });
           else if (data.linkedCardId && data.mediaURL) {
             const target = window.allVaultItems?.find(m => m.id === data.linkedCardId);
             if (target) {
