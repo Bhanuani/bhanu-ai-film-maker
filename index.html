@@ -851,7 +851,7 @@
     .gemini-message.error { color:#fecaca; border-color:rgba(239,68,68,.3); }
     .gemini-composer { margin:10px 13px 0; padding:8px 8px 8px 13px; display:flex; align-items:flex-end; gap:8px; background:#151d2d; border:1px solid rgba(255,255,255,.14); border-radius:14px; }
     .gemini-composer:focus-within { border-color:#9b72cb; box-shadow:0 0 0 2px rgba(155,114,203,.12); }
-    .gemini-composer textarea { flex:1; resize:none; max-height:130px; border:0; outline:0; color:#fff; background:transparent; font: .82rem/1.5 'Plus Jakarta Sans',sans-serif; padding:6px 0; }
+    .gemini-composer textarea { flex:1; resize:vertical; min-height:132px; max-height:220px; overflow-y:auto; border:0; outline:0; color:#fff; background:transparent; font: .82rem/1.5 'Plus Jakarta Sans',sans-serif; padding:6px 0; }
     .gemini-composer textarea::placeholder { color:#8290a5; }
     .gemini-composer button { width:35px; height:35px; flex:0 0 auto; border:0; border-radius:10px; color:white; background:linear-gradient(135deg,#4285f4,#9b72cb 65%,#d96570); cursor:pointer; }
     .gemini-composer button:disabled { opacity:.45; cursor:wait; }
@@ -1186,6 +1186,7 @@
       </div>
       <div class="director-library-tools">
         <input type="search" id="directorLibrarySearch" placeholder="Search prompts, categories, camera terms..." aria-label="Search prompt library">
+        <button type="button" id="addCategoryBtn" class="submit-btn admin-only" style="width:auto;white-space:nowrap;padding:9px 12px;">+ Category</button>
       </div>
     </section>
     <section class="hero-banner-wrapper" id="heroBanner">
@@ -2703,7 +2704,7 @@
       <button type="button" class="gemini-upload-btn" id="geminiUploadBtn" aria-label="Upload a file" title="Upload image, PDF or text file">
         <i class="fa-solid fa-arrow-up-from-bracket"></i>
       </button>
-      <textarea id="geminiInput" rows="1" maxlength="12000" placeholder="Ask Gemini..." aria-label="Message Gemini"></textarea>
+      <textarea id="geminiInput" rows="7" maxlength="12000" placeholder="Ask Gemini..." aria-label="Message Gemini"></textarea>
       <button type="submit" id="geminiSend" aria-label="Send message">
         <i class="fa-solid fa-arrow-up"></i>
       </button>
@@ -2903,7 +2904,7 @@
           document.body.classList.remove("is-admin-active");
           if (byId("profileBadgeRole")) byId("profileBadgeRole").innerText = "VAULT VIEWER";
         }
-        loadFirebaseMovements();
+        loadFirebaseMovements().then(() => loadVaultCategories());
       } else {
         document.body.classList.remove("is-admin-active", "director-mode", "director-show-gemini");
         byId("geminiPanel")?.classList.remove("open");
@@ -3341,85 +3342,45 @@
     const directorGeminiTab = byId("directorGeminiTab");
 
     function syncDirectorLibrary(rawQuery) {
-      const sourceText = String(rawQuery || "").toLowerCase();
+      const raw = String(rawQuery || "").trim();
       const items = Array.isArray(window.allVaultItems) ? window.allVaultItems : [];
+      const librarySearch = byId("directorLibrarySearch");
+      const mainSearch = byId("searchInput");
+      const queryText = raw.toLowerCase();
 
-      const keywordGroups = [
-        { category:"Camera Movement", display:"movement", terms:["camera movement","camera movements","movement","movements","dolly","tracking","track","truck","pan","tilt","crane","orbit","arc","push in","pull out","zoom in","zoom out","handheld","steadicam","gimbal","whip pan","follow shot"] },
-        { category:"Camera Angles", display:"angle", terms:["camera angle","camera angles","angles","angle","low angle","high angle","eye level","bird's eye","birds eye","worm's eye","worms eye","dutch angle","top angle","overhead angle","profile angle"] },
-        { category:"Camera Shots", display:"shot", terms:["camera shot","camera shots","shot types","shot type","close up","close-up","extreme close up","long shot","wide shot","medium shot","establishing shot","full shot","two shot","over the shoulder","pov shot","macro shot"] },
-        { category:"Cinematic Lighting", display:"lighting", terms:["cinematic lighting","lighting","light","lights","backlight","backlighting","rim light","rimlight","split light","key light","fill light","practical light","soft light","hard light","low key","high key","chiaroscuro","volumetric light","god rays","silhouette"] },
-        { category:"Camera Lens", display:"lens", terms:["camera lens","camera lenses","lens","lenses","focal length","wide lens","ultra wide","telephoto","prime lens","macro lens","anamorphic","35mm","50mm","85mm","24mm","fisheye","depth of field","bokeh","aperture"] },
-        { category:"Atmosphere", display:"atmosphere", terms:["atmosphere","environment","weather","mood","fog","mist","smoke","haze","rain","storm","snow","dust","embers","wind","golden hour","blue hour","night","sunrise","sunset"] },
-        { category:"Master Prompts", display:"master prompt", terms:["master prompt","master prompts","recreate prompt","animation prompt","image upscaling","colour recreation","color recreation"] }
-      ];
-
-      const matches = [];
-      for (const group of keywordGroups) {
-        for (const term of group.terms) {
-          const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+");
-          const regex = new RegExp("(^|[^a-z0-9])" + escaped + "(?=$|[^a-z0-9])", "gi");
-          let match;
-          while ((match = regex.exec(sourceText)) !== null) {
-            matches.push({
-              index: match.index + match[1].length,
-              length: match[0].length - match[1].length,
-              category: group.category,
-              display: group.display,
-              term
-            });
-            if (match[0].length === 0) regex.lastIndex++;
-          }
-        }
-      }
-
-      if (!matches.length) {
-        if (directorLibrarySearch) directorLibrarySearch.value = "";
-        currentCategory = "All";
-        document.querySelectorAll(".cat-tab").forEach(btn => btn.classList.remove("active"));
-        document.querySelector('.cat-tab[onclick*="\'All\'"]')?.classList.add("active");
-        renderCards([]);
-        if (directorLibraryStatus) directorLibraryStatus.textContent = "Type a library keyword such as lighting, angle, shot, lens, dolly, fog or rain.";
-        return;
-      }
-
-      matches.sort((a, b) => a.index - b.index || b.length - a.length);
-      const selected = matches[matches.length - 1];
-      const displayTerm = selected.display;
-
-      if (directorLibrarySearch) directorLibrarySearch.value = displayTerm;
-
-      const categoryItems = items.filter(item =>
-        String(item.category || "").toLowerCase() === selected.category.toLowerCase()
-      );
-
-      let results = categoryItems;
-      if (!results.length) {
-        const termVariants = keywordGroups
-          .find(group => group.category === selected.category)?.terms || [selected.term];
-        const terms = termVariants.map(term => term.toLowerCase());
-        results = items.filter(item => {
-          const haystack = `${item.name || ""} ${item.category || ""} ${item.prompt || ""}`.toLowerCase();
-          return terms.some(term => {
-            const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+");
-            return new RegExp("(^|[^a-z0-9])" + escaped + "(?=$|[^a-z0-9])", "i").test(haystack);
-          });
-        });
-      }
+      if (librarySearch && librarySearch.value !== raw) librarySearch.value = raw;
+      if (mainSearch && mainSearch.value !== raw) mainSearch.value = raw;
 
       currentCategory = "All";
-      document.querySelectorAll(".cat-tab").forEach(btn => btn.classList.remove("active"));
-      document.querySelector('.cat-tab[onclick*="\'All\'"]')?.classList.add("active");
-      renderCards(results);
+      document.querySelectorAll(".cat-tab").forEach(btn => {
+        btn.classList.remove("active");
+        if (btn.getAttribute("onclick")?.includes("'All'")) btn.classList.add("active");
+      });
 
+      const terms = queryText.split(/[\\s,;]+/).filter(Boolean);
+      const results = !terms.length ? items : items.filter(item => {
+        const haystack = [
+          item.name || "",
+          item.category || "",
+          item.prompt || "",
+          item.keywords || "",
+          item.tags || ""
+        ].join(" ").toLowerCase();
+        return terms.every(term => haystack.includes(term));
+      });
+
+      renderCards(results);
       if (directorLibraryStatus) {
-        const label = categoryItems.length ? selected.category : `${selected.category} keyword matches`;
-        directorLibraryStatus.textContent = `${results.length} result(s) for “${displayTerm}” · ${label}`;
+        directorLibraryStatus.textContent = raw
+          ? `${results.length} matching prompt(s) for “${raw}”`
+          : "Type any keyword or phrase in Gemini to search the prompt library.";
       }
 
-      const firstCard = grid?.querySelector(".movement-card");
-      if (firstCard && document.body.classList.contains("director-mode")) {
-        firstCard.scrollIntoView({ block:"nearest", behavior:"smooth" });
+      if (raw && results.length) {
+        const firstCard = grid?.querySelector(".movement-card");
+        if (firstCard && document.body.classList.contains("director-mode")) {
+          firstCard.scrollIntoView({ block:"start", behavior:"smooth" });
+        }
       }
     }
 
@@ -3440,7 +3401,9 @@
     geminiInput?.addEventListener("input", () => {
       if (document.body.classList.contains("director-mode")) syncDirectorLibrary(geminiInput.value);
     });
-    directorLibrarySearch?.addEventListener("input", () => syncDirectorLibrary(directorLibrarySearch.value));
+    directorLibrarySearch?.addEventListener("input", () => {
+      syncDirectorLibrary(directorLibrarySearch.value);
+    });
     directorLibraryTab?.addEventListener("click", () => {
       document.body.classList.remove("director-show-gemini");
       directorLibraryTab.classList.add("active");
@@ -3746,6 +3709,11 @@
         const docRef = await addDoc(collection(db, "movements"), movementData);
         movementData.id = docRef.id;
         window.allVaultItems.unshift(movementData);
+        const categoryTab = [...document.querySelectorAll(".cat-tab")].find(btn =>
+          [...btn.querySelectorAll("span")].some(span => !span.classList.contains("count") && span.textContent.trim() === category)
+        );
+        const categoryCountEl = categoryTab?.querySelector(".count");
+        if (categoryCountEl) categoryCountEl.textContent = String(categoryCount(category));
         filterCards();
         movementForm.reset();
         if (movementModal) movementModal.style.display = "none";
@@ -3754,6 +3722,102 @@
         showAuthMessage(explainFirebaseError(err, "Saving movement"));
       } finally {
         if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = "+ Save to Vault"; }
+      }
+    });
+
+    const addCategoryBtn = byId("addCategoryBtn");
+    const categoryBar = document.querySelector(".categories-bar");
+    const itemCategorySelect = byId("itemCategory");
+    const BUILT_IN_CATEGORIES = [
+      "Camera Movement", "Camera Angles", "Camera Shots",
+      "Cinematic Lighting", "Atmosphere", "Camera Lens", "Master Prompts"
+    ];
+
+    function categoryCount(name) {
+      return (window.allVaultItems || []).filter(item =>
+        String(item.category || "").toLowerCase() === String(name).toLowerCase()
+      ).length;
+    }
+
+    function addCategoryToInterface(name, emoji = "🎬") {
+      const cleanName = String(name || "").trim();
+      if (!cleanName) return;
+      const exists = [...document.querySelectorAll(".cat-tab span:not(.count)")]
+        .some(span => span.textContent.trim().toLowerCase() === cleanName.toLowerCase());
+      if (!exists && categoryBar) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "cat-tab";
+        const icon = document.createElement("span");
+        icon.className = "cat-emoji";
+        icon.textContent = emoji;
+        const label = document.createElement("span");
+        label.textContent = cleanName;
+        const count = document.createElement("span");
+        count.className = "count";
+        count.textContent = String(categoryCount(cleanName));
+        button.append(icon, label, count);
+        button.addEventListener("click", () => filterCategory(cleanName, button));
+        categoryBar.appendChild(button);
+      }
+      if (itemCategorySelect && ![...itemCategorySelect.options].some(o => o.value.toLowerCase() === cleanName.toLowerCase())) {
+        const option = document.createElement("option");
+        option.value = cleanName;
+        option.textContent = cleanName;
+        itemCategorySelect.appendChild(option);
+      }
+    }
+
+    async function loadVaultCategories() {
+      try {
+        const snap = await getDocs(collection(db, "vaultCategories"));
+        snap.forEach(docSnap => {
+          const data = docSnap.data();
+          if (data?.name) addCategoryToInterface(data.name, data.emoji || "🎬");
+        });
+        // Also restore any custom categories already used by existing prompt records.
+        (window.allVaultItems || []).forEach(item => {
+          const name = String(item.category || "").trim();
+          if (name && !BUILT_IN_CATEGORIES.includes(name)) addCategoryToInterface(name);
+        });
+      } catch (err) {
+        console.error("Could not load saved categories:", err);
+        if (directorLibraryStatus) directorLibraryStatus.textContent =
+          "Could not load saved categories. Check Firestore rules for the vaultCategories collection.";
+      }
+    }
+
+    addCategoryBtn?.addEventListener("click", async () => {
+      if (!isVerifiedAdmin()) {
+        showAuthMessage("Only the verified administrator can create categories.");
+        return;
+      }
+      const name = prompt("Enter the new category name:");
+      if (!name || !name.trim()) return;
+      const cleanName = name.trim().replace(/\\s+/g, " ");
+      const alreadyExists = [...document.querySelectorAll(".cat-tab span:not(.count)")]
+        .some(span => span.textContent.trim().toLowerCase() === cleanName.toLowerCase());
+      if (alreadyExists) {
+        showAuthMessage("This category already exists.");
+        return;
+      }
+      try {
+        addCategoryBtn.disabled = true;
+        addCategoryBtn.textContent = "Saving...";
+        await addDoc(collection(db, "vaultCategories"), {
+          name: cleanName,
+          emoji: "🎬",
+          createdAt: new Date().toISOString(),
+          createdBy: auth.currentUser.uid
+        });
+        addCategoryToInterface(cleanName, "🎬");
+        if (itemCategorySelect) itemCategorySelect.value = cleanName;
+        showToast(`Category “${cleanName}” saved to your account library.`);
+      } catch (err) {
+        showAuthMessage(explainFirebaseError(err, "Saving category"));
+      } finally {
+        addCategoryBtn.disabled = false;
+        addCategoryBtn.textContent = "+ Category";
       }
     });
 
