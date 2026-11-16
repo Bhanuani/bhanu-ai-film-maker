@@ -3424,27 +3424,41 @@
         return;
       }
 
-      // Append each selected library prompt to the existing composer content.
-      // This lets users click several "Use in Gemini" buttons without losing
-      // text they have already typed or previously selected.
-      const currentText = geminiInput.value.trimEnd();
-      const alreadyIncluded = currentText.includes(promptText);
-      if (!alreadyIncluded) {
-        geminiInput.value = currentText
-          ? `${currentText}\n\n${promptText}`
-          : promptText;
+      // Insert at the text cursor, not at the end or on a new line.
+      // If the user has selected text, insert after the selection so no
+      // existing characters are ever replaced.
+      const currentText = geminiInput.value || "";
+      const selectionStart = Number.isInteger(geminiInput.selectionStart)
+        ? geminiInput.selectionStart : currentText.length;
+      const selectionEnd = Number.isInteger(geminiInput.selectionEnd)
+        ? geminiInput.selectionEnd : selectionStart;
+      const insertAt = Math.max(0, Math.min(currentText.length, selectionEnd));
+
+      // Avoid adding the exact same prompt twice.
+      if (currentText.includes(promptText)) {
+        if (directorLibraryStatus) {
+          directorLibraryStatus.textContent = `“${item.name}” is already in your Gemini message.`;
+        }
+        geminiInput.focus();
+        return;
       }
 
-      // Keep the composer in view and put the caret at the end of the added text.
+      const needsSpaceBefore = insertAt > 0 && !/\\s$/.test(currentText.slice(0, insertAt));
+      const needsSpaceAfter = insertAt < currentText.length && !/^\\s/.test(currentText.slice(insertAt));
+      const insertion = `${needsSpaceBefore ? " " : ""}${promptText}${needsSpaceAfter ? " " : ""}`;
+
+      geminiInput.value =
+        currentText.slice(0, insertAt) +
+        insertion +
+        currentText.slice(insertAt);
+
+      const caretPosition = insertAt + insertion.length;
       geminiInput.focus();
-      const endPosition = geminiInput.value.length;
-      geminiInput.setSelectionRange(endPosition, endPosition);
-      geminiInput.dispatchEvent(new Event("input", { bubbles:true }));
+      geminiInput.setSelectionRange(caretPosition, caretPosition);
+      geminiInput.dispatchEvent(new Event("input", { bubbles: true }));
 
       if (directorLibraryStatus) {
-        directorLibraryStatus.textContent = alreadyIncluded
-          ? `“${item.name}” is already in your Gemini message.`
-          : `“${item.name}” added to your Gemini message. You can select more prompts or press Send.`;
+        directorLibraryStatus.textContent = `“${item.name}” inserted at your cursor position. Existing text was preserved.`;
       }
 
       if (window.innerWidth <= 820) {
