@@ -63,11 +63,12 @@
         radial-gradient(ellipse at 50% 15%, rgba(0,150,210,.10), transparent 62%);
     }
 
+    /* Regular users cannot see admin editing/deleting options */
     body:not(.is-admin-active) .admin-only {
       display: none !important;
     }
 
-    /* TAB SWITCH WELCOME BACK */
+    /* TAB SWITCH WELCOME BACK - ZERO BOX, FULLSCREEN SEAMLESS BLEND */
     #welcomeBackOverlay {
       position: fixed;
       inset: 0;
@@ -112,7 +113,7 @@
       pointer-events: none;
     }
 
-    /* HEADER */
+    /* HEADER - PERFECTLY ALIGNED */
     header {
       background: rgba(4, 7, 17, 0.95);
       border-bottom: 1px solid var(--border-color);
@@ -403,6 +404,7 @@
       transform: none;
     }
 
+
     /* CATEGORIES BAR */
     .categories-bar-wrapper {
       position: relative;
@@ -542,6 +544,7 @@
 
     .card-details h3 { font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; }
 
+    /* IN-PLACE PROMPT WRAPPER WITH SEAMLESS SCREEN-BLENDED VIDEO */
     .prompt-wrapper {
       position: relative;
       background: rgba(0, 0, 0, 0.4);
@@ -586,6 +589,7 @@
     .prompt-box::-webkit-scrollbar { width: 4px; }
     .prompt-box::-webkit-scrollbar-thumb { background: rgba(0, 210, 255, 0.5); border-radius: 999px; }
 
+    /* COPIED VIDEO OVERLAY */
     .copied-video-player {
       position: absolute;
       inset: 0;
@@ -790,13 +794,14 @@
       border-radius: 18px; box-shadow: 0 22px 70px rgba(0,0,0,.65);
     }
     .gemini-panel.open { display: flex; }
-    .gemini-panel-head { min-height: 66px; padding: 13px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,.09); gap:10px; }
+    .gemini-panel-head { min-height: 66px; padding: 13px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,.09); }
     .gemini-menu-toggle {
       width:34px; height:34px; flex:0 0 auto; display:grid; place-items:center;
       border:0; border-radius:9px; color:#dbe4f2; background:rgba(255,255,255,.07);
       cursor:pointer; font-size:15px;
     }
     .gemini-menu-toggle:hover { background:rgba(155,114,203,.2); color:#fff; }
+    .gemini-panel-head { gap:10px; }
     .gemini-menu-drawer {
       position:absolute; z-index:8; top:66px; left:0; bottom:0; width:205px;
       padding:16px 10px; background:#101827; border-right:1px solid rgba(155,114,203,.25);
@@ -851,7 +856,16 @@
     .gemini-composer button { width:35px; height:35px; flex:0 0 auto; border:0; border-radius:10px; color:white; background:linear-gradient(135deg,#4285f4,#9b72cb 65%,#d96570); cursor:pointer; }
     .gemini-composer button:disabled { opacity:.45; cursor:wait; }
     .gemini-disclaimer { text-align:center; color:#718096; font-size:.62rem; padding:8px 10px 11px; }
+    @media (max-width: 700px) {
+      .gemini-launcher { width:39px; min-width:39px; height:39px; padding:7px; gap:0; }
+      .gemini-launcher span { display:none; }
+      .gemini-mark { width:23px; height:23px; }
+      .header-actions { gap:.45rem; }
+      .gemini-panel { top:70px; right:10px; bottom:10px; width:calc(100vw - 20px); max-height:none; }
+    }
 
+
+    /* RESPONSIVE PROMPT GRID */
     @media (max-width: 1100px) {
       .movements-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
@@ -1152,7 +1166,7 @@
             <span class="profile-badge" id="profileBadgeRole" style="font-size: 11px; color: var(--accent-cyan); font-weight: 700;">DIRECTOR</span>
             <span style="font-size: 11px; color: #94a3b8;">Cinemotion AI</span>
           </div>
-          <button type="button" class="logout-btn-dropdown" onclick="handleUserLogout()">
+          <button type="button" class="logout-btn-dropdown" id="signOutButton">
             <i class="fa-solid fa-right-from-bracket"></i> Sign Out
           </button>
         </div>
@@ -1351,7 +1365,7 @@
     <span id="toastMsg">Action Successful!</span>
   </div>
 
-  <!-- ALL 136 DEFAULT PROMPTS SCRIPT -->
+  <!-- SCRIPT -->
   <script>
     const defaultMovements = [
       { id: "mov_1", name: "Slow Dolly In", category: "Camera Movement", prompt: "Slow dolly in, camera moves slowly forward toward the subject." },
@@ -1540,7 +1554,9 @@
       heroVid.muted = true;
       heroVid.playsInline = true;
       const startHeroVideo = () => {
-        heroVid.play().catch(() => {});
+        heroVid.play().catch((err) => {
+          console.warn("Hero video autoplay was blocked; playback can begin after user interaction.", err);
+        });
         document.getElementById("siteBackgroundVideo")?.play().catch(() => {});
       };
       if (document.readyState === "loading") {
@@ -1553,16 +1569,22 @@
     /* INDEXED-DB PERSISTENCE */
     let localDB;
     const dbReq = window.indexedDB ? indexedDB.open("CinemotionMediaDB", 12) : null;
+    if (!dbReq) console.warn("IndexedDB is unavailable; local media and prompt edits will not persist.");
     if (dbReq) {
       dbReq.onupgradeneeded = (e) => {
         localDB = e.target.result;
-        if (!localDB.objectStoreNames.contains("cardMedia")) localDB.createObjectStore("cardMedia", { keyPath: "id" });
-        if (!localDB.objectStoreNames.contains("promptEdits")) localDB.createObjectStore("promptEdits", { keyPath: "id" });
+        if (!localDB.objectStoreNames.contains("cardMedia")) {
+          localDB.createObjectStore("cardMedia", { keyPath: "id" });
+        }
+        if (!localDB.objectStoreNames.contains("promptEdits")) {
+          localDB.createObjectStore("promptEdits", { keyPath: "id" });
+        }
       };
       dbReq.onsuccess = (e) => {
         localDB = e.target.result;
         renderCards(window.allVaultItems);
       };
+      dbReq.onerror = (e) => console.error("IndexedDB initialization failed:", e.target.error);
     }
 
     function getYoutubeEmbedUrl(url) {
@@ -1583,143 +1605,1153 @@
 
     function renderCards(list) {
       if (!grid) return;
-      grid.innerHTML = list.map(item => `
+      grid.innerHTML = list.map(item => {
+        return `
         <div class="movement-card" id="card_${item.id}">
           <div class="card-video-box ${item.mediaURL ? 'has-media' : ''}" id="box_${item.id}"
                data-card-id="${item.id}" tabindex="0" role="group"
-               onclick="handleCardMediaClick('${item.id}')">
+               aria-label="Media upload area for ${item.name}"
+               onpointerdown="setActiveUploadTarget('${item.id}')"
+               onpointerenter="setActiveUploadTarget('${item.id}')"
+               onfocus="setActiveUploadTarget('${item.id}')"
+               onclick="handleCardMediaClick('${item.id}')"
+               ondragover="handleDragOver(event, '${item.id}')"
+               ondragleave="handleDragLeave(event, '${item.id}')"
+               ondrop="handleFileDrop(event, '${item.id}')">
+
             <video id="vid_${item.id}" autoplay loop muted playsinline></video>
             <img id="img_${item.id}" alt="${item.name}">
             <iframe id="yt_${item.id}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+
             <div class="upload-overlay admin-only" id="overlay_${item.id}">
-              <div style="display: flex; flex-direction: column; align-items: center; gap: 0.2rem;">
+              <div onclick="triggerFileInput(event, '${item.id}')" style="display: flex; flex-direction: column; align-items: center; gap: 0.2rem;">
                 <i class="fa-solid fa-cloud-arrow-up cloud-icon"></i>
-                <span class="upload-txt">Click, Drag & Drop or Paste Media</span>
+                <span class="upload-txt">Click, Drag & Drop or Paste Media (Ctrl+V)</span>
+              </div>
+              <div class="link-upload-pill" onclick="openLinkModal('${item.id}', event)">
+                <i class="fa-solid fa-link"></i>
+                <span>Paste Link (Drive / YT / Insta)</span>
               </div>
             </div>
+
+            <input type="file" class="file-input" id="input_${item.id}" accept="video/*,image/*" multiple onchange="handleFileInputChange(event, '${item.id}')">
           </div>
+
           <div class="card-details">
             <div>
               <div class="card-meta">
                 <span class="tag-badge">${item.category || 'Movement'}</span>
+                
                 <div class="card-meta-actions admin-only">
-                  <button type="button" class="meta-action-btn dl-btn" onclick="downloadCardMedia('${item.id}', '${item.name.replace(/'/g, "\\'")}', event)"><i class="fa-solid fa-download"></i></button>
-                  <button type="button" class="meta-action-btn del-btn" onclick="deleteCardMedia('${item.id}', event)"><i class="fa-solid fa-trash"></i></button>
+                  <button type="button" class="meta-action-btn edit-btn" title="Paste / Attach Link" onclick="openLinkModal('${item.id}', event)">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                  </button>
+
+                  <button type="button" class="meta-action-btn dl-btn" title="Download Media" onclick="downloadCardMedia('${item.id}', '${item.name.replace(/'/g, "\\'")}', event)">
+                    <i class="fa-solid fa-download"></i>
+                  </button>
+                  
+                  <button type="button" class="meta-action-btn del-btn" title="Delete Media" onclick="deleteCardMedia('${item.id}', event)">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
                 </div>
               </div>
+
               <h3 id="title_${item.id}">${item.name}</h3>
+              
               <div class="prompt-wrapper" id="prompt_wrap_${item.id}">
                 <div class="prompt-content" id="content_${item.id}">
                   <p class="prompt-box" id="text_${item.id}">${item.prompt}</p>
+                  <button type="button" class="prompt-edit-btn admin-only" title="Edit Prompt Text" onclick="openEditPromptModal('${item.id}', event)">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </button>
                 </div>
+                
                 <video id="copied_video_${item.id}" class="copied-video-player" muted playsinline preload="none"></video>
               </div>
             </div>
-            <button class="copy-btn" onclick="copyCardPrompt('${item.id}')"><i class="fa-solid fa-copy"></i> Copy Prompt</button>
-            <button type="button" class="use-gemini-btn" onclick="insertPromptIntoGemini('${item.id}')"><i class="fa-solid fa-wand-magic-sparkles"></i> Use in Gemini</button>
+            
+            <button class="copy-btn" onclick="copyCardPrompt('${item.id}')">
+              <i class="fa-solid fa-copy"></i> Copy Prompt
+            </button>
+            <button type="button" class="use-gemini-btn" onclick="insertPromptIntoGemini('${item.id}')">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Use in Gemini
+            </button>
           </div>
         </div>
-      `).join('');
+      `;
+      }).join('');
 
-      list.forEach(item => { if (item.mediaURL) applyMediaUrlToCard(item.id, item.mediaURL, item.mediaType); });
+      list.forEach(item => {
+        if (item.mediaURL) {
+          applyMediaUrlToCard(item.id, item.mediaURL, item.mediaType);
+        }
+      });
+
+      if (localDB && list.length) {
+        const tx = localDB.transaction("cardMedia", "readonly");
+        const store = tx.objectStore("cardMedia");
+        const req = store.getAll();
+        req.onsuccess = () => {
+          const mediaById = new Map((req.result || []).map(record => [record.id, record]));
+          list.forEach(item => {
+            const record = mediaById.get(item.id);
+            if (!record) return;
+            if (record.fileBlob) {
+              applyMediaToCard(item.id, record.fileBlob, record.fileType);
+            } else if (record.mediaURL) {
+              applyMediaUrlToCard(item.id, record.mediaURL, record.fileType);
+            }
+          });
+        };
+      }
+
       updateCounts();
     }
 
-    function applyMediaUrlToCard(id, mediaURL, type) {
-      window.cardActiveBlobs = window.cardActiveBlobs || {};
-      window.cardActiveBlobs[id] = { url: mediaURL, type: type || 'video' };
-      const box = document.getElementById(`box_${id}`), vid = document.getElementById(`vid_${id}`), img = document.getElementById(`img_${id}`), yt = document.getElementById(`yt_${id}`);
+    // SOCIAL MEDIA / CLOUD LINK MODAL HANDLER
+    const linkModal = document.getElementById("linkModal");
+    const linkForm = document.getElementById("linkForm");
+    const linkCardId = document.getElementById("linkCardId");
+    const mediaUrlInput = document.getElementById("mediaUrlInput");
+    const closeLinkModalBtn = document.getElementById("closeLinkModalBtn");
+
+    window.openLinkModal = function(id, event) {
+      if (event) event.stopPropagation();
+      if (!linkModal || !linkCardId || !mediaUrlInput) {
+        showToast("Unable to open the media-link form.");
+        return;
+      }
+      linkCardId.value = id;
+      mediaUrlInput.value = "";
+      linkModal.style.display = "flex";
+    };
+
+    if (closeLinkModalBtn && linkModal) {
+      closeLinkModalBtn.onclick = () => { linkModal.style.display = "none"; };
+    }
+
+    window.addEventListener("click", (e) => {
+      if (e.target === linkModal) linkModal.style.display = "none";
+    });
+
+    if (linkForm) {
+      linkForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const id = linkCardId?.value;
+        const url = mediaUrlInput?.value.trim() || "";
+        if (!id || !url) {
+          alert("Please select a card and enter a media URL.");
+          return;
+        }
+
+        const isYoutube = url.includes('youtube.com') || url.includes('youtu.be');
+        const isDrive = url.includes('drive.google.com');
+        const mediaType = isYoutube ? 'youtube' : (isDrive ? 'drive' : 'video');
+        if (isYoutube && !getYoutubeEmbedUrl(url)) {
+          alert("Please enter a valid YouTube video URL.");
+          return;
+        }
+        if (isDrive && !getDriveEmbedUrl(url)) {
+          alert("Please enter a Google Drive file URL in /file/d/FILE_ID/ format.");
+          return;
+        }
+
+        applyMediaUrlToCard(id, url, mediaType);
+
+        if (localDB) {
+          const tx = localDB.transaction("cardMedia", "readwrite");
+          tx.objectStore("cardMedia").put({ id: id, mediaURL: url, fileType: mediaType });
+        }
+
+        if (typeof window.saveMediaLinkToFirestore === "function") {
+          try {
+            await window.saveMediaLinkToFirestore(id, url, mediaType);
+            showToast("Media link saved to Firebase!");
+          } catch (err) {
+            showToast("Cloud save failed: " + (err.message || err));
+            return;
+          }
+        } else {
+          showToast("Firebase is not ready. Link was not cloud-synced.");
+          return;
+        }
+
+        linkModal.style.display = "none";
+      });
+    }
+
+    // EDIT PROMPT MODAL HANDLERS
+    const editPromptModal = document.getElementById("editPromptModal");
+    const editPromptForm = document.getElementById("editPromptForm");
+    const editPromptItemId = document.getElementById("editPromptItemId");
+    const editPromptTitle = document.getElementById("editPromptTitle");
+    const editPromptText = document.getElementById("editPromptText");
+    const closeEditPromptModalBtn = document.getElementById("closeEditPromptModalBtn");
+
+    window.openEditPromptModal = function(id, event) {
+      if (event) event.stopPropagation();
+      const item = window.allVaultItems.find(m => m.id === id);
+      if (!item) return;
+
+      editPromptItemId.value = id;
+      editPromptTitle.value = item.name;
+      editPromptText.value = item.prompt;
+      editPromptModal.style.display = "flex";
+    };
+
+    if (closeEditPromptModalBtn) {
+      closeEditPromptModalBtn.onclick = () => { editPromptModal.style.display = "none"; };
+    }
+
+    window.addEventListener("click", (e) => {
+      if (e.target === editPromptModal) editPromptModal.style.display = "none";
+    });
+
+    if (editPromptForm) {
+      editPromptForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const id = editPromptItemId.value;
+        const newTitle = editPromptTitle.value.trim();
+        const newPrompt = editPromptText.value.trim();
+        const saveEditButton = document.getElementById("saveEditPromptBtn");
+        const item = window.allVaultItems.find(m => m.id === id);
+        if (!item) return;
+
+        if (saveEditButton) { saveEditButton.disabled = true; saveEditButton.textContent = "Syncing..."; }
+        try {
+          if (typeof window.savePromptEditToFirestore !== "function") {
+            throw new Error("Firebase is not ready. Please try again.");
+          }
+          await window.savePromptEditToFirestore(id, newTitle, newPrompt);
+
+          item.name = newTitle;
+          item.prompt = newPrompt;
+          const titleEl = document.getElementById(`title_${id}`);
+          const textEl = document.getElementById(`text_${id}`);
+          if (titleEl) titleEl.innerText = newTitle;
+          if (textEl) textEl.innerText = newPrompt;
+
+          if (localDB) {
+            const tx = localDB.transaction("promptEdits", "readwrite");
+            tx.objectStore("promptEdits").put({ id, name: newTitle, prompt: newPrompt });
+          }
+          showToast("Prompt saved to Firebase!");
+          editPromptModal.style.display = "none";
+        } catch (err) {
+          showToast("Prompt cloud save failed: " + (err.message || err));
+        } finally {
+          if (saveEditButton) { saveEditButton.disabled = false; saveEditButton.textContent = "Update Prompt"; }
+        }
+      });
+    }
+
+    // DRAG & DROP HANDLERS
+    window.handleDragOver = function(e, id) {
+      e.preventDefault();
+      e.stopPropagation();
+      const box = document.getElementById(`box_${id}`);
+      if (box) box.classList.add('drag-over');
+    };
+
+    window.handleDragLeave = function(e, id) {
+      e.preventDefault();
+      e.stopPropagation();
+      const box = document.getElementById(`box_${id}`);
+      if (box) box.classList.remove('drag-over');
+    };
+
+    window.handleFileDrop = function(e, id) {
+      window.setActiveUploadTarget?.(id);
+      e.preventDefault();
+      e.stopPropagation();
+      const box = document.getElementById(`box_${id}`);
+      if (box) box.classList.remove('drag-over');
+
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+        processUploadQueue(id, Array.from(e.dataTransfer.files));
+      }
+    };
+
+    window.triggerFileInput = function(e, id) {
+      window.setActiveUploadTarget?.(id);
+      e.stopPropagation();
+      const input = document.getElementById(`input_${id}`);
+      if (input) input.click();
+    };
+
+    window.handleFileInputChange = function(e, id) {
+      window.setActiveUploadTarget?.(id);
+      const files = e.target.files ? Array.from(e.target.files) : [];
+      if (files.length) processUploadQueue(id, files);
+      e.target.value = "";
+    };
+
+    window.activeUploadTargetId = window.activeUploadTargetId || null;
+
+    window.setActiveUploadTarget = function(id) {
+      if (id && document.getElementById(`box_${id}`)) {
+        window.activeUploadTargetId = id;
+      }
+    };
+
+    document.addEventListener("pointerover", (e) => {
+      const box = e.target.closest?.(".card-video-box[data-card-id]");
+      if (box) window.setActiveUploadTarget(box.dataset.cardId);
+    }, true);
+
+    document.addEventListener("focusin", (e) => {
+      const box = e.target.closest?.(".card-video-box[data-card-id]");
+      if (box) window.setActiveUploadTarget(box.dataset.cardId);
+    }, true);
+
+    window.addEventListener("paste", (e) => {
+      const activeElement = document.activeElement;
+      const activeTag = activeElement?.tagName?.toLowerCase() || "";
+      if (activeTag === "input" || activeTag === "textarea" || activeElement?.isContentEditable) return;
+
+      const clipboardItems = (e.clipboardData || e.originalEvent?.clipboardData)?.items;
+      if (!clipboardItems) return;
+
+      const targetBox = activeElement?.closest?.(".card-video-box[data-card-id]");
+      const targetId = targetBox?.dataset?.cardId || window.activeUploadTargetId;
+      if (!targetId || !document.getElementById(`box_${targetId}`)) {
+        const hasMediaFile = Array.from(clipboardItems).some(item =>
+          item.kind === "file" && (item.type.startsWith("image/") || item.type.startsWith("video/"))
+        );
+        if (hasMediaFile) showToast("First click or move your cursor over the media upload box, then press Ctrl+V.");
+        return;
+      }
+
+      for (let i = 0; i < clipboardItems.length; i++) {
+        const item = clipboardItems[i];
+        if (item.kind === "file" && (item.type.startsWith("image/") || item.type.startsWith("video/"))) {
+          const pastedFile = item.getAsFile();
+          if (pastedFile) {
+            e.preventDefault();
+            window.setActiveUploadTarget(targetId);
+            processUploadedFile(targetId, pastedFile);
+            break;
+          }
+        }
+      }
+    });
+
+    let mediaUploadQueueRunning = false;
+
+    async function processUploadQueue(startCardId, files) {
+      if (mediaUploadQueueRunning) {
+        showToast("An upload queue is already running. Please wait until it finishes.");
+        return;
+      }
+
+      const startIndex = window.allVaultItems.findIndex(item => String(item.id) === String(startCardId));
+      if (startIndex < 0) {
+        showToast("Could not find the selected card for upload.");
+        return;
+      }
+
+      const validFiles = Array.from(files || []);
+      if (!validFiles.length) return;
+
+      const availableCards = window.allVaultItems.length - startIndex;
+      if (validFiles.length > availableCards) {
+        showToast(`Only ${availableCards} card(s) are available from this card. Selected ${validFiles.length} file(s); extra files will not be uploaded.`);
+      }
+
+      mediaUploadQueueRunning = true;
+      let uploaded = 0;
+      const failures = [];
+      const queueLength = Math.min(validFiles.length, availableCards);
+
+      try {
+        for (let i = 0; i < queueLength; i++) {
+          const file = validFiles[i];
+          const card = window.allVaultItems[startIndex + i];
+          const cardId = card.id;
+
+          showToast(`Uploading ${i + 1}/${queueLength}: ${file.name} to ${card.name}...`);
+          const result = await processUploadedFile(cardId, file);
+          if (result?.success) {
+            uploaded++;
+          } else {
+            failures.push(`${file.name} → ${card.name}: ${result?.error || "Upload failed"}`);
+            showToast(`Upload failed for ${file.name}: ${result?.error || "Unknown error"}`);
+          }
+        }
+      } finally {
+        mediaUploadQueueRunning = false;
+      }
+
+      if (failures.length) {
+        const skippedMessage = validFiles.length > queueLength
+          ? ` ${validFiles.length - queueLength} file(s) skipped because there were not enough cards.`
+          : "";
+        showToast(`Queue finished: ${uploaded} uploaded, ${failures.length} failed.${skippedMessage} ${failures.join(" | ")}`);
+      } else if (validFiles.length > queueLength) {
+        showToast(`Queue finished: ${uploaded} uploaded. ${validFiles.length - queueLength} file(s) skipped because there were not enough cards.`);
+      } else {
+        showToast(`Queue finished successfully: ${uploaded}/${queueLength} file(s) uploaded to separate cards.`);
+      }
+    }
+
+    async function processUploadedFile(id, file) {
+      if (!file || (!file.type.startsWith("image/") && !file.type.startsWith("video/"))) {
+        showToast("Please upload a valid image or video file.");
+        return { success: false, error: "Invalid image or video file" };
+      }
+
+      const type = file.type.startsWith("video/") ? "video" : "image";
+      applyMediaToCard(id, file, type);
+
+      if (localDB) {
+        const tx = localDB.transaction("cardMedia", "readwrite");
+        tx.objectStore("cardMedia").put({
+          id, fileBlob: file, fileType: type, fileName: file.name
+        });
+      }
+
+      if (typeof window.uploadMediaFileToFirebase === "function") {
+        try {
+          const cloudUrl = await window.uploadMediaFileToFirebase(id, file, type);
+          applyMediaUrlToCard(id, cloudUrl, type);
+          return { success: true };
+        } catch (err) {
+          return { success: false, error: err.message || String(err) };
+        }
+      }
+
+      return { success: false, error: "Cloudinary upload service is not ready. Local preview is retained." };
+    }
+
+    window.cardActiveBlobs = {};
+
+    function applyMediaToCard(id, blobOrFile, type) {
+      const previous = window.cardActiveBlobs[id];
+      if (previous?.url && previous.url.startsWith("blob:")) {
+        URL.revokeObjectURL(previous.url);
+      }
+      const url = URL.createObjectURL(blobOrFile);
+      window.cardActiveBlobs[id] = { url: url, type: type, raw: blobOrFile };
+
+      const box = document.getElementById(`box_${id}`);
+      const vid = document.getElementById(`vid_${id}`);
+      const img = document.getElementById(`img_${id}`);
+      const yt = document.getElementById(`yt_${id}`);
+
       if (box) box.classList.add('has-media');
+      if (yt) yt.classList.remove('active-media');
+
+      if (type === 'video') {
+        if (img) img.classList.remove('active-media');
+        if (vid) {
+          vid.src = url;
+          vid.loop = true;
+          vid.muted = true;
+          vid.classList.add('active-media');
+          vid.play().catch(() => {});
+        }
+      } else {
+        if (vid) vid.classList.remove('active-media');
+        if (img) {
+          img.src = url;
+          img.classList.add('active-media');
+        }
+      }
+    }
+
+    function applyMediaUrlToCard(id, mediaURL, type) {
+      window.cardActiveBlobs[id] = { url: mediaURL, type: type || 'video' };
+      const box = document.getElementById(`box_${id}`);
+      const vid = document.getElementById(`vid_${id}`);
+      const img = document.getElementById(`img_${id}`);
+      const yt = document.getElementById(`yt_${id}`);
+
+      if (box) box.classList.add('has-media');
+
       const isYoutube = type === 'youtube' || mediaURL.includes('youtube.com') || mediaURL.includes('youtu.be');
       const isDrive = type === 'drive' || mediaURL.includes('drive.google.com');
-      if (isYoutube && yt) { yt.src = getYoutubeEmbedUrl(mediaURL); yt.classList.add('active-media'); }
-      else if (isDrive && yt) { yt.src = getDriveEmbedUrl(mediaURL); yt.classList.add('active-media'); }
-      else if (type === 'video' && vid) { vid.src = mediaURL; vid.loop = true; vid.muted = true; vid.classList.add('active-media'); vid.play().catch(() => {}); }
-      else if (img) { img.src = mediaURL; img.classList.add('active-media'); }
+
+      if (isYoutube) {
+        if (img) img.classList.remove('active-media');
+        if (vid) vid.classList.remove('active-media');
+        if (yt) {
+          yt.src = getYoutubeEmbedUrl(mediaURL);
+          yt.classList.add('active-media');
+        }
+      } else if (isDrive) {
+        if (img) img.classList.remove('active-media');
+        if (vid) vid.classList.remove('active-media');
+        if (yt) {
+          yt.src = getDriveEmbedUrl(mediaURL);
+          yt.classList.add('active-media');
+        }
+      } else if (type === 'video') {
+        if (img) img.classList.remove('active-media');
+        if (yt) yt.classList.remove('active-media');
+        if (vid) {
+          vid.src = mediaURL;
+          vid.loop = true;
+          vid.muted = true;
+          vid.playsInline = true;
+          vid.classList.add('active-media');
+          vid.play().catch(() => {});
+        }
+      } else {
+        if (vid) vid.classList.remove('active-media');
+        if (yt) yt.classList.remove('active-media');
+        if (img) {
+          img.src = mediaURL;
+          img.classList.add('active-media');
+        }
+      }
+    }
+
+    window.editCardMedia = function(id, event) {
+      if (event) event.stopPropagation();
+      openLinkModal(id, event);
+    };
+
+    window.downloadCardMedia = function(id, name, event) {
+      if (event) event.stopPropagation();
+      const media = window.cardActiveBlobs[id];
+      if (!media || !media.url) {
+        alert("Please upload or attach a media link first to download.");
+        return;
+      }
+
+      if (media.type === 'youtube' || media.url.includes('youtube.com') || media.url.includes('youtu.be') || media.url.includes('drive.google.com')) {
+        window.open(media.url, '_blank');
+        return;
+      }
+
+      executeDownload(media.url, name, media.type);
+    };
+
+    function executeDownload(url, filename, type) {
+      const ext = type === 'video' ? '.mp4' : '.png';
+      const cleanName = (filename || 'cinemotion-media').toLowerCase().replace(/[^a-z0-9]/g, '-') + ext;
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = cleanName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      showToast(`Download Started: ${cleanName}`);
+    }
+
+    window.deleteCardMedia = async function(id, event) {
+      if (event) event.stopPropagation();
+      const media = window.cardActiveBlobs[id];
+      const targetItem = window.allVaultItems?.find(m => m.id === id);
+      if (!media && !targetItem?.mediaURL) {
+        alert("No media uploaded to delete in this card.");
+        return;
+      }
+
+      if (!confirm("Are you sure you want to permanently delete this media from Firebase and this device?")) return;
+
+      try {
+        if (typeof window.deleteMediaFromFirestore === "function") {
+          await window.deleteMediaFromFirestore(id);
+        } else {
+          throw new Error("Firebase delete service is not ready. Please try again.");
+        }
+
+        if (media?.url?.startsWith("blob:")) URL.revokeObjectURL(media.url);
+        delete window.cardActiveBlobs[id];
+
+        if (localDB) {
+          await new Promise((resolve, reject) => {
+            const tx = localDB.transaction("cardMedia", "readwrite");
+            tx.objectStore("cardMedia").delete(id);
+            tx.oncomplete = resolve;
+            tx.onerror = () => reject(tx.error || new Error("Local media cleanup failed."));
+          });
+        }
+
+        if (targetItem) {
+          delete targetItem.mediaURL;
+          delete targetItem.mediaType;
+        }
+
+        const box = document.getElementById(`box_${id}`);
+        const vid = document.getElementById(`vid_${id}`);
+        const img = document.getElementById(`img_${id}`);
+        const yt = document.getElementById(`yt_${id}`);
+
+        if (box) box.classList.remove("has-media");
+        if (vid) {
+          vid.pause();
+          vid.removeAttribute("src");
+          vid.load();
+          vid.classList.remove("active-media");
+        }
+        if (img) {
+          img.removeAttribute("src");
+          img.classList.remove("active-media");
+        }
+        if (yt) {
+          yt.removeAttribute("src");
+          yt.classList.remove("active-media");
+        }
+
+        showToast("Media permanently deleted from Firebase Storage, Firestore and this device.");
+      } catch (err) {
+        showToast("Delete failed: " + (err.message || err));
+      }
+    };
+
+    // LIGHTBOX POPUP PLAYER
+    const mediaLightbox = document.getElementById("mediaLightbox");
+    const lightboxStage = document.getElementById("lightboxStage");
+    const lightboxTitle = document.getElementById("lightboxTitle");
+    const lightboxPrompt = document.getElementById("lightboxPrompt");
+    const lightboxCopyBtn = document.getElementById("lightboxCopyBtn");
+    const lightboxDownloadBtn = document.getElementById("lightboxDownloadBtn");
+    const closeLightboxBtn = document.getElementById("closeLightboxBtn");
+
+    window.activeLightboxItem = null;
+
+    window.handleCardMediaClick = function(id) {
+      const media = window.cardActiveBlobs[id];
+      const item = window.allVaultItems.find(m => m.id === id);
+
+      if (!media || !media.url) return;
+
+      window.activeLightboxItem = { id: id, item: item, media: media };
+
+      lightboxTitle.innerHTML = `<i class="fa-solid fa-clapperboard" style="color: var(--accent-cyan);"></i> ${item ? item.name : 'Media Preview'}`;
+      lightboxPrompt.innerText = item ? item.prompt : '';
+
+      lightboxStage.innerHTML = '';
+
+      const isYoutube = media.type === 'youtube' || media.url.includes('youtube.com') || media.url.includes('youtu.be');
+      const isDrive = media.type === 'drive' || media.url.includes('drive.google.com');
+
+      if (isYoutube) {
+        const iframe = document.createElement('iframe');
+        iframe.src = getYoutubeEmbedUrl(media.url);
+        iframe.allow = "autoplay; encrypted-media";
+        iframe.allowFullscreen = true;
+        lightboxStage.appendChild(iframe);
+      } else if (isDrive) {
+        const iframe = document.createElement('iframe');
+        iframe.src = getDriveEmbedUrl(media.url);
+        iframe.allow = "autoplay";
+        iframe.allowFullscreen = true;
+        lightboxStage.appendChild(iframe);
+      } else if (media.type === 'video') {
+        const v = document.createElement('video');
+        v.src = media.url;
+        v.controls = true;
+        v.autoplay = true;
+        v.loop = true;
+        v.playsInline = true;
+        lightboxStage.appendChild(v);
+      } else {
+        const i = document.createElement('img');
+        i.src = media.url;
+        i.alt = item ? item.name : 'Expanded Preview';
+        lightboxStage.appendChild(i);
+      }
+
+      mediaLightbox.style.display = 'flex';
+    };
+
+    if (closeLightboxBtn) {
+      closeLightboxBtn.onclick = () => {
+        mediaLightbox.style.display = 'none';
+        lightboxStage.innerHTML = '';
+      };
+    }
+
+    mediaLightbox.onclick = (e) => {
+      if (e.target === mediaLightbox) {
+        mediaLightbox.style.display = 'none';
+        lightboxStage.innerHTML = '';
+      }
+    };
+
+    if (lightboxCopyBtn) {
+      lightboxCopyBtn.onclick = () => {
+        if (window.activeLightboxItem && window.activeLightboxItem.item) {
+          copyPromptText(window.activeLightboxItem.item.prompt, window.activeLightboxItem.id);
+        }
+      };
+    }
+
+    if (lightboxDownloadBtn) {
+      lightboxDownloadBtn.onclick = () => {
+        if (window.activeLightboxItem) {
+          downloadCardMedia(window.activeLightboxItem.id, window.activeLightboxItem.item ? window.activeLightboxItem.item.name : 'Cinemotion-Media');
+        }
+      };
     }
 
     function updateCounts() {
-      const catCounts = { 'Camera Movement': 44, 'Camera Angles': 12, 'Camera Shots': 15, 'Cinematic Lighting': 0, 'Atmosphere': 60, 'Camera Lens': 0, 'Master Prompts': 5 };
-      if (document.getElementById('count_All')) document.getElementById('count_All').innerText = window.allVaultItems.length;
+      const catCounts = {
+        'Camera Movement': 0, 'Camera Angles': 0, 'Camera Shots': 0, 'Cinematic Lighting': 0, 'Atmosphere': 0, 'Camera Lens': 0, 'Master Prompts': 0
+      };
+
+      window.allVaultItems.forEach(item => {
+        if (catCounts[item.category] !== undefined) catCounts[item.category]++;
+      });
+
+      const countAll = document.getElementById('count_All');
+      if (countAll) countAll.innerText = window.allVaultItems.length;
+
       for (const [cat, count] of Object.entries(catCounts)) {
-        const el = document.getElementById('count_' + cat.replace(/\s+/g, '_'));
+        const idKey = 'count_' + cat.replace(/\s+/g, '_');
+        const el = document.getElementById(idKey);
         if (el) el.innerText = count;
       }
     }
 
-    async function copyPromptText(text, itemId) {
-      await navigator.clipboard.writeText(String(text ?? ""));
-      if (itemId) showToast("Prompt Copied!");
+    const cardCopyClickCounters = {};
+    const cardCopyResetTimers = {};
+    const cardHideAnimationTimers = {};
+
+    function playCopiedVideoAnimation(itemId) {
+      if (!itemId) return;
+      const wrap = document.getElementById(`prompt_wrap_${itemId}`);
+      const vid = document.getElementById(`copied_video_${itemId}`);
+      if (!wrap || !vid) return;
+
+      cardCopyClickCounters[itemId] = (cardCopyClickCounters[itemId] || 0) + 1;
+      const currentClicks = cardCopyClickCounters[itemId];
+
+      clearTimeout(cardCopyResetTimers[itemId]);
+      cardCopyResetTimers[itemId] = setTimeout(() => {
+        cardCopyClickCounters[itemId] = 0;
+      }, 3000);
+
+      const selectedVideo = currentClicks === 1 ? 'Copied-1.mp4' : 'Copied-2.mp4';
+
+      if (!vid.src.endsWith(selectedVideo)) {
+        vid.src = selectedVideo;
+      }
+      vid.currentTime = 0;
+
+      wrap.classList.add('copied-active');
+      vid.play().catch(() => {});
+
+      clearTimeout(cardHideAnimationTimers[itemId]);
+      vid.onended = () => {
+        wrap.classList.remove('copied-active');
+      };
+
+      cardHideAnimationTimers[itemId] = setTimeout(() => {
+        wrap.classList.remove('copied-active');
+      }, 2200);
     }
-    window.copyCardPrompt = (id) => copyPromptText(document.getElementById(`text_${id}`)?.innerText || '', id);
+
+    async function copyPromptText(text, itemId) {
+      try {
+        if (!navigator.clipboard || !navigator.clipboard.writeText) {
+          throw new Error("Clipboard access is unavailable.");
+        }
+        await navigator.clipboard.writeText(String(text ?? ""));
+        if (itemId) {
+          playCopiedVideoAnimation(itemId);
+        }
+      } catch (err) {
+        console.error("Clipboard copy failed:", err);
+      }
+    }
+
+    window.copyCardPrompt = function(itemId) {
+      const textEl = document.getElementById(`text_${itemId}`);
+      const textToCopy = textEl ? textEl.innerText : '';
+      if (textToCopy) {
+        copyPromptText(textToCopy, itemId);
+      }
+    };
+
     function showToast(msg) {
       const toast = document.getElementById('toast');
       document.getElementById('toastMsg').innerText = msg;
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 2200);
     }
+
     function filterCategory(cat, btn) {
-      if (btn) { document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
-      currentCategory = cat; filterCards();
+      if (btn) {
+        document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      currentCategory = cat;
+      filterCards();
     }
+
     function filterCards() {
-      const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
+      const searchEl = document.getElementById('searchInput');
+      const q = searchEl ? searchEl.value.toLowerCase() : '';
       let filtered = window.allVaultItems;
       if (currentCategory !== "All") filtered = filtered.filter(m => m.category === currentCategory);
       filtered = filtered.filter(m => String(m.name || '').toLowerCase().includes(q) || String(m.prompt || '').toLowerCase().includes(q));
       renderCards(filtered);
     }
-    function openPromptLibrary() { alert("Opening Visual Prompts Library: 136 Director Prompts Loaded."); }
+
+    function openPromptLibrary() {
+      alert("Opening Visual Prompts Library: 136 Director Prompts Loaded.");
+    }
 
     let animTimeout;
     function triggerCinematicCategory(category, btnElement) {
       filterCategory(category, btnElement);
-      const stage = document.getElementById('cinematicStage'), scene = document.getElementById('cinematicScene'), title = document.getElementById('stageTitle');
+
+      const stage = document.getElementById('cinematicStage');
+      const scene = document.getElementById('cinematicScene');
+      const title = document.getElementById('stageTitle');
+
       if (!stage || !scene) return;
-      clearTimeout(animTimeout); scene.innerHTML = ''; stage.style.display = 'flex'; title.innerText = category;
-      animTimeout = setTimeout(() => { stage.style.display = 'none'; scene.innerHTML = ''; }, 2000);
+
+      clearTimeout(animTimeout);
+      scene.innerHTML = '';
+      stage.style.display = 'flex';
+      title.innerText = category;
+
+      if (category === 'All') {
+        scene.innerHTML = `
+          <div class="all-orbit-scene">
+            <span class="all-orbit-icon" style="top:0;left:210px">🎥</span>
+            <span class="all-orbit-icon" style="top:80px;right:20px">📐</span>
+            <span class="all-orbit-icon" style="bottom:80px;right:20px">🎬</span>
+            <span class="all-orbit-icon" style="bottom:0;left:210px">💡</span>
+            <span class="all-orbit-icon" style="bottom:80px;left:20px">🌫️</span>
+            <span class="all-orbit-icon" style="top:80px;left:20px">🔭</span>
+            <span class="all-orbit-icon" style="top:210px;left:210px">📝</span>
+          </div>
+        `;
+      }
+      else if (category === 'Master Prompts') {
+        scene.innerHTML = `
+          <div class="master-writing-rig">
+            <span class="master-logo-canvas" role="img" aria-label="Master Prompt">📝</span>
+            <i class="fa-solid fa-pen-nib neon-quill-pen"></i>
+          </div>
+        `;
+      }
+      else if (category === 'Atmosphere') {
+        scene.innerHTML = `
+          <div class="season-sky-lapse"></div>
+          <div class="smoke-rig-real"><span class="scene-emoji" role="img" aria-label="Atmosphere">🌫️</span></div>
+          <div class="season-particles">
+            <span>🌸</span><span>☀️</span><span>🍂</span><span>❄️</span>
+          </div>
+        `;
+      }
+      else if (category === 'Camera Movement') {
+        scene.innerHTML = `<div class="dolly-real-rig"><span class="scene-emoji" role="img" aria-label="Camera Movement">🎥</span></div>`;
+      } 
+      else if (category === 'Camera Angles') {
+        scene.innerHTML = `<div class="angles-real-rig"><div class="angle-fast-cam"><span class="scene-emoji" role="img" aria-label="Camera Angle">📐</span></div></div>`;
+      } 
+      else if (category === 'Camera Shots') {
+        scene.innerHTML = `<div class="clapper-real-rig"><span class="scene-emoji" role="img" aria-label="Camera Shot">🎬</span></div>`;
+      } 
+      else if (category === 'Cinematic Lighting') {
+        scene.innerHTML = `<div class="light-glare"></div><div class="light-real-rig"><span class="scene-emoji" role="img" aria-label="Studio Light">💡</span></div>`;
+      } 
+      else if (category === 'Camera Lens') {
+        scene.innerHTML = `<div class="lens-real-rig"><span class="scene-emoji" role="img" aria-label="Cinema Lens">🔭</span></div>`;
+      }
+
+      animTimeout = setTimeout(() => {
+        stage.style.display = 'none';
+        scene.innerHTML = '';
+      }, 2000);
     }
 
-    const sidebarDrawer = document.getElementById("sidebarDrawer"), sidebarOverlay = document.getElementById("sidebarOverlay"), themesModal = document.getElementById("themesModal");
-    function openSidebar() { sidebarDrawer?.classList.add("active"); sidebarOverlay?.classList.add("active"); }
-    function closeSidebar() { sidebarDrawer?.classList.remove("active"); sidebarOverlay?.classList.remove("active"); }
-    document.getElementById("sidebarToggleBtn").onclick = openSidebar;
-    document.getElementById("closeSidebarBtn").onclick = closeSidebar;
-    if (sidebarOverlay) sidebarOverlay.onclick = closeSidebar;
-    document.getElementById("openThemesBtn").onclick = () => { closeSidebar(); if (themesModal) themesModal.style.display = "flex"; };
-    document.getElementById("closeThemesModalBtn").onclick = () => { if (themesModal) themesModal.style.display = "none"; };
+    const sidebarToggleBtn = document.getElementById("sidebarToggleBtn");
+    const sidebarDrawer = document.getElementById("sidebarDrawer");
+    const sidebarOverlay = document.getElementById("sidebarOverlay");
+    const closeSidebarBtn = document.getElementById("closeSidebarBtn");
+    const openThemesBtn = document.getElementById("openThemesBtn");
+    const themesModal = document.getElementById("themesModal");
+    const closeThemesModalBtn = document.getElementById("closeThemesModalBtn");
 
-    const profilePillBtn = document.getElementById("profilePillBtn"), profileDropdown = document.getElementById("profileDropdown");
-    profilePillBtn?.addEventListener("click", (e) => { e.stopPropagation(); profileDropdown?.classList.toggle("show"); });
+    function openSidebar() { if (sidebarDrawer) sidebarDrawer.classList.add("active"); if (sidebarOverlay) sidebarOverlay.classList.add("active"); }
+    function closeSidebar() { if (sidebarDrawer) sidebarDrawer.classList.remove("active"); if (sidebarOverlay) sidebarOverlay.classList.remove("active"); }
+
+    if (sidebarToggleBtn) sidebarToggleBtn.onclick = openSidebar;
+    if (closeSidebarBtn) closeSidebarBtn.onclick = closeSidebar;
+    if (sidebarOverlay) sidebarOverlay.onclick = closeSidebar;
+
+    if (openThemesBtn) {
+      openThemesBtn.onclick = () => { closeSidebar(); if (themesModal) themesModal.style.display = "flex"; };
+    }
+    if (closeThemesModalBtn) {
+      closeThemesModalBtn.onclick = () => { if (themesModal) themesModal.style.display = "none"; };
+    }
+
+    const profilePillBtn = document.getElementById("profilePillBtn");
+    const profileDropdown = document.getElementById("profileDropdown");
+
+    if (profilePillBtn) {
+      profilePillBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (profileDropdown) profileDropdown.classList.toggle("show");
+      });
+    }
+
     window.addEventListener("click", (e) => {
-      if (profileDropdown && !profileDropdown.contains(e.target) && e.target !== profilePillBtn) profileDropdown.classList.remove("show");
+      const clickedInsideProfile = profilePillBtn?.contains(e.target) || profileDropdown?.contains(e.target);
+      if (profileDropdown && !clickedInsideProfile) {
+        profileDropdown.classList.remove("show");
+      }
       if (themesModal && e.target === themesModal) themesModal.style.display = "none";
     });
+
+    window.openForgotPasswordModal = function() {
+      document.getElementById("forgotPasswordModal").style.display = "flex";
+    };
+
+    window.closeForgotPasswordModal = function() {
+      document.getElementById("forgotPasswordModal").style.display = "none";
+    };
+
+    window.checkRegisterPasswordRules = function() {
+      const pass = document.getElementById("regPassInput")?.value || "";
+      const confirmPass = document.getElementById("regConfirmPassInput")?.value || "";
+      const passHint = document.getElementById("regPassHint");
+      const matchHint = document.getElementById("regMatchHint");
+      const doneBtn = document.getElementById("regDoneBtn");
+
+      const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+      const isStrong = passRegex.test(pass);
+
+      if (isStrong) {
+        passHint.style.color = "#34d399";
+        passHint.innerText = "✓ Password meets all strength criteria.";
+      } else {
+        passHint.style.color = "#f87171";
+        passHint.innerText = "Rule: 1 Capital letter, 1 Small letter, 1 Number, 1 Special Char (@$!%*?&#), min 8 chars.";
+      }
+
+      const isMatch = pass.length > 0 && pass === confirmPass;
+      if (confirmPass.length > 0) {
+        matchHint.style.display = "block";
+        if (isMatch) {
+          matchHint.style.color = "#34d399";
+          matchHint.innerText = "✓ Passwords match.";
+        } else {
+          matchHint.style.color = "#f87171";
+          matchHint.innerText = "Passwords do not match!";
+        }
+      } else {
+        matchHint.style.display = "none";
+      }
+
+      if (isStrong && isMatch) {
+        doneBtn.disabled = false;
+        doneBtn.style.opacity = "1";
+        doneBtn.style.cursor = "pointer";
+      } else {
+        doneBtn.disabled = true;
+        doneBtn.style.opacity = "0.45";
+        doneBtn.style.cursor = "not-allowed";
+      }
+    };
+
+    let welcomeTimer;
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        const overlay = document.getElementById("welcomeBackOverlay");
+        const video = document.getElementById("welcomeVideo");
+
+        if (overlay && video) {
+          clearTimeout(welcomeTimer);
+          overlay.classList.add("show");
+          video.currentTime = 0;
+          video.play().catch(() => {});
+
+          video.onended = () => {
+            overlay.classList.remove("show");
+          };
+
+          welcomeTimer = setTimeout(() => {
+            overlay.classList.remove("show");
+            video.pause();
+          }, 2900);
+        }
+      }
+    });
+
+    (() => {
+      const mainHero = document.getElementById("heroVideo");
+      const ambientHero = document.getElementById("heroVideoBg");
+      const fullScreenBg = document.getElementById("siteBackgroundVideo");
+      const videoLayers = [ambientHero, fullScreenBg].filter(Boolean);
+
+      if (!mainHero) return;
+      mainHero.loop = true;
+      mainHero.muted = true;
+      mainHero.playsInline = true;
+
+      const syncLayer = (layer) => {
+        if (!layer) return;
+        layer.loop = true;
+        layer.muted = true;
+        layer.playsInline = true;
+        layer.addEventListener("loadedmetadata", () => {
+          try { layer.currentTime = mainHero.currentTime || 0; } catch (_) {}
+          mainHero.play().catch(() => {});
+          layer.play().catch(() => {});
+        });
+      };
+      videoLayers.forEach(syncLayer);
+
+      let syncBusy = false;
+      const syncAll = () => {
+        if (syncBusy) return;
+        syncBusy = true;
+        videoLayers.forEach(layer => {
+          if (!layer || !Number.isFinite(layer.duration) || layer.readyState < 2) return;
+          if (Math.abs(layer.currentTime - mainHero.currentTime) > 0.30) {
+            try { layer.currentTime = mainHero.currentTime; } catch (_) {}
+          }
+          if (mainHero.paused && !layer.paused) layer.pause();
+          else if (!mainHero.paused && layer.paused) layer.play().catch(() => {});
+        });
+        syncBusy = false;
+      };
+      mainHero.addEventListener("play", () => videoLayers.forEach(v => v.play().catch(() => {})));
+      mainHero.addEventListener("pause", () => videoLayers.forEach(v => v.pause()));
+      mainHero.addEventListener("seeked", syncAll);
+      mainHero.addEventListener("timeupdate", syncAll);
+      mainHero.play().catch(() => {});
+      videoLayers.forEach(v => v.play().catch(() => {}));
+    })();
+
+    (() => {
+      const overlay = document.getElementById("welcomeBackOverlay");
+      const video = document.getElementById("welcomeVideo");
+      if (!overlay) return;
+      const dismissWelcome = () => {
+        if (!overlay.classList.contains("show")) return;
+        overlay.classList.remove("show");
+        if (video) {
+          video.pause();
+          try { video.currentTime = 0; } catch (_) {}
+        }
+      };
+      overlay.addEventListener("click", dismissWelcome);
+      video?.addEventListener("click", dismissWelcome);
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") dismissWelcome();
+      });
+    })();
 
     renderCards(window.allVaultItems);
   </script>
 
-  <!-- CINEMOTION GEMINI AI ASSISTANT (SECURE DIRECT FETCH API) -->
+
+  <!-- CINEMOTION GEMINI AI ASSISTANT -->
   <section class="gemini-panel" id="geminiPanel" aria-label="Gemini AI Assistant" aria-hidden="true">
     <div class="gemini-panel-head">
-      <button type="button" class="gemini-menu-toggle" id="geminiMenuToggle" title="Gemini menu"><i class="fa-solid fa-bars"></i></button>
+      <button type="button" class="gemini-menu-toggle" id="geminiMenuToggle" aria-label="Open Gemini menu" aria-expanded="false" title="Gemini menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
       <div class="gemini-panel-brand">
-        <svg class="gemini-mark gemini-panel-mark" viewBox="0 0 24 24"><path fill="#00d2ff" d="M12 0L14.5 9.5L24 12L14.5 14.5L12 24L9.5 14.5L0 12L9.5 9.5Z"/></svg>
-        <div><strong>Gemini</strong><small>Powered by Gemini 2.5 Flash</small></div>
+        <svg class="gemini-mark gemini-panel-mark" viewBox="0 0 24 24" aria-hidden="true">
+          <defs>
+            <linearGradient id="geminiPanelGradient" x1="7%" y1="5%" x2="92%" y2="96%">
+              <stop offset="0%" stop-color="#4285F4"/>
+              <stop offset="48%" stop-color="#9B72CB"/>
+              <stop offset="100%" stop-color="#D96570"/>
+            </linearGradient>
+          </defs>
+          <path fill="url(#geminiPanelGradient)" d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/>
+        </svg>
+        <div><strong>Gemini</strong><small>Powered by Gemini 3.8 Flash</small></div>
       </div>
-      <button type="button" class="gemini-close" id="geminiClose">&times;</button>
+      <button type="button" class="gemini-close" id="geminiClose" aria-label="Close Gemini">&times;</button>
     </div>
-    <div class="gemini-messages" id="geminiMessages"></div>
+    <aside class="gemini-menu-drawer" id="geminiMenuDrawer" aria-hidden="true">
+      <div class="gemini-menu-title">CHAT OPTIONS</div>
+      <button type="button" class="gemini-menu-item" id="geminiNewChat">
+        <i class="fa-regular fa-pen-to-square"></i><span>New Chat</span>
+      </button>
+      <button type="button" class="gemini-menu-item gemini-clear-item" id="geminiClearChat">
+        <i class="fa-regular fa-trash-can"></i><span>Clear chat</span>
+      </button>
+    </aside>
+    <div class="gemini-welcome" id="geminiWelcome">
+      <svg class="gemini-welcome-mark" viewBox="0 0 24 24" aria-hidden="true">
+        <defs><linearGradient id="geminiWelcomeGradient" x1="7%" y1="5%" x2="92%" y2="96%"><stop offset="0%" stop-color="#4285F4"/><stop offset="48%" stop-color="#9B72CB"/><stop offset="100%" stop-color="#D96570"/></linearGradient></defs>
+        <path fill="url(#geminiWelcomeGradient)" d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/>
+      </svg>
+      <h3>How can I help you create?</h3>
+      <p>Ask about cinematic prompts, camera movements, shots, lighting, storyboards, or your CINEMOTION workflow.</p>
+      <div class="gemini-suggestions">
+        <button type="button" data-gemini-prompt="Create a cinematic camera movement prompt for a premium product reveal.">Create a product reveal prompt</button>
+        <button type="button" data-gemini-prompt="Suggest a cinematic lighting setup for a dramatic scene.">Suggest cinematic lighting</button>
+      </div>
+    </div>
+    <div class="gemini-messages" id="geminiMessages" aria-live="polite"></div>
+    <div class="gemini-attachment-preview" id="geminiAttachmentPreview" hidden>
+      <i class="fa-solid fa-file"></i>
+      <span id="geminiAttachmentName"></span>
+      <button type="button" id="geminiRemoveAttachment" aria-label="Remove attachment">&times;</button>
+    </div>
     <form class="gemini-composer" id="geminiForm">
-      <textarea id="geminiInput" rows="1" placeholder="Ask Gemini..."></textarea>
-      <button type="submit" id="geminiSend"><i class="fa-solid fa-arrow-up"></i></button>
+      <input type="file" id="geminiFileInput" accept="image/*,application/pdf,text/plain,text/csv,application/json" hidden>
+      <button type="button" class="gemini-upload-btn" id="geminiUploadBtn" aria-label="Upload a file" title="Upload image, PDF or text file">
+        <i class="fa-solid fa-arrow-up-from-bracket"></i>
+      </button>
+      <textarea id="geminiInput" rows="1" maxlength="12000" placeholder="Ask Gemini..." aria-label="Message Gemini"></textarea>
+      <button type="submit" id="geminiSend" aria-label="Send message">
+        <i class="fa-solid fa-arrow-up"></i>
+      </button>
     </form>
+    <p class="gemini-disclaimer">Gemini can make mistakes. Review important information.</p>
   </section>
 
-  <!-- FIREBASE AUTH & DIRECT GEMINI API MODULE -->
+  <!-- FIREBASE AUTH, FORGOT PASSWORD, PHONE OTP, AND FIRESTORE -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+    import { getAI, getGenerativeModel, GoogleAIBackend } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-ai.js";
+    import {
+      initializeAppCheck,
+      ReCaptchaEnterpriseProvider
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app-check.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      sendEmailVerification,
+      sendPasswordResetEmail,
+      signInWithPhoneNumber,
+      RecaptchaVerifier,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      getDocs,
+      query,
+      where,
+      deleteDoc,
+      doc,
+      orderBy,
+      setDoc,
+      updateDoc
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+    import {
+      getStorage,
+      ref as storageRef,
+      uploadBytes,
+      getDownloadURL,
+      deleteObject
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
+
+    const APP_CHECK_SITE_KEY = "6LcimBouAAAAAO7MzcnBsL70pdwFt4ZPs644Yala";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCbF3oQKFz0pFVZ5EdOzFbfrqhiWfKsqHk",
@@ -1727,141 +2759,1046 @@
       projectId: "ai-film-making-7d66f",
       storageBucket: "ai-film-making-7d66f.firebasestorage.app",
       messagingSenderId: "690131375276",
-      appId: "1:690131375276:web:baae8d4bb47874e5e4bb09"
+      appId: "1:690131375276:web:baae8d4bb47874e5e4bb09",
+      measurementId: "G-MFLLSFB155"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    const NOTIFY_RECEIVER_EMAIL = "prasadpakala10@gmail.com";
+    const EMAILJS_PUBLIC_KEY = "";
+    const EMAILJS_SERVICE_ID = "";
+    const EMAILJS_TEMPLATE_ID = "";
+    const CINEMOTION_MEDIA_API = "https://cinemotion-media-api.bhanu-pakala03.workers.dev"; // Cloudflare Worker base URL
+    const CINEMOTION_ADMIN_EMAIL = "bhanu.pakala03@gmail.com";
+    // Single source of truth: never fall back to the retired Gemini 2.5 Flash model.
+    const CINEMOTION_GEMINI_MODEL_ID = "gemini-3.8-flash";
 
-    onAuthStateChanged(auth, (user) => {
-      const gate = document.getElementById("authGateModal");
-      if (user) {
-        if (gate) gate.style.display = "none";
-      } else {
-        if (gate) gate.style.display = "flex";
-      }
-    });
-
-    document.getElementById("emailAuthForm")?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("userEmailInput").value.trim();
-      const pass = document.getElementById("userPassInput").value;
-      try {
-        await signInWithEmailAndPassword(auth, email, pass);
-      } catch (err) {
-        alert("Login Failed: " + err.message);
-      }
-    });
-
-    window.handleUserLogout = () => signOut(auth);
-
-    // GEMINI AI INTEGRATION THROUGH CLOUDFLARE WORKER
-    // The Gemini API key stays in Cloudflare as the GEMINI_API_KEY Secret.
-    const GEMINI_WORKER_URL = "https://cinemotion-media-api.bhanu-pakala03.workers.dev/gemini";
-    const geminiPanel = document.getElementById("geminiPanel");
-    const geminiMessages = document.getElementById("geminiMessages");
-    const geminiForm = document.getElementById("geminiForm");
-    const geminiInput = document.getElementById("geminiInput");
-    const geminiSend = document.getElementById("geminiSend");
-
-    document.getElementById("geminiLauncher")?.addEventListener("click", () => {
-      geminiPanel?.classList.toggle("open");
-    });
-    document.getElementById("geminiClose")?.addEventListener("click", () => {
-      geminiPanel?.classList.remove("open");
-    });
-
-    let conversationHistory = [];
-
-    function addGeminiMessage(text, role) {
-      if (!geminiMessages) return null;
-      const message = document.createElement("div");
-      message.className = `gemini-message ${role}`;
-      message.textContent = text;
-      geminiMessages.appendChild(message);
-      geminiMessages.scrollTo({
-        top: geminiMessages.scrollHeight,
-        behavior: "smooth"
-      });
-      return message;
+    console.info("CINEMOTION configured Gemini model:", CINEMOTION_GEMINI_MODEL_ID);
+    const byId = (id) => document.getElementById(id);
+    function showAuthMessage(message) {
+      console.error("CINEMOTION Firebase:", message);
+      alert(message);
     }
 
-    async function sendGeminiMessage(prompt) {
-      if (!prompt || !prompt.trim()) return;
+    function explainFirebaseError(err, action = "Firebase operation") {
+      console.error(`${action} failed:`, err);
+      const code = err?.code || "unknown";
+      if (code === "auth/configuration-not-found") return "Firebase Authentication is not configured for this Firebase project.";
+      if (code === "auth/operation-not-allowed") return "This sign-in provider is disabled in Firebase Console.";
+      if (code === "auth/unauthorized-domain") return "This domain is not authorized in Firebase Console.";
+      if (code === "auth/invalid-credential") return "Email or password is incorrect.";
+      if (code === "auth/email-already-in-use") return "This email already has an account. Please use Login.";
+      if (code === "auth/weak-password") return "Password is too weak. Please meet all complexity criteria.";
+      if (code === "auth/too-many-requests") return "Firebase temporarily blocked repeated requests. Wait a few minutes and try again.";
+      if (code === "auth/missing-email") return "Enter your email address first.";
+      return `${action} failed: ${err?.message || "Unknown error"}`;
+    }
 
-      const user = auth.currentUser;
-      if (!user) {
-        addGeminiMessage("Please sign in before using Gemini.", "error");
-        document.getElementById("authGateModal")?.style.setProperty("display", "flex");
+    // UI visibility is not authorization. Re-check the signed-in account before
+    // every admin-only database or media operation.
+    function isVerifiedAdmin() {
+      const user = auth?.currentUser;
+      return !!user &&
+        !!user.emailVerified &&
+        String(user.email || "").trim().toLowerCase() === CINEMOTION_ADMIN_EMAIL.toLowerCase();
+    }
+
+    function requireVerifiedAdmin() {
+      if (!isVerifiedAdmin()) {
+        throw new Error("This action is restricted to the verified CINEMOTION administrator.");
+      }
+    }
+
+    let app, auth, db, storage, appCheck;
+    try {
+      app = initializeApp(firebaseConfig);
+
+      try {
+        if (APP_CHECK_SITE_KEY && APP_CHECK_SITE_KEY.trim()) {
+          appCheck = initializeAppCheck(app, {
+            provider: new ReCaptchaEnterpriseProvider(APP_CHECK_SITE_KEY),
+            isTokenAutoRefreshEnabled: true
+          });
+          window.cinemotionAppCheckReady = true;
+        } else {
+          window.cinemotionAppCheckReady = false;
+        }
+      } catch (appCheckError) {
+        window.cinemotionAppCheckReady = false;
+        console.error("Firebase App Check initialization failed:", appCheckError);
+      }
+
+      auth = getAuth(app);
+      db = getFirestore(app);
+      storage = getStorage(app);
+
+      // OPTIMIZED GEMINI INITIALIZATION (Fast response + 60s timeout + System Instruction)
+      try {
+        const firebaseAI = getAI(app, { backend: new GoogleAIBackend() });
+        window.cinemotionGeminiModel = getGenerativeModel(
+          firebaseAI,
+          {
+            model: CINEMOTION_GEMINI_MODEL_ID,
+            // Keep ordinary chat responsive; the model can still reason as needed.
+            generationConfig: {
+              thinkingConfig: { thinkingLevel: "low" }
+            },
+            systemInstruction: {
+              parts: [{
+                text: "You are the conversational AI assistant inside CINEMOTION STUDIO. Respond naturally to the user's actual message. LANGUAGE RULE: Detect the language used in the latest user message and reply in that same language. If the user writes in English, answer in English. If the user writes in Telugu (including Telugu written with English/Roman letters), answer in Telugu; when the user writes Romanized Telugu, prefer clear, natural Romanized Telugu unless they use Telugu script. If the user mixes Telugu and English, reply in the dominant language while keeping familiar technical terms in English where useful. Do not switch languages unless the user asks you to. IMPORTANT: Do not automatically create, suggest, or expand a cinematic prompt. Only write or generate an image/video/filmmaking prompt when the user explicitly asks you to create, write, improve, or provide a prompt. For greetings such as 'hi', 'hello', or 'good morning', reply with a brief friendly greeting in the user's language and ask how you can help; do not generate a prompt. For general questions, answer the question directly in plain conversational language in the user's language. Keep simple answers concise (usually 1-3 sentences) and do not add a cinematic prompt unless explicitly requested. You may help with filmmaking, camera movements, camera angles, shot design, cinematic lighting, storyboards, image/video prompts, and creative production workflows when requested. Preserve exact product geometry and user constraints when writing product prompts. When a user attaches a file, inspect its contents and answer based on it."
+              }]
+            }
+          },
+          { timeout: 180000 }
+        );
+        console.info(`CINEMOTION: Firebase AI Logic initialized with ${CINEMOTION_GEMINI_MODEL_ID} (180s timeout).`);
+      } catch (aiError) {
+        window.cinemotionGeminiModel = null;
+        console.error("Firebase AI Logic initialization failed:", aiError);
+      }
+
+    } catch (err) {
+      console.error("Firebase initialization failed:", err);
+      showAuthMessage("Firebase initialization failed. " + (err?.message || err));
+      throw err;
+    }
+
+    if (window.emailjs && EMAILJS_PUBLIC_KEY) {
+      window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      const gate = byId("authGateModal");
+      const resendBtn = byId("resendVerificationBtn");
+      const verificationText = byId("verificationStatusText");
+
+      if (user && user.email) {
+        try { await user.reload(); }
+        catch (refreshError) { console.warn("Could not refresh email verification state:", refreshError); }
+      }
+
+      if (user && user.email && !user.emailVerified) {
+        document.body.classList.remove("is-admin-active");
+        if (gate) gate.style.display = "flex";
+        if (resendBtn) resendBtn.style.display = "block";
+        if (verificationText) {
+          verificationText.style.display = "block";
+          verificationText.textContent = "Your email is not verified. Check your inbox or click Resend Verification Email. If Firebase temporarily blocked requests, wait before retrying.";
+        }
         return;
       }
 
-      addGeminiMessage(prompt, "user");
-      const aiMsg = addGeminiMessage("Thinking...", "assistant");
+      if (resendBtn) resendBtn.style.display = "none";
+      if (verificationText) verificationText.style.display = "none";
 
-      if (geminiSend) geminiSend.disabled = true;
-      conversationHistory.push({ role: "user", parts: [{ text: prompt }] });
+      if (user) {
+        if (gate) gate.style.display = "none";
+        const displayName = user.email || user.phoneNumber || "Director";
+        if (byId("profileDisplayName")) byId("profileDisplayName").innerText = displayName;
+        if (byId("profileDisplayEmail")) byId("profileDisplayEmail").innerText = user.email || user.phoneNumber || "";
+        const firstLetter = (displayName[0] || "D").toUpperCase();
+        if (byId("headerUserAvatar")) byId("headerUserAvatar").innerText = firstLetter;
+        if (byId("profileAvatarLarge")) byId("profileAvatarLarge").innerText = firstLetter;
 
+        if (user.emailVerified && String(user.email || "").trim().toLowerCase() === CINEMOTION_ADMIN_EMAIL.toLowerCase()) {
+          document.body.classList.add("is-admin-active");
+          if (byId("profileBadgeRole")) byId("profileBadgeRole").innerText = "MASTER DIRECTOR (ADMIN)";
+        } else {
+          document.body.classList.remove("is-admin-active");
+          if (byId("profileBadgeRole")) byId("profileBadgeRole").innerText = "VAULT VIEWER";
+        }
+        loadFirebaseMovements();
+      } else {
+        document.body.classList.remove("is-admin-active", "director-mode", "director-show-gemini");
+        byId("geminiPanel")?.classList.remove("open");
+        if (gate) gate.style.display = "flex";
+      }
+    }, (err) => showAuthMessage(explainFirebaseError(err, "Authentication state check")));
+
+    async function notifyAdminOnLogin(identifier, method) {
       try {
-        // Send recent conversation context to the Worker as one prompt.
-        const historyText = conversationHistory.slice(-16).map(item => {
-          const text = item.parts?.map(part => part.text || "").join("") || "";
-          return `${item.role === "model" ? "Assistant" : "User"}: ${text}`;
-        }).join("\\n\\n");
-
-        const workerPrompt = historyText.length > 28000
-          ? historyText.slice(-28000)
-          : historyText;
-
-        // Firebase ID token is verified by the Cloudflare Worker.
-        const idToken = await user.getIdToken();
-
-        const res = await fetch(GEMINI_WORKER_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${idToken}`
-          },
-          body: JSON.stringify({ prompt: workerPrompt })
+        await addDoc(collection(db, "user_logins"), {
+          identifier,
+          method,
+          timestamp: new Date().toISOString()
         });
-
-        const data = await res.json().catch(() => ({}));
-
-        if (!res.ok) {
-          throw new Error(data?.error || `Gemini request failed (${res.status})`);
-        }
-
-        if (!data?.success || !data?.text) {
-          throw new Error(data?.error || "Gemini returned an empty response");
-        }
-
-        conversationHistory.push({
-          role: "model",
-          parts: [{ text: data.text }]
-        });
-
-        aiMsg.textContent = data.text;
       } catch (err) {
-        // Remove the unanswered user turn so a retry does not duplicate it.
-        conversationHistory.pop();
-        aiMsg.classList.add("error");
-        aiMsg.textContent = "Error: " + (err?.message || "Gemini connection failed");
-      } finally {
-        if (geminiSend) geminiSend.disabled = false;
-        geminiMessages?.scrollTo({
-          top: geminiMessages.scrollHeight,
-          behavior: "smooth"
-        });
+        console.warn("Login record was not saved to Firestore:", err);
+      }
+      if (window.emailjs && EMAILJS_PUBLIC_KEY && EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID) {
+        try {
+          await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+            to_email: NOTIFY_RECEIVER_EMAIL,
+            user_info: identifier,
+            login_time: new Date().toLocaleString(),
+            auth_type: method
+          });
+        } catch (err) {
+          console.warn("EmailJS notification failed:", err);
+        }
       }
     }
 
-    geminiForm?.addEventListener("submit", async (e) => {
+    window.switchAuthMode = function(mode) {
+      const isEmail = mode === "email";
+      const isRegister = mode === "register";
+      const isPhone = mode === "phone";
+
+      byId("tabEmailBtn")?.classList.toggle("active", isEmail);
+      byId("tabRegisterBtn")?.classList.toggle("active", isRegister);
+      byId("tabPhoneBtn")?.classList.toggle("active", isPhone);
+
+      if (byId("emailAuthForm")) byId("emailAuthForm").style.display = isEmail ? "block" : "none";
+      if (byId("registerAuthForm")) byId("registerAuthForm").style.display = isRegister ? "block" : "none";
+      if (byId("phoneAuthForm")) byId("phoneAuthForm").style.display = isPhone ? "block" : "none";
+
+      if (isPhone) {
+        try { initRecaptcha(); }
+        catch (err) { showAuthMessage(explainFirebaseError(err, "reCAPTCHA initialization")); }
+      }
+    };
+
+    byId("emailAuthForm")?.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const value = geminiInput?.value.trim() || "";
-      if (!value || geminiSend?.disabled) return;
-      geminiInput.value = "";
-      await sendGeminiMessage(value);
+      const email = byId("userEmailInput")?.value.trim();
+      const password = byId("userPassInput")?.value || "";
+      if (!email || !password) return showAuthMessage("Enter your email address and password.");
+
+      const submit = byId("emailSubmitBtn");
+      if (submit) { submit.disabled = true; submit.textContent = "Please wait..."; }
+      try {
+        const loginCredential = await signInWithEmailAndPassword(auth, email, password);
+        await loginCredential.user.reload();
+
+        if (!loginCredential.user.emailVerified) {
+          if (byId("resendVerificationBtn")) byId("resendVerificationBtn").style.display = "block";
+          if (byId("verificationStatusText")) {
+            byId("verificationStatusText").style.display = "block";
+            byId("verificationStatusText").textContent = "Email verification is pending. Use the Resend Verification Email button only when needed. Check Inbox, Spam and Promotions.";
+          }
+          showAuthMessage("Please verify your email before entering CINEMOTION. No automatic email was sent, to avoid Firebase rate limits.");
+          return;
+        }
+
+        await notifyAdminOnLogin(email, "Email Login");
+      } catch (err) {
+        showAuthMessage(explainFirebaseError(err, "Login"));
+      } finally {
+        if (submit) { submit.disabled = false; submit.textContent = "Login"; }
+      }
     });
+
+    let verificationResendAllowedAt = 0;
+    window.resendVerificationEmail = async function() {
+      const user = auth.currentUser;
+      const button = byId("resendVerificationBtn");
+      if (!user || !user.email) {
+        showAuthMessage("Please log in with your email and password first.");
+        return;
+      }
+      if (user.emailVerified) {
+        showAuthMessage("Your email is already verified. Please log in again.");
+        return;
+      }
+      const remaining = Math.ceil((verificationResendAllowedAt - Date.now()) / 1000);
+      if (remaining > 0) {
+        showAuthMessage("Please wait " + remaining + " seconds before requesting another verification email.");
+        return;
+      }
+      try {
+        if (button) { button.disabled = true; button.textContent = "Sending..."; }
+        await sendEmailVerification(user, {
+          url: window.location.origin,
+          handleCodeInApp: false
+        });
+        verificationResendAllowedAt = Date.now() + 60000;
+        if (byId("verificationStatusText")) {
+          byId("verificationStatusText").style.display = "block";
+          byId("verificationStatusText").textContent = "Verification email sent. Check Inbox, Spam and Promotions. After verifying, return here and log in again.";
+        }
+        showAuthMessage("Verification email sent. Please check your inbox.");
+      } catch (err) {
+        showAuthMessage(explainFirebaseError(err, "Resending verification email"));
+      } finally {
+        if (button) { button.disabled = false; button.textContent = "Resend Verification Email"; }
+      }
+    };
+
+    byId("registerAuthForm")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = byId("regEmailInput")?.value.trim();
+      const jobStudy = byId("regJobInput")?.value;
+      const pass = byId("regPassInput")?.value;
+      const confirmPass = byId("regConfirmPassInput")?.value;
+
+      if (!email || !jobStudy || !pass || !confirmPass) {
+        return showAuthMessage("Please fill in all 4 registration fields.");
+      }
+      if (pass !== confirmPass) {
+        return showAuthMessage("Passwords do not match!");
+      }
+
+      const doneBtn = byId("regDoneBtn");
+      if (doneBtn) { doneBtn.disabled = true; doneBtn.textContent = "Registering..."; }
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+
+        await sendEmailVerification(userCredential.user, {
+          url: window.location.origin,
+          handleCodeInApp: false
+        });
+
+        await addDoc(collection(db, "registered_users"), {
+          uid: userCredential.user.uid,
+          email: email,
+          occupation: jobStudy,
+          createdAt: new Date().toISOString()
+        });
+
+        await notifyAdminOnLogin(email, `New User Registered (${jobStudy})`);
+        alert("Registration successful. A verification email has been sent to " + email + ". Please verify it from your inbox (also check Spam/Promotions), then log in. Unverified email accounts cannot use admin-only media upload."); 
+        await signOut(auth);
+      } catch (err) {
+        showAuthMessage(explainFirebaseError(err, "Registration"));
+      } finally {
+        if (doneBtn) { doneBtn.disabled = false; doneBtn.textContent = "Done"; }
+      }
+    });
+
+    byId("forgotPasswordForm")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = byId("resetEmailInput")?.value.trim();
+      if (!email) return showAuthMessage("Enter your registered email address.");
+      try {
+        await sendPasswordResetEmail(auth, email);
+        alert("Password reset email sent. Check your inbox and spam folder.");
+        if (byId("forgotPasswordModal")) byId("forgotPasswordModal").style.display = "none";
+      } catch (err) {
+        showAuthMessage(explainFirebaseError(err, "Password reset"));
+      }
+    });
+
+    function initRecaptcha() {
+      if (window.recaptchaVerifier) return window.recaptchaVerifier;
+      const container = byId("recaptcha-container");
+      if (!container) throw new Error("The reCAPTCHA container is missing from the page.");
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, container, { size: "invisible" });
+      return window.recaptchaVerifier;
+    }
+
+    window.requestPhoneOtp = async function() {
+      const phoneNumber = byId("userPhoneInput")?.value.trim();
+      if (!phoneNumber) return showAuthMessage("Enter your mobile number with country code, for example +919876543210.");
+      const sendButton = byId("sendOtpBtn");
+      if (sendButton) { sendButton.disabled = true; sendButton.textContent = "Sending OTP..."; }
+      try {
+        const verifier = initRecaptcha();
+        window.confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, verifier);
+        if (byId("otpGroup")) byId("otpGroup").style.display = "block";
+        if (byId("verifyOtpBtn")) byId("verifyOtpBtn").style.display = "block";
+        if (sendButton) sendButton.style.display = "none";
+        alert("OTP sent to " + phoneNumber);
+      } catch (err) {
+        try { window.recaptchaVerifier?.clear(); } catch (_) {}
+        window.recaptchaVerifier = null;
+        showAuthMessage(explainFirebaseError(err, "Phone OTP request"));
+      } finally {
+        if (sendButton && sendButton.style.display !== "none") {
+          sendButton.disabled = false;
+          sendButton.textContent = "Send OTP";
+        }
+      }
+    };
+
+    window.confirmPhoneOtp = async function() {
+      const code = byId("otpCodeInput")?.value.trim();
+      if (!/^\d{6}$/.test(code || "") || !window.confirmationResult) {
+        return showAuthMessage("Enter the 6-digit OTP sent to your phone.");
+      }
+      try {
+        const result = await window.confirmationResult.confirm(code);
+        await notifyAdminOnLogin(result.user.phoneNumber || "Phone user", "Phone OTP");
+      } catch (err) {
+        showAuthMessage(explainFirebaseError(err, "OTP verification"));
+      }
+    };
+
+    window.handleUserLogout = async function() {
+      const button = byId("signOutButton");
+      if (button) { button.disabled = true; button.textContent = "Signing out..."; }
+
+      try {
+        byId("profileDropdown")?.classList.remove("show");
+        byId("geminiPanel")?.classList.remove("open");
+        document.body.classList.remove("director-mode", "director-show-gemini", "is-admin-active");
+
+        if (!auth.currentUser) {
+          const gate = byId("authGateModal");
+          if (gate) gate.style.display = "flex";
+          return;
+        }
+
+        await signOut(auth);
+        geminiChatSession = null;
+        if (geminiMessages) geminiMessages.replaceChildren();
+        if (geminiInput) geminiInput.value = "";
+        const gate = byId("authGateModal");
+        if (gate) gate.style.display = "flex";
+      } catch (err) {
+        console.error("Sign out failed:", err);
+        showAuthMessage(explainFirebaseError(err, "Sign out"));
+      } finally {
+        if (button) { button.disabled = false; button.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i> Sign Out'; }
+      }
+    };
+
+    byId("signOutButton")?.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      window.handleUserLogout();
+    });
+
+    async function callMediaApi(path, payload, file) {
+      if (!auth.currentUser) throw new Error("Please sign in before managing media.");
+      requireVerifiedAdmin();
+
+      const token = await auth.currentUser.getIdToken(true);
+      const headers = { Authorization: `Bearer ${token}` };
+      let body;
+
+      if (file) {
+        body = new FormData();
+        body.append("file", file, file.name || "media");
+        if (payload?.cardId) body.append("cardId", String(payload.cardId));
+      } else {
+        headers["Content-Type"] = "application/json";
+        body = JSON.stringify(payload || {});
+      }
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000);
+
+      try {
+        const baseUrl = CINEMOTION_MEDIA_API.replace(/\/+$/, "");
+        const endpointPath = String(path || "").startsWith("/") ? path : `/${path}`;
+        const response = await fetch(`${baseUrl}${endpointPath}`, {
+          method: "POST",
+          headers,
+          body,
+          signal: controller.signal
+        });
+
+        const responseText = await response.text();
+        let result = {};
+        if (responseText) {
+          try { result = JSON.parse(responseText); }
+          catch { throw new Error("Media server returned an invalid response. Check the Cloudflare Worker deployment."); }
+        }
+
+        if (!response.ok || result.success === false) {
+          throw new Error(result.error || `Media API error (${response.status})`);
+        }
+        return result;
+      } catch (err) {
+        if (err?.name === "AbortError") {
+          throw new Error("Media upload timed out after 120 seconds. Check your connection and try again.");
+        }
+        throw err;
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    }
+
+    window.uploadMediaFileToFirebase = async function(cardId, file, mediaType) {
+      requireVerifiedAdmin();
+      const result = await callMediaApi("/upload", { cardId }, file);
+      if (!result?.url || !result?.public_id || !result?.resource_type) {
+        throw new Error("Cloudinary upload response is incomplete. The media was not saved to the vault.");
+      }
+      await window.saveMediaLinkToFirestore(cardId, result.url, mediaType, null, result.public_id, result.resource_type);
+      return result.url;
+    };
+
+    async function deleteCloudinaryAsset(data) {
+      if (!data?.cloudinaryPublicId) return true;
+      await callMediaApi("/delete", {
+        public_id: data.cloudinaryPublicId,
+        resource_type: data.cloudinaryResourceType || (data.mediaType === "video" ? "video" : "image")
+      });
+      return true;
+    }
+
+    window.savePromptEditToFirestore = async function(itemId, name, prompt) {
+      requireVerifiedAdmin();
+      await setDoc(doc(db, "promptEdits", String(itemId)), {
+        itemId: String(itemId),
+        name,
+        prompt,
+        updatedAt: new Date().toISOString(),
+        updatedBy: auth.currentUser.uid
+      }, { merge: true });
+    };
+
+    window.deleteMediaFromFirestore = async function(cardId) {
+      requireVerifiedAdmin();
+      const q = query(collection(db, "movements"), where("linkedCardId", "==", String(cardId)));
+      const snapshot = await getDocs(q);
+      for (const docSnap of snapshot.docs) {
+        const data = docSnap.data();
+        if (data.cloudinaryPublicId) await deleteCloudinaryAsset(data);
+        if (data.storagePath) {
+          try { await deleteObject(storageRef(storage, data.storagePath)); }
+          catch (err) { if (err?.code !== "storage/object-not-found") throw err; }
+        }
+      }
+      for (const docSnap of snapshot.docs) await deleteDoc(doc(db, "movements", docSnap.id));
+      return true;
+    };
+
+    window.saveMediaLinkToFirestore = async function(cardId, url, mediaType, storagePath = null, cloudinaryPublicId = null, cloudinaryResourceType = null) {
+      requireVerifiedAdmin();
+      const toast = byId("toast");
+      if (toast) { toast.textContent = "Saving media metadata..."; toast.classList.add("show"); }
+      try {
+        if (!auth.currentUser) throw new Error("Please sign in before syncing media.");
+        const q = query(collection(db, "movements"), where("linkedCardId", "==", String(cardId)));
+        const snap = await getDocs(q);
+        for (const oldDoc of snap.docs) {
+          const oldData = oldDoc.data();
+          if (oldData.cloudinaryPublicId) await deleteCloudinaryAsset(oldData);
+          if (oldData.storagePath && oldData.storagePath !== storagePath) {
+            try { await deleteObject(storageRef(storage, oldData.storagePath)); }
+            catch (err) { if (err?.code !== "storage/object-not-found") throw err; }
+          }
+        }
+        for (const oldDoc of snap.docs) await deleteDoc(doc(db, "movements", oldDoc.id));
+        await addDoc(collection(db, "movements"), {
+          linkedCardId: String(cardId), mediaURL: url, mediaType,
+          storagePath: storagePath || null,
+          cloudinaryPublicId: cloudinaryPublicId || null,
+          cloudinaryResourceType: cloudinaryResourceType || null,
+          createdAt: new Date().toISOString(), updatedBy: auth.currentUser.uid
+        });
+        const item = window.allVaultItems?.find(m => m.id === cardId);
+        if (item) { item.mediaURL = url; item.mediaType = mediaType; }
+        if (toast) { toast.textContent = "Media synced successfully!"; setTimeout(() => toast.classList.remove("show"), 2500); }
+        return true;
+      } catch (err) {
+        if (toast) { toast.textContent = "Cloud sync failed: " + (err.message || err); setTimeout(() => toast.classList.remove("show"), 4000); }
+        throw err;
+      }
+    };
+
+    window.migrateFirebaseMediaToCloudinary = async function() {
+      requireVerifiedAdmin();
+      const q = query(collection(db, "movements"), orderBy("createdAt", "asc"));
+      const snap = await getDocs(q);
+      const legacy = snap.docs.filter(d => { const x = d.data(); return !!x.linkedCardId && !!x.storagePath && !!x.mediaURL; });
+      if (!legacy.length) { alert("No legacy Firebase media records found to migrate."); return; }
+      if (!confirm(`Found ${legacy.length} Firebase media file(s). Migration uploads each to Cloudinary, updates Firestore, verifies the new record, then deletes the old Firebase file. Continue?`)) return;
+      let migrated = 0, failed = 0;
+      for (let i = 0; i < legacy.length; i++) {
+        const d = legacy[i]; const data = d.data();
+        try {
+          let uploaded = data.cloudinaryPublicId ? {
+            url: data.mediaURL, public_id: data.cloudinaryPublicId,
+            resource_type: data.cloudinaryResourceType || (data.mediaType === "video" ? "video" : "image")
+          } : null;
+          if (!uploaded) {
+            uploaded = await callMediaApi("/migrate", {
+              cardId: data.linkedCardId, mediaURL: data.mediaURL, mediaType: data.mediaType
+            });
+            await updateDoc(doc(db, "movements", d.id), {
+              mediaURL: uploaded.url, cloudinaryPublicId: uploaded.public_id,
+              cloudinaryResourceType: uploaded.resource_type, migratedFrom: "firebase-storage",
+              migratedAt: new Date().toISOString(), migrationStatus: "cloudinary-verified"
+            });
+          }
+          const verify = await getDocs(query(collection(db, "movements"), where("linkedCardId", "==", String(data.linkedCardId))));
+          const verified = verify.docs.some(x => x.id === d.id && x.data().cloudinaryPublicId === uploaded.public_id && x.data().mediaURL === uploaded.url);
+          if (!verified) throw new Error("Cloudinary metadata verification failed; original retained.");
+          if (data.storagePath) {
+            try { await deleteObject(storageRef(storage, data.storagePath)); }
+            catch (err) { if (err?.code !== "storage/object-not-found") throw err; }
+          }
+          await updateDoc(doc(db, "movements", d.id), { storagePath: null, migrationStatus: "completed" });
+          migrated++;
+        } catch (err) {
+          failed++; console.error("Migration failed for", d.id, err);
+        }
+      }
+      alert(`Migration finished. Migrated: ${migrated}. Failed/retained for retry: ${failed}. Total: ${legacy.length}.`);
+      await loadFirebaseMovements();
+    };
+
+    // Gemini AI Assistant UI, chat controls, and file attachments.
+    const geminiPanel = byId("geminiPanel");
+    const geminiLauncher = byId("geminiLauncher");
+    const geminiClose = byId("geminiClose");
+    const geminiForm = byId("geminiForm");
+    const geminiInput = byId("geminiInput");
+    const geminiMessages = byId("geminiMessages");
+    const directorLibrarySearch = byId("directorLibrarySearch");
+    const directorLibraryStatus = byId("directorLibraryStatus");
+    const directorLibraryTab = byId("directorLibraryTab");
+    const directorGeminiTab = byId("directorGeminiTab");
+
+    function syncDirectorLibrary(rawQuery) {
+      const sourceText = String(rawQuery || "").toLowerCase();
+      const items = Array.isArray(window.allVaultItems) ? window.allVaultItems : [];
+
+      const keywordGroups = [
+        { category:"Camera Movement", display:"movement", terms:["camera movement","camera movements","movement","movements","dolly","tracking","track","truck","pan","tilt","crane","orbit","arc","push in","pull out","zoom in","zoom out","handheld","steadicam","gimbal","whip pan","follow shot"] },
+        { category:"Camera Angles", display:"angle", terms:["camera angle","camera angles","angles","angle","low angle","high angle","eye level","bird's eye","birds eye","worm's eye","worms eye","dutch angle","top angle","overhead angle","profile angle"] },
+        { category:"Camera Shots", display:"shot", terms:["camera shot","camera shots","shot types","shot type","close up","close-up","extreme close up","long shot","wide shot","medium shot","establishing shot","full shot","two shot","over the shoulder","pov shot","macro shot"] },
+        { category:"Cinematic Lighting", display:"lighting", terms:["cinematic lighting","lighting","light","lights","backlight","backlighting","rim light","rimlight","split light","key light","fill light","practical light","soft light","hard light","low key","high key","chiaroscuro","volumetric light","god rays","silhouette"] },
+        { category:"Camera Lens", display:"lens", terms:["camera lens","camera lenses","lens","lenses","focal length","wide lens","ultra wide","telephoto","prime lens","macro lens","anamorphic","35mm","50mm","85mm","24mm","fisheye","depth of field","bokeh","aperture"] },
+        { category:"Atmosphere", display:"atmosphere", terms:["atmosphere","environment","weather","mood","fog","mist","smoke","haze","rain","storm","snow","dust","embers","wind","golden hour","blue hour","night","sunrise","sunset"] },
+        { category:"Master Prompts", display:"master prompt", terms:["master prompt","master prompts","recreate prompt","animation prompt","image upscaling","colour recreation","color recreation"] }
+      ];
+
+      const matches = [];
+      for (const group of keywordGroups) {
+        for (const term of group.terms) {
+          const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+");
+          const regex = new RegExp("(^|[^a-z0-9])" + escaped + "(?=$|[^a-z0-9])", "gi");
+          let match;
+          while ((match = regex.exec(sourceText)) !== null) {
+            matches.push({
+              index: match.index + match[1].length,
+              length: match[0].length - match[1].length,
+              category: group.category,
+              display: group.display,
+              term
+            });
+            if (match[0].length === 0) regex.lastIndex++;
+          }
+        }
+      }
+
+      if (!matches.length) {
+        if (directorLibrarySearch) directorLibrarySearch.value = "";
+        currentCategory = "All";
+        document.querySelectorAll(".cat-tab").forEach(btn => btn.classList.remove("active"));
+        document.querySelector('.cat-tab[onclick*="\'All\'"]')?.classList.add("active");
+        renderCards([]);
+        if (directorLibraryStatus) directorLibraryStatus.textContent = "Type a library keyword such as lighting, angle, shot, lens, dolly, fog or rain.";
+        return;
+      }
+
+      matches.sort((a, b) => a.index - b.index || b.length - a.length);
+      const selected = matches[matches.length - 1];
+      const displayTerm = selected.display;
+
+      if (directorLibrarySearch) directorLibrarySearch.value = displayTerm;
+
+      const categoryItems = items.filter(item =>
+        String(item.category || "").toLowerCase() === selected.category.toLowerCase()
+      );
+
+      let results = categoryItems;
+      if (!results.length) {
+        const termVariants = keywordGroups
+          .find(group => group.category === selected.category)?.terms || [selected.term];
+        const terms = termVariants.map(term => term.toLowerCase());
+        results = items.filter(item => {
+          const haystack = `${item.name || ""} ${item.category || ""} ${item.prompt || ""}`.toLowerCase();
+          return terms.some(term => {
+            const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+");
+            return new RegExp("(^|[^a-z0-9])" + escaped + "(?=$|[^a-z0-9])", "i").test(haystack);
+          });
+        });
+      }
+
+      currentCategory = "All";
+      document.querySelectorAll(".cat-tab").forEach(btn => btn.classList.remove("active"));
+      document.querySelector('.cat-tab[onclick*="\'All\'"]')?.classList.add("active");
+      renderCards(results);
+
+      if (directorLibraryStatus) {
+        const label = categoryItems.length ? selected.category : `${selected.category} keyword matches`;
+        directorLibraryStatus.textContent = `${results.length} result(s) for “${displayTerm}” · ${label}`;
+      }
+
+      const firstCard = grid?.querySelector(".movement-card");
+      if (firstCard && document.body.classList.contains("director-mode")) {
+        firstCard.scrollIntoView({ block:"nearest", behavior:"smooth" });
+      }
+    }
+
+    window.insertPromptIntoGemini = function(itemId) {
+      const item = window.allVaultItems?.find(entry => String(entry.id) === String(itemId));
+      if (!item || !geminiInput) return;
+      geminiInput.value = item.prompt || "";
+      geminiInput.focus();
+      geminiInput.dispatchEvent(new Event("input", { bubbles:true }));
+      if (directorLibraryStatus) directorLibraryStatus.textContent = `“${item.name}” added to Gemini. Review it, then press Send.`;
+      if (window.innerWidth <= 820) {
+        document.body.classList.add("director-show-gemini");
+        directorLibraryTab?.classList.remove("active");
+        directorGeminiTab?.classList.add("active");
+      }
+    };
+
+    geminiInput?.addEventListener("input", () => {
+      if (document.body.classList.contains("director-mode")) syncDirectorLibrary(geminiInput.value);
+    });
+    directorLibrarySearch?.addEventListener("input", () => syncDirectorLibrary(directorLibrarySearch.value));
+    directorLibraryTab?.addEventListener("click", () => {
+      document.body.classList.remove("director-show-gemini");
+      directorLibraryTab.classList.add("active");
+      directorGeminiTab?.classList.remove("active");
+    });
+    directorGeminiTab?.addEventListener("click", () => {
+      document.body.classList.add("director-show-gemini");
+      directorGeminiTab.classList.add("active");
+      directorLibraryTab?.classList.remove("active");
+      geminiInput?.focus();
+    });
+    const geminiWelcome = byId("geminiWelcome");
+    const geminiMenuToggle = byId("geminiMenuToggle");
+    const geminiMenuDrawer = byId("geminiMenuDrawer");
+    const geminiNewChat = byId("geminiNewChat");
+    const geminiClearChat = byId("geminiClearChat");
+    const geminiFileInput = byId("geminiFileInput");
+    const geminiUploadBtn = byId("geminiUploadBtn");
+    const geminiAttachmentPreview = byId("geminiAttachmentPreview");
+    const geminiAttachmentName = byId("geminiAttachmentName");
+    const geminiRemoveAttachment = byId("geminiRemoveAttachment");
+    let geminiChatSession = null;
+    let geminiSelectedFile = null;
+    const GEMINI_MAX_FILE_BYTES = 15 * 1024 * 1024;
+
+    function openGeminiPanel() {
+      document.body.classList.add("director-mode");
+      if (window.matchMedia("(max-width: 820px)").matches) {
+        document.body.classList.add("director-show-gemini");
+        directorGeminiTab?.classList.add("active");
+        directorLibraryTab?.classList.remove("active");
+      } else {
+        document.body.classList.remove("director-show-gemini");
+      }
+      geminiPanel?.classList.add("open");
+      geminiPanel?.setAttribute("aria-hidden", "false");
+      syncDirectorLibrary(geminiInput?.value || "");
+      if (!auth.currentUser && geminiMessages && !geminiMessages.querySelector(".gemini-message")) {
+        addGeminiMessage("Please sign in to use Gemini. Sign in with your account, then reopen Gemini.", "assistant", true);
+      }
+      geminiInput?.focus();
+    }
+    function closeGeminiPanel() {
+      geminiPanel?.classList.remove("open");
+      geminiPanel?.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("director-mode", "director-show-gemini");
+      closeGeminiMenu();
+    }
+    function openGeminiMenu() {
+      geminiMenuDrawer?.classList.add("open");
+      geminiMenuDrawer?.setAttribute("aria-hidden", "false");
+      geminiMenuToggle?.setAttribute("aria-expanded", "true");
+    }
+    function closeGeminiMenu() {
+      geminiMenuDrawer?.classList.remove("open");
+      geminiMenuDrawer?.setAttribute("aria-hidden", "true");
+      geminiMenuToggle?.setAttribute("aria-expanded", "false");
+    }
+    function toggleGeminiMenu() {
+      if (geminiMenuDrawer?.classList.contains("open")) closeGeminiMenu();
+      else openGeminiMenu();
+    }
+    function resetGeminiConversation() {
+      geminiChatSession = null;
+      if (geminiMessages) geminiMessages.replaceChildren();
+      if (geminiWelcome) geminiWelcome.style.display = "";
+      if (geminiInput) geminiInput.value = "";
+      clearGeminiAttachment();
+      closeGeminiMenu();
+      geminiInput?.focus();
+    }
+    function addGeminiMessage(text, role, isError = false) {
+      if (!geminiMessages) return;
+      const message = document.createElement("div");
+      message.className = `gemini-message ${role}${isError ? " error" : ""}`;
+      message.textContent = text;
+      geminiMessages.appendChild(message);
+      geminiMessages.scrollTop = geminiMessages.scrollHeight;
+      if (geminiWelcome) geminiWelcome.style.display = "none";
+      return message;
+    }
+    function clearGeminiAttachment() {
+      geminiSelectedFile = null;
+      if (geminiFileInput) geminiFileInput.value = "";
+      if (geminiAttachmentPreview) geminiAttachmentPreview.hidden = true;
+      if (geminiAttachmentName) geminiAttachmentName.textContent = "";
+    }
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const dataUrl = String(reader.result || "");
+          resolve(dataUrl.substring(dataUrl.indexOf(",") + 1));
+        };
+        reader.onerror = () => reject(new Error("Could not read the selected file."));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function getInstantGreetingReply(text) {
+      const value = String(text || "").trim().toLowerCase()
+        .replace(/[.!?,;:]+$/g, "")
+        .replace(/\s+/g, " ");
+      const teluguScript = /[\u0C00-\u0C7F]/.test(value);
+      const romanTelugu = /\b(namaskaram|namaste|ela unn(a|aru|av)|bagunn(a|anu|ara)|em chestunnav|baagunnara)\b/i.test(value);
+      const englishGreeting = /^(hi|hello|hey|hiya|good morning|good afternoon|good evening|how are you|hi there|hello there)( there)?$/i.test(value);
+      const teluguGreeting = /^(నమస్కారం|నమస్తే|హాయ్|హలో|ఎలా ఉన్నారు|బాగున్నారా)[\s.!?]*$/u.test(value);
+      if (!(englishGreeting || romanTelugu || teluguGreeting || (teluguScript && /^(హాయ్|హలో|నమస్కారం|నమస్తే)[\s.!?]*$/u.test(value)))) return null;
+      if (teluguScript) return "నమస్కారం! నేను బాగున్నాను. మీకు ఎలా సహాయం చేయగలను?";
+      if (romanTelugu) return "Namaskaram! Nenu ela help cheyyagalanu?";
+      return "Hi! How can I help you?";
+    }
+
+    async function sendGeminiMessage(rawText, attachedFile = null) {
+      const prompt = String(rawText || "").trim();
+      if (!prompt && !attachedFile) return;
+      if (!auth.currentUser) {
+        addGeminiMessage("Please sign in to use Gemini.", "assistant", true);
+        return;
+      }
+      if (!window.cinemotionGeminiModel) {
+        addGeminiMessage("Gemini is not initialized. Check that Firebase AI Logic is enabled for this project and that App Check is correctly registered for this web app.", "assistant", true);
+        return;
+      }
+
+      const userLabel = attachedFile
+        ? `${prompt || "Please analyze this attached file."}\n\n📎 ${attachedFile.name}`
+        : prompt;
+      addGeminiMessage(userLabel, "user");
+
+      if (!attachedFile) {
+        const instantReply = getInstantGreetingReply(prompt);
+        if (instantReply) {
+          addGeminiMessage(instantReply, "assistant");
+          return;
+        }
+      }
+
+      const pending = addGeminiMessage("Gemini is thinking...", "assistant");
+      const sendButton = byId("geminiSend");
+      if (sendButton) sendButton.disabled = true;
+      if (geminiInput) geminiInput.disabled = true;
+      if (geminiUploadBtn) geminiUploadBtn.disabled = true;
+
+      try {
+        if (!geminiChatSession) {
+          geminiChatSession = window.cinemotionGeminiModel.startChat();
+        }
+
+        let messagePayload = prompt || "Please inspect the attached file and help me with it.";
+        if (attachedFile) {
+          const mimeType = attachedFile.type || "application/octet-stream";
+          if (mimeType.startsWith("text/") || mimeType === "application/json") {
+            const textContent = await attachedFile.text();
+            messagePayload += `\n\nAttached file: ${attachedFile.name}\n\n${textContent}`;
+          } else {
+            const base64Data = await fileToBase64(attachedFile);
+            messagePayload = [
+              { text: messagePayload },
+              { inlineData: { data: base64Data, mimeType } }
+            ];
+          }
+        }
+
+        const result = await geminiChatSession.sendMessageStream(messagePayload);
+        let streamedText = "";
+        if (result?.stream && pending) {
+          for await (const chunk of result.stream) {
+            const piece = chunk?.text?.() || "";
+            if (piece) {
+              streamedText += piece;
+              pending.textContent = streamedText;
+              geminiMessages.scrollTop = geminiMessages.scrollHeight;
+            }
+          }
+        }
+        const finalResponse = await result.response;
+        const finalText = finalResponse?.text?.() || streamedText || "Gemini returned an empty response.";
+        if (pending) pending.textContent = finalText;
+      } catch (err) {
+        console.error("Gemini request failed:", err);
+        if (pending) {
+          pending.classList.add("error");
+          const errorText = String(err?.message || err || "Unknown error");
+          const lowerError = errorText.toLowerCase();
+          let friendlyError;
+
+          if (lowerError.includes("timeout") || lowerError.includes("timed out") || lowerError.includes("deadline")) {
+            friendlyError = "Gemini is taking longer than expected. The request timeout is now 180 seconds. If this happens repeatedly, check Firebase AI Logic availability, your internet connection, and Firebase Console > AI monitoring.";
+          } else if (lowerError.includes("app check") || lowerError.includes("attestation") || lowerError.includes("403")) {
+            friendlyError = "Firebase App Check blocked the Gemini request. Confirm that this website domain is registered for the correct Firebase web app and that the reCAPTCHA Enterprise site key matches the key registered in Firebase App Check.";
+          } else if (lowerError.includes("429") || lowerError.includes("quota") || lowerError.includes("resource_exhausted")) {
+            friendlyError = "Gemini request limit reached. Please wait a little and try again, or review your Firebase AI Logic quota and billing limits.";
+          } else {
+            friendlyError = `Gemini request failed: ${errorText}. Check Firebase AI Logic is enabled, App Check is correctly registered, and the browser console for the exact error.`;
+          }
+
+          pending.textContent = friendlyError;
+        }
+      } finally {
+        if (sendButton) sendButton.disabled = false;
+        if (geminiInput) { geminiInput.disabled = false; geminiInput.focus(); }
+        if (geminiUploadBtn) geminiUploadBtn.disabled = false;
+      }
+    }
+
+    if (geminiLauncher) {
+      geminiLauncher.type = "button";
+      geminiLauncher.setAttribute("aria-controls", "geminiPanel");
+      geminiLauncher.setAttribute("aria-expanded", "false");
+      geminiLauncher.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        openGeminiPanel();
+        geminiLauncher.setAttribute("aria-expanded", "true");
+      });
+    }
+    geminiClose?.addEventListener("click", () => {
+      closeGeminiPanel();
+      geminiLauncher?.setAttribute("aria-expanded", "false");
+    });
+    geminiMenuToggle?.addEventListener("click", toggleGeminiMenu);
+    geminiNewChat?.addEventListener("click", () => {
+      resetGeminiConversation();
+      addGeminiMessage("New chat started. What would you like to create?", "assistant");
+    });
+    geminiClearChat?.addEventListener("click", () => {
+      resetGeminiConversation();
+    });
+    geminiUploadBtn?.addEventListener("click", () => geminiFileInput?.click());
+    geminiFileInput?.addEventListener("change", () => {
+      const file = geminiFileInput?.files?.[0];
+      if (!file) return;
+      const allowed = file.type.startsWith("image/") ||
+        file.type === "application/pdf" ||
+        file.type.startsWith("text/") ||
+        file.type === "application/json";
+      if (!allowed) {
+        clearGeminiAttachment();
+        addGeminiMessage("Unsupported file. Please attach an image, PDF, or text file.", "assistant", true);
+        return;
+      }
+      if (file.size > GEMINI_MAX_FILE_BYTES) {
+        clearGeminiAttachment();
+        addGeminiMessage("This file is larger than 15 MB. Please choose a smaller file.", "assistant", true);
+        return;
+      }
+      geminiSelectedFile = file;
+      if (geminiAttachmentName) geminiAttachmentName.textContent = file.name;
+      if (geminiAttachmentPreview) geminiAttachmentPreview.hidden = false;
+      geminiInput?.focus();
+    });
+    geminiRemoveAttachment?.addEventListener("click", clearGeminiAttachment);
+    geminiForm?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const value = geminiInput?.value || "";
+      const file = geminiSelectedFile;
+      if (geminiInput) geminiInput.value = "";
+      clearGeminiAttachment();
+      sendGeminiMessage(value, file);
+    });
+    geminiInput?.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        geminiForm?.requestSubmit();
+      }
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeGeminiMenu();
+    });
+    document.querySelectorAll("[data-gemini-prompt]").forEach((button) => {
+      button.addEventListener("click", () => {
+        openGeminiPanel();
+        sendGeminiMessage(button.getAttribute("data-gemini-prompt"));
+      });
+    });
+
+    const addMovementBtn = byId("addMovementBtn");
+    const movementModal = byId("movementModal");
+    const closeModalBtn = byId("closeModalBtn");
+    const movementForm = byId("movementForm");
+    const saveBtn = byId("saveBtn");
+
+    if (addMovementBtn && movementModal) addMovementBtn.onclick = () => { movementModal.style.display = "flex"; };
+    if (closeModalBtn && movementModal) closeModalBtn.onclick = () => { movementModal.style.display = "none"; };
+    window.addEventListener("click", (e) => { if (e.target === movementModal) movementModal.style.display = "none"; });
+
+    movementForm?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      try { requireVerifiedAdmin(); }
+      catch (authError) { showAuthMessage(authError.message); return; }
+      const url = byId("itemMediaUrl")?.value.trim() || "";
+      const category = byId("itemCategory")?.value;
+      const title = byId("itemTitle")?.value.trim();
+      const prompt = byId("itemPrompt")?.value.trim();
+      if (!title || !prompt) return showAuthMessage("Please enter a movement name and prompt.");
+      const isDrive = url.includes("drive.google.com");
+      const isYoutube = url.includes("youtube.com") || url.includes("youtu.be");
+      const mediaType = !url ? "" : (isYoutube ? "youtube" : (isDrive ? "drive" : "video"));
+      try {
+        if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = "Saving..."; }
+        const movementData = { name: title, category, prompt, mediaURL: url, mediaType, createdAt: new Date().toISOString() };
+        const docRef = await addDoc(collection(db, "movements"), movementData);
+        movementData.id = docRef.id;
+        window.allVaultItems.unshift(movementData);
+        filterCards();
+        movementForm.reset();
+        if (movementModal) movementModal.style.display = "none";
+        alert("New movement saved successfully!");
+      } catch (err) {
+        showAuthMessage(explainFirebaseError(err, "Saving movement"));
+      } finally {
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = "+ Save to Vault"; }
+      }
+    });
+
+    async function loadFirebaseMovements() {
+      try {
+        const q = query(collection(db, "movements"), orderBy("createdAt", "desc"));
+        const [snapshot, editsSnapshot] = await Promise.all([
+          getDocs(q),
+          getDocs(collection(db, "promptEdits"))
+        ]);
+        const customMovements = [];
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          if (data.name) customMovements.push({ id: docSnap.id, ...data });
+          else if (data.linkedCardId && data.mediaURL) {
+            const target = window.allVaultItems?.find(m => m.id === data.linkedCardId);
+            if (target) {
+              target.mediaURL = data.mediaURL;
+              target.mediaType = data.mediaType;
+              if (typeof applyMediaUrlToCard === "function") applyMediaUrlToCard(target.id, data.mediaURL, data.mediaType);
+            }
+          }
+        });
+        if (customMovements.length) {
+          const existingIds = new Set(window.allVaultItems.map((item) => item.id));
+          const newMovements = customMovements.filter((item) => !existingIds.has(item.id));
+          if (newMovements.length) window.allVaultItems = [...newMovements, ...window.allVaultItems];
+        }
+
+        editsSnapshot.forEach((editDoc) => {
+          const edit = editDoc.data();
+          const item = window.allVaultItems.find(m => m.id === (edit.itemId || editDoc.id));
+          if (item) {
+            if (typeof edit.name === "string") item.name = edit.name;
+            if (typeof edit.prompt === "string") item.prompt = edit.prompt;
+          }
+        });
+        renderCards(window.allVaultItems);
+      } catch (err) {
+        console.error("Firestore load error:", err);
+      }
+    }
   </script>
 </body>
 </html>
