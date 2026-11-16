@@ -3413,11 +3413,40 @@
 
     window.insertPromptIntoGemini = function(itemId) {
       const item = window.allVaultItems?.find(entry => String(entry.id) === String(itemId));
-      if (!item || !geminiInput) return;
-      geminiInput.value = item.prompt || "";
+      if (!item || !geminiInput) {
+        console.warn("CINEMOTION: Prompt could not be added to Gemini.", { itemId });
+        return;
+      }
+
+      const promptText = String(item.prompt || "").trim();
+      if (!promptText) {
+        if (directorLibraryStatus) directorLibraryStatus.textContent = `“${item.name}” does not contain prompt text yet.`;
+        return;
+      }
+
+      // Append each selected library prompt to the existing composer content.
+      // This lets users click several "Use in Gemini" buttons without losing
+      // text they have already typed or previously selected.
+      const currentText = geminiInput.value.trimEnd();
+      const alreadyIncluded = currentText.includes(promptText);
+      if (!alreadyIncluded) {
+        geminiInput.value = currentText
+          ? `${currentText}\n\n${promptText}`
+          : promptText;
+      }
+
+      // Keep the composer in view and put the caret at the end of the added text.
       geminiInput.focus();
+      const endPosition = geminiInput.value.length;
+      geminiInput.setSelectionRange(endPosition, endPosition);
       geminiInput.dispatchEvent(new Event("input", { bubbles:true }));
-      if (directorLibraryStatus) directorLibraryStatus.textContent = `“${item.name}” added to Gemini. Review it, then press Send.`;
+
+      if (directorLibraryStatus) {
+        directorLibraryStatus.textContent = alreadyIncluded
+          ? `“${item.name}” is already in your Gemini message.`
+          : `“${item.name}” added to your Gemini message. You can select more prompts or press Send.`;
+      }
+
       if (window.innerWidth <= 820) {
         document.body.classList.add("director-show-gemini");
         directorLibraryTab?.classList.remove("active");
