@@ -845,13 +845,13 @@
     .gemini-suggestions button { text-align:left; color:#dbeafe; background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; font:500 .75rem 'Plus Jakarta Sans',sans-serif; cursor:pointer; }
     .gemini-suggestions button:hover { border-color:#9b72cb; background:rgba(155,114,203,.1); }
     .gemini-messages { flex:1; min-height:80px; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:12px; }
-    .gemini-message { max-width:92%; padding:11px 13px; border-radius:13px; font-size:.8rem; line-height:1.6; white-space:pre-wrap; overflow-wrap:anywhere; }
+    .gemini-message { max-width:92%; padding:11px 13px; border-radius:13px; font-size:.9rem; line-height:1.65; white-space:pre-wrap; overflow-wrap:anywhere; }
     .gemini-message.user { align-self:flex-end; background:rgba(66,133,244,.2); border:1px solid rgba(66,133,244,.25); color:#eff6ff; }
     .gemini-message.assistant { align-self:flex-start; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); color:#e2e8f0; }
     .gemini-message.error { color:#fecaca; border-color:rgba(239,68,68,.3); }
     .gemini-composer { margin:10px 13px 0; padding:8px 8px 8px 13px; display:flex; align-items:flex-end; gap:8px; background:#151d2d; border:1px solid rgba(255,255,255,.14); border-radius:14px; }
     .gemini-composer:focus-within { border-color:#9b72cb; box-shadow:0 0 0 2px rgba(155,114,203,.12); }
-    .gemini-composer textarea { flex:1; resize:vertical; min-height:132px; max-height:220px; overflow-y:auto; border:0; outline:0; color:#fff; background:transparent; font: .82rem/1.5 'Plus Jakarta Sans',sans-serif; padding:6px 0; }
+    .gemini-composer textarea { flex:1; resize:vertical; min-height:132px; max-height:220px; overflow-y:auto; border:0; outline:0; color:#fff; background:transparent; font: .94rem/1.55 'Plus Jakarta Sans',sans-serif; padding:6px 0; }
     .gemini-composer textarea::placeholder { color:#8290a5; }
     .gemini-composer button { width:35px; height:35px; flex:0 0 auto; border:0; border-radius:10px; color:white; background:linear-gradient(135deg,#4285f4,#9b72cb 65%,#d96570); cursor:pointer; }
     .gemini-composer button:disabled { opacity:.45; cursor:wait; }
@@ -1178,7 +1178,7 @@
     <section class="director-library-head" id="directorLibraryHead">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
         <div><h2><i class="fa-solid fa-clapperboard" style="color:var(--accent-cyan);"></i> Director Prompt Library</h2>
-          <p id="directorLibraryStatus">Type in Gemini to find matching prompts and media.</p></div>
+          <p id="directorLibraryStatus">Matching category and prompt keywords automatically find related prompts.</p></div>
         <div class="director-mobile-tabs" aria-label="Workspace panels">
           <button type="button" id="directorLibraryTab" class="active">Library</button>
           <button type="button" id="directorGeminiTab">Gemini</button>
@@ -3342,45 +3342,72 @@
     const directorGeminiTab = byId("directorGeminiTab");
 
     function syncDirectorLibrary(rawQuery) {
-      const raw = String(rawQuery || "").trim();
-      const items = Array.isArray(window.allVaultItems) ? window.allVaultItems : [];
+      const raw = String(rawQuery || "");
+      const trimmed = raw.trim();
       const librarySearch = byId("directorLibrarySearch");
-      const mainSearch = byId("searchInput");
-      const queryText = raw.toLowerCase();
+      const items = Array.isArray(window.allVaultItems) ? window.allVaultItems : [];
 
-      if (librarySearch && librarySearch.value !== raw) librarySearch.value = raw;
-      if (mainSearch && mainSearch.value !== raw) mainSearch.value = raw;
+      // Only react to the latest complete word. A trailing space means the
+      // user has finished that keyword: clear the search field but keep the
+      // last matching cards visible while they continue typing.
+      if (!trimmed) {
+        if (librarySearch) librarySearch.value = "";
+        currentCategory = "All";
+        renderCards(items);
+        if (directorLibraryStatus) directorLibraryStatus.textContent =
+          "Type a category or prompt keyword in Gemini to find matching prompts.";
+        return;
+      }
 
+      if (/\s$/.test(raw)) {
+        if (librarySearch) librarySearch.value = "";
+        return;
+      }
+
+      const tokenMatch = trimmed.match(/([^\s]+)$/);
+      const token = tokenMatch ? tokenMatch[1].toLowerCase().replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "") : "";
+      const ignoredWords = new Set([
+        "a","an","and","are","as","at","be","can","create","for","from","give",
+        "help","how","i","in","is","it","me","my","of","on","or","please",
+        "prompt","prompts","the","to","want","what","with","you","your",
+        "kavali","cheppu","ivvu","please"
+      ]);
+
+      if (!token || token.length < 2 || ignoredWords.has(token)) return;
+
+      const escapeRegex = value => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const wordPattern = new RegExp("(^|[^a-z0-9])" + escapeRegex(token) + "(?=$|[^a-z0-9])", "i");
+
+      const results = items.filter(item => {
+        const category = String(item.category || "");
+        const title = String(item.name || "");
+        const prompt = String(item.prompt || "");
+        const keywords = [item.keywords || "", item.tags || ""].join(" ");
+        // Match actual category names, prompt titles, or meaningful words
+        // present in prompt text; generic conversational words are ignored.
+        return wordPattern.test(category) ||
+          wordPattern.test(title) ||
+          wordPattern.test(prompt) ||
+          wordPattern.test(keywords);
+      });
+
+      if (!results.length) return;
+
+      if (librarySearch) librarySearch.value = token;
       currentCategory = "All";
       document.querySelectorAll(".cat-tab").forEach(btn => {
         btn.classList.remove("active");
         if (btn.getAttribute("onclick")?.includes("'All'")) btn.classList.add("active");
       });
-
-      const terms = queryText.split(/[\\s,;]+/).filter(Boolean);
-      const results = !terms.length ? items : items.filter(item => {
-        const haystack = [
-          item.name || "",
-          item.category || "",
-          item.prompt || "",
-          item.keywords || "",
-          item.tags || ""
-        ].join(" ").toLowerCase();
-        return terms.every(term => haystack.includes(term));
-      });
-
       renderCards(results);
+
       if (directorLibraryStatus) {
-        directorLibraryStatus.textContent = raw
-          ? `${results.length} matching prompt(s) for “${raw}”`
-          : "Type any keyword or phrase in Gemini to search the prompt library.";
+        directorLibraryStatus.textContent = `${results.length} matching prompt(s) for “${token}”`;
       }
 
-      if (raw && results.length) {
-        const firstCard = grid?.querySelector(".movement-card");
-        if (firstCard && document.body.classList.contains("director-mode")) {
-          firstCard.scrollIntoView({ block:"start", behavior:"smooth" });
-        }
+      const firstCard = grid?.querySelector(".movement-card");
+      if (firstCard && document.body.classList.contains("director-mode")) {
+        firstCard.scrollIntoView({ block: "start", behavior: "smooth" });
       }
     }
 
