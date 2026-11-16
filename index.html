@@ -1166,7 +1166,7 @@
             <span class="profile-badge" id="profileBadgeRole" style="font-size: 11px; color: var(--accent-cyan); font-weight: 700;">DIRECTOR</span>
             <span style="font-size: 11px; color: #94a3b8;">Cinemotion AI</span>
           </div>
-          <button type="button" class="logout-btn-dropdown" onclick="handleUserLogout()">
+          <button type="button" class="logout-btn-dropdown" id="signOutButton">
             <i class="fa-solid fa-right-from-bracket"></i> Sign Out
           </button>
         </div>
@@ -2499,7 +2499,8 @@
     }
 
     window.addEventListener("click", (e) => {
-      if (profileDropdown && !profileDropdown.contains(e.target) && e.target !== profilePillBtn) {
+      const clickedInsideProfile = profilePillBtn?.contains(e.target) || profileDropdown?.contains(e.target);
+      if (profileDropdown && !clickedInsideProfile) {
         profileDropdown.classList.remove("show");
       }
       if (themesModal && e.target === themesModal) themesModal.style.display = "none";
@@ -2904,7 +2905,8 @@
         }
         loadFirebaseMovements();
       } else {
-        document.body.classList.remove("is-admin-active");
+        document.body.classList.remove("is-admin-active", "director-mode", "director-show-gemini");
+        byId("geminiPanel")?.classList.remove("open");
         if (gate) gate.style.display = "flex";
       }
     }, (err) => showAuthMessage(explainFirebaseError(err, "Authentication state check")));
@@ -3119,10 +3121,39 @@
     };
 
     window.handleUserLogout = async function() {
-      if (!confirm("Are you sure you want to log out?")) return;
-      try { await signOut(auth); }
-      catch (err) { showAuthMessage(explainFirebaseError(err, "Sign out")); }
+      const button = byId("signOutButton");
+      if (button) { button.disabled = true; button.textContent = "Signing out..."; }
+
+      try {
+        byId("profileDropdown")?.classList.remove("show");
+        byId("geminiPanel")?.classList.remove("open");
+        document.body.classList.remove("director-mode", "director-show-gemini", "is-admin-active");
+
+        if (!auth.currentUser) {
+          const gate = byId("authGateModal");
+          if (gate) gate.style.display = "flex";
+          return;
+        }
+
+        await signOut(auth);
+        geminiChatSession = null;
+        if (geminiMessages) geminiMessages.replaceChildren();
+        if (geminiInput) geminiInput.value = "";
+        const gate = byId("authGateModal");
+        if (gate) gate.style.display = "flex";
+      } catch (err) {
+        console.error("Sign out failed:", err);
+        showAuthMessage(explainFirebaseError(err, "Sign out"));
+      } finally {
+        if (button) { button.disabled = false; button.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i> Sign Out'; }
+      }
     };
+
+    byId("signOutButton")?.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      window.handleUserLogout();
+    });
 
     async function callMediaApi(path, payload, file) {
       if (!auth.currentUser) throw new Error("Please sign in before managing media.");
@@ -3145,7 +3176,7 @@
       const timeoutId = setTimeout(() => controller.abort(), 120000);
 
       try {
-        const baseUrl = CINEMOTION_MEDIA_API.replace(/\\/+$/, "");
+        const baseUrl = CINEMOTION_MEDIA_API.replace(/\/+$/, "");
         const endpointPath = String(path || "").startsWith("/") ? path : `/${path}`;
         const response = await fetch(`${baseUrl}${endpointPath}`, {
           method: "POST",
@@ -3436,10 +3467,6 @@
     const GEMINI_MAX_FILE_BYTES = 15 * 1024 * 1024;
 
     function openGeminiPanel() {
-      if (!auth.currentUser) {
-        showAuthMessage("Please sign in to use Gemini.");
-        return;
-      }
       document.body.classList.add("director-mode");
       if (window.matchMedia("(max-width: 820px)").matches) {
         document.body.classList.add("director-show-gemini");
@@ -3451,6 +3478,9 @@
       geminiPanel?.classList.add("open");
       geminiPanel?.setAttribute("aria-hidden", "false");
       syncDirectorLibrary(geminiInput?.value || "");
+      if (!auth.currentUser && geminiMessages && !geminiMessages.querySelector(".gemini-message")) {
+        addGeminiMessage("Please sign in to use Gemini. Sign in with your account, then reopen Gemini.", "assistant", true);
+      }
       geminiInput?.focus();
     }
     function closeGeminiPanel() {
@@ -3617,8 +3647,21 @@
       }
     }
 
-    geminiLauncher?.addEventListener("click", openGeminiPanel);
-    geminiClose?.addEventListener("click", closeGeminiPanel);
+    if (geminiLauncher) {
+      geminiLauncher.type = "button";
+      geminiLauncher.setAttribute("aria-controls", "geminiPanel");
+      geminiLauncher.setAttribute("aria-expanded", "false");
+      geminiLauncher.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        openGeminiPanel();
+        geminiLauncher.setAttribute("aria-expanded", "true");
+      });
+    }
+    geminiClose?.addEventListener("click", () => {
+      closeGeminiPanel();
+      geminiLauncher?.setAttribute("aria-expanded", "false");
+    });
     geminiMenuToggle?.addEventListener("click", toggleGeminiMenu);
     geminiNewChat?.addEventListener("click", () => {
       resetGeminiConversation();
