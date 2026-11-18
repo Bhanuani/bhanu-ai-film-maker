@@ -1137,7 +1137,34 @@
       #cinemotionLanding * { scroll-behavior:auto !important; animation:none !important; }
     }
 
-  </style>
+  
+    /* CINEMOTION category controls and consistent prompt-card action alignment */
+    .header-actions { flex-shrink: 0; }
+    .header-add-category {
+      width:auto !important; white-space:nowrap; padding:9px 13px !important;
+      min-height:38px; border-radius:999px; font-size:.78rem;
+    }
+    .search-box { flex:0 1 470px; max-width:470px; min-width:170px; }
+    .card-details { flex:1 1 auto; min-height:0; }
+    .card-details > div:first-child { display:flex; flex:1 1 auto; flex-direction:column; min-height:0; }
+    .card-meta { flex:0 0 auto; }
+    .card-details h3 { flex:0 0 auto; }
+    .prompt-wrapper { flex:1 1 auto; min-height:140px; }
+    .prompt-content { align-self:stretch; }
+    .prompt-actions { flex:0 0 40px; margin-top:10px; }
+    .copy-btn, .use-gemini-btn { flex:0 0 auto; }
+    @media (max-width: 900px) {
+      .search-box { flex-basis:260px; max-width:320px; }
+      .header-actions { gap:.45rem; }
+      .header-add-category { padding:8px 10px !important; }
+    }
+    @media (max-width: 620px) {
+      .header-add-category { font-size:.68rem; padding:7px 9px !important; }
+      .search-box { min-width:110px; flex-basis:150px; }
+      .card-details { min-height:0; }
+      .prompt-wrapper { min-height:125px; }
+    }
+</style>
 </head>
 <body>
 
@@ -1454,6 +1481,7 @@
       </div>
 
       <div class="header-actions">
+        <button type="button" id="addCategoryBtn" class="submit-btn admin-only header-add-category" title="Add a new prompt category">+ Category</button>
         <button class="add-btn admin-only" id="addMovementBtn">
           <i class="fa-solid fa-plus"></i> Add Movement
         </button>
@@ -1508,7 +1536,6 @@
       </div>
       <div class="director-library-tools">
         <input type="search" id="directorLibrarySearch" placeholder="Search prompts, categories, camera terms..." aria-label="Search prompt library">
-        <button type="button" id="addCategoryBtn" class="submit-btn admin-only" style="width:auto;white-space:nowrap;padding:9px 12px;">+ Category</button>
       </div>
     </section>
     <section class="hero-banner-wrapper" id="heroBanner">
@@ -2517,7 +2544,11 @@
         return;
       }
 
-      if (!confirm("Are you sure you want to permanently delete this media from Firebase and this device?")) return;
+      const mediaLabel = targetItem?.name ? ` for “${targetItem.name}”` : '';
+      const confirmed = window.confirm(
+        `Delete the uploaded media${mediaLabel}?\n\nThis removes the media file from Firebase Storage and this device. The prompt itself will NOT be deleted.`
+      );
+      if (!confirmed) return;
 
       try {
         if (typeof window.deleteMediaFromFirestore === "function") {
@@ -2756,7 +2787,22 @@
       const searchEl = document.getElementById('searchInput');
       const q = searchEl ? searchEl.value.toLowerCase() : '';
       let filtered = window.allVaultItems;
-      if (currentCategory !== "All") filtered = filtered.filter(m => m.category === currentCategory);
+      if (currentCategory !== "All") {
+        filtered = filtered.filter(m => m.category === currentCategory);
+      } else {
+        const orderedCategoryNames = [...document.querySelectorAll('.categories-bar .cat-tab')]
+          .map(btn => {
+            const label = [...btn.querySelectorAll('span:not(.count)')].map(el => el.textContent.trim()).find(Boolean);
+            return label || '';
+          }).filter(name => name && name !== 'All');
+        const categoryRank = new Map(orderedCategoryNames.map((name, index) => [name, index]));
+        filtered = filtered.map((item, index) => ({ item, index }))
+          .sort((a, b) => {
+            const rankA = categoryRank.has(a.item.category) ? categoryRank.get(a.item.category) : Number.MAX_SAFE_INTEGER;
+            const rankB = categoryRank.has(b.item.category) ? categoryRank.get(b.item.category) : Number.MAX_SAFE_INTEGER;
+            return rankA - rankB || a.index - b.index;
+          }).map(entry => entry.item);
+      }
       filtered = filtered.filter(m => String(m.name || '').toLowerCase().includes(q) || String(m.prompt || '').toLowerCase().includes(q));
       renderCards(filtered);
     }
@@ -4288,10 +4334,10 @@
     async function loadVaultCategories() {
       try {
         const snap = await getDocs(collection(db, "vaultCategories"));
-        snap.forEach(docSnap => {
-          const data = docSnap.data();
-          if (data?.name) addCategoryToInterface(data.name, data.emoji || "🎬");
-        });
+        const savedCategories = snap.docs.map(docSnap => docSnap.data())
+          .filter(data => data?.name)
+          .sort((a, b) => String(a.createdAt || '').localeCompare(String(b.createdAt || '')));
+        savedCategories.forEach(data => addCategoryToInterface(data.name, data.emoji || "🎬"));
         // Also restore any custom categories already used by existing prompt records.
         (window.allVaultItems || []).forEach(item => {
           const name = String(item.category || "").trim();
