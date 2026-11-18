@@ -4711,7 +4711,7 @@
       var spaceVertexShader = [
         "varying vec2 vUv;",
         "void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }"
-      ].join("\\n");
+      ].join("\n");
       var spaceFragmentShader = [
         "precision highp float;",
         "varying vec2 vUv;",
@@ -4746,7 +4746,7 @@
         " float star=1.0-smoothstep(.012,.045,length(local-(vec2(hash21(cell+2.3),hash21(cell+7.1))-.5)*.55));",
         " star*=step(.996,rnd)*.78;",
         " col+=vec3(.45,.65,1.0)*star;",
-        " float vignette=smoothstep(1.15,.18,length(p*vec2(.82,1.0)));",
+        " float vignette=1.0-smoothstep(.18,1.15,length(p*vec2(.82,1.0)));",
         " col*=.58+.42*vignette;",
         " gl_FragColor=vec4(col,1.0);",
         "}"
