@@ -1681,6 +1681,36 @@ body.director-mode #movementsGrid .movement-card {
 }
 </style>
 
+
+<style id="cinemotion-display-clarity-fix">
+/* Preserve the cinematic 3D depth, but never dim the prompt library content. */
+#movementsGrid .movement-card,
+#movementsGrid .movement-card.prompt-depth-near,
+#movementsGrid .movement-card.glass-card-active {
+  opacity:1 !important;
+  filter:none !important;
+}
+#movementsGrid .movement-card .card-video-box img,
+#movementsGrid .movement-card .card-video-box video,
+#movementsGrid .movement-card img {
+  filter:brightness(1.08) saturate(1.08) contrast(1.035) !important;
+}
+#movementsGrid .movement-card .card-details {
+  background:linear-gradient(180deg,rgba(17,32,52,.94),rgba(7,15,30,.97)) !important;
+  color:#f4f8ff !important;
+}
+#movementsGrid .movement-card .prompt-wrapper,
+#movementsGrid .movement-card .prompt-content,
+#movementsGrid .movement-card .prompt-box {
+  background:rgba(5,12,25,.88) !important;
+  color:#e2eaf5 !important;
+}
+#movementsGrid .movement-card .card-details p,
+#movementsGrid .movement-card .card-details label {
+  color:#d5dfed !important;
+}
+</style>
+
 </head>
 <body>
 
@@ -5252,7 +5282,8 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
         card.style.setProperty("--glass-rx", `${rx.toFixed(2)}deg`);
         card.style.setProperty("--glass-ry", `${ry.toFixed(2)}deg`);
         card.style.setProperty("--glass-y", `${y.toFixed(1)}px`);
-        card.style.opacity = (.82 + proximity * .18).toFixed(3);
+        card.style.opacity = "1";
+        card.style.filter = "none";
         card.classList.toggle("glass-card-active", proximity > .72);
         card.style.zIndex = String(10 + Math.round(proximity * 20));
       });
