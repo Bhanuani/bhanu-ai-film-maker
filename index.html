@@ -4706,6 +4706,64 @@
       scene = new THREE.Scene();
       camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 100);
       camera.position.set(0, 0, 10);
+
+      /* Procedural deep-space background: nebula + spiral galaxy, deliberately no sun/star disc. */
+      var spaceVertexShader = [
+        "varying vec2 vUv;",
+        "void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }"
+      ].join("\\n");
+      var spaceFragmentShader = [
+        "precision highp float;",
+        "varying vec2 vUv;",
+        "float hash21(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }",
+        "float noise2(vec2 p){ vec2 i=floor(p),f=fract(p); f=f*f*(3.0-2.0*f); return mix(mix(hash21(i),hash21(i+vec2(1.,0.)),f.x),mix(hash21(i+vec2(0.,1.)),hash21(i+vec2(1.,1.)),f.x),f.y); }",
+        "float fbm2(vec2 p){ float v=0.0,a=.55; for(int i=0;i<5;i++){v+=a*noise2(p);p*=2.02;a*=.5;} return v; }",
+        "void main(){",
+        " vec2 p=(vUv-.5)*vec2(2.0,1.25);",
+        " vec3 col=vec3(.0015,.0035,.012);",
+        " float n=fbm2(p*3.2+vec2(1.7,-.8));",
+        " float n2=fbm2(p*6.4+vec2(-2.1,3.4));",
+        " float cloud=smoothstep(.35,.82,n*.72+n2*.32);",
+        " vec3 blue=vec3(.012,.085,.22);",
+        " vec3 violet=vec3(.095,.025,.20);",
+        " vec3 teal=vec3(.012,.12,.17);",
+        " col+=blue*cloud*(.45+.55*n2);",
+        " col+=violet*smoothstep(.48,.88,fbm2(p*2.4+vec2(4.0,1.2)))*.58;",
+        " col+=teal*smoothstep(.52,.86,fbm2(p*4.0+vec2(-3.0,-2.0)))*.38;",
+        " vec2 g=p-vec2(-.48,.12);",
+        " float radius=length(g);",
+        " float angle=atan(g.y,g.x);",
+        " float spiral=sin(angle*3.0+log(radius+.035)*8.0);",
+        " float arms=smoothstep(.48,.98,spiral)*exp(-radius*2.7)*exp(-abs(g.y)*.28);",
+        " float core=exp(-radius*7.0);",
+        " col+=vec3(.025,.12,.28)*arms*.8;",
+        " col+=vec3(.045,.035,.14)*arms*.55;",
+        " col+=vec3(.018,.065,.12)*core*.8;",
+        " vec2 grid=vUv*vec2(520.0,300.0);",
+        " vec2 cell=floor(grid);",
+        " float rnd=hash21(cell);",
+        " vec2 local=fract(grid)-.5;",
+        " float star=1.0-smoothstep(.012,.045,length(local-(vec2(hash21(cell+2.3),hash21(cell+7.1))-.5)*.55));",
+        " star*=step(.996,rnd)*.78;",
+        " col+=vec3(.45,.65,1.0)*star;",
+        " float vignette=smoothstep(1.15,.18,length(p*vec2(.82,1.0)));",
+        " col*=.58+.42*vignette;",
+        " gl_FragColor=vec4(col,1.0);",
+        "}"
+      ].join("\\n");
+      var deepSpace = new THREE.Mesh(
+        new THREE.PlaneGeometry(100,60),
+        new THREE.ShaderMaterial({
+          vertexShader:spaceVertexShader,
+          fragmentShader:spaceFragmentShader,
+          depthWrite:false,
+          depthTest:false
+        })
+      );
+      deepSpace.position.set(0,0,-34);
+      deepSpace.renderOrder=-10;
+      scene.add(deepSpace);
+
       planet = new THREE.Group();
       planet.position.set(isMobile ? 2.25 : 3.05, isMobile ? .7 : .25, -1.0);
       scene.add(planet);
