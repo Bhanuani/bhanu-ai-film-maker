@@ -4865,7 +4865,7 @@
         new THREE.MeshPhongMaterial({
           color: 0xdceaff,
           transparent: true,
-          opacity: 0.58,
+          opacity: 0,
           depthWrite: false,
           shininess: 2
         })
@@ -4878,6 +4878,7 @@
           cloudTexture.encoding = THREE.sRGBEncoding;
           cloudTexture.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
           cloudLayer.material.map = cloudTexture;
+          cloudLayer.material.opacity = 0.62;
           cloudLayer.material.needsUpdate = true;
           queueDraw();
         },
