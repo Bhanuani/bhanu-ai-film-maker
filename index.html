@@ -1165,6 +1165,71 @@
       .prompt-wrapper { min-height:125px; }
     }
 </style>
+
+    /* FINAL CARD LAYOUT FIX: stable prompt height + right-aligned edit/delete */
+    .movement-card { height: 100%; min-height: 0; }
+    .movement-card .card-details {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 10px;
+      min-height: 0;
+    }
+    .movement-card .card-details > div:first-child {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+    .movement-card .prompt-wrapper {
+      height: 160px;
+      min-height: 160px;
+      max-height: 160px;
+      flex: 0 0 160px;
+      align-items: flex-start;
+    }
+    .movement-card .prompt-content {
+      height: 100%;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+    .movement-card .prompt-box {
+      max-height: none;
+      min-height: 100%;
+      margin: 0;
+      overflow: visible;
+    }
+    .movement-card .prompt-actions {
+      width: 100%;
+      min-height: 34px;
+      height: 34px;
+      margin-top: auto;
+      padding-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      box-sizing: content-box;
+    }
+    .movement-card .prompt-action-btn {
+      margin: 0;
+      flex: 0 0 30px;
+    }
+    .movement-card .copy-btn,
+    .movement-card .use-gemini-btn {
+      flex: 0 0 auto;
+      margin-top: 0;
+    }
+    @media (max-width: 620px) {
+      .movement-card .prompt-wrapper {
+        height: 145px;
+        min-height: 145px;
+        max-height: 145px;
+        flex-basis: 145px;
+      }
+    }
+
 </head>
 <body>
 
@@ -2546,7 +2611,7 @@
 
       const mediaLabel = targetItem?.name ? ` for “${targetItem.name}”` : '';
       const confirmed = window.confirm(
-        `Delete the uploaded media${mediaLabel}?\n\nThis removes the media file from Firebase Storage and this device. The prompt itself will NOT be deleted.`
+        `Are you sure you want to delete the media${mediaLabel}?\n\nThe uploaded image/video will be removed from Firebase Storage and this device.\n\nYour prompt title and prompt text will remain safe and will NOT be deleted.`
       );
       if (!confirmed) return;
 
@@ -2790,16 +2855,24 @@
       if (currentCategory !== "All") {
         filtered = filtered.filter(m => m.category === currentCategory);
       } else {
+        // Read the visible category NAME (the second span), not the emoji icon.
+        // This guarantees All follows the exact tab order: built-ins first,
+        // Master Prompts next, and user-created categories after it.
         const orderedCategoryNames = [...document.querySelectorAll('.categories-bar .cat-tab')]
           .map(btn => {
-            const label = [...btn.querySelectorAll('span:not(.count)')].map(el => el.textContent.trim()).find(Boolean);
-            return label || '';
-          }).filter(name => name && name !== 'All');
-        const categoryRank = new Map(orderedCategoryNames.map((name, index) => [name, index]));
+            const label = btn.querySelector('span:nth-child(2)');
+            return (label?.textContent || '').trim();
+          })
+          .filter(name => name && name.toLowerCase() !== 'all');
+        const categoryRank = new Map(
+          orderedCategoryNames.map((name, index) => [name.trim().toLowerCase(), index])
+        );
         filtered = filtered.map((item, index) => ({ item, index }))
           .sort((a, b) => {
-            const rankA = categoryRank.has(a.item.category) ? categoryRank.get(a.item.category) : Number.MAX_SAFE_INTEGER;
-            const rankB = categoryRank.has(b.item.category) ? categoryRank.get(b.item.category) : Number.MAX_SAFE_INTEGER;
+            const keyA = String(a.item.category || '').trim().toLowerCase();
+            const keyB = String(b.item.category || '').trim().toLowerCase();
+            const rankA = categoryRank.has(keyA) ? categoryRank.get(keyA) : Number.MAX_SAFE_INTEGER;
+            const rankB = categoryRank.has(keyB) ? categoryRank.get(keyB) : Number.MAX_SAFE_INTEGER;
             return rankA - rankB || a.index - b.index;
           }).map(entry => entry.item);
       }
