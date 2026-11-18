@@ -310,3 +310,36 @@ body::after,
     animation: none !important;
   }
 }
+
+/* REAL 3D SPACE SCENE — WebGL canvas layer */
+#cinemotionSpace3D {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: -2;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .7s ease;
+}
+body.webgl-space-active {
+  isolation: isolate;
+}
+body.webgl-space-active #cinemotionSpace3D {
+  opacity: 1;
+}
+body.webgl-space-active::before {
+  background: linear-gradient(180deg, rgba(4,7,17,.10), rgba(4,7,17,.30));
+}
+body.webgl-space-active::after,
+body.webgl-space-active .vault-container::before,
+body.webgl-space-active .vault-container::after {
+  display: none !important;
+}
+@media (max-width: 900px) {
+  #cinemotionSpace3D { opacity: .56; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #cinemotionSpace3D { transition: none; }
+}
