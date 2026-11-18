@@ -254,3 +254,48 @@ button.copy-prompt-btn {
     will-change: auto;
   }
 }
+
+
+/* CINEMOTION SPACE GALAXY — animated starfield and orbital motion */
+/* Make the space scene visibly alive while keeping movement slow and low-cost. */
+body::after {
+  animation: cinemotionStarDrift 115s linear infinite;
+}
+.vault-container::before {
+  animation: cinemotionNebulaDrift 28s ease-in-out infinite alternate,
+             cinemotionNebulaPulse 18s ease-in-out infinite alternate;
+}
+.vault-container::after {
+  transform-origin: 50% 50%;
+  animation: cinemotionOrbitSpin 58s linear infinite;
+  border-width: 2px;
+  border-color: rgba(132,190,255,.34);
+  box-shadow:
+    0 0 12px rgba(75,167,255,.34),
+    0 0 34px rgba(100,90,255,.18),
+    inset 0 0 16px rgba(116,104,255,.14);
+}
+@keyframes cinemotionStarDrift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-34px, 24px, 0); }
+}
+@keyframes cinemotionNebulaPulse {
+  from { filter: saturate(1.05) brightness(.94); }
+  to { filter: saturate(1.32) brightness(1.12); }
+}
+@keyframes cinemotionOrbitSpin {
+  from { transform: rotate(-23deg) rotate(0deg); }
+  to { transform: rotate(-23deg) rotate(360deg); }
+}
+@media (max-width: 900px) {
+  body::after { animation-duration: 180s; }
+  .vault-container::before { animation: none; }
+  .vault-container::after { animation: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body::after,
+  .vault-container::before,
+  .vault-container::after {
+    animation: none !important;
+  }
+}
