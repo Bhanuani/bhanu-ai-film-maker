@@ -1273,6 +1273,58 @@
       }
     }
 </style>
+
+<style id="cinemotion-prompt-card-depth-style">
+/* Prompt cards themselves travel through a 3D perspective while scrolling. */
+#movementsGrid {
+  perspective: 1450px;
+  perspective-origin: 50% 42%;
+  transform-style: preserve-3d;
+  overflow: visible;
+}
+#movementsGrid .movement-card {
+  --prompt-depth-z: -120px;
+  --prompt-depth-rx: 5deg;
+  --prompt-depth-ry: 0deg;
+  --prompt-depth-scale: .92;
+  --prompt-depth-y: 0px;
+  transform:
+    translate3d(0, var(--prompt-depth-y), var(--prompt-depth-z))
+    rotateX(var(--prompt-depth-rx))
+    rotateY(var(--prompt-depth-ry))
+    scale(var(--prompt-depth-scale));
+  transform-origin: 50% 50%;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  will-change: transform, opacity, filter;
+  transition:
+    transform 420ms cubic-bezier(.2,.72,.2,1),
+    opacity 300ms ease,
+    filter 300ms ease,
+    box-shadow 420ms ease;
+  opacity: .78;
+  filter: saturate(.82) brightness(.88);
+  box-shadow: 0 22px 48px rgba(0,0,0,.28);
+}
+#movementsGrid .movement-card.prompt-depth-near {
+  opacity: 1;
+  filter: saturate(1.04) brightness(1.04);
+  box-shadow: 0 30px 58px rgba(0,0,0,.48), 0 0 0 1px rgba(0,210,255,.12);
+}
+#movementsGrid .movement-card .card-video-box,
+#movementsGrid .movement-card .card-details {
+  transform: translateZ(1px);
+}
+@media (prefers-reduced-motion: reduce) {
+  #movementsGrid .movement-card {
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+}
+</style>
+
 </head>
 <body>
 
@@ -4805,6 +4857,98 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
  host?.addEventListener("scroll",()=>{const max=Math.max(1,host.scrollHeight-host.clientHeight);window.cinemotionCamera3D?.setScroll((host.scrollTop/max)*2-1);},{passive:true});
  window.addEventListener("scroll",()=>{if(!document.body.classList.contains("director-mode")){const max=Math.max(1,document.documentElement.scrollHeight-innerHeight);window.cinemotionCamera3D?.setScroll((scrollY/max)*2-1);}},{passive:true});
  addEventListener("beforeunload",()=>{cancelAnimationFrame(raf);ro.disconnect();io.disconnect();renderer.dispose();},{once:true});
+})();
+</script>
+
+
+<script id="cinemotion-prompt-card-depth-script">
+(() => {
+  const grid = document.getElementById("movementsGrid");
+  const vault = document.querySelector(".vault-container");
+  if (!grid || !vault) return;
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduceMotion) return;
+
+  let raf = 0;
+  let cards = [];
+  let lastLayout = "";
+
+  const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+
+  function collectCards() {
+    cards = [...grid.querySelectorAll(".movement-card")];
+    cards.forEach((card, index) => {
+      card.style.setProperty("--prompt-depth-ry", index % 2 ? "-2.4deg" : "2.4deg");
+      card.style.setProperty("--prompt-depth-z", "-150px");
+      card.style.setProperty("--prompt-depth-rx", "7deg");
+      card.style.setProperty("--prompt-depth-scale", ".90");
+      card.style.opacity = ".72";
+    });
+    updateCards();
+  }
+
+  function updateCards() {
+    raf = 0;
+    if (!cards.length) return;
+
+    const directorMode = document.body.classList.contains("director-mode");
+    const viewportTop = directorMode ? vault.getBoundingClientRect().top : 0;
+    const viewportHeight = directorMode ? vault.clientHeight : window.innerHeight;
+    const viewportCenter = viewportTop + viewportHeight * 0.48;
+    const activeRange = Math.max(260, viewportHeight * 0.88);
+
+    cards.forEach((card, index) => {
+      const rect = card.getBoundingClientRect();
+      const center = rect.top + rect.height * 0.5;
+      const signed = (center - viewportCenter) / activeRange;
+      const distance = clamp(Math.abs(signed), 0, 1.55);
+      const proximity = 1 - clamp(distance / 1.25, 0, 1);
+
+      // Far cards recede; cards approaching the viewing plane grow and gain depth.
+      const z = -205 + proximity * 300;
+      const scale = .84 + proximity * .19;
+      const rotateX = clamp(signed * -8.5, -12, 12);
+      const columnTilt = index % 2 ? -2.2 : 2.2;
+      const rotateY = columnTilt * (0.35 + proximity * .65);
+      const translateY = clamp(signed * -8, -12, 12);
+      const opacity = .58 + proximity * .42;
+
+      card.style.setProperty("--prompt-depth-z", `${z.toFixed(1)}px`);
+      card.style.setProperty("--prompt-depth-scale", scale.toFixed(3));
+      card.style.setProperty("--prompt-depth-rx", `${rotateX.toFixed(2)}deg`);
+      card.style.setProperty("--prompt-depth-ry", `${rotateY.toFixed(2)}deg`);
+      card.style.setProperty("--prompt-depth-y", `${translateY.toFixed(1)}px`);
+      card.style.opacity = opacity.toFixed(3);
+      card.classList.toggle("prompt-depth-near", proximity > .78);
+      card.style.zIndex = String(Math.round(proximity * 20));
+    });
+  }
+
+  function scheduleUpdate() {
+    if (!raf) raf = requestAnimationFrame(updateCards);
+  }
+
+  const observer = new MutationObserver(() => {
+    const signature = `${grid.children.length}:${[...grid.children].map(el => el.id).join("|")}`;
+    if (signature !== lastLayout) {
+      lastLayout = signature;
+      collectCards();
+    } else {
+      scheduleUpdate();
+    }
+  });
+  observer.observe(grid, { childList: true });
+
+  // The director library is its own scroll viewport; normal mode uses the page.
+  vault.addEventListener("scroll", scheduleUpdate, { passive: true });
+  window.addEventListener("scroll", scheduleUpdate, { passive: true });
+  window.addEventListener("resize", scheduleUpdate, { passive: true });
+
+  collectCards();
+  window.setTimeout(collectCards, 250);
+  window.setTimeout(collectCards, 900);
+  window.cinemotionPromptCardDepth = { refresh: collectCards };
 })();
 </script>
 
