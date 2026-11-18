@@ -381,3 +381,53 @@ body.webgl-space-active {
 @media (max-width: 900px) {
   #cinemotionSpace3D { opacity: .82 !important; }
 }
+
+
+/* CINEMOTION PHOTOREALISTIC MEGACITY BACKDROP */
+html, body {
+  min-height: 100%;
+  background: #06101b !important;
+}
+body {
+  background-color: #06101b !important;
+  background-image: none !important;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: -1.5%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(3,8,17,.38) 0%, rgba(3,8,17,.24) 42%, rgba(3,8,17,.72) 100%),
+    url("cinemotion-megacity.jpg") center center / cover no-repeat;
+  transform: scale(1.02);
+  will-change: transform;
+}
+body::after,
+.vault-container::before,
+.vault-container::after,
+#siteBackgroundVideo,
+#cinemotionSpace3D {
+  display: none !important;
+}
+.vault-container {
+  position: relative;
+  z-index: 1;
+}
+.movement-card,
+.hero-banner-wrapper,
+.categories-bar-wrapper {
+  backdrop-filter: blur(12px);
+}
+@media (max-width: 900px) {
+  body::before {
+    background-position: 54% center;
+    background-image:
+      linear-gradient(180deg, rgba(3,8,17,.48), rgba(3,8,17,.72)),
+      url("cinemotion-megacity.jpg");
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body::before { transform: none; }
+}
