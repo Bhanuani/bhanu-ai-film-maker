@@ -4691,7 +4691,7 @@
       var canvas = document.getElementById("cinemotionSpace3D");
       if (!canvas || !window.THREE || !window.WebGLRenderingContext) return;
       var THREE = window.THREE;
-      var renderer, scene, camera, planet, ringGroup, stars;
+      var renderer, scene, camera, planet, ringGroup, stars, cloudLayer;
       try {
         renderer = new THREE.WebGLRenderer({
           canvas: canvas, alpha: true, antialias: true,
@@ -4817,11 +4817,75 @@
         " gl_FragColor=vec4(color,1.0);",
         "}"
       ].join("\n");
+      var planetGeometry = new THREE.SphereGeometry(2.05, isMobile ? 72 : 144, isMobile ? 72 : 144);
       var surface = new THREE.Mesh(
-        new THREE.SphereGeometry(2.05, isMobile ? 64 : 112, isMobile ? 64 : 112),
+        planetGeometry,
         new THREE.ShaderMaterial({vertexShader:vertexShader,fragmentShader:fragmentShader})
       );
       planet.add(surface);
+
+      /* NASA Blue Marble photoreal surface texture.
+         Source: NASA Earth Observatory, Blue Marble: Next Generation (January base map).
+         No visible sun is created; the planet is lit by a soft off-camera directional light. */
+      scene.add(new THREE.AmbientLight(0x35415f, 0.58));
+      var planetKeyLight = new THREE.DirectionalLight(0x9bbfff, 1.72);
+      planetKeyLight.position.set(-5.5, 2.6, 6.5);
+      scene.add(planetKeyLight);
+      var planetFillLight = new THREE.DirectionalLight(0x243d88, 0.34);
+      planetFillLight.position.set(5, -2, -3);
+      scene.add(planetFillLight);
+
+      var textureLoader = new THREE.TextureLoader();
+      textureLoader.setCrossOrigin("anonymous");
+      textureLoader.load(
+        "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-base/january/world.200401.3x5400x2700.jpg",
+        function(earthTexture) {
+          earthTexture.encoding = THREE.sRGBEncoding;
+          earthTexture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+          surface.material.dispose();
+          surface.material = new THREE.MeshPhongMaterial({
+            map: earthTexture,
+            bumpMap: earthTexture,
+            bumpScale: 0.035,
+            specular: new THREE.Color(0x253b63),
+            shininess: 11
+          });
+          surface.material.needsUpdate = true;
+          queueDraw();
+        },
+        undefined,
+        function(error) {
+          console.warn("CINEMOTION: NASA Blue Marble texture could not load; procedural planet fallback remains active.", error);
+        }
+      );
+
+      /* Real cloud layer with alpha transparency; source notes EUMETSAT data and NASA Earth imagery. */
+      var cloudLayer = new THREE.Mesh(
+        new THREE.SphereGeometry(2.075, isMobile ? 64 : 128, isMobile ? 64 : 128),
+        new THREE.MeshPhongMaterial({
+          color: 0xdceaff,
+          transparent: true,
+          opacity: 0.58,
+          depthWrite: false,
+          shininess: 2
+        })
+      );
+      cloudLayer.renderOrder = 2;
+      planet.add(cloudLayer);
+      textureLoader.load(
+        "https://clouds.matteason.co.uk/images/2048x1024/clouds-alpha.png",
+        function(cloudTexture) {
+          cloudTexture.encoding = THREE.sRGBEncoding;
+          cloudTexture.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
+          cloudLayer.material.map = cloudTexture;
+          cloudLayer.material.needsUpdate = true;
+          queueDraw();
+        },
+        undefined,
+        function(error) {
+          console.warn("CINEMOTION: cloud texture could not load; planet surface remains visible.", error);
+        }
+      );
 
       var atmosphere = new THREE.Mesh(
         new THREE.SphereGeometry(2.13, 64, 64),
@@ -4871,6 +4935,7 @@
         renderQueued=false;
         planet.rotation.y=currentProgress*1.15;
         planet.rotation.x=.035+currentProgress*.12;
+        if (cloudLayer) cloudLayer.rotation.y = currentProgress*1.32 + 0.08;
         ringGroup.rotation.z=-.18+currentProgress*1.65;
         stars.rotation.y=currentProgress*.045;
         camera.position.y=-currentProgress*.22;
