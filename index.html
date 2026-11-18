@@ -4810,10 +4810,10 @@
       var windowAmber=new THREE.MeshBasicMaterial({color:0xffb66c});
       var windowPink=new THREE.MeshBasicMaterial({color:0xff4d91});
       var windowSets=[
-        new THREE.InstancedMesh(windowGeo,windowBlue,1800),
-        new THREE.InstancedMesh(windowGeo,windowCyan,1200),
-        new THREE.InstancedMesh(windowGeo,windowAmber,850),
-        new THREE.InstancedMesh(windowGeo,windowPink,280)
+        new THREE.InstancedMesh(windowGeo,windowBlue,3600),
+        new THREE.InstancedMesh(windowGeo,windowCyan,2200),
+        new THREE.InstancedMesh(windowGeo,windowAmber,1600),
+        new THREE.InstancedMesh(windowGeo,windowPink,600)
       ];
       var windowCounts=[0,0,0,0];
       var dummy=new THREE.Object3D();
@@ -4959,7 +4959,7 @@
         planet.position.y=-currentProgress*.22;
         stars.rotation.y=currentProgress*.012;
         camera.position.y=10.5-currentProgress*.12;
-        camera.lookAt(0,0,0);
+        camera.lookAt(0,4.1,-7.5);
         renderer.render(scene,camera);
       }
       function queueDraw(){
