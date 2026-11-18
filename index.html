@@ -4805,24 +4805,61 @@
       asteroidFill.position.set(-6,-3,2);
       scene.add(asteroidFill);
 
+      /* High-density natural asteroid silhouettes: smooth normals + layered rocky displacement. */
       function makeRockGeometry(seed){
-        var geo=new THREE.IcosahedronGeometry(1,3);
+        var geo=new THREE.IcosahedronGeometry(1,5);
         var pos=geo.attributes.position;
         for(var v=0;v<pos.count;v++){
           var x=pos.getX(v),y=pos.getY(v),z=pos.getZ(v);
-          var wave=Math.sin(x*8.1+seed)*Math.cos(y*6.7-seed*.7)*Math.sin(z*7.4+seed*1.3);
-          var fine=Math.sin(x*17+seed*2)*Math.sin(y*13-seed)*Math.cos(z*15+seed);
-          var factor=1+wave*.105+fine*.032;
-          pos.setXYZ(v,x*factor*(1+.08*Math.sin(seed+1)),y*factor*(1+.07*Math.cos(seed)),z*factor);
+          var broad=Math.sin(x*4.7+seed)*Math.cos(y*5.3-seed*.7)*Math.sin(z*4.2+seed*1.3);
+          var ridge=Math.sin(x*10.8+seed*2.1)*Math.sin(y*9.4-seed)*Math.cos(z*11.2+seed);
+          var fracture=Math.sin((x+y)*19+seed)*Math.cos((y-z)*17-seed*.4);
+          var factor=1+broad*.105+ridge*.032+fracture*.009;
+          pos.setXYZ(v,x*factor*(1+.065*Math.sin(seed+1)),y*factor*(1+.055*Math.cos(seed)),z*factor);
         }
         geo.computeVertexNormals();
         return geo;
       }
+
+      /* Procedural 512px albedo + bump maps: layered mineral grain, pits and fracture mottling. */
+      function makeRockTexture(seed,asBump){
+        var canvas=document.createElement("canvas");
+        canvas.width=canvas.height=512;
+        var ctx=canvas.getContext("2d");
+        var image=ctx.createImageData(512,512);
+        var data=image.data;
+        for(var py=0;py<512;py++){
+          for(var px=0;px<512;px++){
+            var u=px/512,v=py/512;
+            var n1=Math.sin(u*91+seed*3.1)*Math.cos(v*73-seed*1.7);
+            var n2=Math.sin(u*247+v*191+seed*8.2)*Math.cos(v*223-u*139);
+            var n3=Math.sin(u*19+v*27+seed)*Math.cos(v*31-u*17);
+            var pits=Math.pow(Math.max(0,Math.sin(u*163+seed)*Math.cos(v*151-seed*.6)),9);
+            var value=128+n1*20+n2*13+n3*18-pits*48;
+            var idx=(py*512+px)*4;
+            if(asBump){
+              data[idx]=data[idx+1]=data[idx+2]=Math.max(0,Math.min(255,value+128));
+            }else{
+              var mineral=value-128;
+              data[idx]=Math.max(0,Math.min(255,91+mineral*.56));
+              data[idx+1]=Math.max(0,Math.min(255,101+mineral*.60));
+              data[idx+2]=Math.max(0,Math.min(255,115+mineral*.68));
+            }
+            data[idx+3]=255;
+          }
+        }
+        ctx.putImageData(image,0,0);
+        var tex=new THREE.CanvasTexture(canvas);
+        tex.wrapS=tex.wrapT=THREE.RepeatWrapping;
+        tex.repeat.set(1,1);
+        tex.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());
+        return tex;
+      }
       var rockMaterials=[
-        new THREE.MeshStandardMaterial({color:0x353b48,roughness:1,metalness:.03,flatShading:true}),
-        new THREE.MeshStandardMaterial({color:0x4a4c55,roughness:.96,metalness:.02,flatShading:true}),
-        new THREE.MeshStandardMaterial({color:0x252d3a,roughness:1,metalness:.04,flatShading:true}),
-        new THREE.MeshStandardMaterial({color:0x59606c,roughness:1,metalness:.02,flatShading:true})
+        new THREE.MeshStandardMaterial({color:0x777f8d,map:makeRockTexture(1.7,false),bumpMap:makeRockTexture(1.7,true),bumpScale:.105,roughness:.96,metalness:.015}),
+        new THREE.MeshStandardMaterial({color:0x85818a,map:makeRockTexture(4.2,false),bumpMap:makeRockTexture(4.2,true),bumpScale:.12,roughness:.98,metalness:.01}),
+        new THREE.MeshStandardMaterial({color:0x626e80,map:makeRockTexture(8.6,false),bumpMap:makeRockTexture(8.6,true),bumpScale:.095,roughness:.97,metalness:.02}),
+        new THREE.MeshStandardMaterial({color:0x96949a,map:makeRockTexture(12.1,false),bumpMap:makeRockTexture(12.1,true),bumpScale:.11,roughness:.98,metalness:.01})
       ];
       var rockGeo=[makeRockGeometry(1.7),makeRockGeometry(4.2),makeRockGeometry(8.6),makeRockGeometry(12.1)];
       var rocks=[];
