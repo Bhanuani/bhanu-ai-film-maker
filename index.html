@@ -968,11 +968,328 @@
     @media (max-width: 520px) {
       body.director-mode .movements-grid { grid-template-columns:1fr; }
     }
+
+    /* CINEMOTION PUBLIC LANDING PAGE — isolated from the existing application */
+    body.cinemotion-landing-active { overflow: hidden; }
+    #cinemotionLanding {
+      position: fixed; inset: 0; z-index: 2000000; overflow-y: auto;
+      background: #040711; color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif;
+      overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #00d2ff #0d121f;
+    }
+    #cinemotionLanding * { box-sizing: border-box; }
+    #cinemotionLanding a { text-decoration: none; }
+    #cinemotionLanding button, #cinemotionLanding a { -webkit-tap-highlight-color: transparent; }
+    #cinemotionLanding a:focus-visible, #cinemotionLanding button:focus-visible {
+      outline: 2px solid #00d2ff; outline-offset: 4px;
+    }
+    #cinemotionLanding .lp-wrap { width: min(1180px, calc(100% - 48px)); margin: 0 auto; }
+    #cinemotionLanding .lp-nav-shell {
+      position: sticky; top: 12px; z-index: 20; padding: 12px 0 0; pointer-events: none;
+    }
+    #cinemotionLanding .lp-nav {
+      pointer-events: auto; width: min(1080px, calc(100% - 32px)); margin: 0 auto;
+      min-height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 20px;
+      padding: 10px 16px; border: 1px solid rgba(255,255,255,.12); border-radius: 16px;
+      background: rgba(4,7,17,.88); backdrop-filter: blur(18px);
+      box-shadow: 0 12px 40px rgba(0,0,0,.28);
+    }
+    #cinemotionLanding .lp-brand { display:flex; align-items:center; gap:10px; min-width:0; color:#fff; }
+    #cinemotionLanding .lp-brand img { width:36px; height:36px; object-fit:contain; }
+    #cinemotionLanding .lp-brand strong { display:block; font:800 14px 'Space Grotesk',sans-serif; letter-spacing:.08em; white-space:nowrap; }
+    #cinemotionLanding .lp-brand small { display:block; color:#00d2ff; font-size:8px; letter-spacing:.25em; font-weight:800; }
+    #cinemotionLanding .lp-links { display:flex; align-items:center; gap:25px; color:#cbd5e1; font-size:12px; font-weight:700; }
+    #cinemotionLanding .lp-links a:hover { color:#00d2ff; }
+    #cinemotionLanding .lp-cta {
+      display:inline-flex; align-items:center; justify-content:center; gap:9px; min-height:42px;
+      padding:10px 16px; border:1px solid #00d2ff; border-radius:9px;
+      background:#00d2ff; color:#04101a; font-size:12px; font-weight:800;
+      transition:transform .3s cubic-bezier(.22,1,.36,1), background .25s, box-shadow .25s;
+      cursor:pointer;
+    }
+    #cinemotionLanding .lp-cta:hover { transform:translateY(-2px); background:#75e6ff; box-shadow:0 0 24px rgba(0,210,255,.2); }
+    #cinemotionLanding .lp-cta-secondary {
+      background:rgba(255,255,255,.04); color:#f8fafc; border-color:rgba(255,255,255,.2);
+    }
+    #cinemotionLanding .lp-cta-secondary:hover { background:rgba(255,255,255,.1); box-shadow:none; }
+    #cinemotionLanding .lp-menu-btn { display:none; border:1px solid rgba(255,255,255,.16); background:#0d121f; color:#fff; border-radius:9px; width:40px; height:40px; font-size:18px; cursor:pointer; }
+    #cinemotionLanding .lp-mobile-menu {
+      display:none; position:fixed; inset:0; z-index:30; padding:24px;
+      background:rgba(4,7,17,.98); backdrop-filter:blur(20px);
+    }
+    #cinemotionLanding .lp-mobile-menu.open { display:flex; flex-direction:column; }
+    #cinemotionLanding .lp-mobile-menu-head { display:flex; justify-content:space-between; align-items:center; }
+    #cinemotionLanding .lp-mobile-menu-links { display:flex; flex-direction:column; gap:0; margin:auto 0; }
+    #cinemotionLanding .lp-mobile-menu-links a { padding:18px 0; border-bottom:1px solid rgba(255,255,255,.1); font-size:24px; font-weight:700; }
+    #cinemotionLanding .lp-close-menu { width:42px; height:42px; border:1px solid rgba(255,255,255,.16); border-radius:50%; color:#fff; background:#111827; font-size:24px; cursor:pointer; }
+    #cinemotionLanding .lp-hero {
+      position:relative; min-height:690px; display:flex; align-items:center; overflow:hidden;
+      margin-top:-74px; padding:150px 0 82px; background:#040711;
+    }
+    #cinemotionLanding .lp-hero::before {
+      content:""; position:absolute; inset:0; background-image:url('bhanu-3d-header_2.png');
+      background-position:center; background-size:cover; opacity:.44;
+    }
+    #cinemotionLanding .lp-hero::after {
+      content:""; position:absolute; inset:0; background:rgba(4,7,17,.58);
+    }
+    #cinemotionLanding .lp-hero-content { position:relative; z-index:1; max-width:690px; }
+    #cinemotionLanding .lp-eyebrow {
+      display:flex; align-items:center; gap:10px; color:#00d2ff; font-size:10px;
+      font-weight:800; letter-spacing:.2em; text-transform:uppercase;
+    }
+    #cinemotionLanding .lp-eyebrow::before { content:""; width:28px; height:1px; background:#00d2ff; }
+    #cinemotionLanding .lp-hero h1 {
+      max-width:680px; margin:24px 0 20px; font:700 clamp(44px,7vw,78px)/1.02 'Space Grotesk',sans-serif;
+      letter-spacing:-.065em; text-wrap:balance; color:#fff;
+      background:linear-gradient(100deg,#fff,#9aa8ba); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    #cinemotionLanding .lp-hero p { max-width:580px; color:#cbd5e1; font-size:15px; line-height:1.85; margin:0 0 28px; }
+    #cinemotionLanding .lp-actions { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    #cinemotionLanding .lp-proof { display:flex; flex-wrap:wrap; gap:28px; margin-top:52px; padding-top:22px; border-top:1px solid rgba(255,255,255,.16); max-width:620px; }
+    #cinemotionLanding .lp-proof strong { display:block; color:#fff; font:700 20px 'Space Grotesk',sans-serif; }
+    #cinemotionLanding .lp-proof span { display:block; color:#94a3b8; font-size:9px; text-transform:uppercase; letter-spacing:.12em; margin-top:3px; }
+    #cinemotionLanding .lp-scroll-note { position:absolute; right:28px; bottom:68px; z-index:1; color:#94a3b8; font-size:9px; letter-spacing:.2em; writing-mode:vertical-rl; text-transform:uppercase; }
+    #cinemotionLanding .lp-section { padding:100px 0; }
+    #cinemotionLanding .lp-section-head { max-width:670px; margin-bottom:38px; }
+    #cinemotionLanding .lp-section h2 { margin:12px 0 14px; color:#f8fafc; font:700 clamp(32px,4.5vw,52px)/1.08 'Space Grotesk',sans-serif; letter-spacing:-.055em; text-wrap:balance; }
+    #cinemotionLanding .lp-section-head p, #cinemotionLanding .lp-muted { color:#94a3b8; font-size:14px; line-height:1.85; }
+    #cinemotionLanding .lp-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:15px; }
+    #cinemotionLanding .lp-card {
+      min-height:245px; padding:25px; border:1px solid rgba(255,255,255,.09); border-radius:15px;
+      background:#0d121f; transition:transform .5s cubic-bezier(.22,1,.36,1),border-color .3s;
+    }
+    #cinemotionLanding .lp-card:hover { transform:translateY(-5px); border-color:rgba(0,210,255,.45); }
+    #cinemotionLanding .lp-card-no { color:#00d2ff; font-size:10px; letter-spacing:.18em; font-weight:800; }
+    #cinemotionLanding .lp-card-icon { width:43px; height:43px; display:grid; place-items:center; margin:25px 0 17px; border-radius:12px; background:rgba(0,210,255,.1); color:#00d2ff; font-size:19px; }
+    #cinemotionLanding .lp-card h3 { color:#fff; font:700 18px 'Space Grotesk',sans-serif; margin:0 0 9px; }
+    #cinemotionLanding .lp-card p { color:#94a3b8; font-size:12px; line-height:1.85; margin:0; }
+    #cinemotionLanding .lp-tagline { padding:112px 0; background:#0d121f; border-top:1px solid rgba(255,255,255,.08); border-bottom:1px solid rgba(255,255,255,.08); }
+    #cinemotionLanding .lp-tagline p { max-width:900px; margin:0; color:#f8fafc; font:700 clamp(34px,5.2vw,64px)/1.15 'Space Grotesk',sans-serif; letter-spacing:-.06em; }
+    #cinemotionLanding .lp-word { display:inline-block; color:rgba(248,250,252,.28); transition:color .7s cubic-bezier(.22,1,.36,1); margin-right:.2em; }
+    #cinemotionLanding .lp-word.on { color:#f8fafc; }
+    #cinemotionLanding .lp-steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:15px; }
+    #cinemotionLanding .lp-step { padding:25px; border:1px solid rgba(255,255,255,.09); border-radius:14px; background:#090e1a; }
+    #cinemotionLanding .lp-step-no { color:#00d2ff; font-size:10px; font-weight:800; letter-spacing:.18em; }
+    #cinemotionLanding .lp-step h3 { margin:22px 0 9px; color:#fff; font:700 18px 'Space Grotesk',sans-serif; }
+    #cinemotionLanding .lp-step p { color:#94a3b8; font-size:12px; line-height:1.85; margin:0; }
+    #cinemotionLanding .lp-vault { display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; }
+    #cinemotionLanding .lp-vault-visual {
+      min-height:390px; padding:24px; display:flex; align-items:flex-end; border:1px solid rgba(0,210,255,.2);
+      border-radius:18px; overflow:hidden; position:relative; background:#111827 url('bhanu-3d-header_2.png') center/cover no-repeat;
+    }
+    #cinemotionLanding .lp-vault-visual::before { content:""; position:absolute; inset:0; background:rgba(4,7,17,.48); }
+    #cinemotionLanding .lp-vault-panels { position:relative; z-index:1; width:100%; display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+    #cinemotionLanding .lp-mini { padding:13px; border:1px solid rgba(255,255,255,.14); border-radius:9px; background:rgba(4,7,17,.88); }
+    #cinemotionLanding .lp-mini span { display:block; color:#00d2ff; font-size:8px; letter-spacing:.15em; text-transform:uppercase; }
+    #cinemotionLanding .lp-mini strong { display:block; color:#fff; font-size:12px; margin-top:5px; }
+    #cinemotionLanding .lp-vault-copy h2 { margin-top:12px; }
+    #cinemotionLanding .lp-checks { list-style:none; padding:0; margin:24px 0 28px; display:grid; gap:13px; }
+    #cinemotionLanding .lp-checks li { display:flex; align-items:flex-start; gap:11px; color:#cbd5e1; font-size:12px; line-height:1.7; }
+    #cinemotionLanding .lp-checks i { color:#00d2ff; margin-top:3px; }
+    #cinemotionLanding .lp-faq { max-width:850px; }
+    #cinemotionLanding .lp-faq details { border-bottom:1px solid rgba(255,255,255,.1); padding:19px 0; }
+    #cinemotionLanding .lp-faq summary { display:flex; justify-content:space-between; gap:20px; cursor:pointer; list-style:none; color:#f8fafc; font-size:14px; font-weight:700; }
+    #cinemotionLanding .lp-faq summary::-webkit-details-marker { display:none; }
+    #cinemotionLanding .lp-faq summary::after { content:"+"; color:#00d2ff; font-size:20px; font-weight:400; }
+    #cinemotionLanding .lp-faq details[open] summary::after { content:"−"; }
+    #cinemotionLanding .lp-faq details p { max-width:740px; margin:12px 0 0; color:#94a3b8; font-size:12px; line-height:1.85; }
+    #cinemotionLanding .lp-final { padding:88px 0; background:#0d121f; border-top:1px solid rgba(255,255,255,.08); text-align:center; }
+    #cinemotionLanding .lp-final h2 { max-width:700px; margin:13px auto 16px; }
+    #cinemotionLanding .lp-final p { max-width:560px; margin:0 auto 25px; color:#94a3b8; font-size:13px; line-height:1.8; }
+    #cinemotionLanding .lp-footer { padding:25px 0; border-top:1px solid rgba(255,255,255,.08); color:#64748b; font-size:10px; }
+    #cinemotionLanding .lp-footer-inner { display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+    #cinemotionLanding .lp-footer a:hover { color:#00d2ff; }
+    #cinemotionLanding .lp-reveal { opacity:0; transform:translateY(24px); transition:opacity .75s cubic-bezier(.22,1,.36,1),transform .75s cubic-bezier(.22,1,.36,1); }
+    #cinemotionLanding .lp-reveal.visible { opacity:1; transform:translateY(0); }
+    #cinemotionLanding.is-hidden { display:none !important; }
+    @media (max-width: 760px) {
+      #cinemotionLanding .lp-wrap { width:calc(100% - 36px); }
+      #cinemotionLanding .lp-links { display:none; }
+      #cinemotionLanding .lp-menu-btn { display:block; }
+      #cinemotionLanding .lp-nav { gap:10px; }
+      #cinemotionLanding .lp-nav > .lp-cta { margin-left:auto; min-height:39px; padding:9px 11px; font-size:10px; }
+      #cinemotionLanding .lp-hero { min-height:690px; padding:140px 0 70px; }
+      #cinemotionLanding .lp-hero::before { background-position:58% center; }
+      #cinemotionLanding .lp-hero::after { background:rgba(4,7,17,.68); }
+      #cinemotionLanding .lp-hero p { font-size:13px; }
+      #cinemotionLanding .lp-scroll-note { display:none; }
+      #cinemotionLanding .lp-grid, #cinemotionLanding .lp-steps { grid-template-columns:1fr; }
+      #cinemotionLanding .lp-card { min-height:210px; }
+      #cinemotionLanding .lp-section { padding:78px 0; }
+      #cinemotionLanding .lp-tagline { padding:82px 0; }
+      #cinemotionLanding .lp-vault { grid-template-columns:1fr; gap:28px; }
+      #cinemotionLanding .lp-vault-visual { min-height:320px; }
+      #cinemotionLanding .lp-proof { gap:18px; margin-top:38px; }
+    }
+    @media (max-width: 390px) {
+      #cinemotionLanding .lp-wrap { width:calc(100% - 28px); }
+      #cinemotionLanding .lp-brand img { width:31px; height:31px; }
+      #cinemotionLanding .lp-brand strong { font-size:11px; }
+      #cinemotionLanding .lp-nav { padding:9px 10px; }
+      #cinemotionLanding .lp-hero h1 { font-size:43px; }
+      #cinemotionLanding .lp-actions { align-items:stretch; flex-direction:column; }
+      #cinemotionLanding .lp-actions a { width:100%; }
+      #cinemotionLanding .lp-proof { gap:13px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #cinemotionLanding .lp-reveal { opacity:1; transform:none; transition:none; }
+      #cinemotionLanding .lp-word { color:#f8fafc; transition:none; }
+      #cinemotionLanding * { scroll-behavior:auto !important; animation:none !important; }
+    }
+
   </style>
 </head>
 <body>
 
-  <!-- TAB SWITCH WELCOME BACK OVERLAY -->
+
+  <!-- CINEMOTION PUBLIC LANDING PAGE. Existing app remains below, unchanged. -->
+  <div id="cinemotionLanding" role="dialog" aria-modal="true" aria-label="CINEMOTION STUDIO introduction">
+    <div class="lp-nav-shell">
+      <nav class="lp-nav" aria-label="Landing page navigation">
+        <a class="lp-brand" href="#cinemotionLandingTop" aria-label="CINEMOTION STUDIO home">
+          <img src="assets/cinemotion/icon-128.png" alt="">
+          <span><strong>CINEMOTION</strong><small>DIRECTOR'S STUDIO</small></span>
+        </a>
+        <div class="lp-links">
+          <a href="#landingCapabilities">Capabilities</a>
+          <a href="#landingWorkflow">How it works</a>
+          <a href="#landingVault">Director Vault</a>
+          <a href="#landingFaq">FAQ</a>
+        </div>
+        <button type="button" class="lp-cta" data-enter-cinemotion>Enter Studio <i class="fa-solid fa-arrow-up-right-from-square"></i></button>
+        <button type="button" class="lp-menu-btn" id="landingMenuOpen" aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+      </nav>
+    </div>
+
+    <div class="lp-mobile-menu" id="landingMobileMenu" aria-hidden="true">
+      <div class="lp-mobile-menu-head">
+        <a class="lp-brand" href="#cinemotionLandingTop"><img src="assets/cinemotion/icon-128.png" alt=""><span><strong>CINEMOTION</strong><small>DIRECTOR'S STUDIO</small></span></a>
+        <button type="button" class="lp-close-menu" id="landingMenuClose" aria-label="Close navigation">&times;</button>
+      </div>
+      <div class="lp-mobile-menu-links">
+        <a href="#landingCapabilities">Capabilities</a>
+        <a href="#landingWorkflow">How it works</a>
+        <a href="#landingVault">Director Vault</a>
+        <a href="#landingFaq">FAQ</a>
+        <a href="#" data-enter-cinemotion>Enter CINEMOTION STUDIO ↗</a>
+      </div>
+    </div>
+
+    <main id="cinemotionLandingTop">
+      <section class="lp-hero">
+        <div class="lp-wrap">
+          <div class="lp-hero-content">
+            <div class="lp-eyebrow">A creative workspace for visual storytellers</div>
+            <h1>Think like a director.<br>Frame like a filmmaker.</h1>
+            <p>Explore cinematic camera movements, angles, shots, lighting and visual prompt references. Build your creative direction with the tools already inside CINEMOTION STUDIO.</p>
+            <div class="lp-actions">
+              <a class="lp-cta" href="#" data-enter-cinemotion>Enter CINEMOTION STUDIO <i class="fa-solid fa-arrow-right"></i></a>
+              <a class="lp-cta lp-cta-secondary" href="#landingCapabilities">Explore the studio <i class="fa-solid fa-arrow-down"></i></a>
+            </div>
+            <div class="lp-proof">
+              <div><strong>136+</strong><span>Vault references</span></div>
+              <div><strong>7</strong><span>Creative categories</span></div>
+              <div><strong>AI</strong><span>Gemini assistant</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="lp-scroll-note">Visual storytelling starts with intention</div>
+      </section>
+
+      <section class="lp-section" id="landingCapabilities">
+        <div class="lp-wrap">
+          <div class="lp-section-head lp-reveal">
+            <div class="lp-eyebrow">Inside the studio</div>
+            <h2>Every frame begins with a deliberate choice.</h2>
+            <p>Find a visual reference, understand the camera language and turn your creative idea into a clear prompt direction.</p>
+          </div>
+          <div class="lp-grid">
+            <article class="lp-card lp-reveal"><div class="lp-card-no">01 / CAMERA LANGUAGE</div><div class="lp-card-icon"><i class="fa-solid fa-video"></i></div><h3>Camera movements</h3><p>Explore camera movement references such as dolly, orbit, crane, tracking and reveal shots.</p></article>
+            <article class="lp-card lp-reveal"><div class="lp-card-no">02 / VISUAL COMPOSITION</div><div class="lp-card-icon"><i class="fa-solid fa-crosshairs"></i></div><h3>Angles and shots</h3><p>Choose the perspective, framing and shot type that communicate your scene with intention.</p></article>
+            <article class="lp-card lp-reveal"><div class="lp-card-no">03 / LIGHT AND ATMOSPHERE</div><div class="lp-card-icon"><i class="fa-solid fa-lightbulb"></i></div><h3>Cinematic mood</h3><p>Explore lighting, atmosphere, lens references and master prompts for your visual direction.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-tagline">
+        <div class="lp-wrap">
+          <p id="landingTagline">A stronger visual story starts before the camera moves. It starts with knowing exactly what you want the audience to feel.</p>
+        </div>
+      </section>
+
+      <section class="lp-section" id="landingWorkflow">
+        <div class="lp-wrap">
+          <div class="lp-section-head lp-reveal">
+            <div class="lp-eyebrow">A clear creative process</div>
+            <h2>From visual idea to a usable direction.</h2>
+            <p>Use CINEMOTION as your reference desk for the creative decisions behind the next shot.</p>
+          </div>
+          <div class="lp-steps">
+            <article class="lp-step lp-reveal"><div class="lp-step-no">STEP 01</div><h3>Find your reference</h3><p>Browse the Director Vault by movement, angle, shot, lighting, atmosphere, lens and master prompt.</p></article>
+            <article class="lp-step lp-reveal"><div class="lp-step-no">STEP 02</div><h3>Shape your prompt</h3><p>Open a reference, review its prompt formula and copy or adapt the direction for your scene.</p></article>
+            <article class="lp-step lp-reveal"><div class="lp-step-no">STEP 03</div><h3>Refine with Gemini</h3><p>Use the existing Gemini assistant to discuss cinematic prompts and visual direction.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-section" id="landingVault">
+        <div class="lp-wrap lp-vault">
+          <div class="lp-vault-visual lp-reveal" role="img" aria-label="CINEMOTION Director Vault categories">
+            <div class="lp-vault-panels">
+              <div class="lp-mini"><span>Reference library</span><strong>Camera movement</strong></div>
+              <div class="lp-mini"><span>Composition</span><strong>Angles and shots</strong></div>
+              <div class="lp-mini"><span>Visual mood</span><strong>Lighting and atmosphere</strong></div>
+              <div class="lp-mini"><span>Prompt craft</span><strong>Master prompts</strong></div>
+            </div>
+          </div>
+          <div class="lp-vault-copy lp-reveal">
+            <div class="lp-eyebrow">Your Director Vault</div>
+            <h2>Keep your creative references close.</h2>
+            <p class="lp-muted">A focused reference library for filmmakers, editors and visual storytellers who want more control over the language of their images.</p>
+            <ul class="lp-checks">
+              <li><i class="fa-solid fa-check"></i><span>Browse the existing collection of 136+ references.</span></li>
+              <li><i class="fa-solid fa-check"></i><span>Explore camera movements, angles, shots and visual prompt categories.</span></li>
+              <li><i class="fa-solid fa-check"></i><span>Copy prompt details and use the existing media actions.</span></li>
+              <li><i class="fa-solid fa-check"></i><span>Open the existing Gemini assistant for creative guidance.</span></li>
+            </ul>
+            <a class="lp-cta" href="#" data-enter-cinemotion>Open the Director Vault <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-section" id="landingFaq">
+        <div class="lp-wrap">
+          <div class="lp-section-head lp-reveal"><div class="lp-eyebrow">Questions, answered</div><h2>Before you step into the studio.</h2></div>
+          <div class="lp-faq lp-reveal">
+            <details><summary>What is CINEMOTION STUDIO?</summary><p>CINEMOTION STUDIO is a filmmaking reference workspace for cinematic camera movements, angles, shots, lighting, atmosphere, lenses and prompt guidance.</p></details>
+            <details><summary>Who can use the studio?</summary><p>It is designed for filmmakers, video creators, editors, visual storytellers and creators developing image or video prompts.</p></details>
+            <details><summary>What is inside the Director Vault?</summary><p>The current application includes references across camera movements, camera angles, camera shots, cinematic lighting, atmosphere, camera lens and master prompts.</p></details>
+            <details><summary>Can I copy and use the prompts?</summary><p>Yes. Open a reference in the existing application to review its prompt details and use the available copy actions.</p></details>
+            <details><summary>Does CINEMOTION include an AI assistant?</summary><p>Yes. The existing application includes a Gemini assistant for questions about cinematic prompts and visual direction.</p></details>
+            <details><summary>How do I access my account?</summary><p>Select Enter Studio. Your existing application will open with its current login, registration and mobile OTP options.</p></details>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-final">
+        <div class="lp-wrap lp-reveal">
+          <div class="lp-eyebrow" style="justify-content:center;">Your next frame starts here</div>
+          <h2>Direct with intention.<br>Create with CINEMOTION.</h2>
+          <p>Step into your Director Vault and start shaping the visual language of your next project.</p>
+          <a class="lp-cta" href="#" data-enter-cinemotion>Enter CINEMOTION STUDIO <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="lp-footer">
+      <div class="lp-wrap lp-footer-inner">
+        <span>© CINEMOTION STUDIO. A creative workspace for visual storytellers.</span>
+        <a href="#" data-enter-cinemotion>Open existing application ↗</a>
+      </div>
+    </footer>
+  </div>
+
+    <!-- TAB SWITCH WELCOME BACK OVERLAY -->
   <div id="welcomeBackOverlay">
     <div class="welcome-video-container">
       <video id="welcomeVideo" class="welcome-direct-video" muted playsinline preload="none" src="welcome-back.mp4"></video>
@@ -2911,6 +3228,7 @@
     }
 
     onAuthStateChanged(auth, async (user) => {
+      window.__cinemotionAuthStateResolved = true;
       const gate = byId("authGateModal");
       const resendBtn = byId("resendVerificationBtn");
       const verificationText = byId("verificationStatusText");
@@ -4093,5 +4411,94 @@
       }
     }
   </script>
+
+  <script>
+    // Landing page is a presentation layer only. The existing app and Firebase code stay intact.
+    (function initCinemotionLanding() {
+      const landing = document.getElementById("cinemotionLanding");
+      if (!landing) return;
+
+      document.body.classList.add("cinemotion-landing-active");
+
+      const enterStudio = () => {
+        landing.classList.add("is-hidden");
+        landing.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("cinemotion-landing-active");
+        const gate = document.getElementById("authGateModal");
+        // The existing Firebase onAuthStateChanged handler remains responsible for
+        // deciding whether the user sees the app or the current sign-in gate.
+        if (gate && !window.__cinemotionAuthStateResolved) {
+          gate.style.display = "flex";
+        }
+      };
+
+      landing.querySelectorAll("[data-enter-cinemotion]").forEach((control) => {
+        control.addEventListener("click", (event) => {
+          event.preventDefault();
+          enterStudio();
+        });
+      });
+
+      const menu = document.getElementById("landingMobileMenu");
+      const openMenu = document.getElementById("landingMenuOpen");
+      const closeMenu = document.getElementById("landingMenuClose");
+      const setMenu = (open) => {
+        if (!menu) return;
+        menu.classList.toggle("open", open);
+        menu.setAttribute("aria-hidden", String(!open));
+        openMenu?.setAttribute("aria-expanded", String(open));
+      };
+      openMenu?.addEventListener("click", () => setMenu(true));
+      closeMenu?.addEventListener("click", () => setMenu(false));
+      menu?.querySelectorAll('a[href^="#landing"]').forEach((link) => {
+        link.addEventListener("click", () => setMenu(false));
+      });
+
+      const revealItems = landing.querySelectorAll(".lp-reveal");
+      if ("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        const revealObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12 });
+        revealItems.forEach((item) => revealObserver.observe(item));
+      } else {
+        revealItems.forEach((item) => item.classList.add("visible"));
+      }
+
+      const tagline = document.getElementById("landingTagline");
+      if (tagline) {
+        const words = tagline.textContent.trim().split(/\s+/);
+        tagline.textContent = "";
+        words.forEach((word, index) => {
+          const span = document.createElement("span");
+          span.className = "lp-word";
+          span.textContent = word;
+          tagline.appendChild(span);
+          if (index < words.length - 1) tagline.appendChild(document.createTextNode(" "));
+        });
+        if ("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          const wordObserver = new IntersectionObserver((entries) => {
+            if (entries.some((entry) => entry.isIntersecting)) {
+              tagline.querySelectorAll(".lp-word").forEach((word, index) => {
+                window.setTimeout(() => word.classList.add("on"), index * 55);
+              });
+              wordObserver.disconnect();
+            }
+          }, { threshold: 0.25 });
+          wordObserver.observe(tagline);
+        } else {
+          tagline.querySelectorAll(".lp-word").forEach((word) => word.classList.add("on"));
+        }
+      }
+
+      // Expose a small, read-only state marker for the existing auth callback.
+      window.cinemotionLandingEnter = enterStudio;
+    })();
+  </script>
+
 </body>
 </html>
