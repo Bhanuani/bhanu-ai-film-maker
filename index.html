@@ -80,14 +80,16 @@
       align-items: center;
       justify-content: center;
       opacity: 0;
+      visibility: hidden;
       pointer-events: none;
       transition: opacity 0.4s ease;
       overflow: hidden;
     }
 
     #welcomeBackOverlay.show {
-      opacity: 1;
-      pointer-events: auto;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
     }
 
     .welcome-video-container {
@@ -564,8 +566,33 @@
 
     .prompt-content {
       width: 100%;
-      padding: 0.85rem 2.4rem 0.85rem 0.85rem;
+      padding: 0.85rem;
       transition: opacity 0.3s ease;
+    }
+
+    .prompt-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      min-height: 40px;
+    }
+    .prompt-action-btn {
+      width: 30px;
+      height: 30px;
+      flex: 0 0 30px;
+      font-size: 0.82rem;
+      border-radius: 8px;
+    }
+    .prompt-action-btn.edit-btn:hover {
+      border-color: #f59e0b;
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.15);
+    }
+    .prompt-action-btn.del-btn:hover {
+      border-color: #ef4444;
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.15);
     }
 
     .prompt-wrapper.copied-active .prompt-content {
@@ -607,33 +634,7 @@
       opacity: 1;
     }
 
-    .prompt-edit-btn {
-      position: absolute;
-      bottom: 8px;
-      right: 8px;
-      width: 28px;
-      height: 28px;
-      border-radius: 7px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(13, 18, 31, 0.9);
-      color: #94a3b8;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 0.82rem;
-      transition: all 0.2s ease;
-      backdrop-filter: blur(6px);
-      z-index: 4;
-    }
-
-    .prompt-edit-btn:hover {
-      border-color: var(--accent-cyan);
-      color: var(--accent-cyan);
-      background: rgba(0, 210, 255, 0.15);
-      transform: scale(1.1);
-      box-shadow: 0 0 12px rgba(0, 210, 255, 0.4);
-    }
+    .prompt-edit-btn { display: none !important; }
 
     .copy-btn {
       width: 100%;
@@ -843,8 +844,10 @@
     }
     .gemini-intro-video {
       display:block; width:min(100%, 980px); max-height:100%;
-      aspect-ratio:16/9; object-fit:contain; background:#000;
-      border:0; border-radius:14px;
+      aspect-ratio:16/9; object-fit:contain;
+      background:transparent; border:0; border-radius:0;
+      mix-blend-mode:screen;
+      transform:translateY(5%);
     }
     .gemini-messages { flex:1; min-height:80px; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:12px; }
     .gemini-message { max-width:92%; padding:11px 13px; border-radius:13px; font-size:.9rem; line-height:1.65; white-space:pre-wrap; overflow-wrap:anywhere; }
@@ -866,6 +869,49 @@
       .gemini-panel { top:70px; right:10px; bottom:10px; width:calc(100vw - 20px); max-height:none; }
     }
 
+
+
+    /* PREMIUM REAL-TIME THREE.JS CINEMA CAMERA */
+    .director-camera-stage {
+      position:relative; isolation:isolate; overflow:hidden;
+      min-height:190px; margin:12px 0 16px; padding:22px 20px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      border:1px solid rgba(0,210,255,.28); border-radius:18px;
+      background:
+        radial-gradient(ellipse at 78% 48%,rgba(0,190,255,.17),transparent 36%),
+        radial-gradient(ellipse at 93% 10%,rgba(125,70,255,.14),transparent 35%),
+        linear-gradient(115deg,#07101f 0%,#0a1020 55%,#101027 100%);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 14px 38px rgba(0,0,0,.2);
+    }
+    .camera-stage-grid {
+      position:absolute; inset:0; z-index:-1; opacity:.25; pointer-events:none;
+      background-image:linear-gradient(rgba(0,210,255,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(0,210,255,.10) 1px,transparent 1px);
+      background-size:28px 28px;
+      mask-image:linear-gradient(90deg,transparent 4%,#000 55%,#000 100%);
+      transform:perspective(420px) rotateX(58deg) scale(1.35) translateY(22%);
+      transform-origin:center bottom;
+    }
+    .camera-stage-copy { position:relative; z-index:2; width:46%; min-width:190px; }
+    .camera-stage-eyebrow { display:flex; align-items:center; gap:8px; color:#6deaff; font-size:.62rem; font-weight:900; letter-spacing:.13em; }
+    .camera-stage-eyebrow i { width:7px; height:7px; border-radius:50%; background:#00d2ff; box-shadow:0 0 12px #00d2ff; animation:cameraLivePulse 1.5s infinite; }
+    .camera-stage-copy h3 { margin:8px 0 5px; color:#f4f8ff; font-size:1.12rem; letter-spacing:-.035em; }
+    .camera-stage-copy p { margin:0; max-width:360px; color:#91a3bd; font-size:.72rem; line-height:1.5; }
+    .camera-stage-mode { display:inline-flex; margin-top:11px; padding:5px 8px; border:1px solid rgba(0,210,255,.28); border-radius:6px; background:rgba(0,210,255,.07); color:#62eaff; font-size:.57rem; font-weight:900; letter-spacing:.08em; }
+    .camera-three-wrap { position:relative; z-index:1; width:54%; height:160px; min-width:190px; }
+    #cameraThreeCanvas { display:block; width:100%; height:100%; position:relative; z-index:2; outline:none; }
+    .camera-three-glow { position:absolute; width:68%; height:46%; right:9%; top:30%; border-radius:50%; background:rgba(0,190,255,.18); filter:blur(32px); pointer-events:none; }
+    @keyframes cameraLivePulse { 50% { opacity:.35; transform:scale(.75); } }
+    @media(max-width:700px) {
+      .director-camera-stage { min-height:160px; padding:15px 12px; gap:4px; }
+      .camera-stage-copy { min-width:145px; width:48%; }
+      .camera-stage-copy h3 { font-size:.92rem; }
+      .camera-stage-copy p { font-size:.62rem; }
+      .camera-stage-eyebrow { font-size:.5rem; }
+      .camera-three-wrap { min-width:125px; width:52%; height:132px; }
+    }
+    @media(prefers-reduced-motion:reduce) {
+      .camera-stage-eyebrow i { animation:none; }
+    }
 
     /* RESPONSIVE PROMPT GRID */
     @media (max-width: 1100px) {
@@ -965,11 +1011,420 @@
     @media (max-width: 520px) {
       body.director-mode .movements-grid { grid-template-columns:1fr; }
     }
-  </style>
+
+    /* CINEMOTION PUBLIC LANDING PAGE — isolated from the existing application */
+    body.cinemotion-landing-active { overflow: hidden; }
+    #cinemotionLanding {
+      position: fixed; inset: 0; z-index: 2000000; overflow-y: auto;
+      background: #040711; color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif;
+      overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #00d2ff #0d121f;
+    }
+    #cinemotionLanding * { box-sizing: border-box; }
+    #cinemotionLanding a { text-decoration: none; }
+    #cinemotionLanding button, #cinemotionLanding a { -webkit-tap-highlight-color: transparent; }
+    #cinemotionLanding a:focus-visible, #cinemotionLanding button:focus-visible {
+      outline: 2px solid #00d2ff; outline-offset: 4px;
+    }
+    #cinemotionLanding .lp-wrap { width: min(1180px, calc(100% - 48px)); margin: 0 auto; }
+    #cinemotionLanding .lp-nav-shell {
+      position: sticky; top: 12px; z-index: 20; padding: 12px 0 0; pointer-events: none;
+    }
+    #cinemotionLanding .lp-nav {
+      pointer-events: auto; width: min(1080px, calc(100% - 32px)); margin: 0 auto;
+      min-height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 20px;
+      padding: 10px 16px; border: 1px solid rgba(255,255,255,.12); border-radius: 16px;
+      background: rgba(4,7,17,.88); backdrop-filter: blur(18px);
+      box-shadow: 0 12px 40px rgba(0,0,0,.28);
+    }
+    #cinemotionLanding .lp-brand { display:flex; align-items:center; gap:10px; min-width:0; color:#fff; }
+    #cinemotionLanding .lp-brand img { width:36px; height:36px; object-fit:contain; }
+    #cinemotionLanding .lp-brand strong { display:block; font:800 14px 'Space Grotesk',sans-serif; letter-spacing:.08em; white-space:nowrap; }
+    #cinemotionLanding .lp-brand small { display:block; color:#00d2ff; font-size:8px; letter-spacing:.25em; font-weight:800; }
+    #cinemotionLanding .lp-links { display:flex; align-items:center; gap:25px; color:#cbd5e1; font-size:12px; font-weight:700; }
+    #cinemotionLanding .lp-links a:hover { color:#00d2ff; }
+    #cinemotionLanding .lp-cta {
+      display:inline-flex; align-items:center; justify-content:center; gap:9px; min-height:42px;
+      padding:10px 16px; border:1px solid #00d2ff; border-radius:9px;
+      background:#00d2ff; color:#04101a; font-size:12px; font-weight:800;
+      transition:transform .3s cubic-bezier(.22,1,.36,1), background .25s, box-shadow .25s;
+      cursor:pointer;
+    }
+    #cinemotionLanding .lp-cta:hover { transform:translateY(-2px); background:#75e6ff; box-shadow:0 0 24px rgba(0,210,255,.2); }
+    #cinemotionLanding .lp-cta-secondary {
+      background:rgba(255,255,255,.04); color:#f8fafc; border-color:rgba(255,255,255,.2);
+    }
+    #cinemotionLanding .lp-cta-secondary:hover { background:rgba(255,255,255,.1); box-shadow:none; }
+    #cinemotionLanding .lp-menu-btn { display:none; border:1px solid rgba(255,255,255,.16); background:#0d121f; color:#fff; border-radius:9px; width:40px; height:40px; font-size:18px; cursor:pointer; }
+    #cinemotionLanding .lp-mobile-menu {
+      display:none; position:fixed; inset:0; z-index:30; padding:24px;
+      background:rgba(4,7,17,.98); backdrop-filter:blur(20px);
+    }
+    #cinemotionLanding .lp-mobile-menu.open { display:flex; flex-direction:column; }
+    #cinemotionLanding .lp-mobile-menu-head { display:flex; justify-content:space-between; align-items:center; }
+    #cinemotionLanding .lp-mobile-menu-links { display:flex; flex-direction:column; gap:0; margin:auto 0; }
+    #cinemotionLanding .lp-mobile-menu-links a { padding:18px 0; border-bottom:1px solid rgba(255,255,255,.1); font-size:24px; font-weight:700; }
+    #cinemotionLanding .lp-close-menu { width:42px; height:42px; border:1px solid rgba(255,255,255,.16); border-radius:50%; color:#fff; background:#111827; font-size:24px; cursor:pointer; }
+    #cinemotionLanding .lp-hero {
+      position:relative; min-height:690px; display:flex; align-items:center; overflow:hidden;
+      margin-top:-74px; padding:150px 0 82px; background:#040711;
+    }
+    #cinemotionLanding .lp-hero::before {
+      content:""; position:absolute; inset:0; background-image:url('bhanu-3d-header_2.png');
+      background-position:center; background-size:cover; opacity:.44;
+    }
+    #cinemotionLanding .lp-hero::after {
+      content:""; position:absolute; inset:0; background:rgba(4,7,17,.58);
+    }
+    #cinemotionLanding .lp-hero-content { position:relative; z-index:1; max-width:690px; }
+    #cinemotionLanding .lp-eyebrow {
+      display:flex; align-items:center; gap:10px; color:#00d2ff; font-size:10px;
+      font-weight:800; letter-spacing:.2em; text-transform:uppercase;
+    }
+    #cinemotionLanding .lp-eyebrow::before { content:""; width:28px; height:1px; background:#00d2ff; }
+    #cinemotionLanding .lp-hero h1 {
+      max-width:680px; margin:24px 0 20px; font:700 clamp(44px,7vw,78px)/1.02 'Space Grotesk',sans-serif;
+      letter-spacing:-.065em; text-wrap:balance; color:#fff;
+      background:linear-gradient(100deg,#fff,#9aa8ba); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    #cinemotionLanding .lp-hero p { max-width:580px; color:#cbd5e1; font-size:15px; line-height:1.85; margin:0 0 28px; }
+    #cinemotionLanding .lp-actions { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    #cinemotionLanding .lp-proof { display:flex; flex-wrap:wrap; gap:28px; margin-top:52px; padding-top:22px; border-top:1px solid rgba(255,255,255,.16); max-width:620px; }
+    #cinemotionLanding .lp-proof strong { display:block; color:#fff; font:700 20px 'Space Grotesk',sans-serif; }
+    #cinemotionLanding .lp-proof span { display:block; color:#94a3b8; font-size:9px; text-transform:uppercase; letter-spacing:.12em; margin-top:3px; }
+    #cinemotionLanding .lp-scroll-note { position:absolute; right:28px; bottom:68px; z-index:1; color:#94a3b8; font-size:9px; letter-spacing:.2em; writing-mode:vertical-rl; text-transform:uppercase; }
+    #cinemotionLanding .lp-section { padding:100px 0; }
+    #cinemotionLanding .lp-section-head { max-width:670px; margin-bottom:38px; }
+    #cinemotionLanding .lp-section h2 { margin:12px 0 14px; color:#f8fafc; font:700 clamp(32px,4.5vw,52px)/1.08 'Space Grotesk',sans-serif; letter-spacing:-.055em; text-wrap:balance; }
+    #cinemotionLanding .lp-section-head p, #cinemotionLanding .lp-muted { color:#94a3b8; font-size:14px; line-height:1.85; }
+    #cinemotionLanding .lp-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:15px; }
+    #cinemotionLanding .lp-card {
+      min-height:245px; padding:25px; border:1px solid rgba(255,255,255,.09); border-radius:15px;
+      background:#0d121f; transition:transform .5s cubic-bezier(.22,1,.36,1),border-color .3s;
+    }
+    #cinemotionLanding .lp-card:hover { transform:translateY(-5px); border-color:rgba(0,210,255,.45); }
+    #cinemotionLanding .lp-card-no { color:#00d2ff; font-size:10px; letter-spacing:.18em; font-weight:800; }
+    #cinemotionLanding .lp-card-icon { width:43px; height:43px; display:grid; place-items:center; margin:25px 0 17px; border-radius:12px; background:rgba(0,210,255,.1); color:#00d2ff; font-size:19px; }
+    #cinemotionLanding .lp-card h3 { color:#fff; font:700 18px 'Space Grotesk',sans-serif; margin:0 0 9px; }
+    #cinemotionLanding .lp-card p { color:#94a3b8; font-size:12px; line-height:1.85; margin:0; }
+    #cinemotionLanding .lp-tagline { padding:112px 0; background:#0d121f; border-top:1px solid rgba(255,255,255,.08); border-bottom:1px solid rgba(255,255,255,.08); }
+    #cinemotionLanding .lp-tagline p { max-width:900px; margin:0; color:#f8fafc; font:700 clamp(34px,5.2vw,64px)/1.15 'Space Grotesk',sans-serif; letter-spacing:-.06em; }
+    #cinemotionLanding .lp-word { display:inline-block; color:rgba(248,250,252,.28); transition:color .7s cubic-bezier(.22,1,.36,1); margin-right:.2em; }
+    #cinemotionLanding .lp-word.on { color:#f8fafc; }
+    #cinemotionLanding .lp-steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:15px; }
+    #cinemotionLanding .lp-step { padding:25px; border:1px solid rgba(255,255,255,.09); border-radius:14px; background:#090e1a; }
+    #cinemotionLanding .lp-step-no { color:#00d2ff; font-size:10px; font-weight:800; letter-spacing:.18em; }
+    #cinemotionLanding .lp-step h3 { margin:22px 0 9px; color:#fff; font:700 18px 'Space Grotesk',sans-serif; }
+    #cinemotionLanding .lp-step p { color:#94a3b8; font-size:12px; line-height:1.85; margin:0; }
+    #cinemotionLanding .lp-vault { display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; }
+    #cinemotionLanding .lp-vault-visual {
+      min-height:390px; padding:24px; display:flex; align-items:flex-end; border:1px solid rgba(0,210,255,.2);
+      border-radius:18px; overflow:hidden; position:relative; background:#111827 url('bhanu-3d-header_2.png') center/cover no-repeat;
+    }
+    #cinemotionLanding .lp-vault-visual::before { content:""; position:absolute; inset:0; background:rgba(4,7,17,.48); }
+    #cinemotionLanding .lp-vault-panels { position:relative; z-index:1; width:100%; display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+    #cinemotionLanding .lp-mini { padding:13px; border:1px solid rgba(255,255,255,.14); border-radius:9px; background:rgba(4,7,17,.88); }
+    #cinemotionLanding .lp-mini span { display:block; color:#00d2ff; font-size:8px; letter-spacing:.15em; text-transform:uppercase; }
+    #cinemotionLanding .lp-mini strong { display:block; color:#fff; font-size:12px; margin-top:5px; }
+    #cinemotionLanding .lp-vault-copy h2 { margin-top:12px; }
+    #cinemotionLanding .lp-checks { list-style:none; padding:0; margin:24px 0 28px; display:grid; gap:13px; }
+    #cinemotionLanding .lp-checks li { display:flex; align-items:flex-start; gap:11px; color:#cbd5e1; font-size:12px; line-height:1.7; }
+    #cinemotionLanding .lp-checks i { color:#00d2ff; margin-top:3px; }
+    #cinemotionLanding .lp-faq { max-width:850px; }
+    #cinemotionLanding .lp-faq details { border-bottom:1px solid rgba(255,255,255,.1); padding:19px 0; }
+    #cinemotionLanding .lp-faq summary { display:flex; justify-content:space-between; gap:20px; cursor:pointer; list-style:none; color:#f8fafc; font-size:14px; font-weight:700; }
+    #cinemotionLanding .lp-faq summary::-webkit-details-marker { display:none; }
+    #cinemotionLanding .lp-faq summary::after { content:"+"; color:#00d2ff; font-size:20px; font-weight:400; }
+    #cinemotionLanding .lp-faq details[open] summary::after { content:"−"; }
+    #cinemotionLanding .lp-faq details p { max-width:740px; margin:12px 0 0; color:#94a3b8; font-size:12px; line-height:1.85; }
+    #cinemotionLanding .lp-final { padding:88px 0; background:#0d121f; border-top:1px solid rgba(255,255,255,.08); text-align:center; }
+    #cinemotionLanding .lp-final h2 { max-width:700px; margin:13px auto 16px; }
+    #cinemotionLanding .lp-final p { max-width:560px; margin:0 auto 25px; color:#94a3b8; font-size:13px; line-height:1.8; }
+    #cinemotionLanding .lp-footer { padding:25px 0; border-top:1px solid rgba(255,255,255,.08); color:#64748b; font-size:10px; }
+    #cinemotionLanding .lp-footer-inner { display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+    #cinemotionLanding .lp-footer a:hover { color:#00d2ff; }
+    #cinemotionLanding .lp-reveal { opacity:0; transform:translateY(24px); transition:opacity .75s cubic-bezier(.22,1,.36,1),transform .75s cubic-bezier(.22,1,.36,1); }
+    #cinemotionLanding .lp-reveal.visible { opacity:1; transform:translateY(0); }
+    #cinemotionLanding.is-hidden { display:none !important; }
+    @media (max-width: 760px) {
+      #cinemotionLanding .lp-wrap { width:calc(100% - 36px); }
+      #cinemotionLanding .lp-links { display:none; }
+      #cinemotionLanding .lp-menu-btn { display:block; }
+      #cinemotionLanding .lp-nav { gap:10px; }
+      #cinemotionLanding .lp-nav > .lp-cta { margin-left:auto; min-height:39px; padding:9px 11px; font-size:10px; }
+      #cinemotionLanding .lp-hero { min-height:690px; padding:140px 0 70px; }
+      #cinemotionLanding .lp-hero::before { background-position:58% center; }
+      #cinemotionLanding .lp-hero::after { background:rgba(4,7,17,.68); }
+      #cinemotionLanding .lp-hero p { font-size:13px; }
+      #cinemotionLanding .lp-scroll-note { display:none; }
+      #cinemotionLanding .lp-grid, #cinemotionLanding .lp-steps { grid-template-columns:1fr; }
+      #cinemotionLanding .lp-card { min-height:210px; }
+      #cinemotionLanding .lp-section { padding:78px 0; }
+      #cinemotionLanding .lp-tagline { padding:82px 0; }
+      #cinemotionLanding .lp-vault { grid-template-columns:1fr; gap:28px; }
+      #cinemotionLanding .lp-vault-visual { min-height:320px; }
+      #cinemotionLanding .lp-proof { gap:18px; margin-top:38px; }
+    }
+    @media (max-width: 390px) {
+      #cinemotionLanding .lp-wrap { width:calc(100% - 28px); }
+      #cinemotionLanding .lp-brand img { width:31px; height:31px; }
+      #cinemotionLanding .lp-brand strong { font-size:11px; }
+      #cinemotionLanding .lp-nav { padding:9px 10px; }
+      #cinemotionLanding .lp-hero h1 { font-size:43px; }
+      #cinemotionLanding .lp-actions { align-items:stretch; flex-direction:column; }
+      #cinemotionLanding .lp-actions a { width:100%; }
+      #cinemotionLanding .lp-proof { gap:13px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #cinemotionLanding .lp-reveal { opacity:1; transform:none; transition:none; }
+      #cinemotionLanding .lp-word { color:#f8fafc; transition:none; }
+      #cinemotionLanding * { scroll-behavior:auto !important; animation:none !important; }
+    }
+
+  
+    /* CINEMOTION category controls and consistent prompt-card action alignment */
+    .header-actions { flex-shrink: 0; }
+    .header-add-category {
+      width:auto !important; white-space:nowrap; padding:9px 13px !important;
+      min-height:38px; border-radius:999px; font-size:.78rem;
+    }
+    .search-box { flex:0 1 470px; max-width:470px; min-width:170px; }
+    .card-details { flex:1 1 auto; min-height:0; }
+    .card-details > div:first-child { display:flex; flex:1 1 auto; flex-direction:column; min-height:0; }
+    .card-meta { flex:0 0 auto; }
+    .card-details h3 { flex:0 0 auto; }
+    .prompt-wrapper { flex:1 1 auto; min-height:140px; }
+    .prompt-content { align-self:stretch; }
+    .prompt-actions { flex:0 0 40px; margin-top:10px; }
+    .copy-btn, .use-gemini-btn { flex:0 0 auto; }
+    @media (max-width: 900px) {
+      .search-box { flex-basis:260px; max-width:320px; }
+      .header-actions { gap:.45rem; }
+      .header-add-category { padding:8px 10px !important; }
+    }
+    @media (max-width: 620px) {
+      .header-add-category { font-size:.68rem; padding:7px 9px !important; }
+      .search-box { min-width:110px; flex-basis:150px; }
+      .card-details { min-height:0; }
+      .prompt-wrapper { min-height:125px; }
+    }
+
+
+    /* FINAL CARD LAYOUT FIX: stable prompt height + right-aligned edit/delete */
+    .movement-card { height: 100%; min-height: 0; }
+    .movement-card .card-details {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 10px;
+      min-height: 0;
+    }
+    .movement-card .card-details > div:first-child {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+    .movement-card .prompt-wrapper {
+      height: 160px;
+      min-height: 160px;
+      max-height: 160px;
+      flex: 0 0 160px;
+      align-items: flex-start;
+    }
+    .movement-card .prompt-content {
+      height: 100%;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+    .movement-card .prompt-box {
+      max-height: none;
+      min-height: 100%;
+      margin: 0;
+      overflow: visible;
+    }
+    .movement-card .prompt-actions {
+      width: 100%;
+      min-height: 34px;
+      height: 34px;
+      margin-top: auto;
+      padding-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      box-sizing: content-box;
+    }
+    .movement-card .prompt-action-btn {
+      margin: 0;
+      flex: 0 0 30px;
+    }
+    .movement-card .copy-btn,
+    .movement-card .use-gemini-btn {
+      flex: 0 0 auto;
+      margin-top: 0;
+    }
+    @media (max-width: 620px) {
+      .movement-card .prompt-wrapper {
+        height: 145px;
+        min-height: 145px;
+        max-height: 145px;
+        flex-basis: 145px;
+      }
+    }
+</style>
 </head>
 <body>
 
-  <!-- TAB SWITCH WELCOME BACK OVERLAY -->
+
+  <!-- CINEMOTION PUBLIC LANDING PAGE. Existing app remains below, unchanged. -->
+  <div id="cinemotionLanding" role="dialog" aria-modal="true" aria-label="CINEMOTION STUDIO introduction">
+    <div class="lp-nav-shell">
+      <nav class="lp-nav" aria-label="Landing page navigation">
+        <a class="lp-brand" href="#cinemotionLandingTop" aria-label="CINEMOTION STUDIO home">
+          <img src="assets/cinemotion/icon-128.png" alt="">
+          <span><strong>CINEMOTION</strong><small>DIRECTOR'S STUDIO</small></span>
+        </a>
+        <div class="lp-links">
+          <a href="#landingCapabilities">Capabilities</a>
+          <a href="#landingWorkflow">How it works</a>
+          <a href="#landingVault">Director Vault</a>
+          <a href="#landingFaq">FAQ</a>
+        </div>
+        <button type="button" class="lp-cta" data-enter-cinemotion>Enter Studio <i class="fa-solid fa-arrow-up-right-from-square"></i></button>
+        <button type="button" class="lp-menu-btn" id="landingMenuOpen" aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+      </nav>
+    </div>
+
+    <div class="lp-mobile-menu" id="landingMobileMenu" aria-hidden="true">
+      <div class="lp-mobile-menu-head">
+        <a class="lp-brand" href="#cinemotionLandingTop"><img src="assets/cinemotion/icon-128.png" alt=""><span><strong>CINEMOTION</strong><small>DIRECTOR'S STUDIO</small></span></a>
+        <button type="button" class="lp-close-menu" id="landingMenuClose" aria-label="Close navigation">&times;</button>
+      </div>
+      <div class="lp-mobile-menu-links">
+        <a href="#landingCapabilities">Capabilities</a>
+        <a href="#landingWorkflow">How it works</a>
+        <a href="#landingVault">Director Vault</a>
+        <a href="#landingFaq">FAQ</a>
+        <a href="#" data-enter-cinemotion>Enter CINEMOTION STUDIO ↗</a>
+      </div>
+    </div>
+
+    <main id="cinemotionLandingTop">
+      <section class="lp-hero">
+        <div class="lp-wrap">
+          <div class="lp-hero-content">
+            <div class="lp-eyebrow">A creative workspace for visual storytellers</div>
+            <h1>Think like a director.<br>Frame like a filmmaker.</h1>
+            <p>Explore cinematic camera movements, angles, shots, lighting and visual prompt references. Build your creative direction with the tools already inside CINEMOTION STUDIO.</p>
+            <div class="lp-actions">
+              <a class="lp-cta" href="#" data-enter-cinemotion>Enter CINEMOTION STUDIO <i class="fa-solid fa-arrow-right"></i></a>
+              <a class="lp-cta lp-cta-secondary" href="#landingCapabilities">Explore the studio <i class="fa-solid fa-arrow-down"></i></a>
+            </div>
+            <div class="lp-proof">
+              <div><strong>136+</strong><span>Vault references</span></div>
+              <div><strong>7</strong><span>Creative categories</span></div>
+              <div><strong>AI</strong><span>Gemini assistant</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="lp-scroll-note">Visual storytelling starts with intention</div>
+      </section>
+
+      <section class="lp-section" id="landingCapabilities">
+        <div class="lp-wrap">
+          <div class="lp-section-head lp-reveal">
+            <div class="lp-eyebrow">Inside the studio</div>
+            <h2>Every frame begins with a deliberate choice.</h2>
+            <p>Find a visual reference, understand the camera language and turn your creative idea into a clear prompt direction.</p>
+          </div>
+          <div class="lp-grid">
+            <article class="lp-card lp-reveal"><div class="lp-card-no">01 / CAMERA LANGUAGE</div><div class="lp-card-icon"><i class="fa-solid fa-video"></i></div><h3>Camera movements</h3><p>Explore camera movement references such as dolly, orbit, crane, tracking and reveal shots.</p></article>
+            <article class="lp-card lp-reveal"><div class="lp-card-no">02 / VISUAL COMPOSITION</div><div class="lp-card-icon"><i class="fa-solid fa-crosshairs"></i></div><h3>Angles and shots</h3><p>Choose the perspective, framing and shot type that communicate your scene with intention.</p></article>
+            <article class="lp-card lp-reveal"><div class="lp-card-no">03 / LIGHT AND ATMOSPHERE</div><div class="lp-card-icon"><i class="fa-solid fa-lightbulb"></i></div><h3>Cinematic mood</h3><p>Explore lighting, atmosphere, lens references and master prompts for your visual direction.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-tagline">
+        <div class="lp-wrap">
+          <p id="landingTagline">A stronger visual story starts before the camera moves. It starts with knowing exactly what you want the audience to feel.</p>
+        </div>
+      </section>
+
+      <section class="lp-section" id="landingWorkflow">
+        <div class="lp-wrap">
+          <div class="lp-section-head lp-reveal">
+            <div class="lp-eyebrow">A clear creative process</div>
+            <h2>From visual idea to a usable direction.</h2>
+            <p>Use CINEMOTION as your reference desk for the creative decisions behind the next shot.</p>
+          </div>
+          <div class="lp-steps">
+            <article class="lp-step lp-reveal"><div class="lp-step-no">STEP 01</div><h3>Find your reference</h3><p>Browse the Director Vault by movement, angle, shot, lighting, atmosphere, lens and master prompt.</p></article>
+            <article class="lp-step lp-reveal"><div class="lp-step-no">STEP 02</div><h3>Shape your prompt</h3><p>Open a reference, review its prompt formula and copy or adapt the direction for your scene.</p></article>
+            <article class="lp-step lp-reveal"><div class="lp-step-no">STEP 03</div><h3>Refine with Gemini</h3><p>Use the existing Gemini assistant to discuss cinematic prompts and visual direction.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-section" id="landingVault">
+        <div class="lp-wrap lp-vault">
+          <div class="lp-vault-visual lp-reveal" role="img" aria-label="CINEMOTION Director Vault categories">
+            <div class="lp-vault-panels">
+              <div class="lp-mini"><span>Reference library</span><strong>Camera movement</strong></div>
+              <div class="lp-mini"><span>Composition</span><strong>Angles and shots</strong></div>
+              <div class="lp-mini"><span>Visual mood</span><strong>Lighting and atmosphere</strong></div>
+              <div class="lp-mini"><span>Prompt craft</span><strong>Master prompts</strong></div>
+            </div>
+          </div>
+          <div class="lp-vault-copy lp-reveal">
+            <div class="lp-eyebrow">Your Director Vault</div>
+            <h2>Keep your creative references close.</h2>
+            <p class="lp-muted">A focused reference library for filmmakers, editors and visual storytellers who want more control over the language of their images.</p>
+            <ul class="lp-checks">
+              <li><i class="fa-solid fa-check"></i><span>Browse the existing collection of 136+ references.</span></li>
+              <li><i class="fa-solid fa-check"></i><span>Explore camera movements, angles, shots and visual prompt categories.</span></li>
+              <li><i class="fa-solid fa-check"></i><span>Copy prompt details and use the existing media actions.</span></li>
+              <li><i class="fa-solid fa-check"></i><span>Open the existing Gemini assistant for creative guidance.</span></li>
+            </ul>
+            <a class="lp-cta" href="#" data-enter-cinemotion>Open the Director Vault <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-section" id="landingFaq">
+        <div class="lp-wrap">
+          <div class="lp-section-head lp-reveal"><div class="lp-eyebrow">Questions, answered</div><h2>Before you step into the studio.</h2></div>
+          <div class="lp-faq lp-reveal">
+            <details><summary>What is CINEMOTION STUDIO?</summary><p>CINEMOTION STUDIO is a filmmaking reference workspace for cinematic camera movements, angles, shots, lighting, atmosphere, lenses and prompt guidance.</p></details>
+            <details><summary>Who can use the studio?</summary><p>It is designed for filmmakers, video creators, editors, visual storytellers and creators developing image or video prompts.</p></details>
+            <details><summary>What is inside the Director Vault?</summary><p>The current application includes references across camera movements, camera angles, camera shots, cinematic lighting, atmosphere, camera lens and master prompts.</p></details>
+            <details><summary>Can I copy and use the prompts?</summary><p>Yes. Open a reference in the existing application to review its prompt details and use the available copy actions.</p></details>
+            <details><summary>Does CINEMOTION include an AI assistant?</summary><p>Yes. The existing application includes a Gemini assistant for questions about cinematic prompts and visual direction.</p></details>
+            <details><summary>How do I access my account?</summary><p>Select Enter Studio. Your existing application will open with its current login, registration and mobile OTP options.</p></details>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-final">
+        <div class="lp-wrap lp-reveal">
+          <div class="lp-eyebrow" style="justify-content:center;">Your next frame starts here</div>
+          <h2>Direct with intention.<br>Create with CINEMOTION.</h2>
+          <p>Step into your Director Vault and start shaping the visual language of your next project.</p>
+          <a class="lp-cta" href="#" data-enter-cinemotion>Enter CINEMOTION STUDIO <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="lp-footer">
+      <div class="lp-wrap lp-footer-inner">
+        <span>© CINEMOTION STUDIO. A creative workspace for visual storytellers.</span>
+        <a href="#" data-enter-cinemotion>Open existing application ↗</a>
+      </div>
+    </footer>
+  </div>
+
+    <!-- TAB SWITCH WELCOME BACK OVERLAY -->
   <div id="welcomeBackOverlay">
     <div class="welcome-video-container">
       <video id="welcomeVideo" class="welcome-direct-video" muted playsinline preload="none" src="welcome-back.mp4"></video>
@@ -1134,6 +1589,7 @@
       </div>
 
       <div class="header-actions">
+        <button type="button" id="addCategoryBtn" class="submit-btn admin-only header-add-category" title="Add a new prompt category">+ Category</button>
         <button class="add-btn admin-only" id="addMovementBtn">
           <i class="fa-solid fa-plus"></i> Add Movement
         </button>
@@ -1188,9 +1644,23 @@
       </div>
       <div class="director-library-tools">
         <input type="search" id="directorLibrarySearch" placeholder="Search prompts, categories, camera terms..." aria-label="Search prompt library">
-        <button type="button" id="addCategoryBtn" class="submit-btn admin-only" style="width:auto;white-space:nowrap;padding:9px 12px;">+ Category</button>
       </div>
     </section>
+
+    <section class="director-camera-stage" id="directorCameraStage" aria-label="Interactive 3D cinema camera preview">
+      <div class="camera-stage-copy">
+        <span class="camera-stage-eyebrow"><i></i> LIVE 3D CAMERA SIMULATION</span>
+        <h3 id="cameraStageTitle">Floating Cinema Camera</h3>
+        <p id="cameraStageHint">Type a camera or cinematic prompt keyword in Gemini to animate the camera</p>
+        <span class="camera-stage-mode" id="cameraStageMode">IDLE · READY</span>
+      </div>
+      <div class="camera-three-wrap" id="cameraThreeWrap">
+        <canvas id="cameraThreeCanvas" aria-label="Animated 3D professional cinema camera"></canvas>
+        <div class="camera-three-glow"></div>
+      </div>
+      <div class="camera-stage-grid"></div>
+    </section>
+
     <section class="hero-banner-wrapper" id="heroBanner">
       <video id="heroVideo" class="hero-foreground-video" autoplay muted playsinline loop preload="none" poster="bhanu-3d-header_2.png" src="hero-banner-3.mp4"></video>
     </section>
@@ -1608,6 +2078,31 @@
 
     function renderCards(list) {
       if (!grid) return;
+
+      // Always apply category order at the final rendering boundary.
+      // This covers first load, Firebase refreshes, edits and category changes.
+      if (currentCategory === "All") {
+        const builtInOrder = [
+          "Camera Movement", "Camera Angles", "Camera Shots",
+          "Cinematic Lighting", "Atmosphere", "Camera Lens", "Master Prompts"
+        ];
+        const customOrder = [...document.querySelectorAll(".categories-bar .cat-tab")]
+          .map(btn => (btn.querySelector("span:nth-child(2)")?.textContent || "").trim())
+          .filter(name => name && name.toLowerCase() !== "all" &&
+            !builtInOrder.some(b => b.toLowerCase() === name.toLowerCase()));
+        const orderedNames = [...builtInOrder, ...customOrder];
+        const ranks = new Map(orderedNames.map((name, index) => [name.toLowerCase(), index]));
+        list = list.map((item, index) => ({ item, index }))
+          .sort((a, b) => {
+            const aKey = String(a.item.category || "").trim().toLowerCase();
+            const bKey = String(b.item.category || "").trim().toLowerCase();
+            const aRank = ranks.has(aKey) ? ranks.get(aKey) : Number.MAX_SAFE_INTEGER;
+            const bRank = ranks.has(bKey) ? ranks.get(bKey) : Number.MAX_SAFE_INTEGER;
+            return aRank - bRank || a.index - b.index;
+          })
+          .map(entry => entry.item);
+      }
+
       grid.innerHTML = list.map(item => {
         return `
         <div class="movement-card" id="card_${item.id}">
@@ -1665,16 +2160,20 @@
               <div class="prompt-wrapper" id="prompt_wrap_${item.id}">
                 <div class="prompt-content" id="content_${item.id}">
                   <p class="prompt-box" id="text_${item.id}">${item.prompt}</p>
-                  <button type="button" class="prompt-edit-btn admin-only" title="Edit Prompt Text" onclick="openEditPromptModal('${item.id}', event)">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                  </button>
                 </div>
-                
                 <video id="copied_video_${item.id}" class="copied-video-player" muted playsinline preload="none"></video>
               </div>
+              <div class="prompt-actions admin-only" aria-label="Prompt actions">
+                <button type="button" class="meta-action-btn edit-btn prompt-action-btn" title="Edit Prompt" aria-label="Edit prompt" onclick="openEditPromptModal('${item.id}', event)">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button type="button" class="meta-action-btn del-btn prompt-action-btn" title="Delete Prompt" aria-label="Delete prompt" onclick="deletePromptCard('${item.id}', event)">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
             </div>
-            
-            <button class="copy-btn" onclick="copyCardPrompt('${item.id}')">
+
+                        <button class="copy-btn" onclick="copyCardPrompt('${item.id}')">
               <i class="fa-solid fa-copy"></i> Copy Prompt
             </button>
             <button type="button" class="use-gemini-btn" onclick="insertPromptIntoGemini('${item.id}')">
@@ -1848,6 +2347,45 @@
         }
       });
     }
+
+    window.deletePromptCard = async function(id, event) {
+      if (event) { event.preventDefault(); event.stopPropagation(); }
+      if (!document.body.classList.contains("is-admin-active")) {
+        showToast("Only the verified administrator can delete prompts.");
+        return;
+      }
+      const item = window.allVaultItems?.find(entry => String(entry.id) === String(id));
+      if (!item) { showToast("This prompt could not be found."); return; }
+      const confirmed = window.confirm(
+        `Delete “${item.name}” permanently?\n\nThis prompt will be removed from its category and stay deleted after refresh.`
+      );
+      if (!confirmed) return;
+
+      const button = event?.currentTarget;
+      if (button) { button.disabled = true; button.style.opacity = "0.55"; button.style.cursor = "wait"; }
+      try {
+        if (typeof window.deletePromptFromFirestore !== "function") {
+          throw new Error("Firebase is not ready. Please try again.");
+        }
+        await window.deletePromptFromFirestore(id);
+        window.allVaultItems = window.allVaultItems.filter(entry => String(entry.id) !== String(id));
+        if (localDB) {
+          await new Promise((resolve, reject) => {
+            const tx = localDB.transaction("promptEdits", "readwrite");
+            tx.objectStore("promptEdits").delete(String(id));
+            tx.oncomplete = resolve;
+            tx.onerror = () => reject(tx.error || new Error("Local prompt cleanup failed."));
+          });
+        }
+        filterCards();
+        updateCounts();
+        showToast("Prompt permanently deleted.");
+      } catch (err) {
+        console.error("Prompt deletion failed:", err);
+        showToast("Prompt delete failed: " + (err.message || err));
+        if (button) { button.disabled = false; button.style.opacity = ""; button.style.cursor = ""; }
+      }
+    };
 
     // DRAG & DROP HANDLERS
     window.handleDragOver = function(e, id) {
@@ -2154,7 +2692,11 @@
         return;
       }
 
-      if (!confirm("Are you sure you want to permanently delete this media from Firebase and this device?")) return;
+      const mediaLabel = targetItem?.name ? ` for “${targetItem.name}”` : '';
+      const confirmed = window.confirm(
+        `Are you sure you want to delete the media${mediaLabel}?\n\nThe uploaded image/video will be removed from Firebase Storage and this device.\n\nYour prompt title and prompt text will remain safe and will NOT be deleted.`
+      );
+      if (!confirmed) return;
 
       try {
         if (typeof window.deleteMediaFromFirestore === "function") {
@@ -2393,7 +2935,31 @@
       const searchEl = document.getElementById('searchInput');
       const q = searchEl ? searchEl.value.toLowerCase() : '';
       let filtered = window.allVaultItems;
-      if (currentCategory !== "All") filtered = filtered.filter(m => m.category === currentCategory);
+      if (currentCategory !== "All") {
+        filtered = filtered.filter(m => m.category === currentCategory);
+      } else {
+        // Read the visible category NAME (the second span), not the emoji icon.
+        // This guarantees All follows the exact tab order: built-ins first,
+        // Master Prompts next, and user-created categories after it.
+        const orderedCategoryNames = [
+          'Camera Movement', 'Camera Angles', 'Camera Shots',
+          'Cinematic Lighting', 'Atmosphere', 'Camera Lens', 'Master Prompts',
+          ...[...document.querySelectorAll('.categories-bar .cat-tab')]
+            .map(btn => (btn.querySelector('span:nth-child(2)')?.textContent || '').trim())
+            .filter(name => name && !['all','camera movement','camera angles','camera shots','cinematic lighting','atmosphere','camera lens','master prompts'].includes(name.toLowerCase()))
+        ];
+        const categoryRank = new Map(
+          orderedCategoryNames.map((name, index) => [name.trim().toLowerCase(), index])
+        );
+        filtered = filtered.map((item, index) => ({ item, index }))
+          .sort((a, b) => {
+            const keyA = String(a.item.category || '').trim().toLowerCase();
+            const keyB = String(b.item.category || '').trim().toLowerCase();
+            const rankA = categoryRank.has(keyA) ? categoryRank.get(keyA) : Number.MAX_SAFE_INTEGER;
+            const rankB = categoryRank.has(keyB) ? categoryRank.get(keyB) : Number.MAX_SAFE_INTEGER;
+            return rankA - rankB || a.index - b.index;
+          }).map(entry => entry.item);
+      }
       filtered = filtered.filter(m => String(m.name || '').toLowerCase().includes(q) || String(m.prompt || '').toLowerCase().includes(q));
       renderCards(filtered);
     }
@@ -2560,29 +3126,26 @@
       }
     };
 
-    let welcomeTimer;
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "visible") {
-        const overlay = document.getElementById("welcomeBackOverlay");
-        const video = document.getElementById("welcomeVideo");
-
-        if (overlay && video) {
-          clearTimeout(welcomeTimer);
-          overlay.classList.add("show");
-          video.currentTime = 0;
-          video.play().catch(() => {});
-
-          video.onended = () => {
-            overlay.classList.remove("show");
-          };
-
-          welcomeTimer = setTimeout(() => {
-            overlay.classList.remove("show");
-            video.pause();
-          }, 2900);
+    // Prevent a dark welcome-back layer from covering the page on tab/site return.
+    (() => {
+      const overlay = document.getElementById("welcomeBackOverlay");
+      const video = document.getElementById("welcomeVideo");
+      const clearWelcomeLayer = () => {
+        if (overlay) {
+          overlay.classList.remove("show");
+          overlay.style.opacity = "0";
+          overlay.style.pointerEvents = "none";
+          overlay.style.visibility = "hidden";
         }
-      }
-    });
+        if (video && !video.paused) video.pause();
+      };
+      clearWelcomeLayer();
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") clearWelcomeLayer();
+      });
+      window.addEventListener("pageshow", clearWelcomeLayer);
+      window.addEventListener("focus", clearWelcomeLayer);
+    })();
 
     (() => {
       const mainHero = document.getElementById("heroVideo");
@@ -2868,6 +3431,7 @@
     }
 
     onAuthStateChanged(auth, async (user) => {
+      window.__cinemotionAuthStateResolved = true;
       const gate = byId("authGateModal");
       const resendBtn = byId("resendVerificationBtn");
       const verificationText = byId("verificationStatusText");
@@ -3240,6 +3804,21 @@
       }, { merge: true });
     };
 
+    // A tombstone keeps deleted built-in prompts deleted after reloads and on other devices.
+    window.deletePromptFromFirestore = async function(itemId) {
+      requireVerifiedAdmin();
+      const id = String(itemId);
+      await setDoc(doc(db, "promptDeletions", id), {
+        itemId: id,
+        deletedAt: new Date().toISOString(),
+        deletedBy: auth.currentUser.uid
+      }, { merge: true });
+
+      // The tombstone hides built-in and custom cards on every client after reload.
+      await deleteDoc(doc(db, "promptEdits", id));
+      return true;
+    };
+
     window.deleteMediaFromFirestore = async function(cardId) {
       requireVerifiedAdmin();
       const q = query(collection(db, "movements"), where("linkedCardId", "==", String(cardId)));
@@ -3364,6 +3943,9 @@
 
       if (/\s$/.test(raw)) {
         if (librarySearch) librarySearch.value = "";
+        window.cinemotionCamera3D?.setMotion("idle");
+        if (byId("cameraStageMode")) byId("cameraStageMode").textContent = "IDLE · READY";
+        if (byId("cameraStageHint")) byId("cameraStageHint").textContent = "Ready for your next camera or cinematic keyword";
         return;
       }
 
@@ -3394,7 +3976,36 @@
           wordPattern.test(keywords);
       });
 
-      if (!results.length) return;
+      if (!results.length) {
+        window.cinemotionCamera3D?.setMotion("idle");
+        return;
+      }
+
+      const cameraMotionRules = [
+        { keys:["dolly","push","pull","creep","approach","retreat"], motion:"dolly", title:"Dolly Camera Move", hint:"The complete camera rig glides forward and backward", mode:"DOLLY · FORWARD / BACK" },
+        { keys:["orbit","arc","revolve","circle","360"], motion:"orbit", title:"Orbit Camera Move", hint:"The camera rig rotates around its cinematic subject", mode:"ORBIT · 360° ROTATION" },
+        { keys:["crane","jib","rise","elevate","pedestal"], motion:"crane", title:"Crane Camera Move", hint:"The camera rig rises and lowers smoothly", mode:"CRANE · UP / DOWN" },
+        { keys:["zoom","telephoto","focal"], motion:"zoom", title:"Lens Zoom", hint:"The lens barrel extends and retracts with a focus pulse", mode:"ZOOM · LENS ACTION" },
+        { keys:["pan","sweep"], motion:"pan", title:"Pan Camera Move", hint:"The camera head pans smoothly from left to right", mode:"PAN · LEFT / RIGHT" },
+        { keys:["tilt","low","high"], motion:"tilt", title:"Tilt & Angle", hint:"The camera head tilts to preview the selected angle", mode:"TILT · VERTICAL ANGLE" },
+        { keys:["roll","dutch"], motion:"roll", title:"Roll Camera Move", hint:"The camera rotates around its optical axis", mode:"ROLL · ROTATION" },
+        { keys:["truck","track","tracking","slide","lateral"], motion:"track", title:"Tracking Camera Move", hint:"The camera rig tracks laterally across the scene", mode:"TRACK · SIDEWAYS" },
+        { keys:["light","lighting","exposure","flare","glow"], motion:"light", title:"Cinematic Lighting", hint:"Lens reflections and cinematic highlights intensify", mode:"LIGHT · CINEMATIC GLOW" }
+      ];
+      const matchedMotion = cameraMotionRules.find(rule =>
+        rule.keys.some(key => key.startsWith(token) || token.startsWith(key))
+      );
+      if (matchedMotion) {
+        window.cinemotionCamera3D?.setMotion(matchedMotion.motion);
+        if (byId("cameraStageTitle")) byId("cameraStageTitle").textContent = matchedMotion.title;
+        if (byId("cameraStageHint")) byId("cameraStageHint").textContent = matchedMotion.hint;
+        if (byId("cameraStageMode")) byId("cameraStageMode").textContent = matchedMotion.mode;
+      } else {
+        window.cinemotionCamera3D?.setMotion("idle");
+        if (byId("cameraStageTitle")) byId("cameraStageTitle").textContent = "Floating Cinema Camera";
+        if (byId("cameraStageHint")) byId("cameraStageHint").textContent = `${results.length} matching prompt reference(s)`;
+        if (byId("cameraStageMode")) byId("cameraStageMode").textContent = "MATCH · PROMPT FOUND";
+      }
 
       if (librarySearch) librarySearch.value = token;
       currentCategory = "All";
@@ -3912,10 +4523,10 @@
     async function loadVaultCategories() {
       try {
         const snap = await getDocs(collection(db, "vaultCategories"));
-        snap.forEach(docSnap => {
-          const data = docSnap.data();
-          if (data?.name) addCategoryToInterface(data.name, data.emoji || "🎬");
-        });
+        const savedCategories = snap.docs.map(docSnap => docSnap.data())
+          .filter(data => data?.name)
+          .sort((a, b) => String(a.createdAt || '').localeCompare(String(b.createdAt || '')));
+        savedCategories.forEach(data => addCategoryToInterface(data.name, data.emoji || "🎬"));
         // Also restore any custom categories already used by existing prompt records.
         (window.allVaultItems || []).forEach(item => {
           const name = String(item.category || "").trim();
@@ -3965,42 +4576,358 @@
     async function loadFirebaseMovements() {
       try {
         const q = query(collection(db, "movements"), orderBy("createdAt", "desc"));
-        const [snapshot, editsSnapshot] = await Promise.all([
-          getDocs(q),
-          getDocs(collection(db, "promptEdits"))
-        ]);
+
+        // Load the main movement records first. Optional collections must never
+        // prevent the user's saved movements from appearing.
+        const snapshot = await getDocs(q);
+
+        let editsSnapshot = null;
+        try {
+          editsSnapshot = await getDocs(collection(db, "promptEdits"));
+        } catch (editError) {
+          console.warn("Could not load prompt edits; showing original saved prompts:", editError);
+        }
+
+        let deletionsSnapshot = null;
+        try {
+          deletionsSnapshot = await getDocs(collection(db, "promptDeletions"));
+        } catch (deletionError) {
+          // A missing read permission here must not block the movements collection.
+          console.warn("Could not load prompt deletion records; showing saved movements:", deletionError);
+        }
+
+        const deletedPromptIds = new Set(
+          (deletionsSnapshot?.docs || []).map(docSnap => String(docSnap.id))
+        );
+
+        window.allVaultItems = (window.allVaultItems || []).filter(
+          item => !deletedPromptIds.has(String(item.id))
+        );
+
         const customMovements = [];
         snapshot.forEach((docSnap) => {
           const data = docSnap.data();
-          if (data.name) customMovements.push({ id: docSnap.id, ...data });
-          else if (data.linkedCardId && data.mediaURL) {
+          if (data.name && !deletedPromptIds.has(String(docSnap.id))) {
+            customMovements.push({ id: docSnap.id, ...data });
+          } else if (data.linkedCardId && data.mediaURL) {
             const target = window.allVaultItems?.find(m => m.id === data.linkedCardId);
             if (target) {
               target.mediaURL = data.mediaURL;
               target.mediaType = data.mediaType;
-              if (typeof applyMediaUrlToCard === "function") applyMediaUrlToCard(target.id, data.mediaURL, data.mediaType);
+              if (typeof applyMediaUrlToCard === "function") {
+                applyMediaUrlToCard(target.id, data.mediaURL, data.mediaType);
+              }
             }
           }
         });
+
         if (customMovements.length) {
           const existingIds = new Set(window.allVaultItems.map((item) => item.id));
           const newMovements = customMovements.filter((item) => !existingIds.has(item.id));
-          if (newMovements.length) window.allVaultItems = [...newMovements, ...window.allVaultItems];
+          if (newMovements.length) {
+            window.allVaultItems = [...newMovements, ...window.allVaultItems];
+          }
         }
 
-        editsSnapshot.forEach((editDoc) => {
-          const edit = editDoc.data();
-          const item = window.allVaultItems.find(m => m.id === (edit.itemId || editDoc.id));
-          if (item) {
-            if (typeof edit.name === "string") item.name = edit.name;
-            if (typeof edit.prompt === "string") item.prompt = edit.prompt;
-          }
-        });
+        if (editsSnapshot) {
+          editsSnapshot.forEach((editDoc) => {
+            const edit = editDoc.data();
+            const item = window.allVaultItems.find(m => m.id === (edit.itemId || editDoc.id));
+            if (item) {
+              if (typeof edit.name === "string") item.name = edit.name;
+              if (typeof edit.prompt === "string") item.prompt = edit.prompt;
+            }
+          });
+        }
+
         renderCards(window.allVaultItems);
       } catch (err) {
         console.error("Firestore load error:", err);
       }
     }
   </script>
+
+  <script>
+    // Landing page is a presentation layer only. The existing app and Firebase code stay intact.
+    (function initCinemotionLanding() {
+      const landing = document.getElementById("cinemotionLanding");
+      if (!landing) return;
+
+      document.body.classList.add("cinemotion-landing-active");
+
+      const enterStudio = () => {
+        landing.classList.add("is-hidden");
+        landing.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("cinemotion-landing-active");
+        const gate = document.getElementById("authGateModal");
+        // The existing Firebase onAuthStateChanged handler remains responsible for
+        // deciding whether the user sees the app or the current sign-in gate.
+        if (gate && !window.__cinemotionAuthStateResolved) {
+          gate.style.display = "flex";
+        }
+      };
+
+      landing.querySelectorAll("[data-enter-cinemotion]").forEach((control) => {
+        control.addEventListener("click", (event) => {
+          event.preventDefault();
+          enterStudio();
+        });
+      });
+
+      const menu = document.getElementById("landingMobileMenu");
+      const openMenu = document.getElementById("landingMenuOpen");
+      const closeMenu = document.getElementById("landingMenuClose");
+      const setMenu = (open) => {
+        if (!menu) return;
+        menu.classList.toggle("open", open);
+        menu.setAttribute("aria-hidden", String(!open));
+        openMenu?.setAttribute("aria-expanded", String(open));
+      };
+      openMenu?.addEventListener("click", () => setMenu(true));
+      closeMenu?.addEventListener("click", () => setMenu(false));
+      menu?.querySelectorAll('a[href^="#landing"]').forEach((link) => {
+        link.addEventListener("click", () => setMenu(false));
+      });
+
+      const revealItems = landing.querySelectorAll(".lp-reveal");
+      if ("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        const revealObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12 });
+        revealItems.forEach((item) => revealObserver.observe(item));
+      } else {
+        revealItems.forEach((item) => item.classList.add("visible"));
+      }
+
+      const tagline = document.getElementById("landingTagline");
+      if (tagline) {
+        const words = tagline.textContent.trim().split(/\s+/);
+        tagline.textContent = "";
+        words.forEach((word, index) => {
+          const span = document.createElement("span");
+          span.className = "lp-word";
+          span.textContent = word;
+          tagline.appendChild(span);
+          if (index < words.length - 1) tagline.appendChild(document.createTextNode(" "));
+        });
+        if ("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          const wordObserver = new IntersectionObserver((entries) => {
+            if (entries.some((entry) => entry.isIntersecting)) {
+              tagline.querySelectorAll(".lp-word").forEach((word, index) => {
+                window.setTimeout(() => word.classList.add("on"), index * 55);
+              });
+              wordObserver.disconnect();
+            }
+          }, { threshold: 0.25 });
+          wordObserver.observe(tagline);
+        } else {
+          tagline.querySelectorAll(".lp-word").forEach((word) => word.classList.add("on"));
+        }
+      }
+
+      // Expose a small, read-only state marker for the existing auth callback.
+      window.cinemotionLandingEnter = enterStudio;
+    })();
+  </script>
+
+
+  <script type="module">
+    import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+
+    (() => {
+      const canvas = document.getElementById("cameraThreeCanvas");
+      const stage = document.getElementById("directorCameraStage");
+      if (!canvas || !stage) return;
+
+      let renderer;
+      try {
+        renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:true });
+      } catch (error) {
+        const hint = document.getElementById("cameraStageHint");
+        if (hint) hint.textContent = "3D preview is unavailable in this browser or graphics configuration.";
+        return;
+      }
+
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.7));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.25;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
+      camera.position.set(0.05, 1.05, 7.6);
+
+      scene.add(new THREE.HemisphereLight(0x9ecfff, 0x101526, 2.1));
+      const key = new THREE.DirectionalLight(0xffffff, 3.4);
+      key.position.set(-3, 5, 5); scene.add(key);
+      const cyan = new THREE.PointLight(0x00cfff, 28, 12);
+      cyan.position.set(3, 1.4, 3); scene.add(cyan);
+      const violet = new THREE.PointLight(0x8a62ff, 17, 10);
+      violet.position.set(-3, -1, -2); scene.add(violet);
+      const warm = new THREE.PointLight(0xffb36b, 8, 8);
+      warm.position.set(0, 2, -3); scene.add(warm);
+
+      const rig = new THREE.Group();
+      scene.add(rig);
+      const cameraBody = new THREE.Group();
+      rig.add(cameraBody);
+
+      const mat = (color, metalness=0.65, roughness=0.32, emissive=0x000000) =>
+        new THREE.MeshStandardMaterial({ color, metalness, roughness, emissive, emissiveIntensity:0.3 });
+      const bodyMat = mat(0x171e2a, 0.82, 0.29);
+      const edgeMat = mat(0x586477, 0.9, 0.24);
+      const rubberMat = mat(0x080d15, 0.15, 0.68);
+      const glassMat = new THREE.MeshPhysicalMaterial({
+        color:0x0a3550, metalness:0.35, roughness:0.08, transmission:0.18,
+        transparent:true, opacity:0.95, clearcoat:1, emissive:0x003c68, emissiveIntensity:0.8
+      });
+      const cyanMat = new THREE.MeshStandardMaterial({ color:0x00cfff, emissive:0x00aaff, emissiveIntensity:1.8, metalness:0.35, roughness:0.2 });
+      const goldMat = mat(0xd5a45c, 0.82, 0.25);
+
+      function box(parent, size, position, material, bevel=0.06) {
+        const geometry = new THREE.BoxGeometry(...size);
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(...position);
+        mesh.castShadow = true; mesh.receiveShadow = true;
+        parent.add(mesh);
+        return mesh;
+      }
+      function cylinder(parent, radiusTop, radiusBottom, length, position, material, segments=48, axis="z") {
+        const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radiusTop, radiusBottom, length, segments), material);
+        mesh.position.set(...position);
+        if (axis === "z") mesh.rotation.x = Math.PI/2;
+        if (axis === "x") mesh.rotation.z = Math.PI/2;
+        mesh.castShadow = true; mesh.receiveShadow = true; parent.add(mesh);
+        return mesh;
+      }
+
+      // Main cinema-camera body, front lens assembly, lens rings and glass.
+      box(cameraBody, [2.35,1.28,1.18], [0,0,0], bodyMat);
+      box(cameraBody, [2.43,0.10,1.20], [0,-0.66,0], edgeMat);
+      box(cameraBody, [0.28,0.72,1.05], [-1.28,0.02,0], rubberMat);
+      box(cameraBody, [0.24,0.72,1.05], [1.28,0.02,0], edgeMat);
+      box(cameraBody, [0.72,0.24,0.9], [0,0.77,0], rubberMat);
+
+      const lens = new THREE.Group();
+      lens.position.set(0.05,0.03,0.77);
+      cameraBody.add(lens);
+      cylinder(lens,0.72,0.78,0.26,[0,0,0.12],edgeMat);
+      cylinder(lens,0.66,0.69,0.32,[0,0,0.35],rubberMat);
+      cylinder(lens,0.59,0.63,0.22,[0,0,0.59],goldMat);
+      cylinder(lens,0.55,0.58,0.16,[0,0,0.75],edgeMat);
+      cylinder(lens,0.48,0.50,0.12,[0,0,0.87],rubberMat);
+      cylinder(lens,0.43,0.43,0.055,[0,0,0.96],glassMat);
+      cylinder(lens,0.17,0.17,0.065,[0,0,1.0],cyanMat);
+
+      // Fine focus rings around the lens barrel.
+      for (let z=0.28; z<0.92; z+=0.09) {
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(0.63-(z-0.28)*0.25,0.018,8,56), goldMat);
+        ring.position.z = z; lens.add(ring);
+      }
+      // Top handle and viewfinder.
+      box(cameraBody,[1.25,0.12,0.22],[0,0.88,-0.02],edgeMat);
+      box(cameraBody,[0.12,0.38,0.16],[-0.52,1.08,-0.02],edgeMat);
+      box(cameraBody,[0.12,0.38,0.16],[0.52,1.08,-0.02],edgeMat);
+      box(cameraBody,[1.16,0.12,0.18],[0,1.26,-0.02],bodyMat);
+      box(cameraBody,[0.52,0.36,0.42],[0.88,0.84,-0.1],bodyMat);
+      box(cameraBody,[0.40,0.24,0.08],[0.88,0.84,0.15],glassMat);
+      // Side display, ports, switches and status lights.
+      box(cameraBody,[0.54,0.38,0.07],[-1.23,0.24,0.28],rubberMat);
+      box(cameraBody,[0.42,0.27,0.025],[-1.23,0.24,0.325],glassMat);
+      for (let i=0;i<3;i++) {
+        const knob = cylinder(cameraBody,0.075,0.075,0.09,[0.94,0.22+i*0.2,0.62],goldMat,24,"z");
+        knob.rotation.z = Math.PI/2;
+      }
+      box(cameraBody,[0.22,0.09,0.08],[0.82,-0.35,0.62],cyanMat);
+      box(cameraBody,[0.12,0.09,0.08],[1.02,-0.35,0.62],goldMat);
+
+      // Matte rails and a subtle bottom mounting plate.
+      box(cameraBody,[1.35,0.13,0.28],[0,-0.78,-0.1],edgeMat);
+      box(cameraBody,[0.64,0.16,0.45],[0,-0.91,-0.1],rubberMat);
+
+      // Floating halo rings and a subtle studio floor grid.
+      const haloMat = new THREE.MeshBasicMaterial({ color:0x00cfff, transparent:true, opacity:0.42 });
+      const halo = new THREE.Mesh(new THREE.TorusGeometry(1.82,0.012,8,100),haloMat);
+      halo.rotation.x = Math.PI/2.25; halo.position.y=-0.05; rig.add(halo);
+      const floorGrid = new THREE.GridHelper(12,30,0x07516c,0x102a40);
+      floorGrid.position.y=-1.52; floorGrid.material.transparent=true; floorGrid.material.opacity=0.28; scene.add(floorGrid);
+
+      const clock = new THREE.Clock();
+      const target = { motion:"idle" };
+      let scrollTilt = 0;
+      window.cinemotionCamera3D = {
+        setMotion(name) { target.motion = name || "idle"; },
+        setScroll(value) { scrollTilt = Math.max(-1,Math.min(1,value)); }
+      };
+
+      function resize() {
+        const width = Math.max(1,canvas.clientWidth);
+        const height = Math.max(1,canvas.clientHeight);
+        renderer.setSize(width,height,false);
+        camera.aspect = width/height;
+        camera.updateProjectionMatrix();
+      }
+      const observer = new ResizeObserver(resize);
+      observer.observe(canvas);
+      resize();
+
+      let raf = 0;
+      function animate() {
+        raf = requestAnimationFrame(animate);
+        const t = clock.getElapsedTime();
+        const smooth = 1 - Math.exp(-3.2 * clock.getDelta());
+        const motion = target.motion;
+        const idleY = Math.sin(t*0.85)*0.08;
+        let yaw = Math.sin(t*0.32)*0.16;
+        let pitch = Math.sin(t*0.48)*0.055;
+        let roll = 0;
+        let z = 0;
+        let x = 0;
+        let y = idleY;
+        let lensPulse = 1;
+
+        if (motion === "dolly") { z = Math.sin(t*2.1)*0.72; lensPulse=1+Math.sin(t*2.1)*0.07; }
+        if (motion === "orbit") { yaw = t*0.95; }
+        if (motion === "crane") { y = idleY + Math.sin(t*1.7)*0.62; pitch = -0.08+Math.sin(t*1.7)*0.08; }
+        if (motion === "zoom") { lensPulse = 1+Math.sin(t*2.6)*0.16; z = Math.sin(t*2.6)*0.14; }
+        if (motion === "pan") { yaw = Math.sin(t*2.0)*0.62; }
+        if (motion === "tilt") { pitch = Math.sin(t*1.9)*0.42; }
+        if (motion === "roll") { roll = Math.sin(t*1.6)*0.55; }
+        if (motion === "track") { x = Math.sin(t*1.7)*0.65; yaw = -x*0.22; }
+        if (motion === "light") { cyan.intensity = 25 + Math.sin(t*4)*18; violet.intensity = 18 + Math.cos(t*3)*12; }
+        else { cyan.intensity = 28; violet.intensity = 17; }
+
+        rig.position.x += (x-rig.position.x)*smooth;
+        rig.position.y += (y-rig.position.y)*smooth;
+        rig.position.z += (z-rig.position.z)*smooth;
+        rig.rotation.y += (yaw-rig.rotation.y)*smooth;
+        rig.rotation.x += ((pitch+scrollTilt*0.10)-rig.rotation.x)*smooth;
+        rig.rotation.z += (roll-rig.rotation.z)*smooth;
+        lens.scale.setScalar(lens.scale.x + (lensPulse-lens.scale.x)*smooth);
+        halo.rotation.z = t*0.18;
+        renderer.render(scene,camera);
+      }
+      animate();
+
+      const scrollHost = document.querySelector(".vault-container");
+      if (scrollHost) {
+        scrollHost.addEventListener("scroll", () => {
+          const max = Math.max(1,scrollHost.scrollHeight-scrollHost.clientHeight);
+          window.cinemotionCamera3D?.setScroll((scrollHost.scrollTop/max)*2-1);
+        }, {passive:true});
+      }
+      window.addEventListener("beforeunload", () => {
+        cancelAnimationFrame(raf); observer.disconnect(); renderer.dispose();
+      }, {once:true});
+    })();
+  </script>
+
 </body>
 </html>
