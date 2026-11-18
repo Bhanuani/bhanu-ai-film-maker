@@ -1229,6 +1229,25 @@
         flex-basis: 145px;
       }
     }
+
+    /* Final prompt-card layout: fixed prompt viewport and right-aligned controls. */
+    .movement-card { display:flex; flex-direction:column; height:100%; min-height:0; }
+    .movement-card > .card-details { display:flex; flex:1 1 auto; flex-direction:column; justify-content:flex-start; min-height:0; gap:10px; }
+    .movement-card .card-details > div:first-child { display:flex; flex:1 1 auto; flex-direction:column; min-height:0; }
+    .movement-card .prompt-wrapper { flex:0 0 160px; height:160px; min-height:160px; max-height:160px; align-items:flex-start; }
+    .movement-card .prompt-content { height:100%; overflow-y:auto; box-sizing:border-box; }
+    .movement-card .prompt-box { max-height:none; min-height:0; margin:0; overflow:visible; }
+    .movement-card .prompt-actions {
+      display:flex !important; width:100%; min-height:34px; height:34px;
+      margin: auto 0 0 !important; padding-top:10px; align-items:center;
+      justify-content:flex-end !important; gap:8px; box-sizing:border-box;
+    }
+    .movement-card .prompt-actions .prompt-action-btn { margin:0; flex:0 0 30px; }
+    .movement-card .card-meta-actions { margin-left:auto; justify-content:flex-end; }
+    .movement-card .copy-btn, .movement-card .use-gemini-btn { flex:0 0 auto; margin-top:0; }
+    @media (max-width:620px) {
+      .movement-card .prompt-wrapper { flex-basis:145px; height:145px; min-height:145px; max-height:145px; }
+    }
 </style>
 </head>
 <body>
@@ -2021,26 +2040,24 @@
     function renderCards(list) {
       if (!grid) return;
 
-      // Always apply category order at the final rendering boundary.
-      // This covers first load, Firebase refreshes, edits and category changes.
-      if (currentCategory === "All") {
+      // In All view, show the built-in categories in the intended sequence.
+      // User-created categories always follow the built-in categories.
+      if (String(currentCategory || "").trim().toLowerCase() === "all") {
         const builtInOrder = [
-          "Camera Movement", "Camera Angles", "Camera Shots",
-          "Cinematic Lighting", "Atmosphere", "Camera Lens", "Master Prompts"
+          "camera movement", "camera angles", "camera shots",
+          "cinematic lighting", "atmosphere", "camera lens", "master prompts"
         ];
         const customOrder = [...document.querySelectorAll(".categories-bar .cat-tab")]
-          .map(btn => (btn.querySelector("span:nth-child(2)")?.textContent || "").trim())
-          .filter(name => name && name.toLowerCase() !== "all" &&
-            !builtInOrder.some(b => b.toLowerCase() === name.toLowerCase()));
-        const orderedNames = [...builtInOrder, ...customOrder];
-        const ranks = new Map(orderedNames.map((name, index) => [name.toLowerCase(), index]));
-        list = list.map((item, index) => ({ item, index }))
+          .map(btn => (btn.querySelector("span:nth-child(2)")?.textContent || "").trim().toLowerCase())
+          .filter(name => name && name !== "all" && !builtInOrder.includes(name));
+        const rank = new Map([...builtInOrder, ...customOrder].map((name, index) => [name, index]));
+        list = list.map((item, originalIndex) => ({ item, originalIndex }))
           .sort((a, b) => {
-            const aKey = String(a.item.category || "").trim().toLowerCase();
-            const bKey = String(b.item.category || "").trim().toLowerCase();
-            const aRank = ranks.has(aKey) ? ranks.get(aKey) : Number.MAX_SAFE_INTEGER;
-            const bRank = ranks.has(bKey) ? ranks.get(bKey) : Number.MAX_SAFE_INTEGER;
-            return aRank - bRank || a.index - b.index;
+            const aCategory = String(a.item.category || "").trim().toLowerCase();
+            const bCategory = String(b.item.category || "").trim().toLowerCase();
+            const aRank = rank.has(aCategory) ? rank.get(aCategory) : Number.MAX_SAFE_INTEGER;
+            const bRank = rank.has(bCategory) ? rank.get(bCategory) : Number.MAX_SAFE_INTEGER;
+            return (aRank - bRank) || (a.originalIndex - b.originalIndex);
           })
           .map(entry => entry.item);
       }
@@ -3871,62 +3888,80 @@
       const librarySearch = byId("directorLibrarySearch");
       const items = Array.isArray(window.allVaultItems) ? window.allVaultItems : [];
 
-      // Only react to the latest complete word. A trailing space means the
-      // user has finished that keyword: clear the search field but keep the
-      // last matching cards visible while they continue typing.
-      if (!trimmed) {
-        if (librarySearch) librarySearch.value = "";
-        currentCategory = "All";
-        renderCards(items);
-        if (directorLibraryStatus) directorLibraryStatus.textContent =
-          "Type a category or prompt keyword in Gemini to find matching prompts.";
-        return;
-      }
-
+      // A space completes the current keyword. Clear only the left search field;
+      // keep the current matches visible until the next keyword is typed.
       if (/\s$/.test(raw)) {
         if (librarySearch) librarySearch.value = "";
         return;
       }
 
+      if (!trimmed) {
+        if (librarySearch) librarySearch.value = "";
+        currentCategory = "All";
+        renderCards(items);
+        if (directorLibraryStatus) {
+          directorLibraryStatus.textContent =
+            "Type any part of a camera or prompt term in Gemini to find matching references.";
+        }
+        return;
+      }
+
       const tokenMatch = trimmed.match(/([^\s]+)$/);
-      const token = tokenMatch ? tokenMatch[1].toLowerCase().replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "") : "";
+      const token = tokenMatch
+        ? tokenMatch[1].toLowerCase().replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "")
+        : "";
       const ignoredWords = new Set([
         "a","an","and","are","as","at","be","can","create","for","from","give",
         "help","how","i","in","is","it","me","my","of","on","or","please",
         "prompt","prompts","the","to","want","what","with","you","your",
-        "kavali","cheppu","ivvu","please"
+        "kavali","cheppu","ivvu"
       ]);
 
-      if (!token || token.length < 2 || ignoredWords.has(token)) return;
+      if (!token || token.length < 2 || ignoredWords.has(token)) {
+        if (librarySearch) librarySearch.value = "";
+        return;
+      }
 
-      const escapeRegex = value => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const wordPattern = new RegExp("(^|[^a-z0-9])" + escapeRegex(token) + "(?=$|[^a-z0-9])", "i");
+      // Prefix matching is intentional: "do" finds "Dolly", "dolly zoom",
+      // "door", etc. Search only words that actually occur in prompt records.
+      const hasWordPrefix = (value, prefix) => {
+        const words = String(value || "").toLowerCase().match(/[a-z0-9]+/g) || [];
+        return words.some(word => word.startsWith(prefix));
+      };
 
       const results = items.filter(item => {
-        const category = String(item.category || "");
-        const title = String(item.name || "");
-        const prompt = String(item.prompt || "");
-        const keywords = [item.keywords || "", item.tags || ""].join(" ");
-        // Match actual category names, prompt titles, or meaningful words
-        // present in prompt text; generic conversational words are ignored.
-        return wordPattern.test(category) ||
-          wordPattern.test(title) ||
-          wordPattern.test(prompt) ||
-          wordPattern.test(keywords);
+        const searchable = [
+          item.category || "",
+          item.name || "",
+          item.prompt || "",
+          item.keywords || "",
+          item.tags || ""
+        ].join(" ");
+        return hasWordPrefix(searchable, token);
       });
 
-      if (!results.length) return;
-
-      if (librarySearch) librarySearch.value = token;
       currentCategory = "All";
       document.querySelectorAll(".cat-tab").forEach(btn => {
-        btn.classList.remove("active");
-        if (btn.getAttribute("onclick")?.includes("'All'")) btn.classList.add("active");
+        btn.classList.toggle(
+          "active",
+          btn.querySelector("span:nth-child(2)")?.textContent.trim().toLowerCase() === "all"
+        );
       });
-      renderCards(results);
 
+      if (!results.length) {
+        if (librarySearch) librarySearch.value = "";
+        renderCards(items);
+        if (directorLibraryStatus) {
+          directorLibraryStatus.textContent = `No prompt term starts with “${token}”. Keep typing a camera or prompt keyword.`;
+        }
+        return;
+      }
+
+      if (librarySearch) librarySearch.value = token;
+      renderCards(results);
       if (directorLibraryStatus) {
-        directorLibraryStatus.textContent = `${results.length} matching prompt(s) for “${token}”`;
+        directorLibraryStatus.textContent =
+          `${results.length} matching prompt(s) for “${token}” — partial-word matches enabled`;
       }
 
       const firstCard = grid?.querySelector(".movement-card");
@@ -3967,8 +4002,8 @@
         return;
       }
 
-      const needsSpaceBefore = insertAt > 0 && !/\\s$/.test(currentText.slice(0, insertAt));
-      const needsSpaceAfter = insertAt < currentText.length && !/^\\s/.test(currentText.slice(insertAt));
+      const needsSpaceBefore = insertAt > 0 && !/\s$/.test(currentText.slice(0, insertAt));
+      const needsSpaceAfter = insertAt < currentText.length && !/^\s/.test(currentText.slice(insertAt));
       const insertion = `${needsSpaceBefore ? " " : ""}${promptText}${needsSpaceAfter ? " " : ""}`;
 
       geminiInput.value =
