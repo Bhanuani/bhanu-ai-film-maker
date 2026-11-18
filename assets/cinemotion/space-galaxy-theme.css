@@ -343,3 +343,23 @@ body.webgl-space-active .vault-container::after {
 @media (prefers-reduced-motion: reduce) {
   #cinemotionSpace3D { transition: none; }
 }
+
+
+/* CINEMOTION REFERENCE-MATCH: deep asteroid field, no Earth planet or ring backdrop */
+body.webgl-space-active {
+  background: #02050b !important;
+  background-image: none !important;
+}
+body.webgl-space-active::before {
+  background: linear-gradient(180deg, rgba(2,5,12,.08), rgba(2,5,12,.20)) !important;
+}
+body.webgl-space-active .vault-container::before,
+body.webgl-space-active .vault-container::after {
+  display: none !important;
+}
+#cinemotionSpace3D {
+  opacity: 1;
+}
+@media (max-width: 900px) {
+  #cinemotionSpace3D { opacity: .72; }
+}
