@@ -363,3 +363,21 @@ body.webgl-space-active .vault-container::after {
 @media (max-width: 900px) {
   #cinemotionSpace3D { opacity: .72; }
 }
+
+/* Megacity theme: suppress all legacy galaxy gradients behind the WebGL city. */
+body.webgl-space-active::before,
+body.webgl-space-active::after,
+body.webgl-space-active .vault-container::before,
+body.webgl-space-active .vault-container::after {
+  display: none !important;
+}
+body.webgl-space-active {
+  background: #071322 !important;
+  background-image: none !important;
+}
+#cinemotionSpace3D {
+  opacity: 1 !important;
+}
+@media (max-width: 900px) {
+  #cinemotionSpace3D { opacity: .82 !important; }
+}
