@@ -153,3 +153,104 @@ button.copy-prompt-btn {
   .movement-card, .cat-tab, .meta-action-btn { transition: none !important; }
   .cat-emoji, .cat-3d-img { animation: none !important; }
 }
+
+
+/* CINEMOTION SPACE GALAXY — dimensional planet scene (CSS-only, no WebGL/runtime dependency) */
+.vault-container {
+  position: relative;
+  isolation: isolate;
+}
+.vault-container::before {
+  content: "";
+  position: fixed;
+  inset: 60px 0 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle 17vw at 78% 43%,
+      rgba(226,241,255,.96) 0%,
+      rgba(118,174,255,.94) 5%,
+      rgba(58,91,184,.98) 20%,
+      rgba(25,37,103,.98) 39%,
+      rgba(7,13,43,.99) 57%,
+      transparent 59%),
+    radial-gradient(ellipse 34vw 11vw at 78% 44%,
+      transparent 39%,
+      rgba(113,186,255,.08) 41%,
+      rgba(166,216,255,.76) 43%,
+      rgba(119,131,255,.48) 44%,
+      rgba(54,78,173,.12) 46%,
+      transparent 49%),
+    radial-gradient(ellipse at 80% 35%, rgba(120,74,255,.25), transparent 34%),
+    radial-gradient(ellipse at 18% 55%, rgba(0,153,255,.20), transparent 39%),
+    radial-gradient(ellipse at 58% 82%, rgba(87,47,180,.17), transparent 38%);
+  background-repeat: no-repeat;
+  filter: saturate(1.15);
+  opacity: .78;
+  animation: cinemotionNebulaDrift 42s ease-in-out infinite alternate;
+  will-change: transform;
+}
+.vault-container::after {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  pointer-events: none;
+  width: min(76vw, 1120px);
+  height: min(28vw, 410px);
+  min-height: 210px;
+  right: -9vw;
+  top: 23vh;
+  border: 1px solid rgba(132,190,255,.28);
+  border-radius: 50%;
+  transform: rotate(-23deg);
+  box-shadow:
+    0 0 10px rgba(75,167,255,.22),
+    inset 0 0 12px rgba(116,104,255,.10),
+    0 0 48px rgba(100,90,255,.10);
+  opacity: .62;
+  animation: cinemotionOrbitFloat 34s ease-in-out infinite alternate;
+}
+@keyframes cinemotionNebulaDrift {
+  from { transform: scale(1) translate3d(0, 0, 0); }
+  to { transform: scale(1.035) translate3d(-.7vw, .5vh, 0); }
+}
+@keyframes cinemotionOrbitFloat {
+  from { transform: rotate(-23deg) translate3d(0, 0, 0); }
+  to { transform: rotate(-19deg) translate3d(-.8vw, .5vh, 0); }
+}
+@media (max-width: 900px) {
+  .vault-container::before {
+    inset: 60px 0 0;
+    background:
+      radial-gradient(circle 29vw at 88% 38%,
+        rgba(194,222,255,.85) 0%,
+        rgba(76,123,221,.92) 18%,
+        rgba(20,33,91,.98) 48%,
+        transparent 60%),
+      radial-gradient(ellipse 53vw 18vw at 88% 39%,
+        transparent 40%,
+        rgba(135,190,255,.58) 44%,
+        transparent 49%),
+      radial-gradient(ellipse at 20% 60%, rgba(0,153,255,.16), transparent 45%),
+      radial-gradient(ellipse at 75% 24%, rgba(120,74,255,.16), transparent 42%);
+    opacity: .48;
+    animation: none;
+    will-change: auto;
+  }
+  .vault-container::after {
+    width: 92vw;
+    height: 34vw;
+    min-height: 120px;
+    right: -32vw;
+    top: 19vh;
+    opacity: .34;
+    animation: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vault-container::before,
+  .vault-container::after {
+    animation: none !important;
+    will-change: auto;
+  }
+}
