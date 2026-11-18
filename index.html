@@ -1164,7 +1164,7 @@
       .card-details { min-height:0; }
       .prompt-wrapper { min-height:125px; }
     }
-</style>
+
 
     /* FINAL CARD LAYOUT FIX: stable prompt height + right-aligned edit/delete */
     .movement-card { height: 100%; min-height: 0; }
@@ -1229,7 +1229,7 @@
         flex-basis: 145px;
       }
     }
-
+</style>
 </head>
 <body>
 
@@ -2020,6 +2020,31 @@
 
     function renderCards(list) {
       if (!grid) return;
+
+      // Always apply category order at the final rendering boundary.
+      // This covers first load, Firebase refreshes, edits and category changes.
+      if (currentCategory === "All") {
+        const builtInOrder = [
+          "Camera Movement", "Camera Angles", "Camera Shots",
+          "Cinematic Lighting", "Atmosphere", "Camera Lens", "Master Prompts"
+        ];
+        const customOrder = [...document.querySelectorAll(".categories-bar .cat-tab")]
+          .map(btn => (btn.querySelector("span:nth-child(2)")?.textContent || "").trim())
+          .filter(name => name && name.toLowerCase() !== "all" &&
+            !builtInOrder.some(b => b.toLowerCase() === name.toLowerCase()));
+        const orderedNames = [...builtInOrder, ...customOrder];
+        const ranks = new Map(orderedNames.map((name, index) => [name.toLowerCase(), index]));
+        list = list.map((item, index) => ({ item, index }))
+          .sort((a, b) => {
+            const aKey = String(a.item.category || "").trim().toLowerCase();
+            const bKey = String(b.item.category || "").trim().toLowerCase();
+            const aRank = ranks.has(aKey) ? ranks.get(aKey) : Number.MAX_SAFE_INTEGER;
+            const bRank = ranks.has(bKey) ? ranks.get(bKey) : Number.MAX_SAFE_INTEGER;
+            return aRank - bRank || a.index - b.index;
+          })
+          .map(entry => entry.item);
+      }
+
       grid.innerHTML = list.map(item => {
         return `
         <div class="movement-card" id="card_${item.id}">
@@ -2858,12 +2883,13 @@
         // Read the visible category NAME (the second span), not the emoji icon.
         // This guarantees All follows the exact tab order: built-ins first,
         // Master Prompts next, and user-created categories after it.
-        const orderedCategoryNames = [...document.querySelectorAll('.categories-bar .cat-tab')]
-          .map(btn => {
-            const label = btn.querySelector('span:nth-child(2)');
-            return (label?.textContent || '').trim();
-          })
-          .filter(name => name && name.toLowerCase() !== 'all');
+        const orderedCategoryNames = [
+          'Camera Movement', 'Camera Angles', 'Camera Shots',
+          'Cinematic Lighting', 'Atmosphere', 'Camera Lens', 'Master Prompts',
+          ...[...document.querySelectorAll('.categories-bar .cat-tab')]
+            .map(btn => (btn.querySelector('span:nth-child(2)')?.textContent || '').trim())
+            .filter(name => name && !['all','camera movement','camera angles','camera shots','cinematic lighting','atmosphere','camera lens','master prompts'].includes(name.toLowerCase()))
+        ];
         const categoryRank = new Map(
           orderedCategoryNames.map((name, index) => [name.trim().toLowerCase(), index])
         );
