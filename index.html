@@ -1248,6 +1248,205 @@
     @media (max-width:620px) {
       .movement-card .prompt-wrapper { flex-basis:145px; height:145px; min-height:145px; max-height:145px; }
     }
+
+/* =========================================================
+   CINEMOTION STUDIO — SPACE GALAXY THEME 07
+   Visual-only override layer. Existing app markup, data,
+   Firebase logic, media handlers and controls are untouched.
+   ========================================================= */
+:root {
+  --bg-dark: #030615;
+  --card-bg: rgba(5, 15, 34, 0.88);
+  --border-color: rgba(103, 190, 255, 0.22);
+  --accent-cyan: #13d9ff;
+  --accent-glow: rgba(19, 217, 255, 0.30);
+  --text-main: #f4f8ff;
+  --text-muted: #a8bad5;
+  --space-blue: #176dff;
+  --space-violet: #9b5cff;
+}
+html {
+  background: #020511;
+  min-height: 100%;
+}
+body {
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(25, 75, 160, .20), transparent 46%),
+    linear-gradient(180deg, #030615 0%, #061027 55%, #020511 100%);
+  background-attachment: fixed;
+  isolation: isolate;
+}
+/* CSS-only nebula + dimensional planetary glow; no heavy video/image asset */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 7% 42%,
+      rgba(112, 204, 255, .92) 0%,
+      rgba(32, 119, 255, .68) 2.2%,
+      rgba(12, 49, 126, .62) 5.2%,
+      rgba(5, 19, 54, .12) 9%,
+      transparent 13%),
+    radial-gradient(ellipse at 4% 45%, transparent 0 8.5%, rgba(55, 151, 255, .24) 8.8%, transparent 9.3%),
+    radial-gradient(ellipse at 4% 45%, transparent 0 11%, rgba(147, 88, 255, .18) 11.2%, transparent 11.6%),
+    radial-gradient(ellipse at 88% 18%, rgba(104, 43, 190, .23), transparent 27%),
+    radial-gradient(ellipse at 72% 68%, rgba(0, 135, 255, .13), transparent 34%),
+    radial-gradient(ellipse at 34% 8%, rgba(0, 198, 255, .12), transparent 26%),
+    linear-gradient(115deg, rgba(2, 5, 17, .12), rgba(3, 8, 27, .58) 48%, rgba(8, 4, 27, .24));
+  opacity: .96;
+}
+/* Sparse star field built from gradients: lightweight and static */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .52;
+  background-image:
+    radial-gradient(2px 2px at 8% 18%, rgba(220,245,255,.85) 45%, transparent 70%),
+    radial-gradient(1px 1px at 18% 72%, rgba(180,215,255,.9) 45%, transparent 70%),
+    radial-gradient(1.5px 1.5px at 28% 31%, rgba(255,255,255,.7) 45%, transparent 70%),
+    radial-gradient(1px 1px at 42% 12%, rgba(190,220,255,.8) 45%, transparent 70%),
+    radial-gradient(2px 2px at 56% 84%, rgba(210,225,255,.65) 45%, transparent 70%),
+    radial-gradient(1px 1px at 68% 25%, rgba(255,255,255,.75) 45%, transparent 70%),
+    radial-gradient(1.5px 1.5px at 79% 57%, rgba(180,210,255,.8) 45%, transparent 70%),
+    radial-gradient(1px 1px at 91% 38%, rgba(255,255,255,.8) 45%, transparent 70%),
+    radial-gradient(1px 1px at 96% 82%, rgba(170,205,255,.7) 45%, transparent 70%);
+  background-size: 370px 290px, 430px 360px, 510px 390px, 460px 330px, 520px 420px, 390px 310px, 480px 370px, 410px 350px, 530px 410px;
+}
+/* Retain the existing background-video element and source; soften it under the galaxy layer */
+#siteBackgroundVideo {
+  opacity: .12;
+  filter: brightness(.38) saturate(.82);
+}
+header {
+  background: rgba(3, 9, 27, .78);
+  border-bottom-color: rgba(86, 181, 255, .20);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, .22);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+.header-inner, .vault-container {
+  position: relative;
+}
+.brand-logo-mark {
+  filter: drop-shadow(0 0 12px rgba(19, 217, 255, .38));
+}
+.search-box input, .profile-pill, .menu-btn {
+  background: rgba(9, 24, 52, .70);
+  border-color: rgba(116, 190, 255, .22);
+}
+.search-box input:focus {
+  border-color: rgba(19, 217, 255, .78);
+  box-shadow: 0 0 0 3px rgba(19, 217, 255, .09), 0 0 22px rgba(19, 217, 255, .18);
+}
+.sidebar-drawer {
+  background: rgba(4, 12, 31, .97);
+  border-right-color: rgba(19, 217, 255, .28);
+  box-shadow: 14px 0 50px rgba(0, 0, 0, .55);
+}
+.sidebar-item:hover, .menu-btn:hover {
+  background: rgba(19, 217, 255, .10);
+  border-color: rgba(19, 217, 255, .30);
+}
+.hero-banner-wrapper {
+  background: rgba(3, 10, 28, .72);
+  border-color: rgba(74, 183, 255, .40);
+  box-shadow: 0 18px 55px rgba(0, 0, 0, .36), 0 0 36px rgba(24, 127, 255, .12);
+}
+.categories-bar {
+  scrollbar-color: rgba(19, 217, 255, .72) rgba(255,255,255,.05);
+}
+.cat-tab {
+  background: linear-gradient(145deg, rgba(17, 39, 75, .82), rgba(7, 15, 35, .82));
+  border-color: rgba(120, 190, 255, .20);
+  color: #c0cde3;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.055), 0 8px 22px rgba(0,0,0,.12);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.cat-tab:hover {
+  border-color: rgba(19, 217, 255, .56);
+  background: linear-gradient(145deg, rgba(15, 69, 112, .82), rgba(8, 20, 47, .90));
+}
+.cat-tab.active {
+  background: linear-gradient(135deg, rgba(19, 217, 255, .25), rgba(26, 83, 164, .36) 55%, rgba(12, 25, 55, .94));
+  border-color: rgba(19, 217, 255, .88);
+  box-shadow: 0 0 22px rgba(19, 217, 255, .20), inset 0 1px 0 rgba(255,255,255,.14);
+}
+.movement-card {
+  background: linear-gradient(155deg, rgba(13, 34, 67, .90), rgba(4, 12, 29, .94) 72%);
+  border: 1px solid rgba(92, 181, 255, .28);
+  border-radius: 17px;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, .30), inset 0 1px 0 rgba(255,255,255,.055);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.movement-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(19, 217, 255, .62);
+  box-shadow: 0 18px 38px rgba(0,0,0,.38), 0 0 24px rgba(19,217,255,.10);
+}
+.card-video-box {
+  border-bottom-color: rgba(89, 177, 255, .22);
+}
+.card-details {
+  background: linear-gradient(180deg, rgba(8, 21, 44, .26), rgba(4, 12, 29, .32));
+}
+.tag-badge {
+  color: #38e5ff;
+  background: rgba(19, 217, 255, .10);
+  border-color: rgba(19, 217, 255, .30);
+}
+.card-details textarea, .card-details input, .card-details .prompt-text,
+.card-details [contenteditable="true"] {
+  background-color: rgba(2, 9, 23, .70);
+  border-color: rgba(111, 179, 255, .18);
+}
+.meta-action-btn, .card-details button:not(.copy-prompt-btn) {
+  border-color: rgba(133, 190, 255, .22);
+}
+.add-btn, .copy-prompt-btn {
+  background: linear-gradient(100deg, #12dff5 0%, #1599ff 100%);
+  color: #03101e;
+  box-shadow: 0 7px 20px rgba(0, 173, 255, .18);
+}
+.add-btn:hover, .copy-prompt-btn:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 9px 25px rgba(0, 173, 255, .28);
+}
+.profile-dropdown {
+  background: rgba(5, 15, 36, .97);
+  border-color: rgba(19, 217, 255, .34);
+  box-shadow: 0 16px 45px rgba(0,0,0,.55);
+}
+.sidebar-overlay {
+  background: rgba(0, 4, 17, .74);
+}
+/* Keep the galaxy ambience subtle on phones and respect reduced-motion preferences */
+@media (max-width: 768px) {
+  body::before { opacity: .72; }
+  body::after { opacity: .30; }
+  #siteBackgroundVideo { opacity: .06; }
+  .movement-card {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: 0 8px 22px rgba(0,0,0,.24);
+  }
+  .cat-tab {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cat-emoji, .cat-3d-img { animation: none !important; }
+  .movement-card, .cat-tab, .add-btn { transition: none !important; }
+}
+
 </style>
 </head>
 <body>
