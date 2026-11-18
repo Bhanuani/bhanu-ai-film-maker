@@ -4764,161 +4764,102 @@
       deepSpace.renderOrder=-10;
       scene.add(deepSpace);
 
+      /* CINEMOTION ASTEROID FIELD SCENE — matched to the supplied deep-space reference.
+         No planet, no visible sun disc. All rock bodies are actual 3D meshes. */
       planet = new THREE.Group();
-      planet.position.set(isMobile ? 2.25 : 3.05, isMobile ? .7 : .25, -1.0);
+      planet.position.set(0,0,0);
       scene.add(planet);
-
-      var vertexShader = [
-        "varying vec3 vNormal;",
-        "varying vec3 vPos;",
-        "varying vec3 vWorld;",
-        "varying vec2 vUv;",
-        "void main(){",
-        " vNormal = normalize(normalMatrix * normal);",
-        " vPos = position;",
-        " vUv = uv;",
-        " vec4 world = modelMatrix * vec4(position,1.0);",
-        " vWorld = world.xyz;",
-        " gl_Position = projectionMatrix * viewMatrix * world;",
-        "}"
-      ].join("\n");
-
-      var fragmentShader = [
-        "precision highp float;",
-        "varying vec3 vNormal; varying vec3 vPos; varying vec3 vWorld; varying vec2 vUv;",
-        "float hash31(vec3 p){ p=fract(p*.1031); p+=dot(p,p.yxz+33.33); return fract((p.x+p.y)*p.z); }",
-        "float noise3(vec3 x){",
-        " vec3 i=floor(x), f=fract(x); f=f*f*(3.0-2.0*f);",
-        " return mix(mix(mix(hash31(i),hash31(i+vec3(1,0,0)),f.x),mix(hash31(i+vec3(0,1,0)),hash31(i+vec3(1,1,0)),f.x),f.y),",
-        " mix(mix(hash31(i+vec3(0,0,1)),hash31(i+vec3(1,0,1)),f.x),mix(hash31(i+vec3(0,1,1)),hash31(i+vec3(1,1,1)),f.x),f.y),f.z);",
-        "}",
-        "float fbm(vec3 p){ float v=0.0,a=.52; for(int i=0;i<5;i++){v+=a*noise3(p);p*=2.03;a*=.5;} return v; }",
-        "void main(){",
-        " vec3 n=normalize(vNormal);",
-        " float continent=fbm(vPos*2.15 + vec3(1.7,0.0,2.4));",
-        " float detail=fbm(vPos*8.0);",
-        " float land=smoothstep(.48,.61,continent);",
-        " vec3 ocean=mix(vec3(.008,.025,.095),vec3(.025,.16,.36),detail);",
-        " vec3 ground=mix(vec3(.035,.13,.34),vec3(.20,.31,.68),detail);",
-        " vec3 color=mix(ocean,ground,land);",
-        " float clouds=smoothstep(.64,.78,fbm(vPos*11.0+vec3(4.0,1.0,2.0)));",
-        " color=mix(color,vec3(.48,.68,.95),clouds*.22);",
-        " vec3 lightDir=normalize(vec3(-.55,.55,1.0));",
-        " float diffuse=max(dot(n,lightDir),0.0);",
-        " float night= smoothstep(-.25,.35,dot(n,lightDir));",
-        " vec3 viewDir=normalize(cameraPosition-vWorld);",
-        " vec3 halfDir=normalize(lightDir+viewDir);",
-        " float spec=pow(max(dot(n,halfDir),0.0),52.0);",
-        " float rim=pow(1.0-max(dot(n,viewDir),0.0),3.2);",
-        " color*=.24+.92*diffuse;",
-        " color+=vec3(.12,.48,1.0)*spec*.85;",
-        " color+=vec3(.08,.36,.95)*rim*.48;",
-        " color=mix(color,color*.30,1.0-night*.55);",
-        " gl_FragColor=vec4(color,1.0);",
-        "}"
-      ].join("\n");
-      var planetGeometry = new THREE.SphereGeometry(2.05, isMobile ? 72 : 144, isMobile ? 72 : 144);
-      var surface = new THREE.Mesh(
-        planetGeometry,
-        new THREE.ShaderMaterial({vertexShader:vertexShader,fragmentShader:fragmentShader})
-      );
-      planet.add(surface);
-
-      /* NASA Blue Marble photoreal surface texture.
-         Source: NASA Earth Observatory, Blue Marble: Next Generation (January base map).
-         No visible sun is created; the planet is lit by a soft off-camera directional light. */
-      scene.add(new THREE.AmbientLight(0x35415f, 0.58));
-      var planetKeyLight = new THREE.DirectionalLight(0x9bbfff, 1.72);
-      planetKeyLight.position.set(-5.5, 2.6, 6.5);
-      scene.add(planetKeyLight);
-      var planetFillLight = new THREE.DirectionalLight(0x243d88, 0.34);
-      planetFillLight.position.set(5, -2, -3);
-      scene.add(planetFillLight);
-
-      var textureLoader = new THREE.TextureLoader();
-      textureLoader.setCrossOrigin("anonymous");
-      textureLoader.load(
-        "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-base/january/world.200401.3x5400x2700.jpg",
-        function(earthTexture) {
-          earthTexture.encoding = THREE.sRGBEncoding;
-          earthTexture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-          surface.material.dispose();
-          surface.material = new THREE.MeshPhongMaterial({
-            map: earthTexture,
-            bumpMap: earthTexture,
-            bumpScale: 0.035,
-            specular: new THREE.Color(0x253b63),
-            shininess: 11
-          });
-          surface.material.needsUpdate = true;
-          queueDraw();
-        },
-        undefined,
-        function(error) {
-          console.warn("CINEMOTION: NASA Blue Marble texture could not load; procedural planet fallback remains active.", error);
-        }
-      );
-
-      /* Real cloud layer with alpha transparency; source notes EUMETSAT data and NASA Earth imagery. */
-      var cloudLayer = new THREE.Mesh(
-        new THREE.SphereGeometry(2.075, isMobile ? 64 : 128, isMobile ? 64 : 128),
-        new THREE.MeshPhongMaterial({
-          color: 0xdceaff,
-          transparent: true,
-          opacity: 0,
-          depthWrite: false,
-          shininess: 2
-        })
-      );
-      cloudLayer.renderOrder = 2;
-      planet.add(cloudLayer);
-      textureLoader.load(
-        "https://clouds.matteason.co.uk/images/2048x1024/clouds-alpha.png",
-        function(cloudTexture) {
-          cloudTexture.encoding = THREE.sRGBEncoding;
-          cloudTexture.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
-          cloudLayer.material.map = cloudTexture;
-          cloudLayer.material.opacity = 0.62;
-          cloudLayer.material.needsUpdate = true;
-          queueDraw();
-        },
-        undefined,
-        function(error) {
-          console.warn("CINEMOTION: cloud texture could not load; planet surface remains visible.", error);
-        }
-      );
-
-      var atmosphere = new THREE.Mesh(
-        new THREE.SphereGeometry(2.13, 64, 64),
-        new THREE.ShaderMaterial({
-          transparent:true, side:THREE.BackSide, blending:THREE.AdditiveBlending, depthWrite:false,
-          vertexShader:"varying vec3 vN; void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}",
-          fragmentShader:"varying vec3 vN; void main(){float rim=pow(1.0-abs(dot(normalize(vN),vec3(0.0,0.0,1.0))),2.2);gl_FragColor=vec4(vec3(.12,.48,1.0),rim*.48);}"
-        })
-      );
-      planet.add(atmosphere);
-
       ringGroup = new THREE.Group();
       planet.add(ringGroup);
-      var ringMaterial = new THREE.MeshBasicMaterial({
-        color:0x7ebcff, transparent:true, opacity:.68,
-        side:THREE.DoubleSide, blending:THREE.AdditiveBlending,
-        depthWrite:false
-      });
-      var ring1 = new THREE.Mesh(new THREE.TorusGeometry(2.72,.018,6,220),ringMaterial);
-      ring1.rotation.x=1.12; ring1.rotation.y=.12; ringGroup.add(ring1);
-      var ring2 = new THREE.Mesh(
-        new THREE.TorusGeometry(2.91,.008,5,220),
-        new THREE.MeshBasicMaterial({color:0x8a79ff,transparent:true,opacity:.42,blending:THREE.AdditiveBlending,depthWrite:false})
-      );
-      ring2.rotation.x=1.12; ring2.rotation.y=.12; ringGroup.add(ring2);
+      cloudLayer = null;
 
-      var starCount=isMobile?420:1100;
+      var spaceBackdrop = new THREE.Mesh(
+        new THREE.PlaneGeometry(100,60),
+        new THREE.ShaderMaterial({
+          depthWrite:false,
+          vertexShader:"varying vec2 vUv; void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}",
+          fragmentShader:[
+            "precision highp float; varying vec2 vUv;",
+            "float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}",
+            "float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(h(i),h(i+vec2(1.,0.)),f.x),mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),f.x),f.y);}",
+            "float fb(vec2 p){float v=0.,a=.55;for(int i=0;i<5;i++){v+=a*n(p);p*=2.03;a*=.5;}return v;}",
+            "void main(){vec2 p=(vUv-.5)*vec2(2.,1.25);float a=fb(p*3.2+vec2(1.2,-.8));float b=fb(p*6.4+vec2(-2.1,3.4));float c=fb(p*2.1+vec2(4.,1.));",
+            "float cloud=smoothstep(.30,.78,a*.72+b*.30);vec3 col=vec3(.002,.005,.015);",
+            "col+=vec3(.025,.095,.22)*cloud*(.45+b*.6);col+=vec3(.075,.12,.23)*smoothstep(.52,.86,c)*.55;",
+            "float beam=exp(-length((p-vec2(.62,.40))*vec2(1.2,1.8))*2.6);col+=vec3(.20,.34,.55)*beam*.26;",
+            "float vign=1.-smoothstep(.25,1.15,length(p*vec2(.82,1.)));col*=.62+.38*vign;",
+            "gl_FragColor=vec4(col,1.);}"
+          ].join("\n")
+        })
+      );
+      spaceBackdrop.position.set(0,0,-32);
+      spaceBackdrop.renderOrder=-20;
+      scene.add(spaceBackdrop);
+
+      /* Off-frame area lighting gives the reference's cold rim highlights; the light source itself is never shown. */
+      scene.add(new THREE.AmbientLight(0x34435e,0.48));
+      var asteroidKey = new THREE.DirectionalLight(0xc7dcff,2.05);
+      asteroidKey.position.set(7,5,8);
+      scene.add(asteroidKey);
+      var asteroidFill = new THREE.DirectionalLight(0x294b83,0.55);
+      asteroidFill.position.set(-6,-3,2);
+      scene.add(asteroidFill);
+
+      function makeRockGeometry(seed){
+        var geo=new THREE.IcosahedronGeometry(1,3);
+        var pos=geo.attributes.position;
+        for(var v=0;v<pos.count;v++){
+          var x=pos.getX(v),y=pos.getY(v),z=pos.getZ(v);
+          var wave=Math.sin(x*8.1+seed)*Math.cos(y*6.7-seed*.7)*Math.sin(z*7.4+seed*1.3);
+          var fine=Math.sin(x*17+seed*2)*Math.sin(y*13-seed)*Math.cos(z*15+seed);
+          var factor=1+wave*.105+fine*.032;
+          pos.setXYZ(v,x*factor*(1+.08*Math.sin(seed+1)),y*factor*(1+.07*Math.cos(seed)),z*factor);
+        }
+        geo.computeVertexNormals();
+        return geo;
+      }
+      var rockMaterials=[
+        new THREE.MeshStandardMaterial({color:0x353b48,roughness:1,metalness:.03,flatShading:true}),
+        new THREE.MeshStandardMaterial({color:0x4a4c55,roughness:.96,metalness:.02,flatShading:true}),
+        new THREE.MeshStandardMaterial({color:0x252d3a,roughness:1,metalness:.04,flatShading:true}),
+        new THREE.MeshStandardMaterial({color:0x59606c,roughness:1,metalness:.02,flatShading:true})
+      ];
+      var rockGeo=[makeRockGeometry(1.7),makeRockGeometry(4.2),makeRockGeometry(8.6),makeRockGeometry(12.1)];
+      var rocks=[];
+      function addRock(x,y,z,scale,variant,rotX,rotY,rotZ){
+        var mesh=new THREE.Mesh(rockGeo[variant%rockGeo.length],rockMaterials[variant%rockMaterials.length]);
+        mesh.position.set(x,y,z);
+        mesh.scale.set(scale*(.82+variant*.035),scale*(.9+(variant%3)*.07),scale*(.78+(variant%2)*.16));
+        mesh.rotation.set(rotX,rotY,rotZ);
+        planet.add(mesh);
+        rocks.push(mesh);
+      }
+      /* Foreground boulders + layered mid/far asteroid field, placed like the supplied reference image. */
+      addRock(-4.0,-1.45,1.0,1.55,0,.34,.6,.18);
+      addRock(-.65,.62,-3.0,.86,1,.8,.2,.4);
+      addRock(2.55,1.25,-5.8,.62,2,.2,1.1,.7);
+      addRock(-2.5,-3.35,-1.8,.82,3,.9,.5,.2);
+      addRock(3.9,-2.0,-7.0,.43,0,.3,.7,1.1);
+      addRock(5.0,2.7,-9.0,.35,2,.5,.2,.8);
+      addRock(-5.8,2.1,-6.0,.31,1,.1,.8,.4);
+      addRock(.8,-2.8,-8.0,.28,3,.4,.3,.9);
+      addRock(6.0,-.3,-11.0,.22,2,.6,.1,.5);
+      addRock(-1.0,3.1,-10.0,.24,0,.7,.8,.2);
+      var asteroidCount=isMobile?22:44;
+      for(var ai=0;ai<asteroidCount;ai++){
+        var depth=-4-Math.random()*18;
+        var spreadX=(Math.random()-.5)*(isMobile?10:17);
+        var spreadY=(Math.random()-.5)*8;
+        var size=.055+Math.pow(Math.random(),2)*.25;
+        addRock(spreadX,spreadY,depth,size,ai%4,Math.random()*3,Math.random()*3,Math.random()*3);
+      }
+
+      var starCount=isMobile?300:760;
       var starPositions=new Float32Array(starCount*3);
       for(var i=0;i<starCount;i++){
         var radius=7+Math.random()*22;
         var theta=Math.random()*Math.PI*2;
-        var z=(Math.random()-.5)*24;
+        var z=-8-Math.random()*24;
         starPositions[i*3]=Math.cos(theta)*radius;
         starPositions[i*3+1]=Math.sin(theta)*radius;
         starPositions[i*3+2]=z;
@@ -4926,7 +4867,7 @@
       var starGeometry=new THREE.BufferGeometry();
       starGeometry.setAttribute("position",new THREE.BufferAttribute(starPositions,3));
       stars=new THREE.Points(starGeometry,new THREE.PointsMaterial({
-        color:0xb9d9ff,size:isMobile?0.035:0.045,transparent:true,opacity:.78,
+        color:0xd5e5ff,size:isMobile?0.028:0.038,transparent:true,opacity:.82,
         sizeAttenuation:true,depthWrite:false
       }));
       scene.add(stars);
@@ -4934,11 +4875,15 @@
       var maxScroll=0, currentProgress=0, renderQueued=false;
       function draw(){
         renderQueued=false;
-        planet.rotation.y=currentProgress*1.15;
-        planet.rotation.x=.035+currentProgress*.12;
-        if (cloudLayer) cloudLayer.rotation.y = currentProgress*1.32 + 0.08;
-        ringGroup.rotation.z=-.18+currentProgress*1.65;
-        stars.rotation.y=currentProgress*.045;
+        planet.rotation.y=currentProgress*.16;
+        planet.rotation.x=currentProgress*.055;
+        ringGroup.rotation.z=currentProgress*.08;
+        for(var ri=0;ri<rocks.length;ri++){
+          rocks[ri].rotation.y += 0;
+          rocks[ri].position.y += 0;
+        }
+        stars.rotation.y=currentProgress*.035;
+        camera.position.y=-currentProgress*.16;
         camera.position.y=-currentProgress*.22;
         camera.lookAt(0,0,0);
         renderer.render(scene,camera);
