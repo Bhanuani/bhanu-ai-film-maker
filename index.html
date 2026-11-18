@@ -3982,6 +3982,7 @@
       }
 
       const cameraMotionRules = [
+        { keys:["camera","cinema","filmmaking","film","rig"], motion:"orbit", title:"Floating Cinema Camera", hint:"The 3D cinema camera slowly rotates in a premium product showcase", mode:"SHOWCASE · 3D ORBIT" },
         { keys:["dolly","push","pull","creep","approach","retreat"], motion:"dolly", title:"Dolly Camera Move", hint:"The complete camera rig glides forward and backward", mode:"DOLLY · FORWARD / BACK" },
         { keys:["orbit","arc","revolve","circle","360"], motion:"orbit", title:"Orbit Camera Move", hint:"The camera rig rotates around its cinematic subject", mode:"ORBIT · 360° ROTATION" },
         { keys:["crane","jib","rise","elevate","pedestal"], motion:"crane", title:"Crane Camera Move", hint:"The camera rig rises and lowers smoothly", mode:"CRANE · UP / DOWN" },
@@ -4762,7 +4763,7 @@
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
-      camera.position.set(0.05, 1.05, 7.6);
+      camera.position.set(0.05, 1.0, 6.25);
 
       scene.add(new THREE.HemisphereLight(0x9ecfff, 0x101526, 2.1));
       const key = new THREE.DirectionalLight(0xffffff, 3.4);
@@ -4778,6 +4779,7 @@
       scene.add(rig);
       const cameraBody = new THREE.Group();
       rig.add(cameraBody);
+      rig.scale.setScalar(1.18);
 
       const mat = (color, metalness=0.65, roughness=0.32, emissive=0x000000) =>
         new THREE.MeshStandardMaterial({ color, metalness, roughness, emissive, emissiveIntensity:0.3 });
@@ -4881,12 +4883,13 @@
       let raf = 0;
       function animate() {
         raf = requestAnimationFrame(animate);
-        const t = clock.getElapsedTime();
-        const smooth = 1 - Math.exp(-3.2 * clock.getDelta());
+        const delta = Math.min(clock.getDelta(), 0.05);
+        const t = clock.elapsedTime;
+        const smooth = 1 - Math.exp(-5.5 * delta);
         const motion = target.motion;
-        const idleY = Math.sin(t*0.85)*0.08;
-        let yaw = Math.sin(t*0.32)*0.16;
-        let pitch = Math.sin(t*0.48)*0.055;
+        const idleY = Math.sin(t*1.15)*0.14;
+        let yaw = Math.sin(t*0.72)*0.38;
+        let pitch = Math.sin(t*0.92)*0.13;
         let roll = 0;
         let z = 0;
         let x = 0;
@@ -4915,6 +4918,14 @@
         renderer.render(scene,camera);
       }
       animate();
+
+      stage.addEventListener("pointermove", event => {
+        const rect = stage.getBoundingClientRect();
+        const nx = ((event.clientX - rect.left) / Math.max(1, rect.width) - 0.5) * 2;
+        const ny = ((event.clientY - rect.top) / Math.max(1, rect.height) - 0.5) * 2;
+        rig.rotation.y += (nx * 0.18 - rig.rotation.y) * 0.025;
+        rig.rotation.x += (-ny * 0.10 - rig.rotation.x) * 0.025;
+      }, {passive:true});
 
       const scrollHost = document.querySelector(".vault-container");
       if (scrollHost) {
