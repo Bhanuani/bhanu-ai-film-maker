@@ -1647,15 +1647,15 @@
       </div>
     </section>
 
-    <section class="director-camera-stage" id="directorCameraStage" aria-label="Interactive 3D cinema camera preview">
+    <section class="director-camera-stage" id="directorCameraStage" aria-label="Interactive layered 3D cinematic prompt visualization">
       <div class="camera-stage-copy">
-        <span class="camera-stage-eyebrow"><i></i> LIVE 3D CAMERA SIMULATION</span>
-        <h3 id="cameraStageTitle">Floating Cinema Camera</h3>
-        <p id="cameraStageHint">Type a camera or cinematic prompt keyword in Gemini to animate the camera</p>
+        <span class="camera-stage-eyebrow"><i></i> LIVE 3D DEPTH SIMULATION</span>
+        <h3 id="cameraStageTitle">Layered Cinematic Depth</h3>
+        <p id="cameraStageHint">Matching prompt elements emerge from the background in layered 3D depth</p>
         <span class="camera-stage-mode" id="cameraStageMode">IDLE · READY</span>
       </div>
       <div class="camera-three-wrap" id="cameraThreeWrap">
-        <canvas id="cameraThreeCanvas" aria-label="Animated 3D professional cinema camera"></canvas>
+        <canvas id="cameraThreeCanvas" aria-label="Animated layered 3D cinematic glass panels"></canvas>
         <div class="camera-three-glow"></div>
       </div>
       <div class="camera-stage-grid"></div>
@@ -3978,35 +3978,32 @@
 
       if (!results.length) {
         window.cinemotionCamera3D?.setMotion("idle");
+        window.cinemotionCamera3D?.setScene("cinematic", token, 0);
+        if (byId("cameraStageMode")) byId("cameraStageMode").textContent = "SEARCHING · 3D READY";
         return;
       }
 
-      const cameraMotionRules = [
-        { keys:["camera","cinema","filmmaking","film","rig"], motion:"orbit", title:"Floating Cinema Camera", hint:"The 3D cinema camera slowly rotates in a premium product showcase", mode:"SHOWCASE · 3D ORBIT" },
-        { keys:["dolly","push","pull","creep","approach","retreat"], motion:"dolly", title:"Dolly Camera Move", hint:"The complete camera rig glides forward and backward", mode:"DOLLY · FORWARD / BACK" },
-        { keys:["orbit","arc","revolve","circle","360"], motion:"orbit", title:"Orbit Camera Move", hint:"The camera rig rotates around its cinematic subject", mode:"ORBIT · 360° ROTATION" },
-        { keys:["crane","jib","rise","elevate","pedestal"], motion:"crane", title:"Crane Camera Move", hint:"The camera rig rises and lowers smoothly", mode:"CRANE · UP / DOWN" },
-        { keys:["zoom","telephoto","focal"], motion:"zoom", title:"Lens Zoom", hint:"The lens barrel extends and retracts with a focus pulse", mode:"ZOOM · LENS ACTION" },
-        { keys:["pan","sweep"], motion:"pan", title:"Pan Camera Move", hint:"The camera head pans smoothly from left to right", mode:"PAN · LEFT / RIGHT" },
-        { keys:["tilt","low","high"], motion:"tilt", title:"Tilt & Angle", hint:"The camera head tilts to preview the selected angle", mode:"TILT · VERTICAL ANGLE" },
-        { keys:["roll","dutch"], motion:"roll", title:"Roll Camera Move", hint:"The camera rotates around its optical axis", mode:"ROLL · ROTATION" },
-        { keys:["truck","track","tracking","slide","lateral"], motion:"track", title:"Tracking Camera Move", hint:"The camera rig tracks laterally across the scene", mode:"TRACK · SIDEWAYS" },
-        { keys:["light","lighting","exposure","flare","glow"], motion:"light", title:"Cinematic Lighting", hint:"Lens reflections and cinematic highlights intensify", mode:"LIGHT · CINEMATIC GLOW" }
+      const visualRules = [
+        { keys:["camera","cinema","filmmaking","film","rig","dolly","push","pull","creep","approach","retreat","orbit","arc","revolve","circle","360","crane","jib","rise","elevate","pedestal","zoom","telephoto","focal","pan","sweep","tilt","low","high","roll","dutch","truck","track","tracking","slide","lateral"], scene:"camera", title:"Cinema Camera · Depth Reveal", hint:"Layered glass camera panels travel from the far background toward the viewer", mode:"CAMERA · BACK TO FRONT" },
+        { keys:["light","lighting","exposure","flare","glow","softbox","rim","keylight"], scene:"lighting", title:"Lighting Rig · Depth Reveal", hint:"3D lighting panels and luminous softboxes emerge in layered perspective", mode:"LIGHTING · DEPTH REVEAL" },
+        { keys:["shot","closeup","close","wide","medium","macro","establishing","pov"], scene:"shot", title:"Shot Framing · Depth Reveal", hint:"Framing cards slide forward in a multi-plane cinematic stack", mode:"SHOT · LAYERED FRAMING" },
+        { keys:["lens","focal","bokeh","focus","aperture","anamorphic","telephoto"], scene:"lens", title:"Lens System · Depth Reveal", hint:"Floating optical glass elements advance from deep perspective", mode:"LENS · OPTICAL DEPTH" },
+        { keys:["smoke","fog","mist","rain","snow","atmosphere","particle","dust"], scene:"atmosphere", title:"Atmosphere · Depth Reveal", hint:"Translucent atmospheric layers drift forward at different depths", mode:"ATMOSPHERE · 3D LAYERS" },
+        { keys:["product","reveal","showcase","turntable","hero"], scene:"product", title:"Product Reveal · Depth Reveal", hint:"Premium translucent showcase panels emerge one after another", mode:"PRODUCT · REVEAL" },
+        { keys:["character","portrait","face","person","human"], scene:"portrait", title:"Character Design · Depth Reveal", hint:"Character reference panels rise from the background in layered depth", mode:"CHARACTER · DEPTH REVEAL" }
       ];
-      const matchedMotion = cameraMotionRules.find(rule =>
+      const matchedVisual = visualRules.find(rule =>
         rule.keys.some(key => key.startsWith(token) || token.startsWith(key))
       );
-      if (matchedMotion) {
-        window.cinemotionCamera3D?.setMotion(matchedMotion.motion);
-        if (byId("cameraStageTitle")) byId("cameraStageTitle").textContent = matchedMotion.title;
-        if (byId("cameraStageHint")) byId("cameraStageHint").textContent = matchedMotion.hint;
-        if (byId("cameraStageMode")) byId("cameraStageMode").textContent = matchedMotion.mode;
-      } else {
-        window.cinemotionCamera3D?.setMotion("idle");
-        if (byId("cameraStageTitle")) byId("cameraStageTitle").textContent = "Floating Cinema Camera";
-        if (byId("cameraStageHint")) byId("cameraStageHint").textContent = `${results.length} matching prompt reference(s)`;
-        if (byId("cameraStageMode")) byId("cameraStageMode").textContent = "MATCH · PROMPT FOUND";
-      }
+      const sceneName = matchedVisual?.scene || "cinematic";
+      window.cinemotionCamera3D?.setScene(sceneName, token, results.length);
+      window.cinemotionCamera3D?.setMotion("depth");
+      if (byId("cameraStageTitle")) byId("cameraStageTitle").textContent =
+        matchedVisual?.title || "Cinematic Prompt · Depth Reveal";
+      if (byId("cameraStageHint")) byId("cameraStageHint").textContent =
+        matchedVisual?.hint || `${results.length} matching prompt reference(s) · layered 3D elements emerging from the background`;
+      if (byId("cameraStageMode")) byId("cameraStageMode").textContent =
+        matchedVisual?.mode || "MATCH · 3D DEPTH REVEAL";
 
       if (librarySearch) librarySearch.value = token;
       currentCategory = "All";
@@ -4738,207 +4735,78 @@
 
 
   <script type="module">
-    import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
-
-    (() => {
-      const canvas = document.getElementById("cameraThreeCanvas");
-      const stage = document.getElementById("directorCameraStage");
-      if (!canvas || !stage) return;
-
-      let renderer;
-      try {
-        renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:true });
-      } catch (error) {
-        const hint = document.getElementById("cameraStageHint");
-        if (hint) hint.textContent = "3D preview is unavailable in this browser or graphics configuration.";
-        return;
-      }
-
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.7));
-      renderer.outputColorSpace = THREE.SRGBColorSpace;
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.25;
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
-      camera.position.set(0.05, 1.0, 6.25);
-
-      scene.add(new THREE.HemisphereLight(0x9ecfff, 0x101526, 2.1));
-      const key = new THREE.DirectionalLight(0xffffff, 3.4);
-      key.position.set(-3, 5, 5); scene.add(key);
-      const cyan = new THREE.PointLight(0x00cfff, 28, 12);
-      cyan.position.set(3, 1.4, 3); scene.add(cyan);
-      const violet = new THREE.PointLight(0x8a62ff, 17, 10);
-      violet.position.set(-3, -1, -2); scene.add(violet);
-      const warm = new THREE.PointLight(0xffb36b, 8, 8);
-      warm.position.set(0, 2, -3); scene.add(warm);
-
-      const rig = new THREE.Group();
-      scene.add(rig);
-      const cameraBody = new THREE.Group();
-      rig.add(cameraBody);
-      rig.scale.setScalar(1.18);
-
-      const mat = (color, metalness=0.65, roughness=0.32, emissive=0x000000) =>
-        new THREE.MeshStandardMaterial({ color, metalness, roughness, emissive, emissiveIntensity:0.3 });
-      const bodyMat = mat(0x171e2a, 0.82, 0.29);
-      const edgeMat = mat(0x586477, 0.9, 0.24);
-      const rubberMat = mat(0x080d15, 0.15, 0.68);
-      const glassMat = new THREE.MeshPhysicalMaterial({
-        color:0x0a3550, metalness:0.35, roughness:0.08, transmission:0.18,
-        transparent:true, opacity:0.95, clearcoat:1, emissive:0x003c68, emissiveIntensity:0.8
-      });
-      const cyanMat = new THREE.MeshStandardMaterial({ color:0x00cfff, emissive:0x00aaff, emissiveIntensity:1.8, metalness:0.35, roughness:0.2 });
-      const goldMat = mat(0xd5a45c, 0.82, 0.25);
-
-      function box(parent, size, position, material, bevel=0.06) {
-        const geometry = new THREE.BoxGeometry(...size);
-        const mesh = new THREE.Mesh(geometry, material);
-        mesh.position.set(...position);
-        mesh.castShadow = true; mesh.receiveShadow = true;
-        parent.add(mesh);
-        return mesh;
-      }
-      function cylinder(parent, radiusTop, radiusBottom, length, position, material, segments=48, axis="z") {
-        const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radiusTop, radiusBottom, length, segments), material);
-        mesh.position.set(...position);
-        if (axis === "z") mesh.rotation.x = Math.PI/2;
-        if (axis === "x") mesh.rotation.z = Math.PI/2;
-        mesh.castShadow = true; mesh.receiveShadow = true; parent.add(mesh);
-        return mesh;
-      }
-
-      // Main cinema-camera body, front lens assembly, lens rings and glass.
-      box(cameraBody, [2.35,1.28,1.18], [0,0,0], bodyMat);
-      box(cameraBody, [2.43,0.10,1.20], [0,-0.66,0], edgeMat);
-      box(cameraBody, [0.28,0.72,1.05], [-1.28,0.02,0], rubberMat);
-      box(cameraBody, [0.24,0.72,1.05], [1.28,0.02,0], edgeMat);
-      box(cameraBody, [0.72,0.24,0.9], [0,0.77,0], rubberMat);
-
-      const lens = new THREE.Group();
-      lens.position.set(0.05,0.03,0.77);
-      cameraBody.add(lens);
-      cylinder(lens,0.72,0.78,0.26,[0,0,0.12],edgeMat);
-      cylinder(lens,0.66,0.69,0.32,[0,0,0.35],rubberMat);
-      cylinder(lens,0.59,0.63,0.22,[0,0,0.59],goldMat);
-      cylinder(lens,0.55,0.58,0.16,[0,0,0.75],edgeMat);
-      cylinder(lens,0.48,0.50,0.12,[0,0,0.87],rubberMat);
-      cylinder(lens,0.43,0.43,0.055,[0,0,0.96],glassMat);
-      cylinder(lens,0.17,0.17,0.065,[0,0,1.0],cyanMat);
-
-      // Fine focus rings around the lens barrel.
-      for (let z=0.28; z<0.92; z+=0.09) {
-        const ring = new THREE.Mesh(new THREE.TorusGeometry(0.63-(z-0.28)*0.25,0.018,8,56), goldMat);
-        ring.position.z = z; lens.add(ring);
-      }
-      // Top handle and viewfinder.
-      box(cameraBody,[1.25,0.12,0.22],[0,0.88,-0.02],edgeMat);
-      box(cameraBody,[0.12,0.38,0.16],[-0.52,1.08,-0.02],edgeMat);
-      box(cameraBody,[0.12,0.38,0.16],[0.52,1.08,-0.02],edgeMat);
-      box(cameraBody,[1.16,0.12,0.18],[0,1.26,-0.02],bodyMat);
-      box(cameraBody,[0.52,0.36,0.42],[0.88,0.84,-0.1],bodyMat);
-      box(cameraBody,[0.40,0.24,0.08],[0.88,0.84,0.15],glassMat);
-      // Side display, ports, switches and status lights.
-      box(cameraBody,[0.54,0.38,0.07],[-1.23,0.24,0.28],rubberMat);
-      box(cameraBody,[0.42,0.27,0.025],[-1.23,0.24,0.325],glassMat);
-      for (let i=0;i<3;i++) {
-        const knob = cylinder(cameraBody,0.075,0.075,0.09,[0.94,0.22+i*0.2,0.62],goldMat,24,"z");
-        knob.rotation.z = Math.PI/2;
-      }
-      box(cameraBody,[0.22,0.09,0.08],[0.82,-0.35,0.62],cyanMat);
-      box(cameraBody,[0.12,0.09,0.08],[1.02,-0.35,0.62],goldMat);
-
-      // Matte rails and a subtle bottom mounting plate.
-      box(cameraBody,[1.35,0.13,0.28],[0,-0.78,-0.1],edgeMat);
-      box(cameraBody,[0.64,0.16,0.45],[0,-0.91,-0.1],rubberMat);
-
-      // Floating halo rings and a subtle studio floor grid.
-      const haloMat = new THREE.MeshBasicMaterial({ color:0x00cfff, transparent:true, opacity:0.42 });
-      const halo = new THREE.Mesh(new THREE.TorusGeometry(1.82,0.012,8,100),haloMat);
-      halo.rotation.x = Math.PI/2.25; halo.position.y=-0.05; rig.add(halo);
-      const floorGrid = new THREE.GridHelper(12,30,0x07516c,0x102a40);
-      floorGrid.position.y=-1.52; floorGrid.material.transparent=true; floorGrid.material.opacity=0.28; scene.add(floorGrid);
-
-      const clock = new THREE.Clock();
-      const target = { motion:"idle" };
-      let scrollTilt = 0;
-      window.cinemotionCamera3D = {
-        setMotion(name) { target.motion = name || "idle"; },
-        setScroll(value) { scrollTilt = Math.max(-1,Math.min(1,value)); }
-      };
-
-      function resize() {
-        const width = Math.max(1,canvas.clientWidth);
-        const height = Math.max(1,canvas.clientHeight);
-        renderer.setSize(width,height,false);
-        camera.aspect = width/height;
-        camera.updateProjectionMatrix();
-      }
-      const observer = new ResizeObserver(resize);
-      observer.observe(canvas);
-      resize();
-
-      let raf = 0;
-      function animate() {
-        raf = requestAnimationFrame(animate);
-        const delta = Math.min(clock.getDelta(), 0.05);
-        const t = clock.elapsedTime;
-        const smooth = 1 - Math.exp(-5.5 * delta);
-        const motion = target.motion;
-        const idleY = Math.sin(t*1.15)*0.14;
-        let yaw = Math.sin(t*0.72)*0.38;
-        let pitch = Math.sin(t*0.92)*0.13;
-        let roll = 0;
-        let z = 0;
-        let x = 0;
-        let y = idleY;
-        let lensPulse = 1;
-
-        if (motion === "dolly") { z = Math.sin(t*2.1)*0.72; lensPulse=1+Math.sin(t*2.1)*0.07; }
-        if (motion === "orbit") { yaw = t*0.95; }
-        if (motion === "crane") { y = idleY + Math.sin(t*1.7)*0.62; pitch = -0.08+Math.sin(t*1.7)*0.08; }
-        if (motion === "zoom") { lensPulse = 1+Math.sin(t*2.6)*0.16; z = Math.sin(t*2.6)*0.14; }
-        if (motion === "pan") { yaw = Math.sin(t*2.0)*0.62; }
-        if (motion === "tilt") { pitch = Math.sin(t*1.9)*0.42; }
-        if (motion === "roll") { roll = Math.sin(t*1.6)*0.55; }
-        if (motion === "track") { x = Math.sin(t*1.7)*0.65; yaw = -x*0.22; }
-        if (motion === "light") { cyan.intensity = 25 + Math.sin(t*4)*18; violet.intensity = 18 + Math.cos(t*3)*12; }
-        else { cyan.intensity = 28; violet.intensity = 17; }
-
-        rig.position.x += (x-rig.position.x)*smooth;
-        rig.position.y += (y-rig.position.y)*smooth;
-        rig.position.z += (z-rig.position.z)*smooth;
-        rig.rotation.y += (yaw-rig.rotation.y)*smooth;
-        rig.rotation.x += ((pitch+scrollTilt*0.10)-rig.rotation.x)*smooth;
-        rig.rotation.z += (roll-rig.rotation.z)*smooth;
-        lens.scale.setScalar(lens.scale.x + (lensPulse-lens.scale.x)*smooth);
-        halo.rotation.z = t*0.18;
-        renderer.render(scene,camera);
-      }
-      animate();
-
-      stage.addEventListener("pointermove", event => {
-        const rect = stage.getBoundingClientRect();
-        const nx = ((event.clientX - rect.left) / Math.max(1, rect.width) - 0.5) * 2;
-        const ny = ((event.clientY - rect.top) / Math.max(1, rect.height) - 0.5) * 2;
-        rig.rotation.y += (nx * 0.18 - rig.rotation.y) * 0.025;
-        rig.rotation.x += (-ny * 0.10 - rig.rotation.x) * 0.025;
-      }, {passive:true});
-
-      const scrollHost = document.querySelector(".vault-container");
-      if (scrollHost) {
-        scrollHost.addEventListener("scroll", () => {
-          const max = Math.max(1,scrollHost.scrollHeight-scrollHost.clientHeight);
-          window.cinemotionCamera3D?.setScroll((scrollHost.scrollTop/max)*2-1);
-        }, {passive:true});
-      }
-      window.addEventListener("beforeunload", () => {
-        cancelAnimationFrame(raf); observer.disconnect(); renderer.dispose();
-      }, {once:true});
-    })();
-  </script>
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+(() => {
+ const canvas=document.getElementById("cameraThreeCanvas"), stage=document.getElementById("directorCameraStage");
+ if(!canvas||!stage)return;
+ let renderer;
+ try{renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:"high-performance"});}
+ catch(e){const h=document.getElementById("cameraStageHint");if(h)h.textContent="3D preview unavailable in this browser.";return;}
+ renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.outputColorSpace=THREE.SRGBColorSpace;
+ renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
+ const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(36,1,.1,100);
+ camera.position.set(0,0.1,9.5);camera.lookAt(0,0,0);
+ scene.add(new THREE.HemisphereLight(0xc9eaff,0x101528,2));
+ const key=new THREE.DirectionalLight(0xffffff,3);key.position.set(-4,5,7);scene.add(key);
+ const cyan=new THREE.PointLight(0x00cfff,34,18);cyan.position.set(3,1,4);scene.add(cyan);
+ const violet=new THREE.PointLight(0x8a62ff,22,16);violet.position.set(-4,-1,-3);scene.add(violet);
+ const gold=new THREE.PointLight(0xffb66e,10,14);gold.position.set(0,4,-5);scene.add(gold);
+ const world=new THREE.Group();scene.add(world);
+ const glass=new THREE.MeshPhysicalMaterial({color:0x9ceaff,metalness:.18,roughness:.12,transmission:.22,transparent:true,opacity:.42,thickness:.5,clearcoat:1,side:THREE.DoubleSide});
+ const edge=new THREE.MeshStandardMaterial({color:0x9beeff,metalness:.75,roughness:.2,emissive:0x007da8,emissiveIntensity:.45});
+ const dark=new THREE.MeshStandardMaterial({color:0x111c31,metalness:.5,roughness:.28,emissive:0x07172c,emissiveIntensity:.35});
+ const cyanMat=new THREE.MeshBasicMaterial({color:0x26dfff}),violetMat=new THREE.MeshBasicMaterial({color:0x9b7bff}),whiteMat=new THREE.MeshBasicMaterial({color:0xeaf8ff}),goldMat=new THREE.MeshStandardMaterial({color:0xe9b96d,metalness:.8,roughness:.22});
+ function shape(w,h,r){let x=-w/2,y=-h/2,s=new THREE.Shape();s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.quadraticCurveTo(x+w,y,x+w,y+r);s.lineTo(x+w,y+h-r);s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);s.lineTo(x+r,y+h);s.quadraticCurveTo(x,y+h,x,y+h-r);s.lineTo(x,y+r);s.quadraticCurveTo(x,y,x+r,y);return s;}
+ function panel(i){
+  const g=new THREE.Group(),w=i===2?2.55:1.62,h=i===2?1.52:2.12;
+  const frame=new THREE.Mesh(new THREE.ExtrudeGeometry(shape(w,h,.14),{depth:.07,bevelEnabled:true,bevelSegments:2,steps:1,bevelSize:.02,bevelThickness:.02}),edge);g.add(frame);
+  const pane=new THREE.Mesh(new THREE.ShapeGeometry(shape(w-.09,h-.09,.12)),glass);pane.position.z=.078;g.add(pane);
+  const inner=new THREE.Mesh(new THREE.ShapeGeometry(shape(w-.2,h-.2,.09)),dark);inner.position.z=.09;inner.material=dark.clone();inner.material.transparent=true;inner.material.opacity=.72;g.add(inner);
+  function bar(bw,bh,x,y,z,m){const o=new THREE.Mesh(new THREE.BoxGeometry(bw,bh,.025),m);o.position.set(x,y,z);g.add(o);}
+  bar(w*.28,.035,0,h*.36,.13,whiteMat);bar(w*.12,.025,-w*.32,h*.36,.13,cyanMat);bar(w*.1,.025,w*.32,h*.36,.13,violetMat);
+  const media=new THREE.Mesh(new THREE.ShapeGeometry(shape(w*.76,h*.32,.07)),edge);media.position.set(0,.08,.13);g.add(media);
+  const mediaInner=new THREE.Mesh(new THREE.ShapeGeometry(shape(w*.73,h*.29,.06)),dark);mediaInner.position.set(0,.08,.15);g.add(mediaInner);
+  for(let j=0;j<3;j++)bar(w*(.45-j*.035),.035,-w*.03,-h*.2-j*.14,.14,j===0?cyanMat:edge);
+  for(let j=0;j<3;j++){const dot=new THREE.Mesh(new THREE.SphereGeometry(.04,12,10),j===1?goldMat:cyanMat);dot.position.set(-w*.31+j*.12,-h*.39,.15);g.add(dot);}
+  bar(.025,h*.7,w*.39,0,.15,i%2?goldMat:cyanMat);
+  g.userData={i,phase:i*.72,baseX:(i-2)*.2,baseY:(2-i)*.09};world.add(g);return g;
+ }
+ const panels=Array.from({length:5},(_,i)=>panel(i));
+ const grid=new THREE.GridHelper(18,36,0x087da2,0x14334b);grid.position.y=-1.65;grid.material.transparent=true;grid.material.opacity=.2;scene.add(grid);
+ const halos=new THREE.Group();scene.add(halos);
+ for(let i=0;i<3;i++){const r=new THREE.Mesh(new THREE.TorusGeometry(1.5+i*.42,.009,6,96),new THREE.MeshBasicMaterial({color:i===1?0x987bff:0x00d8ff,transparent:true,opacity:.25}));r.rotation.x=Math.PI/2.4;r.position.z=-2-i*.7;halos.add(r);}
+ const state={scene:"cinematic",scroll:0}; 
+ window.cinemotionCamera3D={
+  setScene(name,token,count){state.scene=name||"cinematic";const colors={camera:0x00cfff,lighting:0xffc46b,shot:0x9b82ff,lens:0x78eaff,atmosphere:0x9ccfff,product:0xffc978,portrait:0xd6a4ff,cinematic:0x00d2ff};const c=colors[state.scene]||0x00d2ff;cyan.color.setHex(c);edge.emissive.setHex(c);},
+  setMotion(){},setScroll(v){state.scroll=Math.max(-1,Math.min(1,Number(v)||0));}
+ };
+ function resize(){const w=Math.max(1,canvas.clientWidth),h=Math.max(1,canvas.clientHeight);renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+ const ro=new ResizeObserver(resize);ro.observe(canvas);resize();
+ const clock=new THREE.Clock();let raf=0,visible=true;
+ const io=new IntersectionObserver(es=>{visible=es.some(e=>e.isIntersecting);if(visible&&!raf)animate();});io.observe(stage);
+ function animate(){
+  if(!visible){raf=0;return;}raf=requestAnimationFrame(animate);
+  const t=clock.getElapsedTime(),boost=Math.abs(state.scroll),speed=1+boost*1.3;
+  panels.forEach((p,i)=>{
+   const d=p.userData,progress=((t*speed+d.phase)%5.8)/5.8;
+   const z=-7.3+progress*7.5,scale=(.56+progress*.58)*(i===2?1.04:.88);
+   const x=d.baseX+Math.sin(t*.45+d.phase)*.12+state.scroll*.16;
+   const y=d.baseY+Math.sin(t*.8+d.phase)*.09-state.scroll*.1;
+   p.position.x+=(x-p.position.x)*.06;p.position.y+=(y-p.position.y)*.06;p.position.z+=(z-p.position.z)*.075;
+   p.scale.x+=(scale-p.scale.x)*.06;p.scale.y+=(scale-p.scale.y)*.06;p.scale.z+=(scale-p.scale.z)*.06;
+   p.rotation.y+=(Math.sin(t*.42+d.phase)*.13-p.rotation.y)*.045;
+   p.rotation.x+=(Math.cos(t*.5+d.phase)*.05+state.scroll*.04-p.rotation.x)*.045;
+   p.rotation.z+=(Math.sin(t*.32+d.phase)*.025-p.rotation.z)*.045;
+  });
+  halos.rotation.z=t*.05;grid.position.z=(t*.16)%1;cyan.intensity=28+Math.sin(t*1.8)*5+boost*10;renderer.render(scene,camera);
+ }
+ animate();
+ const host=document.querySelector(".vault-container");
+ host?.addEventListener("scroll",()=>{const max=Math.max(1,host.scrollHeight-host.clientHeight);window.cinemotionCamera3D?.setScroll((host.scrollTop/max)*2-1);},{passive:true});
+ window.addEventListener("scroll",()=>{if(!document.body.classList.contains("director-mode")){const max=Math.max(1,document.documentElement.scrollHeight-innerHeight);window.cinemotionCamera3D?.setScroll((scrollY/max)*2-1);}},{passive:true});
+ addEventListener("beforeunload",()=>{cancelAnimationFrame(raf);ro.disconnect();io.disconnect();renderer.dispose();},{once:true});
+})();
+</script>
 
 </body>
 </html>
