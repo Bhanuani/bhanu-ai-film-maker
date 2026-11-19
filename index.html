@@ -3664,12 +3664,12 @@
       </div>
     </section>
     <form class="gemini-composer" id="geminiForm">
-      <input type="file" id="geminiFileInput" accept="image/*" multiple hidden>
+      <input type="file" id="geminiFileInput" accept="image/*,video/*" multiple hidden>
       <div class="gemini-attachment-preview" id="geminiAttachmentPreview" hidden>
         <div class="gemini-attachment-grid" id="geminiAttachmentGrid"></div>
         <span class="gemini-attachment-count" id="geminiAttachmentCount"></span>
       </div>
-      <button type="button" class="gemini-upload-btn" id="geminiUploadBtn" aria-label="Upload a file" title="Upload image, PDF or text file">
+      <button type="button" class="gemini-upload-btn" id="geminiUploadBtn" aria-label="Upload a file" title="Upload images or a reference video">
         <i class="fa-solid fa-arrow-up-from-bracket"></i>
       </button>
       <textarea id="geminiInput" rows="1" maxlength="12000" placeholder="Ask Gemini..." aria-label="Message Gemini"></textarea>
@@ -4688,12 +4688,17 @@
         geminiAttachmentObjectUrls.push(url);
         const item = document.createElement("div");
         item.className = "gemini-attachment-item";
-        const thumb = document.createElement("img");
-        thumb.src = url; thumb.alt = file.name; thumb.title = file.name;
-        thumb.addEventListener("click", () => openGeminiImageViewer(url));
+        let thumb;
+        if (file.type.startsWith("video/")) {
+          thumb = document.createElement("video"); thumb.src = url; thumb.muted = true; thumb.playsInline = true; thumb.preload = "metadata"; thumb.title = file.name;
+          thumb.addEventListener("click", () => { thumb.controls = true; thumb.play().catch(() => {}); });
+        } else {
+          thumb = document.createElement("img"); thumb.src = url; thumb.alt = file.name; thumb.title = file.name;
+          thumb.addEventListener("click", () => openGeminiImageViewer(url));
+        }
         const remove = document.createElement("button");
         remove.type = "button"; remove.textContent = "×";
-        remove.setAttribute("aria-label", "Remove image " + (index + 1));
+        remove.setAttribute("aria-label", "Remove attachment " + (index + 1));
         remove.addEventListener("click", () => {
           geminiSelectedFiles.splice(index, 1);
           showGeminiAttachments(geminiSelectedFiles);
@@ -4702,7 +4707,7 @@
         item.append(thumb, remove);
         geminiAttachmentGrid.appendChild(item);
       });
-      if (geminiAttachmentCount) geminiAttachmentCount.textContent = files.length + "/7 images";
+      if (geminiAttachmentCount) geminiAttachmentCount.textContent = files.some(file => file.type.startsWith("video/")) ? files.length + " attachment(s) · Reference video mode" : files.length + "/7 images";
       if (geminiAttachmentPreview) geminiAttachmentPreview.hidden = files.length === 0;
     }
     function loadGeminiHelper(src, globalName) {
@@ -4751,7 +4756,7 @@
       const vfxStatus = document.getElementById("geminiVfxStatus");
       const vfxStatusText = vfxStatus?.querySelector(".vfx-status-text");
       const vfxStatusTools = vfxStatus?.querySelector(".vfx-status-tools");
-      const toolNames = {filmDirector:"AI Film Director",shotBreakdown:"AI Shot Breakdown",cameraDirector:"Camera Director",lightingDirector:"Lighting Director",characterContinuity:"Character Continuity",worldBuilder:"World Builder",soundDirector:"Sound Design Director",storyboardPlanner:"Storyboard Planner",promptOptimizer:"Prompt Optimizer",sceneConsistency:"Scene Consistency Engine",compositionDirector:"Composition Director",colorMoodDirector:"Color & Mood Director",motionPhysicsDirector:"Motion & Physics Director",actingDirector:"Emotion & Acting Director",durationPlanner:"Shot Duration Planner",visualStyleLock:"Visual Style Lock",realismChecker:"Realism Checker",complexityAnalyzer:"Scene Complexity Analyzer",characterBlocking:"Character Blocking Director",vfxSupervisor:"VFX Supervisor",videoMotionPlanner:"Video Motion Planner",vfx_director:"VFX Auto Director",vfx_atmosphere:"Atmosphere FX",vfx_impact:"Impact FX",vfx_magic:"Magic / Energy FX",vfx_transition:"Transition Designer"};
+      const toolNames = {referenceVideoDirector:"Reference Video Replication Director",filmDirector:"AI Film Director",shotBreakdown:"AI Shot Breakdown",cameraDirector:"Camera Director",lightingDirector:"Lighting Director",characterContinuity:"Character Continuity",worldBuilder:"World Builder",soundDirector:"Sound Design Director",storyboardPlanner:"Storyboard Planner",promptOptimizer:"Prompt Optimizer",sceneConsistency:"Scene Consistency Engine",compositionDirector:"Composition Director",colorMoodDirector:"Color & Mood Director",motionPhysicsDirector:"Motion & Physics Director",actingDirector:"Emotion & Acting Director",durationPlanner:"Shot Duration Planner",visualStyleLock:"Visual Style Lock",realismChecker:"Realism Checker",complexityAnalyzer:"Scene Complexity Analyzer",characterBlocking:"Character Blocking Director",vfxSupervisor:"VFX Supervisor",videoMotionPlanner:"Video Motion Planner",vfx_director:"VFX Auto Director",vfx_atmosphere:"Atmosphere FX",vfx_impact:"Impact FX",vfx_magic:"Magic / Energy FX",vfx_transition:"Transition Designer"};
       const vfxToolNames = {director:"Auto Director",atmosphere:"Atmosphere FX",impact:"Impact FX",magic:"Magic / Energy FX",transition:"Transition Designer"};
       const showVfxStatus = (stage="working") => {
         if (!autoTools.length || !vfxStatus) return;
@@ -4761,6 +4766,8 @@
       };
       const hideVfxStatus = () => vfxStatus?.classList.remove("active");
       const attachedFiles = Array.isArray(attachedFile) ? attachedFile : (attachedFile ? [attachedFile] : []);
+      const hasReferenceVideo = attachedFiles.some(file => file.type.startsWith("video/"));
+      if (hasReferenceVideo) ["filmDirector","shotBreakdown","cameraDirector","compositionDirector","lightingDirector","colorMoodDirector","motionPhysicsDirector","durationPlanner","sceneConsistency","visualStyleLock","realismChecker","complexityAnalyzer","videoMotionPlanner","referenceVideoDirector"].forEach(id => { if (!autoTools.includes(id)) autoTools.push(id); });
       const userExplicitlyRequestedPrompt = /(?:\b(?:generate|create|write|make|give|provide|improve|enhance|rewrite|craft)\b.{0,70}\bprompt\b|\bprompt\b.{0,50}\b(?:ivvu|generate|create|write|give|make|chey|provide)\b|\b(?:image|video|cinematic|animation)\s+prompt\b)/i.test(prompt);
       if (!prompt && !attachedFiles.length) return;
       if (!auth.currentUser) {
@@ -4773,7 +4780,7 @@
       }
 
       const userLabel = attachedFiles.length
-        ? (prompt || "Please analyze the attached images.") + "\n\n📎 " + attachedFiles.map(file => file.name).join(", ")
+        ? (prompt || (hasReferenceVideo ? "Please reverse-engineer this reference video and generate a recreation prompt." : "Please analyze the attached images.")) + "\n\n📎 " + attachedFiles.map(file => file.name).join(", ")
         : prompt;
       addGeminiMessage(userLabel, "user");
 
@@ -4798,8 +4805,11 @@
           geminiChatSession = window.cinemotionGeminiModel.startChat();
         }
 
-        let messagePayload = prompt || "Please inspect the attached image(s) and help me with them.";
-        if (attachedFiles.length > 1) {
+        let messagePayload = prompt || (hasReferenceVideo ? "Reverse-engineer the attached reference video and create a recreation prompt." : "Please inspect the attached image(s) and help me with them.");
+        if (hasReferenceVideo) {
+          const mediaParts = await Promise.all(attachedFiles.map(async file => ({ inlineData: { data: await fileToBase64(file), mimeType: file.type || (file.name.toLowerCase().endsWith(".mp4") ? "video/mp4" : "application/octet-stream") } })));
+          messagePayload = [{ text: messagePayload }, ...mediaParts];
+        } else if (attachedFiles.length > 1) {
           const imageParts = await Promise.all(attachedFiles.map(async file => ({
             inlineData: { data: await fileToBase64(file), mimeType: file.type || "image/jpeg" }
           })));
@@ -4870,7 +4880,8 @@
           complexityAnalyzer:"SCENE COMPLEXITY ANALYZER: identify competing actions, too many moving subjects, conflicting camera moves or excessive effects. Simplify into staged beats or separate shots while preserving intent.",
           characterBlocking:"CHARACTER BLOCKING DIRECTOR: map each character's screen position, facing, eyelines, movement path, distance and interaction. Maintain screen direction and spatial geography across cuts.",
           vfxSupervisor:"VFX SUPERVISOR: select only story-motivated VFX, specify timing, scale, compositing/lighting integration and environmental interaction. Do not add effects gratuitously.",
-          videoMotionPlanner:"IMAGE-TO-VIDEO / MOTION PLANNER: separate subject motion, background/environment motion, camera motion and temporal progression; create one coherent primary action with a start, middle and end. Respect image composition and locked reference details."
+          videoMotionPlanner:"IMAGE-TO-VIDEO / MOTION PLANNER: separate subject motion, background/environment motion, camera motion and temporal progression; create one coherent primary action with a start, middle and end. Respect image composition and locked reference details.",
+          referenceVideoDirector:"REFERENCE VIDEO REVERSE-ENGINEERING DIRECTOR: Treat the uploaded video as evidence, not inspiration. Reconstruct its visible sequence as faithfully as possible: shot boundaries and timestamps, shot duration, shot size, camera angle/height, lens feel, movement and speed, subject appearance/position/actions/gestures/timing, environment motion, lighting direction/intensity/color temperature/shadows, palette/grade, focus/depth of field, cuts/transitions, visible VFX, and audio cues only if audio is available. Output a timecoded shot-by-shot recreation prompt and a unified ready-to-copy prompt. Preserve original order and visual intent; do not invent, embellish, add subjects, change camera/action, or redesign. Separate observed facts from uncertain inference and mark unknowns. Do not claim frame-perfect reconstruction."
         };
         const selectedSpecialists = autoTools.filter(k=>aiToolInstructions[k]).map(k=>aiToolInstructions[k]);
         if (hasReferenceVideo) {
@@ -5080,19 +5091,15 @@
     geminiFileInput?.addEventListener("change", () => {
       const files = Array.from(geminiFileInput.files || []);
       if (!files.length) return;
-      if (files.length > 7) {
+      const videos = files.filter(file => file.type.startsWith("video/"));
+      if (videos.length > 1 || (videos.length && files.length > 4) || files.length > 7 || files.some(file => !file.type.startsWith("image/") && !file.type.startsWith("video/"))) {
         clearGeminiAttachment();
-        addGeminiMessage("Maximum 7 images allowed per message.", "assistant", true);
-        return;
-      }
-      if (files.some(file => !file.type.startsWith("image/"))) {
-        clearGeminiAttachment();
-        addGeminiMessage("Please select image files only. Up to 7 images are supported.", "assistant", true);
+        addGeminiMessage("Attach up to 7 images, or 1 reference video with up to 3 supporting images. Other file types are not supported in this upload flow.", "assistant", true);
         return;
       }
       if (files.some(file => file.size > GEMINI_MAX_FILE_BYTES)) {
         clearGeminiAttachment();
-        addGeminiMessage("Each image must be smaller than 15 MB.", "assistant", true);
+        addGeminiMessage("Each attachment must be smaller than 15 MB.", "assistant", true);
         return;
       }
       clearGeminiAttachment();
@@ -5748,6 +5755,7 @@
     if(has(/(blocking|positions|where.*stand|stand.*where|left side|right side|foreground character|multiple characters|two characters|group|actors|walk toward|walk away)/)) add("characterBlocking");
     if(has(/(vfx|visual effects|cgi|fx|effects|explosion|magic|portal|particles|smoke|fire|energy|creature)/)) add("vfxSupervisor");
     if(has(/(animate|animation|image.to.video|video prompt|motion prompt|moving shot|sequence|action sequence)/)) add("videoMotionPlanner");
+    if(has(/(reference video|recreate.*video|video recreation|reverse engineer|reverse-engineering|analyze.*video|analyse.*video|match the reference video|as in the reference video)/)) add("referenceVideoDirector");
     for(const v of detectCinemotionVfxTools(p)) add("vfx_"+v);
     return t;
   }
@@ -5781,6 +5789,7 @@
 <script id="cinemotion-ai-director-suite-ui">
 (()=>{const modal=document.getElementById('cinemotionAiSuite'),grid=document.getElementById('cinemotionAiSuiteGrid'),btn=document.getElementById('geminiDirectorSuiteBtn'),close=document.getElementById('cinemotionAiSuiteClose'),input=document.getElementById('geminiInput'),form=document.getElementById('geminiForm'),launcher=document.getElementById('geminiLauncher');
 const tools=[
+["🎞️","Reference Video Replication Director","Reverse-engineers uploaded reference video into a detailed shot-by-shot recreation prompt."],
 ["🎬","AI Film Director","Master director orchestrates relevant specialists and keeps your idea coherent."],
 ["🧩","Storyboard Generator","Turns a scene or sequence into ordered storyboard panels and shot beats."],
 ["🖼️","Composition Director","Plans subject placement, foreground depth, leading lines, balance and negative space."],
@@ -5802,7 +5811,7 @@ const tools=[
 ["📍","Character Blocking","Maps actor positions, eyelines, paths, facing and screen geography across cuts."],
 ["📚","Shot Breakdown","Creates timecoded shot-by-shot plans with camera, action, lighting, transition and continuity."]
 ];
-const focusPrompts={"AI Film Director":"Act as the master AI film director and orchestrate all relevant specialists for my scene. Scene: ","Storyboard Generator":"Create a storyboard plan for my scene, with numbered panels, composition, action and continuity. Scene: ","Composition Director":"Act as my composition director. Design subject placement, foreground/midground/background, leading lines and visual balance. Scene: ","Color & Mood Director":"Act as color and mood director. Create a story-motivated palette and grading direction. Scene: ","Lighting Director":"Act as lighting director. Plan physically motivated key, fill, rim and practical lighting. Scene: ","Continuity Checker":"Run a strict continuity check on this scene/sequence and identify locks and possible conflicts. Scene: ","Motion & Physics Director":"Plan natural motion and physics for this scene, including subject, props and environment interaction. Scene: ","AI Sound Designer":"Design timed sound, ambience, Foley and SFX for this scene; respect any silence or music constraints. Scene: ","Transition Designer":"Design motivated transitions between shots and use a clean cut when no transition is justified. Sequence: ","Environment Builder":"Build a detailed cinematic environment while preserving all established setting facts. Scene: ","Emotion & Acting Director":"Direct the actor's emotion, micro-expressions, gaze, breathing, posture and gestures. Scene: ","VFX Supervisor":"Act as VFX supervisor and design only story-motivated effects, timing and integration. Scene: ","Prompt Enhancer":"Enhance my prompt into a clear, model-ready cinematic prompt without changing my intent or constraints. Prompt: ","Video Motion Planner":"Plan image-to-video motion separately for subject, environment, camera and time progression. Scene/reference: ","Shot Duration Planner":"Plan shot durations and pacing. If a total duration is provided, make timecodes add up exactly. Scene: ","Visual Style Lock":"Create a concise visual style bible and apply it consistently to this scene/sequence. Scene: ","Realism Checker":"Analyze realism and plausibility. Flag conflicting instructions, physics, lighting, scale and camera issues. Scene: ","Complexity Analyzer":"Analyze scene complexity for video AI. Identify competing actions and simplify into staged beats without losing intent. Scene: ","Character Blocking":"Plan character positions, facing, eyelines, movement paths and screen geography. Scene: ","Shot Breakdown":"Create a shot-by-shot breakdown with timecodes, shot size, angle, camera movement, action, lighting, transition and continuity. Scene: "};
+const focusPrompts={"Reference Video Replication Director":"Act as the Reference Video Replication Director. Reverse-engineer the uploaded reference video and produce an accurate recreation prompt. Preserve shot order, timing, camera framing and movement, subject action, environment, lighting, color, transitions and sound cues when available. Do not creatively redesign or add elements. Mark uncertain details. Reference video: ","AI Film Director":"Act as the master AI film director and orchestrate all relevant specialists for my scene. Scene: ","Storyboard Generator":"Create a storyboard plan for my scene, with numbered panels, composition, action and continuity. Scene: ","Composition Director":"Act as my composition director. Design subject placement, foreground/midground/background, leading lines and visual balance. Scene: ","Color & Mood Director":"Act as color and mood director. Create a story-motivated palette and grading direction. Scene: ","Lighting Director":"Act as lighting director. Plan physically motivated key, fill, rim and practical lighting. Scene: ","Continuity Checker":"Run a strict continuity check on this scene/sequence and identify locks and possible conflicts. Scene: ","Motion & Physics Director":"Plan natural motion and physics for this scene, including subject, props and environment interaction. Scene: ","AI Sound Designer":"Design timed sound, ambience, Foley and SFX for this scene; respect any silence or music constraints. Scene: ","Transition Designer":"Design motivated transitions between shots and use a clean cut when no transition is justified. Sequence: ","Environment Builder":"Build a detailed cinematic environment while preserving all established setting facts. Scene: ","Emotion & Acting Director":"Direct the actor's emotion, micro-expressions, gaze, breathing, posture and gestures. Scene: ","VFX Supervisor":"Act as VFX supervisor and design only story-motivated effects, timing and integration. Scene: ","Prompt Enhancer":"Enhance my prompt into a clear, model-ready cinematic prompt without changing my intent or constraints. Prompt: ","Video Motion Planner":"Plan image-to-video motion separately for subject, environment, camera and time progression. Scene/reference: ","Shot Duration Planner":"Plan shot durations and pacing. If a total duration is provided, make timecodes add up exactly. Scene: ","Visual Style Lock":"Create a concise visual style bible and apply it consistently to this scene/sequence. Scene: ","Realism Checker":"Analyze realism and plausibility. Flag conflicting instructions, physics, lighting, scale and camera issues. Scene: ","Complexity Analyzer":"Analyze scene complexity for video AI. Identify competing actions and simplify into staged beats without losing intent. Scene: ","Character Blocking":"Plan character positions, facing, eyelines, movement paths and screen geography. Scene: ","Shot Breakdown":"Create a shot-by-shot breakdown with timecodes, shot size, angle, camera movement, action, lighting, transition and continuity. Scene: "};
 if(grid&&!grid.dataset.built){grid.innerHTML=tools.map(([icon,name,desc])=>'<article class="cinemotion-ai-tool-card"><span class="tool-icon">'+icon+'</span><strong>'+name+'</strong><p>'+desc+'</p><button type="button" data-focus-tool="'+name+'">Focus this tool</button></article>').join('');grid.dataset.built='1';}
 function open(){launcher?.click();modal.hidden=false;}function shut(){modal.hidden=true;}
 btn?.addEventListener('click',open);close?.addEventListener('click',shut);modal?.addEventListener('click',e=>{if(e.target===modal)shut();});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)shut();});
