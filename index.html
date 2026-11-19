@@ -4730,30 +4730,28 @@
     });
     geminiUploadBtn?.addEventListener("click", () => geminiFileInput?.click());
     geminiFileInput?.addEventListener("change", () => {
-      const file = geminiFileInput?.files?.[0];
-      if (!file) return;
-      const ext = (file.name.split(".").pop() || "").toLowerCase();
-      const allowed = file.type.startsWith("image/") || file.type.startsWith("video/") ||
-        file.type === "application/pdf" || file.type.startsWith("text/") ||
-        file.type === "application/json" ||
-        ["xls","xlsx","xlsm","ods","tif","tiff","gif","webp","csv","txt","md","json"].includes(ext);
-      if (!allowed) {
+      const files = Array.from(geminiFileInput.files || []);
+      if (!files.length) return;
+      if (files.length > 7) {
         clearGeminiAttachment();
-        addGeminiMessage("Unsupported file. Please attach an image, PDF, or text file.", "assistant", true);
+        addGeminiMessage("Maximum 7 images allowed per message.", "assistant", true);
         return;
       }
-      if (file.size > GEMINI_MAX_FILE_BYTES) {
+      if (files.some(file => !file.type.startsWith("image/"))) {
         clearGeminiAttachment();
-        addGeminiMessage("This file is larger than 15 MB. Please choose a smaller file.", "assistant", true);
+        addGeminiMessage("Please select image files only. Up to 7 images are supported.", "assistant", true);
+        return;
+      }
+      if (files.some(file => file.size > GEMINI_MAX_FILE_BYTES)) {
+        clearGeminiAttachment();
+        addGeminiMessage("Each image must be smaller than 15 MB.", "assistant", true);
         return;
       }
       clearGeminiAttachment();
-      geminiSelectedFile = file;
-      showGeminiAttachment(file);
+      geminiSelectedFiles = files;
+      showGeminiAttachments(files);
       geminiInput?.focus();
     });
-    geminiRemoveAttachment?.addEventListener("click", clearGeminiAttachment);
-    geminiAttachmentThumb?.addEventListener("click", openGeminiImageViewer);
     geminiImageViewerClose?.addEventListener("click", closeGeminiImageViewer);
     geminiImageViewer?.addEventListener("click", (event) => {
       if (event.target === geminiImageViewer) closeGeminiImageViewer();
@@ -4762,28 +4760,24 @@
       if (event.key === "Escape" && geminiImageViewer && !geminiImageViewer.hidden) closeGeminiImageViewer();
     });
     geminiInput?.addEventListener("paste", (event) => {
-      const files = Array.from(event.clipboardData?.files || []);
+      const files = Array.from(event.clipboardData?.files || []).filter(file => file.type.startsWith("image/"));
       if (!files.length) return;
-      const file = files[0];
-      const ext = (file.name.split(".").pop() || "").toLowerCase();
-      const allowed = file.type.startsWith("image/") || file.type.startsWith("video/") ||
-        file.type === "application/pdf" || file.type.startsWith("text/") ||
-        file.type === "application/json" ||
-        ["xls","xlsx","xlsm","ods","tif","tiff","gif","webp","csv","txt","md","json"].includes(ext);
-      if (!allowed) { addGeminiMessage("This clipboard file type is not supported.", "assistant", true); return; }
       event.preventDefault();
-      if (file.size > GEMINI_MAX_FILE_BYTES) { addGeminiMessage("This file is larger than 15 MB. Please choose a smaller file.", "assistant", true); return; }
+      if (files.some(file => file.size > GEMINI_MAX_FILE_BYTES)) {
+        addGeminiMessage("Each image must be smaller than 15 MB.", "assistant", true); return;
+      }
+      const combined = [...geminiSelectedFiles, ...files].slice(0, 7);
       clearGeminiAttachment();
-      geminiSelectedFile = file;
-      showGeminiAttachment(file);
+      geminiSelectedFiles = combined;
+      showGeminiAttachments(combined);
     });
     geminiForm?.addEventListener("submit", (event) => {
       event.preventDefault();
       const value = geminiInput?.value || "";
-      const file = geminiSelectedFile;
+      const files = [...geminiSelectedFiles];
       if (geminiInput) { geminiInput.value = ""; resizeGeminiComposer(); }
       clearGeminiAttachment();
-      sendGeminiMessage(value, file);
+      sendGeminiMessage(value, files);
     });
     function resizeGeminiComposer() {
       if (!geminiInput) return;
