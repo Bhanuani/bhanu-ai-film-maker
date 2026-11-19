@@ -4598,7 +4598,8 @@
         }
       }
 
-      const pending = addGeminiMessage("Gemini is thinking...", "assistant");
+      // Do not create a "thinking" bubble. The assistant bubble appears with the first streamed text.
+      let pending = null;
       const sendButton = byId("geminiSend");
       if (sendButton) sendButton.disabled = true;
       if (geminiInput) geminiInput.disabled = true;
@@ -4662,11 +4663,12 @@
 
         const result = await geminiChatSession.sendMessageStream(messagePayload);
         let streamedText = "";
-        if (result?.stream && pending) {
+        if (result?.stream) {
           for await (const chunk of result.stream) {
             const piece = chunk?.text?.() || "";
             if (piece) {
               streamedText += piece;
+              if (!pending) pending = addGeminiMessage("", "assistant");
               pending.textContent = streamedText;
               geminiMessages.scrollTop = geminiMessages.scrollHeight;
             }
@@ -4674,10 +4676,12 @@
         }
         const finalResponse = await result.response;
         const finalText = finalResponse?.text?.() || streamedText || "Gemini returned an empty response.";
-        if (pending) pending.textContent = finalText;
+        if (!pending) pending = addGeminiMessage("", "assistant");
+        pending.textContent = finalText;
       } catch (err) {
         console.error("Gemini request failed:", err);
-        if (pending) {
+        {
+          if (!pending) pending = addGeminiMessage("", "assistant", true);
           pending.classList.add("error");
           const errorText = String(err?.message || err || "Unknown error");
           const lowerError = errorText.toLowerCase();
