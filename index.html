@@ -4214,10 +4214,7 @@
           `${results.length} matching prompt(s) for “${token}” — partial-word matches enabled`;
       }
 
-      const firstCard = grid?.querySelector(".movement-card");
-      if (firstCard && document.body.classList.contains("director-mode")) {
-        firstCard.scrollIntoView({ block: "start", behavior: "smooth" });
-      }
+      // Avoid moving the prompt grid while the user is typing in Gemini.
     }
 
     window.insertPromptIntoGemini = function(itemId) {
@@ -4277,11 +4274,24 @@
       }
     };
 
+    // Debounce vault matching so keystrokes stay responsive.
+    // Suggestions refresh shortly after typing pauses; Gemini submission is unchanged.
+    let geminiLibrarySearchTimer = null;
+    const scheduleDirectorLibrarySync = (value) => {
+      if (geminiLibrarySearchTimer) clearTimeout(geminiLibrarySearchTimer);
+      geminiLibrarySearchTimer = setTimeout(() => {
+        geminiLibrarySearchTimer = null;
+        syncDirectorLibrary(value);
+      }, 180);
+    };
+
     geminiInput?.addEventListener("input", () => {
-      if (document.body.classList.contains("director-mode")) syncDirectorLibrary(geminiInput.value);
+      if (document.body.classList.contains("director-mode")) {
+        scheduleDirectorLibrarySync(geminiInput.value);
+      }
     });
     directorLibrarySearch?.addEventListener("input", () => {
-      syncDirectorLibrary(directorLibrarySearch.value);
+      scheduleDirectorLibrarySync(directorLibrarySearch.value);
     });
     directorLibraryTab?.addEventListener("click", () => {
       document.body.classList.remove("director-show-gemini");
