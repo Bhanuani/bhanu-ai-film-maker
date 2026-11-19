@@ -836,11 +836,16 @@
     .gemini-menu-item i { width:17px; color:#a78bfa; text-align:center; }
     .gemini-menu-item.gemini-clear-item i { color:#f28b82; }
     .gemini-attachment-preview {
-      margin:8px 13px 0; padding:7px 10px; display:flex; align-items:center; gap:9px;
+      margin:8px 13px 0; padding:8px 10px; display:flex; align-items:center; gap:10px;
       color:#dbeafe; background:rgba(66,133,244,.12); border:1px solid rgba(66,133,244,.28);
-      border-radius:10px; font-size:.72rem;
+      border-radius:10px; font-size:.72rem; min-width:0;
     }
     .gemini-attachment-preview[hidden] { display:none; }
+    .gemini-attachment-preview .gemini-attachment-thumb {
+      width:58px; height:58px; flex:0 0 58px; display:block; object-fit:cover;
+      border-radius:7px; border:1px solid rgba(255,255,255,.16); background:#080d18;
+    }
+    .gemini-attachment-preview .gemini-attachment-file-icon { flex:0 0 auto; color:#a5b4fc; font-size:1.25rem; }
     .gemini-attachment-preview span { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .gemini-attachment-preview button { border:0; background:transparent; color:#cbd5e1; font-size:19px; cursor:pointer; }
     .gemini-upload-btn {
@@ -3507,7 +3512,8 @@
     </div>
     <div class="gemini-messages" id="geminiMessages" aria-live="polite"></div>
     <div class="gemini-attachment-preview" id="geminiAttachmentPreview" hidden>
-      <i class="fa-solid fa-file"></i>
+      <img class="gemini-attachment-thumb" id="geminiAttachmentThumb" alt="Selected image preview" hidden>
+      <i class="fa-solid fa-file gemini-attachment-file-icon" id="geminiAttachmentFileIcon"></i>
       <span id="geminiAttachmentName"></span>
       <button type="button" id="geminiRemoveAttachment" aria-label="Remove attachment">&times;</button>
     </div>
@@ -4353,7 +4359,10 @@
     const geminiUploadBtn = byId("geminiUploadBtn");
     const geminiAttachmentPreview = byId("geminiAttachmentPreview");
     const geminiAttachmentName = byId("geminiAttachmentName");
+    const geminiAttachmentThumb = byId("geminiAttachmentThumb");
+    const geminiAttachmentFileIcon = byId("geminiAttachmentFileIcon");
     const geminiRemoveAttachment = byId("geminiRemoveAttachment");
+    let geminiAttachmentObjectUrl = null;
     let geminiChatSession = null;
     let geminiSelectedFile = null;
     const GEMINI_MAX_FILE_BYTES = 15 * 1024 * 1024;
@@ -4422,8 +4431,44 @@
     function clearGeminiAttachment() {
       geminiSelectedFile = null;
       if (geminiFileInput) geminiFileInput.value = "";
+      if (geminiAttachmentThumb) {
+        geminiAttachmentThumb.removeAttribute("src");
+        geminiAttachmentThumb.hidden = true;
+      }
+      if (geminiAttachmentObjectUrl) {
+        URL.revokeObjectURL(geminiAttachmentObjectUrl);
+        geminiAttachmentObjectUrl = null;
+      }
+      if (geminiAttachmentFileIcon) geminiAttachmentFileIcon.hidden = false;
       if (geminiAttachmentPreview) geminiAttachmentPreview.hidden = true;
       if (geminiAttachmentName) geminiAttachmentName.textContent = "";
+    }
+    function showGeminiAttachment(file) {
+      if (!file) return;
+      if (geminiAttachmentObjectUrl) {
+        URL.revokeObjectURL(geminiAttachmentObjectUrl);
+        geminiAttachmentObjectUrl = null;
+      }
+      if (geminiAttachmentName) geminiAttachmentName.textContent = file.name || "Attached file";
+      const isImage = file.type?.startsWith("image/") ||
+        /\\.(png|jpe?g|gif|webp|bmp|avif|tiff?)$/i.test(file.name || "");
+      if (isImage && geminiAttachmentThumb) {
+        geminiAttachmentObjectUrl = URL.createObjectURL(file);
+        geminiAttachmentThumb.src = geminiAttachmentObjectUrl;
+        geminiAttachmentThumb.hidden = false;
+        if (geminiAttachmentFileIcon) geminiAttachmentFileIcon.hidden = true;
+        geminiAttachmentThumb.onerror = () => {
+          geminiAttachmentThumb.hidden = true;
+          if (geminiAttachmentFileIcon) geminiAttachmentFileIcon.hidden = false;
+        };
+      } else {
+        if (geminiAttachmentThumb) {
+          geminiAttachmentThumb.removeAttribute("src");
+          geminiAttachmentThumb.hidden = true;
+        }
+        if (geminiAttachmentFileIcon) geminiAttachmentFileIcon.hidden = false;
+      }
+      if (geminiAttachmentPreview) geminiAttachmentPreview.hidden = false;
     }
     function loadGeminiHelper(src, globalName) {
       if (window[globalName]) return Promise.resolve(window[globalName]);
@@ -4692,9 +4737,9 @@
         addGeminiMessage("This file is larger than 15 MB. Please choose a smaller file.", "assistant", true);
         return;
       }
+      clearGeminiAttachment();
       geminiSelectedFile = file;
-      if (geminiAttachmentName) geminiAttachmentName.textContent = file.name;
-      if (geminiAttachmentPreview) geminiAttachmentPreview.hidden = false;
+      showGeminiAttachment(file);
       geminiInput?.focus();
     });
     geminiRemoveAttachment?.addEventListener("click", clearGeminiAttachment);
@@ -4710,9 +4755,9 @@
       if (!allowed) { addGeminiMessage("This clipboard file type is not supported.", "assistant", true); return; }
       event.preventDefault();
       if (file.size > GEMINI_MAX_FILE_BYTES) { addGeminiMessage("This file is larger than 15 MB. Please choose a smaller file.", "assistant", true); return; }
+      clearGeminiAttachment();
       geminiSelectedFile = file;
-      if (geminiAttachmentName) geminiAttachmentName.textContent = file.name || "Pasted file";
-      if (geminiAttachmentPreview) geminiAttachmentPreview.hidden = false;
+      showGeminiAttachment(file);
     });
     geminiForm?.addEventListener("submit", (event) => {
       event.preventDefault();
