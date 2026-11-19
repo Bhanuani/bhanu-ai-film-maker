@@ -494,6 +494,22 @@
     }
     .movement-card:hover { transform: translateY(-4px); border-color: rgba(0, 210, 255, 0.4); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); }
 
+    /* Lightweight BorderBeam-inspired highlight: only the first two visible cards */
+    .movement-card.beam-card { isolation: isolate; }
+    .movement-card.beam-card::before {
+      content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px;
+      background: conic-gradient(from var(--beam-angle, 0deg), transparent 0 68%, #00d2ff 76%, #7c3aed 83%, #00d2ff 90%, transparent 98%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      pointer-events: none; z-index: 3; opacity: .82;
+      animation: cinemotion-beam-rotate 7s linear infinite;
+    }
+    @property --beam-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+    @keyframes cinemotion-beam-rotate { to { --beam-angle: 360deg; } }
+    @media (prefers-reduced-motion: reduce) {
+      .movement-card.beam-card::before { animation: none; }
+    }
+
     .card-video-box {
       width: 100%; aspect-ratio: 16 / 9; background: #000; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; border-bottom: 1px solid var(--border-color); cursor: pointer;
     }
@@ -2188,9 +2204,9 @@
           .map(entry => entry.item);
       }
 
-      grid.innerHTML = list.map(item => {
+      grid.innerHTML = list.map((item, index) => {
         return `
-        <div class="movement-card" id="card_${item.id}">
+        <div class="movement-card ${index < 2 ? 'beam-card' : ''}" id="card_${item.id}">
           <div class="card-video-box ${item.mediaURL ? 'has-media' : ''}" id="box_${item.id}"
                data-card-id="${item.id}" tabindex="0" role="group"
                aria-label="Media upload area for ${item.name}"
