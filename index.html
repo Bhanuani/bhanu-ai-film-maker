@@ -4521,7 +4521,8 @@
 
     async function sendGeminiMessageNow(rawText, attachedFile = null) {
       const prompt = String(rawText || "").trim();
-      if (!prompt && !attachedFile) return;
+      const attachedFiles = Array.isArray(attachedFile) ? attachedFile : (attachedFile ? [attachedFile] : []);
+      if (!prompt && !attachedFiles.length) return;
       if (!auth.currentUser) {
         addGeminiMessage("Please sign in to use Gemini.", "assistant", true);
         return;
@@ -4531,12 +4532,12 @@
         return;
       }
 
-      const userLabel = attachedFile
-        ? `${prompt || "Please analyze this attached file."}\n\n📎 ${attachedFile.name}`
+      const userLabel = attachedFiles.length
+        ? (prompt || "Please analyze the attached images.") + "\n\n📎 " + attachedFiles.map(file => file.name).join(", ")
         : prompt;
       addGeminiMessage(userLabel, "user");
 
-      if (!attachedFile) {
+      if (!attachedFiles.length) {
         const instantReply = getInstantGreetingReply(prompt);
         if (instantReply) {
           addGeminiMessage(instantReply, "assistant");
@@ -4555,8 +4556,14 @@
           geminiChatSession = window.cinemotionGeminiModel.startChat();
         }
 
-        let messagePayload = prompt || "Please inspect the attached file and help me with it.";
-        if (attachedFile) {
+        let messagePayload = prompt || "Please inspect the attached image(s) and help me with them.";
+        if (attachedFiles.length > 1) {
+          const imageParts = await Promise.all(attachedFiles.map(async file => ({
+            inlineData: { data: await fileToBase64(file), mimeType: file.type || "image/jpeg" }
+          })));
+          messagePayload = [{ text: messagePayload }, ...imageParts];
+        } else if (attachedFiles.length === 1) {
+          attachedFile = attachedFiles[0];
           const ext = (attachedFile.name.split(".").pop() || "").toLowerCase();
           const spreadsheet = ["xls","xlsx","xlsm","ods"].includes(ext);
           if (spreadsheet) {
