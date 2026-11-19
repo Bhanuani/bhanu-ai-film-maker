@@ -1248,8 +1248,86 @@
     @media (max-width:620px) {
       .movement-card .prompt-wrapper { flex-basis:145px; height:145px; min-height:145px; max-height:145px; }
     }
+
+
+    /* LOCAL FILE EXPLORER — admin-only, browser permission based */
+    #localExplorerOverlay { position:fixed; inset:0; z-index:1000002; display:none; background:rgba(2,6,16,.94); backdrop-filter:blur(18px); padding:clamp(10px,2vw,26px); overflow:auto; }
+    #localExplorerOverlay.open { display:block; }
+    .local-explorer-shell { max-width:1440px; min-height:calc(100vh - 2 * clamp(10px,2vw,26px)); margin:auto; background:#080f1d; border:1px solid rgba(0,210,255,.28); border-radius:18px; box-shadow:0 24px 90px rgba(0,0,0,.6); overflow:hidden; display:flex; flex-direction:column; }
+    .local-explorer-head { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:18px 22px; border-bottom:1px solid var(--border-color); background:rgba(10,18,32,.96); }
+    .local-explorer-title { display:flex; align-items:center; gap:12px; min-width:0; }
+    .local-explorer-title-icon { width:42px; height:42px; display:grid; place-items:center; border-radius:12px; color:#04101a; background:var(--accent-cyan); font-size:18px; }
+    .local-explorer-title h2 { color:#fff; font:800 1.05rem 'Space Grotesk',sans-serif; }
+    .local-explorer-title p { color:#94a3b8; font-size:.72rem; margin-top:3px; }
+    .local-explorer-close { width:38px; height:38px; border:1px solid rgba(255,255,255,.12); border-radius:10px; color:#cbd5e1; background:rgba(255,255,255,.05); font-size:22px; cursor:pointer; }
+    .local-explorer-toolbar { display:flex; flex-wrap:wrap; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border-color); }
+    .local-explorer-toolbar input[type=search] { flex:1 1 260px; min-width:180px; background:#111a2b; color:#fff; border:1px solid rgba(255,255,255,.14); border-radius:10px; padding:11px 13px; outline:none; font: .82rem 'Plus Jakarta Sans',sans-serif; }
+    .local-explorer-toolbar input[type=search]:focus { border-color:var(--accent-cyan); }
+    .local-explorer-btn { border:1px solid rgba(0,210,255,.4); border-radius:10px; padding:10px 14px; color:#03111a; background:var(--accent-cyan); font:700 .78rem 'Plus Jakarta Sans',sans-serif; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; }
+    .local-explorer-btn.secondary { color:#dbeafe; background:rgba(0,210,255,.08); }
+    .local-explorer-btn:disabled { opacity:.5; cursor:not-allowed; }
+    .local-explorer-filters { display:flex; flex-wrap:wrap; gap:7px; padding:12px 20px 0; }
+    .local-filter-btn { border:1px solid rgba(255,255,255,.12); border-radius:999px; padding:7px 12px; color:#aebdd0; background:rgba(255,255,255,.035); font:700 .72rem 'Plus Jakarta Sans',sans-serif; cursor:pointer; }
+    .local-filter-btn.active { color:#04101a; background:var(--accent-cyan); border-color:var(--accent-cyan); }
+    .local-explorer-status { padding:12px 20px 4px; color:#94a3b8; font-size:.75rem; display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; }
+    .local-explorer-results { padding:16px 20px 22px; flex:1; }
+    .local-explorer-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:12px; }
+    .local-file-card { min-width:0; border:1px solid rgba(255,255,255,.09); border-radius:12px; overflow:hidden; background:#0d1728; cursor:pointer; transition:border-color .18s,transform .18s; }
+    .local-file-card:hover { border-color:rgba(0,210,255,.55); transform:translateY(-2px); }
+    .local-file-thumb { height:132px; display:grid; place-items:center; background:linear-gradient(145deg,#111d31,#080e19); overflow:hidden; color:#00d2ff; font-size:34px; }
+    .local-file-thumb img,.local-file-thumb video { width:100%; height:100%; object-fit:cover; }
+    .local-file-info { padding:10px 11px 12px; }
+    .local-file-name { color:#f1f5f9; font-size:.76rem; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .local-file-meta { color:#8292a8; font-size:.66rem; margin-top:5px; display:flex; justify-content:space-between; gap:6px; }
+    .local-file-path { color:#64748b; font-size:.62rem; margin-top:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .local-explorer-empty { border:1px dashed rgba(255,255,255,.15); border-radius:14px; padding:55px 20px; text-align:center; color:#94a3b8; }
+    .local-explorer-empty i { display:block; font-size:34px; color:#00d2ff; margin-bottom:13px; }
+    .local-explorer-empty strong { color:#e2e8f0; display:block; margin-bottom:6px; }
+    .local-preview-modal { position:fixed; inset:0; z-index:1000004; display:none; align-items:center; justify-content:center; padding:20px; background:rgba(0,0,0,.88); }
+    .local-preview-modal.open { display:flex; }
+    .local-preview-box { width:min(100%,1000px); max-height:92vh; background:#080f1d; border:1px solid rgba(0,210,255,.35); border-radius:16px; overflow:hidden; display:flex; flex-direction:column; }
+    .local-preview-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; border-bottom:1px solid var(--border-color); color:#e2e8f0; font-size:.8rem; }
+    .local-preview-stage { min-height:220px; max-height:68vh; display:grid; place-items:center; padding:14px; background:#02050b; overflow:auto; }
+    .local-preview-stage img,.local-preview-stage video { max-width:100%; max-height:64vh; object-fit:contain; }
+    .local-preview-stage audio { width:min(100%,600px); }
+    .local-preview-foot { padding:11px 16px; color:#94a3b8; font-size:.7rem; overflow-wrap:anywhere; }
+    @media(max-width:600px) { .local-explorer-head { padding:14px; } .local-explorer-toolbar,.local-explorer-filters,.local-explorer-status,.local-explorer-results { padding-left:13px; padding-right:13px; } .local-explorer-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; } .local-file-thumb { height:105px; } }
+
 </style>
   <link rel="stylesheet" href="assets/cinemotion/space-galaxy-theme.css">
+
+  <style id="cinemotion-ai-smart-studio-styles">
+    .ai-smart-overlay{position:fixed;inset:0;z-index:10080;display:none;align-items:center;justify-content:center;padding:22px;background:rgba(2,6,18,.82);backdrop-filter:blur(14px)}
+    .ai-smart-overlay.open{display:flex}
+    .ai-smart-shell{width:min(1040px,100%);max-height:min(92vh,900px);overflow:auto;background:linear-gradient(145deg,#101a2c,#080d18 70%);border:1px solid rgba(90,190,255,.22);border-radius:22px;box-shadow:0 28px 100px rgba(0,0,0,.6);color:#f8fafc}
+    .ai-smart-head{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 24px;background:rgba(10,17,31,.94);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.08)}
+    .ai-smart-brand{display:flex;align-items:center;gap:12px}.ai-smart-brand-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,#2563eb,#9333ea);font-size:19px;box-shadow:0 8px 25px rgba(59,130,246,.25)}
+    .ai-smart-brand strong{display:block;font-size:17px;letter-spacing:.08em}.ai-smart-brand small{display:block;color:#8fa4c3;margin-top:3px;font-size:11px;letter-spacing:.08em}
+    .ai-smart-close{width:38px;height:38px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.05);color:#dbeafe;font-size:24px;cursor:pointer}
+    .ai-smart-body{padding:22px 24px 24px}.ai-smart-intro{margin-bottom:18px;color:#9fb0c9;font-size:13px;line-height:1.6}
+    .ai-smart-tools{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:20px}
+    .ai-smart-tool{min-height:90px;text-align:left;padding:13px;border:1px solid rgba(255,255,255,.1);border-radius:14px;background:rgba(255,255,255,.035);color:#e7eefc;cursor:pointer;transition:.18s}
+    .ai-smart-tool:hover{border-color:rgba(56,189,248,.5);background:rgba(14,165,233,.08)}
+    .ai-smart-tool.active{border-color:#38bdf8;background:linear-gradient(145deg,rgba(14,165,233,.18),rgba(124,58,237,.12));box-shadow:inset 0 0 0 1px rgba(56,189,248,.12)}
+    .ai-smart-tool i{display:block;color:#67d5ff;font-size:18px;margin-bottom:9px}.ai-smart-tool strong{display:block;font-size:12px}.ai-smart-tool small{display:block;color:#91a2bb;font-size:10px;margin-top:4px;line-height:1.4}
+    .ai-smart-form{display:grid;grid-template-columns:1fr;gap:12px}.ai-smart-field label{display:block;margin-bottom:7px;color:#c7d5ea;font-size:12px;font-weight:700;letter-spacing:.04em}
+    .ai-smart-field textarea,.ai-smart-field input{width:100%;border:1px solid rgba(148,163,184,.22);border-radius:12px;background:rgba(2,6,18,.65);color:#f8fafc;padding:13px 14px;font:inherit;font-size:13px;outline:none;resize:vertical}
+    .ai-smart-field textarea:focus,.ai-smart-field input:focus{border-color:#38bdf8;box-shadow:0 0 0 3px rgba(56,189,248,.1)}
+    .ai-smart-field textarea::placeholder,.ai-smart-field input::placeholder{color:#64748b}
+    .ai-smart-field textarea{min-height:124px;line-height:1.55}.ai-smart-field .short-area{min-height:78px}
+    .ai-smart-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:3px}
+    .ai-smart-generate,.ai-smart-secondary{border:0;border-radius:11px;padding:12px 17px;font-weight:700;font-size:12px;cursor:pointer}
+    .ai-smart-generate{background:linear-gradient(100deg,#0284c7,#7c3aed);color:white;box-shadow:0 8px 24px rgba(14,165,233,.2)}
+    .ai-smart-generate:disabled{opacity:.55;cursor:wait}.ai-smart-secondary{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#dbeafe}
+    .ai-smart-status{min-height:18px;color:#8da5c5;font-size:11px}
+    .ai-smart-result-wrap{margin-top:20px;border:1px solid rgba(56,189,248,.18);border-radius:15px;background:rgba(2,6,18,.5);overflow:hidden}
+    .ai-smart-result-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 15px;border-bottom:1px solid rgba(255,255,255,.07);color:#b9d7ef;font-size:11px;font-weight:800;letter-spacing:.08em}
+    .ai-smart-result{min-height:100px;max-height:340px;overflow:auto;padding:16px;color:#e2e8f0;font-size:13px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere}
+    .ai-smart-result.empty{color:#64748b}.ai-smart-foot{margin-top:13px;color:#71839e;font-size:10px;line-height:1.5}
+    @media(max-width:760px){.ai-smart-overlay{padding:8px}.ai-smart-shell{max-height:96vh;border-radius:16px}.ai-smart-head{padding:15px}.ai-smart-body{padding:16px}.ai-smart-tools{grid-template-columns:repeat(2,minmax(0,1fr))}.ai-smart-tool{min-height:80px}}
+    @media(max-width:390px){.ai-smart-tools{grid-template-columns:1fr 1fr}.ai-smart-tool{padding:10px}.ai-smart-tool small{font-size:9px}}
+  </style>
+
 </head>
 <body>
 
@@ -1509,6 +1587,46 @@
     </div>
   </div>
 
+
+
+  <!-- ADMIN LOCAL FILE EXPLORER: reads only folders explicitly selected by the administrator -->
+  <section id="localExplorerOverlay" aria-label="Local File Explorer" aria-hidden="true">
+    <div class="local-explorer-shell">
+      <div class="local-explorer-head">
+        <div class="local-explorer-title">
+          <div class="local-explorer-title-icon"><i class="fa-solid fa-folder-tree"></i></div>
+          <div><h2>LOCAL FILE EXPLORER</h2><p>Search images, videos and audio on this PC</p></div>
+        </div>
+        <button type="button" class="local-explorer-close" id="closeLocalExplorerBtn" aria-label="Close Local File Explorer">&times;</button>
+      </div>
+      <div class="local-explorer-toolbar">
+        <input type="search" id="localFileSearch" placeholder="Search filename, extension or folder..." autocomplete="off">
+        <button type="button" class="local-explorer-btn" id="chooseLocalFolderBtn"><i class="fa-solid fa-folder-open"></i> Select Folder</button>
+        <button type="button" class="local-explorer-btn secondary" id="rescanLocalFolderBtn" disabled><i class="fa-solid fa-rotate"></i> Rescan</button>
+        <input type="file" id="localFolderFallbackInput" webkitdirectory directory multiple hidden>
+      </div>
+      <div class="local-explorer-filters" role="group" aria-label="Filter file type">
+        <button class="local-filter-btn active" data-local-filter="all" type="button">All media</button>
+        <button class="local-filter-btn" data-local-filter="image" type="button"><i class="fa-regular fa-image"></i> Images</button>
+        <button class="local-filter-btn" data-local-filter="video" type="button"><i class="fa-solid fa-film"></i> Videos</button>
+        <button class="local-filter-btn" data-local-filter="audio" type="button"><i class="fa-solid fa-music"></i> Audio</button>
+      </div>
+      <div class="local-explorer-status"><span id="localExplorerStatus">Select a folder to begin. Subfolders will also be scanned.</span><span id="localExplorerCount">0 files</span></div>
+      <div class="local-explorer-results">
+        <div id="localExplorerGrid" class="local-explorer-grid">
+          <div class="local-explorer-empty" style="grid-column:1/-1"><i class="fa-solid fa-hard-drive"></i><strong>No folder selected</strong>Choose a folder on your PC to search its media files.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="local-preview-modal" id="localFilePreviewModal" role="dialog" aria-modal="true" aria-label="Local media preview">
+    <div class="local-preview-box">
+      <div class="local-preview-head"><strong id="localPreviewName">Preview</strong><button type="button" class="local-explorer-close" id="closeLocalPreviewBtn" aria-label="Close preview">&times;</button></div>
+      <div class="local-preview-stage" id="localPreviewStage"></div>
+      <div class="local-preview-foot" id="localPreviewDetails"></div>
+    </div>
+  </div>
+
   <div id="cinematicStage">
     <div class="stage-backdrop"></div>
     <div class="cinematic-scene" id="cinematicScene"></div>
@@ -1526,6 +1644,13 @@
       <button class="close-btn" id="closeSidebarBtn">&times;</button>
     </div>
     <div class="sidebar-menu">
+      <button class="sidebar-item admin-only" id="openLocalExplorerBtn" type="button">
+        <i class="fa-solid fa-folder-open"></i>
+        <span>Local File Explorer</span>
+        <span class="sidebar-badge">NEW</span>
+      </button>
+
+
       <button class="sidebar-item" id="openThemesBtn">
         <i class="fa-solid fa-palette"></i>
         <span>10 Classic Themes</span>
@@ -3329,6 +3454,9 @@
         String(user.email || "").trim().toLowerCase() === CINEMOTION_ADMIN_EMAIL.toLowerCase();
     }
 
+    // Local File Explorer calls this same verified-admin check before opening or scanning.
+    window.cinemotionIsVerifiedAdmin = isVerifiedAdmin;
+
     function requireVerifiedAdmin() {
       if (!isVerifiedAdmin()) {
         throw new Error("This action is restricted to the verified CINEMOTION administrator.");
@@ -3368,7 +3496,7 @@
             // Flash-Lite uses minimal thinking by default for faster everyday chat.
             systemInstruction: {
               parts: [{
-                text: "You are the conversational AI assistant inside CINEMOTION STUDIO. Respond naturally to the user's actual message. LANGUAGE RULE: Detect the language used in the latest user message and reply in that same language. If the user writes in English, answer in English. If the user writes in Telugu (including Telugu written with English/Roman letters), answer in Telugu; when the user writes Romanized Telugu, prefer clear, natural Romanized Telugu unless they use Telugu script. If the user mixes Telugu and English, reply in the dominant language while keeping familiar technical terms in English where useful. Do not switch languages unless the user asks you to. IMPORTANT: Do not automatically create, suggest, or expand a cinematic prompt. Only write or generate an image/video/filmmaking prompt when the user explicitly asks you to create, write, improve, or provide a prompt. For greetings such as 'hi', 'hello', or 'good morning', reply with a brief friendly greeting in the user's language and ask how you can help; do not generate a prompt. For general questions, answer the question directly in plain conversational language in the user's language. Keep simple answers concise (usually 1-3 sentences) and do not add a cinematic prompt unless explicitly requested. You may help with filmmaking, camera movements, camera angles, shot design, cinematic lighting, storyboards, image/video prompts, and creative production workflows when requested. Preserve exact product geometry and user constraints when writing product prompts. When a user attaches a file, inspect its contents and answer based on it."
+                text: "You are the conversational AI assistant inside CINEMOTION STUDIO. Respond naturally to the user's actual message. LANGUAGE RULE: Detect the language used in the latest user message and reply in that same language. If the user writes in English, answer in English. If the user writes in Telugu (including Telugu written with English/Roman letters), answer in Telugu; when the user writes Romanized Telugu, prefer clear, natural Romanized Telugu unless they use Telugu script. If the user mixes Telugu and English, reply in the dominant language while keeping familiar technical terms in English where useful. Do not switch languages unless the user asks you to. IMPORTANT: Do not automatically create, suggest, or expand a cinematic prompt. Only write or generate an image/video/filmmaking prompt when the user explicitly asks you to create, write, improve, or provide a prompt. For greetings such as 'hi', 'hello', or 'good morning', reply with a brief friendly greeting in the user's language and ask how you can help; do not generate a prompt. For general questions, answer the question directly in plain conversational language in the user's language. Keep simple answers concise (usually 1-3 sentences) and do not add a cinematic prompt unless explicitly requested. You may help with filmmaking, camera movements, camera angles, shot design, cinematic lighting, storyboards, image/video prompts, and creative production workflows when requested. Preserve exact product geometry and user constraints when writing product prompts. When a user attaches a file, inspect its contents and answer based on it. When the user submits a cinematic idea, image prompt, video prompt, scene description, storyboard request, or filmmaking prompt, automatically apply these four capabilities inside this same Gemini conversation without showing a separate tool menu or asking the user to choose a mode: (1) PROMPT ENHANCER: preserve the user's exact intent and constraints, then improve clarity and production detail including subject/action, environment, composition, camera angle, lens, movement, lighting, atmosphere, realism, and relevant negative constraints; (2) SHOT BREAKDOWN: when the request describes a video, sequence, advertisement, or timed scene, organize it into logically continuous shots with timecodes, shot size, angle, lens, camera movement, action, lighting, VFX, transition, and sound; ensure durations add up when a total duration is given; (3) CONTINUITY CHECKER: maintain all established character identity, face/body, costume, props, product geometry, location, weather, lighting direction, screen direction, scale, and action continuity across shots; flag missing information as UNKNOWN instead of inventing facts; never claim to inspect visual references unless they were attached; (4) FILM DIRECTOR ASSISTANT: make practical director-level decisions and explain useful camera, lens, lighting, framing, VFX, and editing choices where relevant; (5) AI TRANSITION DESIGNER: for multi-shot sequences, select the most visually and logically appropriate transition between adjacent shots based on action, composition, subject movement, camera direction, shapes, lighting, and scene meaning. Prefer a clean cut when a transition would be distracting or unjustified. Use match cuts only when a strong visual match exists; use motivated camera transitions (whip pan, push-through, tilt/continuing movement) only when movement can plausibly connect both shots; use reveal transitions (occlusion, foreground wipe, clouds/fog separation, silhouette reveal) only when the scene supports them; use transformation/particle/morph VFX only when explicitly requested or genuinely motivated by the story. Do not repeat the same transition type consecutively unless repetition is intentional. Never invent a transition that changes locked subject/product/character geometry, identity, position, or other user constraints. Specify the outgoing shot ending, transition mechanics, incoming shot beginning, duration, and continuity requirements so the video model can execute it; if there is no suitable transition, explicitly use a clean cut. For a single still-image prompt, do not force a shot list or transition; apply prompt enhancement, continuity locks, and director-level visual decisions. For a multi-shot/video prompt, apply all four and present the final ready-to-copy prompt first, followed by a concise shot breakdown and continuity locks when useful. Do not add details that conflict with the user's instructions. Never change locked face, body, product shape, geometry, color, pose, or background when the user says to preserve them. For ordinary greetings and unrelated questions, do not activate these filmmaking workflows; answer normally. Do not mention these internal capabilities unless the user asks."
               }]
             }
           },
@@ -4681,6 +4809,227 @@
     })();
   </script>
 
+
+
+
+
+
+  <script>
+    /* CINEMOTION LOCAL FILE EXPLORER
+       Uses the browser's File System Access API where available, with a directory-input fallback.
+       No files are uploaded, copied to cloud storage, or modified by this module.
+    */
+    (() => {
+      const $ = (id) => document.getElementById(id);
+      const overlay = $('localExplorerOverlay');
+      if (!overlay) return;
+
+      const IMAGE_EXT = new Set(['jpg','jpeg','png','gif','webp','bmp','svg','avif','heic','tif','tiff']);
+      const VIDEO_EXT = new Set(['mp4','m4v','mov','webm','mkv','avi','mpeg','mpg','3gp']);
+      const AUDIO_EXT = new Set(['mp3','wav','ogg','oga','m4a','aac','flac','opus','wma']);
+      let indexedFiles = [];
+      let selectedDirectoryHandle = null;
+      let activeFilter = 'all';
+      let previewUrl = null;
+
+      function adminAllowed() {
+        return typeof window.cinemotionIsVerifiedAdmin === 'function' && window.cinemotionIsVerifiedAdmin();
+      }
+      function notify(message) {
+        const toast = $('toast');
+        if (toast) { toast.textContent = message; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2600); }
+        else console.info('[Local File Explorer]', message);
+      }
+      function extOf(name) { const i = String(name || '').lastIndexOf('.'); return i >= 0 ? name.slice(i + 1).toLowerCase() : ''; }
+      function mediaType(file) {
+        const ext = extOf(file.name);
+        if (file.type?.startsWith('image/') || IMAGE_EXT.has(ext)) return 'image';
+        if (file.type?.startsWith('video/') || VIDEO_EXT.has(ext)) return 'video';
+        if (file.type?.startsWith('audio/') || AUDIO_EXT.has(ext)) return 'audio';
+        return null;
+      }
+      function formatBytes(bytes) {
+        if (!Number.isFinite(bytes) || bytes < 0) return '—';
+        if (bytes < 1024) return `${bytes} B`;
+        const units = ['KB','MB','GB','TB']; let n = bytes / 1024, i = 0;
+        while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
+        return `${n.toFixed(n >= 100 ? 0 : 1)} ${units[i]}`;
+      }
+      function formatDate(value) { return value ? new Date(value).toLocaleString() : 'Date unavailable'; }
+      function setStatus(message) { $('localExplorerStatus').textContent = message; }
+      function openExplorer() {
+        if (!adminAllowed()) { notify('Verified administrator access required.'); return; }
+        overlay.classList.add('open'); overlay.setAttribute('aria-hidden','false');
+        document.body.style.overflow = 'hidden';
+        $('localFileSearch').focus();
+      }
+      function closeExplorer() {
+        overlay.classList.remove('open'); overlay.setAttribute('aria-hidden','true');
+        document.body.style.overflow = '';
+        closePreview();
+      }
+      function emptyState(title, detail, icon='fa-folder-open') {
+        $('localExplorerGrid').innerHTML = `<div class="local-explorer-empty" style="grid-column:1/-1"><i class="fa-solid ${icon}"></i><strong>${escapeHtml(title)}</strong>${escapeHtml(detail)}</div>`;
+      }
+      function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+      }
+      function renderFiles() {
+        const query = $('localFileSearch').value.trim().toLowerCase();
+        const visible = indexedFiles.filter(item => {
+          const type = mediaType(item.file);
+          if (!type || (activeFilter !== 'all' && type !== activeFilter)) return false;
+          const haystack = `${item.file.name} ${item.relativePath} ${extOf(item.file.name)}`.toLowerCase();
+          return !query || haystack.includes(query);
+        }).sort((a,b) => a.file.name.localeCompare(b.file.name, undefined, {sensitivity:'base'}));
+        $('localExplorerCount').textContent = `${visible.length.toLocaleString()} shown · ${indexedFiles.length.toLocaleString()} indexed`;
+        if (!visible.length) {
+          emptyState(indexedFiles.length ? 'No matching media found' : 'No media indexed', indexedFiles.length ? 'Try another search term or file-type filter.' : 'Select a folder containing images, videos or audio files.', 'fa-magnifying-glass');
+          return;
+        }
+        const frag = document.createDocumentFragment();
+        visible.forEach(item => {
+          const type = mediaType(item.file);
+          const card = document.createElement('button');
+          card.type = 'button'; card.className = 'local-file-card';
+          card.setAttribute('aria-label', `Preview ${item.file.name}`);
+          const thumb = document.createElement('div'); thumb.className = 'local-file-thumb';
+          const icon = type === 'image' ? 'fa-image' : type === 'video' ? 'fa-film' : 'fa-music';
+          const iconEl = document.createElement('i'); iconEl.className = `fa-solid ${icon}`; thumb.appendChild(iconEl);
+          const info = document.createElement('div'); info.className = 'local-file-info';
+          const name = document.createElement('div'); name.className = 'local-file-name'; name.textContent = item.file.name; name.title = item.file.name;
+          const meta = document.createElement('div'); meta.className = 'local-file-meta';
+          const typeLabel = document.createElement('span'); typeLabel.textContent = extOf(item.file.name).toUpperCase() || type;
+          const sizeLabel = document.createElement('span'); sizeLabel.textContent = formatBytes(item.file.size);
+          meta.append(typeLabel,sizeLabel);
+          const path = document.createElement('div'); path.className = 'local-file-path'; path.textContent = item.relativePath; path.title = item.relativePath;
+          info.append(name,meta,path); card.append(thumb,info);
+          card.addEventListener('click', () => previewFile(item));
+          frag.appendChild(card);
+        });
+        $('localExplorerGrid').replaceChildren(frag);
+      }
+      async function scanDirectory(handle) {
+        indexedFiles = [];
+        selectedDirectoryHandle = handle;
+        $('rescanLocalFolderBtn').disabled = false;
+        setStatus(`Scanning “${handle.name}”…`);
+        $('localExplorerCount').textContent = 'Scanning…';
+        emptyState('Scanning folder', 'Reading media filenames and metadata. File contents remain on your PC.', 'fa-spinner fa-spin');
+        let directories = 0, skipped = 0;
+        const MAX_FILES = 20000, MAX_DEPTH = 30;
+        async function walk(dir, prefix='', depth=0) {
+          if (depth > MAX_DEPTH || indexedFiles.length >= MAX_FILES) return;
+          for await (const entry of dir.values()) {
+            if (entry.name.startsWith('.') || entry.name === 'System Volume Information' || entry.name === '$RECYCLE.BIN') { skipped++; continue; }
+            const relativePath = prefix ? `${prefix}/${entry.name}` : entry.name;
+            if (entry.kind === 'directory') {
+              directories++;
+              await walk(entry, relativePath, depth + 1);
+            } else if (entry.kind === 'file') {
+              const ext = extOf(entry.name);
+              if (IMAGE_EXT.has(ext) || VIDEO_EXT.has(ext) || AUDIO_EXT.has(ext)) {
+                try {
+                  const file = await entry.getFile();
+                  indexedFiles.push({file, relativePath, handle:entry});
+                } catch (err) { console.warn('Could not read local file metadata:', relativePath, err); }
+              }
+              if (indexedFiles.length && indexedFiles.length % 100 === 0) {
+                setStatus(`Scanning “${handle.name}”… ${indexedFiles.length.toLocaleString()} media files found`);
+                await new Promise(resolve => requestAnimationFrame(resolve));
+              }
+              if (indexedFiles.length >= MAX_FILES) break;
+            }
+          }
+        }
+        try {
+          await walk(handle);
+          indexedFiles.sort((a,b) => a.file.name.localeCompare(b.file.name, undefined, {sensitivity:'base'}));
+          setStatus(`Scanned “${handle.name}” · ${directories.toLocaleString()} subfolders · ${skipped.toLocaleString()} hidden/system entries skipped${indexedFiles.length >= MAX_FILES ? ' · 20,000-file safety limit reached' : ''}`);
+          renderFiles();
+        } catch (err) {
+          console.error('Local folder scan failed:', err);
+          setStatus(`Could not finish scanning: ${err.message || err}`);
+          notify('Folder scan failed. Check browser permissions.');
+        }
+      }
+      async function chooseFolder() {
+        if (!adminAllowed()) { notify('Verified administrator access required.'); return; }
+        if ('showDirectoryPicker' in window) {
+          try {
+            const handle = await window.showDirectoryPicker({mode:'read'});
+            await scanDirectory(handle);
+          } catch (err) {
+            if (err?.name !== 'AbortError') { console.error(err); notify(err?.message || 'Unable to open this folder.'); }
+          }
+        } else {
+          $('localFolderFallbackInput').click();
+        }
+      }
+      async function rescan() {
+        if (!adminAllowed()) { notify('Verified administrator access required.'); return; }
+        if (!selectedDirectoryHandle) return;
+        try {
+          if (selectedDirectoryHandle.queryPermission) {
+            let permission = await selectedDirectoryHandle.queryPermission({mode:'read'});
+            if (permission !== 'granted') permission = await selectedDirectoryHandle.requestPermission({mode:'read'});
+            if (permission !== 'granted') { notify('Folder permission was not granted. Select the folder again.'); return; }
+          }
+          await scanDirectory(selectedDirectoryHandle);
+        } catch (err) { notify(err?.message || 'Rescan failed. Please select the folder again.'); }
+      }
+      function previewFile(item) {
+        if (!adminAllowed()) { notify('Verified administrator access required.'); return; }
+        closePreview();
+        const file = item.file, type = mediaType(file), stage = $('localPreviewStage');
+        previewUrl = URL.createObjectURL(file);
+        let element;
+        if (type === 'image') { element = document.createElement('img'); element.alt = file.name; element.src = previewUrl; }
+        else if (type === 'video') { element = document.createElement('video'); element.controls = true; element.autoplay = true; element.src = previewUrl; }
+        else { element = document.createElement('audio'); element.controls = true; element.autoplay = true; element.src = previewUrl; }
+        stage.replaceChildren(element);
+        $('localPreviewName').textContent = file.name;
+        $('localPreviewDetails').textContent = `${item.relativePath} · ${formatBytes(file.size)} · Modified ${formatDate(file.lastModified)} · Local preview only`;
+        $('localFilePreviewModal').classList.add('open');
+      }
+      function closePreview() {
+        const modal = $('localFilePreviewModal');
+        if (modal) modal.classList.remove('open');
+        const stage = $('localPreviewStage');
+        if (stage) stage.replaceChildren();
+        if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = null; }
+      }
+
+      $('openLocalExplorerBtn')?.addEventListener('click', () => { closeSidebar(); openExplorer(); });
+      $('closeLocalExplorerBtn')?.addEventListener('click', closeExplorer);
+      $('chooseLocalFolderBtn')?.addEventListener('click', chooseFolder);
+      $('rescanLocalFolderBtn')?.addEventListener('click', rescan);
+      $('localFileSearch')?.addEventListener('input', renderFiles);
+      $('localFolderFallbackInput')?.addEventListener('change', event => {
+        const files = Array.from(event.target.files || []);
+        indexedFiles = files.map(file => ({file, relativePath:file.webkitRelativePath || file.name})).filter(item => mediaType(item.file));
+        selectedDirectoryHandle = null;
+        $('rescanLocalFolderBtn').disabled = true;
+        setStatus(`Selected folder contains ${indexedFiles.length.toLocaleString()} supported media files. Browser fallback mode.`);
+        renderFiles(); event.target.value = '';
+      });
+      document.querySelectorAll('[data-local-filter]').forEach(button => button.addEventListener('click', () => {
+        activeFilter = button.dataset.localFilter;
+        document.querySelectorAll('[data-local-filter]').forEach(el => el.classList.toggle('active', el === button));
+        renderFiles();
+      }));
+      $('closeLocalPreviewBtn')?.addEventListener('click', closePreview);
+      $('localFilePreviewModal')?.addEventListener('click', event => { if (event.target === $('localFilePreviewModal')) closePreview(); });
+      overlay.addEventListener('click', event => { if (event.target === overlay) closeExplorer(); });
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+          if ($('localFilePreviewModal')?.classList.contains('open')) closePreview();
+          else if (overlay.classList.contains('open')) closeExplorer();
+        }
+      });
+      window.cinemotionLocalExplorer = { open:openExplorer, close:closeExplorer, rescan };
+    })();
+  </script>
 
 
 
