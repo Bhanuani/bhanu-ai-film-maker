@@ -3511,14 +3511,14 @@
       </video>
     </div>
     <div class="gemini-messages" id="geminiMessages" aria-live="polite"></div>
-    <div class="gemini-attachment-preview" id="geminiAttachmentPreview" hidden>
-      <img class="gemini-attachment-thumb" id="geminiAttachmentThumb" alt="Selected image preview" hidden>
-      <i class="fa-solid fa-file gemini-attachment-file-icon" id="geminiAttachmentFileIcon"></i>
-      <span id="geminiAttachmentName"></span>
-      <button type="button" id="geminiRemoveAttachment" aria-label="Remove attachment">&times;</button>
-    </div>
     <form class="gemini-composer" id="geminiForm">
       <input type="file" id="geminiFileInput" accept="image/*,video/*,application/pdf,text/*,application/json,.xls,.xlsx,.xlsm,.ods,.tif,.tiff,.gif,.webp" hidden>
+      <div class="gemini-attachment-preview" id="geminiAttachmentPreview" hidden>
+        <img class="gemini-attachment-thumb" id="geminiAttachmentThumb" alt="Selected image preview" hidden>
+        <i class="fa-solid fa-file gemini-attachment-file-icon" id="geminiAttachmentFileIcon"></i>
+        <span id="geminiAttachmentName"></span>
+        <button type="button" id="geminiRemoveAttachment" aria-label="Remove attachment">&times;</button>
+      </div>
       <button type="button" class="gemini-upload-btn" id="geminiUploadBtn" aria-label="Upload a file" title="Upload image, PDF or text file">
         <i class="fa-solid fa-arrow-up-from-bracket"></i>
       </button>
