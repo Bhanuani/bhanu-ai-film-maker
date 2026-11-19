@@ -3566,9 +3566,32 @@
       background: linear-gradient(145deg, rgba(255,255,255,.10), transparent 38%, rgba(255,255,255,.025));
     }
     #geminiMessages .gemini-message:hover {
-      transform: perspective(900px) translateY(-2px) translateZ(8px);
-      box-shadow: 0 18px 38px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.22);
+      /* Keep text rasterization crisp: no hover transform/zoom that can blur glyphs. */
+      transform: none;
+      box-shadow: 0 14px 34px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.18);
     }
+    #geminiMessages .gemini-copy-prompt {
+      position: relative;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 12px;
+      padding: 7px 12px;
+      border-radius: 10px;
+      color: #e8f5ff;
+      font: 600 12px/1.2 inherit;
+      background: linear-gradient(145deg, rgba(39,197,255,.20), rgba(113,85,255,.17));
+      border: 1px solid rgba(120,196,255,.42);
+      box-shadow: 0 5px 12px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.28);
+      cursor: pointer;
+      transition: background .18s ease, box-shadow .18s ease;
+    }
+    #geminiMessages .gemini-copy-prompt:hover {
+      background: linear-gradient(145deg, rgba(39,197,255,.3), rgba(113,85,255,.25));
+      box-shadow: 0 7px 15px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.32);
+    }
+    #geminiMessages .gemini-copy-prompt:active { transform: translateY(1px); }
     #geminiMessages .gemini-message.user {
       background: linear-gradient(135deg, rgba(64,126,255,.22), rgba(89,69,170,.16));
       border: 1px solid rgba(122,169,255,.36);
@@ -4575,6 +4598,7 @@
     async function sendGeminiMessageNow(rawText, attachedFile = null) {
       const prompt = String(rawText || "").trim();
       const attachedFiles = Array.isArray(attachedFile) ? attachedFile : (attachedFile ? [attachedFile] : []);
+      const userExplicitlyRequestedPrompt = /(?:\b(?:generate|create|write|make|give|provide|improve|enhance|rewrite|craft)\b.{0,70}\bprompt\b|\bprompt\b.{0,50}\b(?:ivvu|generate|create|write|give|make|chey|provide)\b|\b(?:image|video|cinematic|animation)\s+prompt\b)/i.test(prompt);
       if (!prompt && !attachedFiles.length) return;
       if (!auth.currentUser) {
         addGeminiMessage("Please sign in to use Gemini.", "assistant", true);
@@ -4702,6 +4726,29 @@
         if (!pending) pending = addGeminiMessage("", "assistant");
         // Keep the completed streamed text; only use the final response as a fallback.
         if (!streamedText) pending.textContent = finalText;
+        if (userExplicitlyRequestedPrompt && !pending.querySelector(".gemini-copy-prompt")) {
+          const copyButton = document.createElement("button");
+          copyButton.type = "button";
+          copyButton.className = "gemini-copy-prompt";
+          copyButton.innerHTML = "▣ <span>Copy Prompt</span>";
+          copyButton.addEventListener("click", async () => {
+            const displayed = pending.textContent || finalText;
+            const promptMatch = displayed.match(/(?:\*\*Prompt:\*\*|Prompt:)([\s\S]*?)(?=\n\s*(?:\*\*Shot Breakdown:?\*\*|\*\*Continuity Locks:?\*\*|\*\*Director Notes:?\*\*)|$)/i);
+            const textToCopy = (promptMatch ? promptMatch[1] : displayed).trim();
+            try {
+              await navigator.clipboard.writeText(textToCopy);
+              copyButton.innerHTML = "✓ <span>Copied!</span>";
+              setTimeout(() => { copyButton.innerHTML = "▣ <span>Copy Prompt</span>"; }, 1500);
+            } catch (_) {
+              const temp = document.createElement("textarea");
+              temp.value = textToCopy; document.body.appendChild(temp); temp.select();
+              document.execCommand("copy"); temp.remove();
+              copyButton.innerHTML = "✓ <span>Copied!</span>";
+              setTimeout(() => { copyButton.innerHTML = "▣ <span>Copy Prompt</span>"; }, 1500);
+            }
+          });
+          pending.appendChild(copyButton);
+        }
       } catch (err) {
         console.error("Gemini request failed:", err);
         {
