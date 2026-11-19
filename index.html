@@ -1610,7 +1610,15 @@
 
 
   <style id="cinemotion-vfx-smart-controls">
-    #geminiVfxQuickBar{display:flex;align-items:center;gap:7px;flex-wrap:nowrap;overflow-x:auto;width:min(100% - 28px,900px);margin:8px auto 2px;padding:5px 2px;scrollbar-width:thin}
+    #geminiVfxQuickBar{display:none!important}
+    #geminiVfxStatus{display:none;align-items:center;gap:9px;width:min(100% - 28px,900px);margin:8px auto 4px;padding:10px 13px;border:1px solid rgba(0,210,255,.2);border-radius:12px;background:linear-gradient(100deg,rgba(5,18,34,.94),rgba(19,18,44,.94));color:#d9edff;font:600 12px/1.35 'Plus Jakarta Sans',sans-serif;box-shadow:0 0 18px rgba(0,210,255,.06)}
+    #geminiVfxStatus.active{display:flex}
+    #geminiVfxStatus .vfx-status-spinner{width:14px;height:14px;flex:0 0 14px;border:2px solid rgba(0,210,255,.22);border-top-color:#00d2ff;border-radius:50%;animation:vfx-status-spin .8s linear infinite}
+    #geminiVfxStatus .vfx-status-tools{display:flex;flex-wrap:wrap;gap:5px}
+    #geminiVfxStatus .vfx-status-tool{padding:3px 7px;border-radius:999px;background:rgba(0,210,255,.08);border:1px solid rgba(0,210,255,.18);color:#9deaff;font-size:10px}
+    #geminiVfxStatus .vfx-status-text{color:#91a8c4}
+    @keyframes vfx-status-spin{to{transform:rotate(360deg)}}
+    @media(prefers-reduced-motion:reduce){#geminiVfxStatus .vfx-status-spinner{animation:none}}
     #geminiVfxQuickBar .vfx-chip{flex:0 0 auto;border:1px solid rgba(92,190,255,.22);background:rgba(12,25,44,.75);color:#d9edff;border-radius:999px;padding:7px 10px;font:600 11px/1.2 'Plus Jakarta Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:.18s}
     #geminiVfxQuickBar .vfx-chip:hover{border-color:#38bdf8;background:rgba(14,165,233,.16);box-shadow:0 0 12px rgba(56,189,248,.12)}
     #geminiVfxQuickBar .vfx-chip.primary{border-color:rgba(168,85,247,.4);background:linear-gradient(100deg,rgba(2,132,199,.16),rgba(124,58,237,.16))}
@@ -3615,6 +3623,9 @@
       </video>
     </div>
     <div class="gemini-messages" id="geminiMessages" aria-live="polite"></div>
+    <div id="geminiVfxStatus" aria-live="polite" role="status">
+      <span class="vfx-status-spinner"></span><span class="vfx-status-text">Analyzing your prompt…</span><span class="vfx-status-tools"></span>
+    </div>
 
     <div id="geminiVfxQuickBar" aria-label="Smart VFX tools">
       <span class="vfx-label">VFX TOOLS</span>
@@ -4708,6 +4719,18 @@
 
     async function sendGeminiMessageNow(rawText, attachedFile = null) {
       const prompt = String(rawText || "").trim();
+      const autoVfx = detectCinemotionVfxTools(prompt);
+      const vfxStatus = document.getElementById("geminiVfxStatus");
+      const vfxStatusText = vfxStatus?.querySelector(".vfx-status-text");
+      const vfxStatusTools = vfxStatus?.querySelector(".vfx-status-tools");
+      const vfxToolNames = {director:"Auto Director",atmosphere:"Atmosphere FX",impact:"Impact FX",magic:"Magic / Energy FX",transition:"Transition Designer"};
+      const showVfxStatus = () => {
+        if (!autoVfx.length || !vfxStatus) return;
+        vfxStatus.classList.add("active");
+        if (vfxStatusText) vfxStatusText.textContent = "Analyzing scene · Activating";
+        if (vfxStatusTools) vfxStatusTools.innerHTML = autoVfx.map(k => '<span class="vfx-status-tool">'+vfxToolNames[k]+'</span>').join("");
+      };
+      const hideVfxStatus = () => vfxStatus?.classList.remove("active");
       const attachedFiles = Array.isArray(attachedFile) ? attachedFile : (attachedFile ? [attachedFile] : []);
       const userExplicitlyRequestedPrompt = /(?:\b(?:generate|create|write|make|give|provide|improve|enhance|rewrite|craft)\b.{0,70}\bprompt\b|\bprompt\b.{0,50}\b(?:ivvu|generate|create|write|give|make|chey|provide)\b|\b(?:image|video|cinematic|animation)\s+prompt\b)/i.test(prompt);
       if (!prompt && !attachedFiles.length) return;
@@ -4733,6 +4756,7 @@
         }
       }
 
+      showVfxStatus();
       // Do not create a "thinking" bubble. The assistant bubble appears with the first streamed text.
       let pending = null;
       const sendButton = byId("geminiSend");
@@ -4796,6 +4820,19 @@
           }
         }
 
+        if (autoVfx.length) {
+          const vfxInstructions = {
+            director:"Act as CINEMOTION VFX Auto Director: preserve the scene's intent and continuity, choose only motivated VFX, integrate camera, lighting, physics, timing and environment interaction into a ready-to-copy cinematic prompt.",
+            atmosphere:"Atmosphere FX: add only scene-motivated fog, mist, smoke, dust, rain/snow, wind, volumetric light or particles. Specify timing, density, movement and continuity.",
+            impact:"Impact FX: design motivated impact timing, shockwave, debris, sparks, ground/environment response, camera shake and motion blur. Keep physics credible.",
+            magic:"Magic/Energy FX: if appropriate, design aura, energy arcs, particles, runes, trails or portals with color, build-up, timing, lighting spill and subject/environment interaction. Do not force magic into unrelated scenes.",
+            transition:"Transition Designer: create a motivated transition with outgoing/incoming shot details, mechanics, duration and visual/action continuity. Prefer a clean cut if no connection is justified."
+          };
+          const autoBlock = "\\n\\nCINEMOTION AUTO VFX WORKFLOW (selected tools: "+autoVfx.map(k=>vfxToolNames[k]).join(", ")+")\\n"+autoVfx.map(k=>vfxInstructions[k]).join("\\n")+"\\nOutput the final integrated prompt first, then a concise breakdown of which effects were applied and their timing. Intensity: Balanced.";
+          if (typeof messagePayload === "string") messagePayload += autoBlock;
+          else if (Array.isArray(messagePayload) && messagePayload[0]?.text) messagePayload[0].text += autoBlock;
+        }
+        if (vfxStatusText) vfxStatusText.textContent = autoVfx.length ? "VFX tools working · Building cinematic prompt" : "Gemini is thinking…";
         const result = await geminiChatSession.sendMessageStream(messagePayload);
         let streamedText = "";
         let typingBuffer = "";
@@ -4882,6 +4919,7 @@
           pending.textContent = friendlyError;
         }
       } finally {
+        hideVfxStatus();
         if (sendButton) sendButton.disabled = false;
         if (geminiInput) { geminiInput.disabled = false; geminiInput.focus(); }
         if (geminiUploadBtn) geminiUploadBtn.disabled = false;
@@ -5610,6 +5648,22 @@
   </script>
 
 
+  <script id="cinemotion-vfx-auto-detection">
+  function detectCinemotionVfxTools(text){
+    const p=String(text||"").toLowerCase();
+    const promptIntent=/(prompt|cinematic|video|shot|scene|generate|create|make|write|improve|enhance|dragon|warrior|action|reveal|film)/i.test(p);
+    if(!promptIntent) return [];
+    const tools=[];
+    const has=(r)=>r.test(p);
+    if(has(/(fog|mist|smoke|dust|cloud|storm|rain|snow|wind|atmosphere|haze|volumetric|particle|environment|weather|clouds|grass|vegetation|fire|flame)/)) tools.push("atmosphere");
+    if(has(/(impact|land|landing|slam|crash|explosion|explode|fight|battle|punch|kick|hit|fall|collision|shockwave|debris|earthquake|ground|footstep|break|smash)/)) tools.push("impact");
+    if(has(/(magic|magical|energy|glow|aura|spell|power|lightning|electric|portal|rune|enchanted|sword glow|transformation|teleport)/)) tools.push("magic");
+    if(has(/(transition|match cut|cut to|match-cut|morph|wipe|whip pan|next shot|between shots|shot 1|shot 2)/)) tools.push("transition");
+    if(has(/(vfx|visual effect|cinematic|dragon|creature|reveal|camera|epic|film|prompt)/) || !tools.length) tools.unshift("director");
+    if(tools.length>1 && !tools.includes("director")) tools.unshift("director");
+    return [...new Set(tools)];
+  }
+  </script>
   <script id="cinemotion-vfx-smart-controls-script">
   (()=> {
     const bar=document.getElementById('geminiVfxQuickBar');
