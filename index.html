@@ -1312,21 +1312,36 @@
 </style>
   <link rel="stylesheet" href="assets/cinemotion/space-galaxy-theme.css">
 
-  <!-- Lightweight Border Beam effect: Gemini panel only (no React/npm dependency) -->
+  <!-- Border Beam is restricted to the Gemini message composer -->
   <style id="gemini-border-beam">
     @property --gemini-beam-angle {
       syntax: "<angle>";
       inherits: false;
       initial-value: 0deg;
     }
-    #geminiPanel {
+
+    #geminiPanel { isolation: auto; }
+
+    /* Compact, centered search-bar style composer */
+    #geminiForm {
+      position: relative;
       isolation: isolate;
+      width: min(100% - 36px, 760px);
+      min-height: 58px;
+      margin: 10px auto 0;
+      padding: 7px 8px 7px 12px;
+      align-items: center;
+      gap: 9px;
+      border: 1px solid rgba(155,114,203,.3);
+      border-radius: 999px;
+      background: rgba(23, 30, 47, .96);
+      box-shadow: 0 8px 28px rgba(0,0,0,.16);
     }
-    #geminiPanel::before {
+    #geminiForm::before {
       content: "";
       position: absolute;
-      inset: 0;
-      z-index: 2;
+      inset: -1px;
+      z-index: -1;
       padding: 1.5px;
       border-radius: inherit;
       pointer-events: none;
@@ -1335,7 +1350,7 @@
         from var(--gemini-beam-angle),
         transparent 0deg,
         transparent 235deg,
-        rgba(66, 133, 244, .18) 270deg,
+        rgba(66,133,244,.18) 270deg,
         #4285f4 292deg,
         #9b72cb 316deg,
         #d96570 336deg,
@@ -1346,22 +1361,58 @@
       -webkit-mask-composite: xor;
       mask-composite: exclude;
     }
-    #geminiPanel.open::before {
+    #geminiPanel.open #geminiForm::before {
       opacity: .95;
       animation: geminiBorderBeam 5.5s linear infinite;
     }
-    #geminiPanel > * {
-      position: relative;
-      z-index: 1;
+    #geminiForm > * { position: relative; z-index: 1; }
+    #geminiForm textarea {
+      min-width: 0;
+      min-height: 38px;
+      max-height: 116px;
+      height: 38px;
+      padding: 9px 2px;
+      resize: none;
+      overflow-y: auto;
+      line-height: 1.4;
+      align-self: center;
     }
-    #geminiPanel .gemini-menu-drawer {
-      z-index: 4;
+    #geminiForm .gemini-upload-btn,
+    #geminiForm #geminiSend {
+      width: 36px;
+      height: 36px;
+      flex: 0 0 36px;
+      border-radius: 50%;
     }
+    #geminiForm .gemini-upload-btn {
+      border: 0;
+      color: #dbeafe;
+      background: rgba(155,114,203,.2);
+    }
+    #geminiForm #geminiSend {
+      display: grid;
+      place-items: center;
+    }
+    #geminiForm:focus-within {
+      border-color: rgba(155,114,203,.48);
+      box-shadow: 0 8px 30px rgba(0,0,0,.2);
+    }
+    .gemini-disclaimer { padding: 6px 10px 10px; }
+
     @keyframes geminiBorderBeam {
       to { --gemini-beam-angle: 360deg; }
     }
+    @media (max-width: 700px) {
+      #geminiForm {
+        width: calc(100% - 22px);
+        min-height: 56px;
+        margin-top: 8px;
+        padding: 6px 7px 6px 10px;
+      }
+      #geminiForm textarea { min-height: 36px; height: 36px; }
+    }
     @media (prefers-reduced-motion: reduce) {
-      #geminiPanel.open::before { animation: none; }
+      #geminiPanel.open #geminiForm::before { animation: none; }
     }
   </style>
 
@@ -3425,7 +3476,7 @@
       <button type="button" class="gemini-upload-btn" id="geminiUploadBtn" aria-label="Upload a file" title="Upload image, PDF or text file">
         <i class="fa-solid fa-arrow-up-from-bracket"></i>
       </button>
-      <textarea id="geminiInput" rows="7" maxlength="12000" placeholder="Ask Gemini..." aria-label="Message Gemini"></textarea>
+      <textarea id="geminiInput" rows="1" maxlength="12000" placeholder="Ask Gemini..." aria-label="Message Gemini"></textarea>
       <button type="submit" id="geminiSend" aria-label="Send message">
         <i class="fa-solid fa-arrow-up"></i>
       </button>
