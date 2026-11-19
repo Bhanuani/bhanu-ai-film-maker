@@ -1447,6 +1447,55 @@
     .ai-smart-result.empty{color:#64748b}.ai-smart-foot{margin-top:13px;color:#71839e;font-size:10px;line-height:1.5}
     @media(max-width:760px){.ai-smart-overlay{padding:8px}.ai-smart-shell{max-height:96vh;border-radius:16px}.ai-smart-head{padding:15px}.ai-smart-body{padding:16px}.ai-smart-tools{grid-template-columns:repeat(2,minmax(0,1fr))}.ai-smart-tool{min-height:80px}}
     @media(max-width:390px){.ai-smart-tools{grid-template-columns:1fr 1fr}.ai-smart-tool{padding:10px}.ai-smart-tool small{font-size:9px}}
+
+    /* Compact Director Library cards beside Gemini — desktop split view only */
+    @media (min-width: 821px) {
+      body.director-mode .movements-grid {
+        box-sizing: border-box;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        padding-left: 40px;
+        padding-right: 40px;
+        align-items: stretch;
+      }
+      body.director-mode .movement-card {
+        min-width: 0;
+        width: 100%;
+        border-radius: 12px;
+      }
+      body.director-mode .card-video-box { aspect-ratio: 16 / 9; }
+      body.director-mode .card-details { padding: 8px; gap: 7px; }
+      body.director-mode .card-details h3 {
+        font-size: .82rem;
+        line-height: 1.25;
+      }
+      body.director-mode .prompt-wrapper {
+        height: 104px;
+        min-height: 104px;
+        max-height: 104px;
+        flex: 0 0 104px;
+      }
+      body.director-mode .prompt-box {
+        font-size: .68rem;
+        line-height: 1.45;
+      }
+      body.director-mode .prompt-actions {
+        min-height: 30px;
+        height: 30px;
+        padding-top: 6px;
+        gap: 7px;
+      }
+      body.director-mode .prompt-action-btn {
+        width: 29px;
+        height: 29px;
+        flex-basis: 29px;
+      }
+      body.director-mode .copy-btn,
+      body.director-mode .use-gemini-btn {
+        padding: 7px 8px;
+        font-size: .7rem;
+      }
+    }
   </style>
 
 </head>
