@@ -4748,11 +4748,11 @@
       const vfxStatusTools = vfxStatus?.querySelector(".vfx-status-tools");
       const toolNames = {filmDirector:"AI Film Director",shotBreakdown:"AI Shot Breakdown",cameraDirector:"Camera Director",lightingDirector:"Lighting Director",characterContinuity:"Character Continuity",worldBuilder:"World Builder",soundDirector:"Sound Design Director",storyboardPlanner:"Storyboard Planner",promptOptimizer:"Prompt Optimizer",sceneConsistency:"Scene Consistency Engine",compositionDirector:"Composition Director",colorMoodDirector:"Color & Mood Director",motionPhysicsDirector:"Motion & Physics Director",actingDirector:"Emotion & Acting Director",durationPlanner:"Shot Duration Planner",visualStyleLock:"Visual Style Lock",realismChecker:"Realism Checker",complexityAnalyzer:"Scene Complexity Analyzer",characterBlocking:"Character Blocking Director",vfxSupervisor:"VFX Supervisor",videoMotionPlanner:"Video Motion Planner",vfx_director:"VFX Auto Director",vfx_atmosphere:"Atmosphere FX",vfx_impact:"Impact FX",vfx_magic:"Magic / Energy FX",vfx_transition:"Transition Designer"};
       const vfxToolNames = {director:"Auto Director",atmosphere:"Atmosphere FX",impact:"Impact FX",magic:"Magic / Energy FX",transition:"Transition Designer"};
-      const showVfxStatus = () => {
+      const showVfxStatus = (stage="working") => {
         if (!autoTools.length || !vfxStatus) return;
         vfxStatus.classList.add("active");
-        if (vfxStatusText) vfxStatusText.textContent = "AI Film Director · Activating specialists";
-        if (vfxStatusTools) vfxStatusTools.innerHTML = autoTools.map(k => '<span class="vfx-status-tool">'+toolNames[k]+'</span>').join("");
+        if (vfxStatusText) vfxStatusText.textContent = stage==="completed" ? "Specialist analysis complete" : "AI Director is analyzing your prompt…";
+        if (vfxStatusTools) vfxStatusTools.innerHTML = autoTools.map(k => '<span class="vfx-status-tool vfx-status-row"><span class="vfx-status-icon">'+(stage==="completed"?"✓":"⟳")+'</span><span class="vfx-status-name">'+(toolNames[k]||k)+'</span><span class="vfx-status-state">'+(stage==="completed"?"Completed":"Working…")+'</span></span>').join("");
       };
       const hideVfxStatus = () => vfxStatus?.classList.remove("active");
       const attachedFiles = Array.isArray(attachedFile) ? attachedFile : (attachedFile ? [attachedFile] : []);
@@ -4868,6 +4868,11 @@
           videoMotionPlanner:"IMAGE-TO-VIDEO / MOTION PLANNER: separate subject motion, background/environment motion, camera motion and temporal progression; create one coherent primary action with a start, middle and end. Respect image composition and locked reference details."
         };
         const selectedSpecialists = autoTools.filter(k=>aiToolInstructions[k]).map(k=>aiToolInstructions[k]);
+        if (hasReferenceVideo) {
+          const reverseEngineeringBlock = "\n\nREFERENCE VIDEO REVERSE-ENGINEERING MODE — PRIORITY: recreate the uploaded video as closely as possible, not creatively reinterpret it. Analyze the video directly. Provide (1) observed shot-by-shot timecodes, (2) detailed camera/framing/movement, (3) subject action and timing, (4) environment, lighting, color and effects, (5) transitions and sound only if available, (6) uncertainties/unknowns, and (7) one ready-to-copy recreation prompt. Preserve original order and timing. Do not add content not supported by the reference. If exact duration is known, timecodes must cover the full duration.";
+          if (typeof messagePayload === "string") messagePayload += reverseEngineeringBlock;
+          else if (Array.isArray(messagePayload) && messagePayload[0]?.text) messagePayload[0].text += reverseEngineeringBlock;
+        }
         if (selectedSpecialists.length) {
           const suiteBlock = "\\n\\nCINEMOTION AI FILM DIRECTOR SUITE — ACTIVATED SPECIALISTS: "+autoTools.map(k=>toolNames[k]).join(", ")+"\\n"+selectedSpecialists.join("\\n")+"\\nDeliver a coherent, ready-to-copy cinematic prompt first. Add concise shot/timing breakdown only when useful. Keep user constraints absolute and do not invent requested media outputs.";
           if (typeof messagePayload === "string") messagePayload += suiteBlock;
@@ -4885,7 +4890,7 @@
           if (typeof messagePayload === "string") messagePayload += autoBlock;
           else if (Array.isArray(messagePayload) && messagePayload[0]?.text) messagePayload[0].text += autoBlock;
         }
-        if (vfxStatusText) vfxStatusText.textContent = autoTools.length ? "Specialists working · Building cinematic output" : "Gemini is thinking…";
+        if (vfxStatusText) vfxStatusText.textContent = autoTools.length ? "Selected specialists working · Building cinematic output" : "Gemini is thinking…";
         const result = await geminiChatSession.sendMessageStream(messagePayload);
         let streamedText = "";
         let typingBuffer = "";
