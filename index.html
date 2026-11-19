@@ -1170,13 +1170,13 @@
     .prompt-actions { flex:0 0 40px; margin-top:10px; }
     .copy-btn, .use-gemini-btn { flex:0 0 auto; }
     @media (max-width: 900px) {
-      .search-box { flex-basis:260px; max-width:320px; }
+      .search-box { flex:0 1 300px; width:300px; max-width:300px; min-width:150px; }
       .header-actions { gap:.45rem; }
       .header-add-category { padding:8px 10px !important; }
     }
     @media (max-width: 620px) {
       .header-add-category { font-size:.68rem; padding:7px 9px !important; }
-      .search-box { min-width:110px; flex-basis:150px; }
+      .search-box { min-width:100px; flex:0 1 180px; width:180px; max-width:180px; }
       .card-details { min-height:0; }
       .prompt-wrapper { min-height:125px; }
     }
@@ -1500,16 +1500,20 @@
 
 
   <style id="cinemotion-workspace-adjustments">
-    .search-box { padding-right:42px; }
-    .search-box input { padding-right:48px; }
+    .search-box { flex:0 1 350px; width:350px; max-width:350px; min-width:190px; }
+    .search-box input { padding-right:1.1rem; }
     .header-local-explorer-btn {
-      position:absolute; z-index:2; right:5px; top:50%; transform:translateY(-50%);
-      width:34px; height:34px; display:inline-grid; place-items:center;
-      border-radius:50%; border:1px solid rgba(0,210,255,.32);
+      position:relative; flex:0 0 38px; width:38px; height:38px;
+      display:inline-grid; place-items:center; padding:0;
+      border-radius:50%; border:1px solid rgba(0,210,255,.38);
       color:#31d8f5; background:rgba(0,210,255,.09); cursor:pointer;
-      transition:background .18s ease,border-color .18s ease;
+      transition:background .18s ease,border-color .18s ease,box-shadow .18s ease;
     }
-    .header-local-explorer-btn:hover { background:rgba(0,210,255,.2); border-color:#00d2ff; }
+    .header-local-explorer-btn:hover {
+      background:rgba(0,210,255,.2); border-color:#00d2ff;
+      box-shadow:0 0 12px rgba(0,210,255,.18);
+    }
+    .header-local-explorer-btn i { position:static; transform:none; color:inherit; font-size:15px; }
     body.director-mode .vault-container { width:var(--director-split,50vw)!important; border-right:0; }
     body.director-mode .gemini-panel,
     body.director-mode .gemini-panel.open {
@@ -1893,12 +1897,12 @@
       <div class="search-box">
         <i class="fa-solid fa-magnifying-glass"></i>
         <input type="text" id="searchInput" placeholder="Search camera motion, prompt formula, angle..." onkeyup="filterCards()">
-        <button type="button" class="admin-only header-local-explorer-btn" id="openLocalExplorerBtn" title="Local File Explorer" aria-label="Open Local File Explorer">
-          <i class="fa-solid fa-folder-open"></i>
-        </button>
       </div>
 
       <div class="header-actions">
+        <button type="button" class="admin-only header-local-explorer-btn" id="openLocalExplorerBtn" title="Local File Explorer" aria-label="Open Local File Explorer">
+          <i class="fa-solid fa-folder-open"></i>
+        </button>
         <button type="button" id="addCategoryBtn" class="submit-btn admin-only header-add-category" title="Add a new prompt category">+ Category</button>
         <button class="add-btn admin-only" id="addMovementBtn">
           <i class="fa-solid fa-plus"></i> Add Movement
