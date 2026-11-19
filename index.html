@@ -4425,6 +4425,19 @@
       if (geminiAttachmentPreview) geminiAttachmentPreview.hidden = true;
       if (geminiAttachmentName) geminiAttachmentName.textContent = "";
     }
+    function loadGeminiHelper(src, globalName) {
+      if (window[globalName]) return Promise.resolve(window[globalName]);
+      window.__cinemotionGeminiHelpers ||= {};
+      if (window.__cinemotionGeminiHelpers[globalName]) return window.__cinemotionGeminiHelpers[globalName];
+      window.__cinemotionGeminiHelpers[globalName] = new Promise((resolve,reject) => {
+        const script=document.createElement("script");
+        script.src=src;
+        script.onload=()=>window[globalName]?resolve(window[globalName]):reject(new Error("File helper did not initialize."));
+        script.onerror=()=>reject(new Error("Could not load the file-format helper. Check your internet connection."));
+        document.head.appendChild(script);
+      });
+      return window.__cinemotionGeminiHelpers[globalName];
+    }
     function fileToBase64(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -4489,16 +4502,46 @@
 
         let messagePayload = prompt || "Please inspect the attached file and help me with it.";
         if (attachedFile) {
-          const mimeType = attachedFile.type || "application/octet-stream";
-          if (mimeType.startsWith("text/") || mimeType === "application/json") {
-            const textContent = await attachedFile.text();
-            messagePayload += `\n\nAttached file: ${attachedFile.name}\n\n${textContent}`;
+          const ext = (attachedFile.name.split(".").pop() || "").toLowerCase();
+          const spreadsheet = ["xls","xlsx","xlsm","ods"].includes(ext);
+          if (spreadsheet) {
+            await loadGeminiHelper("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js", "XLSX");
+            const workbook = window.XLSX.read(await attachedFile.arrayBuffer(), {type:"array"});
+            const sheetText = workbook.SheetNames.map(name =>
+              "Sheet: " + name + "\n" + window.XLSX.utils.sheet_to_csv(workbook.Sheets[name])
+            ).join("\n\n");
+            messagePayload += "\n\nAttached spreadsheet: " + attachedFile.name + "\n\n" + sheetText;
+          } else if (attachedFile.type.startsWith("text/") || attachedFile.type === "application/json" || ["csv","txt","md","json"].includes(ext)) {
+            messagePayload += "\n\nAttached file: " + attachedFile.name + "\n\n" + await attachedFile.text();
           } else {
-            const base64Data = await fileToBase64(attachedFile);
-            messagePayload = [
-              { text: messagePayload },
-              { inlineData: { data: base64Data, mimeType } }
-            ];
+            let fileForGemini = attachedFile;
+            let mimeType = attachedFile.type || "application/octet-stream";
+            if (["tif","tiff"].includes(ext)) {
+              await loadGeminiHelper("https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.js", "UTIF");
+              const bytes = new Uint8Array(await attachedFile.arrayBuffer());
+              const pages = window.UTIF.decode(bytes);
+              if (!pages.length) throw new Error("Could not read this TIFF file.");
+              window.UTIF.decodeImage(bytes, pages[0]);
+              const rgba = window.UTIF.toRGBA8(pages[0]);
+              const canvas = document.createElement("canvas");
+              canvas.width = pages[0].width; canvas.height = pages[0].height;
+              const ctx = canvas.getContext("2d");
+              const imageData = ctx.createImageData(canvas.width, canvas.height);
+              imageData.data.set(rgba); ctx.putImageData(imageData,0,0);
+              const png = await new Promise((resolve,reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("TIFF conversion failed.")), "image/png"));
+              fileForGemini = new File([png], attachedFile.name.replace(/\\.tiff?$/i,".png"), {type:"image/png"});
+              mimeType = "image/png";
+            } else if (ext === "gif") {
+              const bitmap = await createImageBitmap(attachedFile);
+              const canvas = document.createElement("canvas");
+              canvas.width = bitmap.width; canvas.height = bitmap.height;
+              canvas.getContext("2d").drawImage(bitmap,0,0); bitmap.close();
+              const png = await new Promise((resolve,reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("GIF conversion failed.")), "image/png"));
+              fileForGemini = new File([png], attachedFile.name.replace(/\\.gif$/i,".png"), {type:"image/png"});
+              mimeType = "image/png";
+            }
+            const base64Data = await fileToBase64(fileForGemini);
+            messagePayload = [{text:messagePayload},{inlineData:{data:base64Data,mimeType}}];
           }
         }
 
