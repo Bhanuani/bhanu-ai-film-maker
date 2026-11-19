@@ -4451,7 +4451,7 @@
       }
       if (geminiAttachmentName) geminiAttachmentName.textContent = file.name || "Attached file";
       const isImage = file.type?.startsWith("image/") ||
-        /\\.(png|jpe?g|gif|webp|bmp|avif|tiff?)$/i.test(file.name || "");
+        /\.(png|jpe?g|gif|webp|bmp|avif|tiff?)$/i.test(file.name || "");
       if (isImage && geminiAttachmentThumb) {
         geminiAttachmentObjectUrl = URL.createObjectURL(file);
         geminiAttachmentThumb.src = geminiAttachmentObjectUrl;
