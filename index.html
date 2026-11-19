@@ -3535,6 +3535,10 @@
       </button>
     </form>
     <p class="gemini-disclaimer">Gemini can make mistakes. Review important information.</p>
+    <div class="gemini-image-viewer" id="geminiImageViewer" hidden role="dialog" aria-modal="true" aria-label="Image preview">
+      <button type="button" class="gemini-image-viewer-close" id="geminiImageViewerClose" aria-label="Close image preview">&times;</button>
+      <img id="geminiImageViewerImage" alt="Full-size attachment preview">
+    </div>
   </section>
 
   <!-- FIREBASE AUTH, FORGOT PASSWORD, PHONE OTP, AND FIRESTORE -->
@@ -4369,6 +4373,9 @@
     const geminiAttachmentThumb = byId("geminiAttachmentThumb");
     const geminiAttachmentFileIcon = byId("geminiAttachmentFileIcon");
     const geminiRemoveAttachment = byId("geminiRemoveAttachment");
+    const geminiImageViewer = byId("geminiImageViewer");
+    const geminiImageViewerImage = byId("geminiImageViewerImage");
+    const geminiImageViewerClose = byId("geminiImageViewerClose");
     let geminiAttachmentObjectUrl = null;
     let geminiChatSession = null;
     let geminiSelectedFile = null;
@@ -4435,7 +4442,17 @@
       if (geminiWelcome) geminiWelcome.style.display = "none";
       return message;
     }
+    function closeGeminiImageViewer() {
+      if (geminiImageViewer) geminiImageViewer.hidden = true;
+      if (geminiImageViewerImage) geminiImageViewerImage.removeAttribute("src");
+    }
+    function openGeminiImageViewer() {
+      if (!geminiAttachmentObjectUrl || !geminiImageViewer || !geminiImageViewerImage) return;
+      geminiImageViewerImage.src = geminiAttachmentObjectUrl;
+      geminiImageViewer.hidden = false;
+    }
     function clearGeminiAttachment() {
+      closeGeminiImageViewer();
       geminiSelectedFile = null;
       if (geminiFileInput) geminiFileInput.value = "";
       if (geminiAttachmentThumb) {
@@ -4750,6 +4767,14 @@
       geminiInput?.focus();
     });
     geminiRemoveAttachment?.addEventListener("click", clearGeminiAttachment);
+    geminiAttachmentThumb?.addEventListener("click", openGeminiImageViewer);
+    geminiImageViewerClose?.addEventListener("click", closeGeminiImageViewer);
+    geminiImageViewer?.addEventListener("click", (event) => {
+      if (event.target === geminiImageViewer) closeGeminiImageViewer();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && geminiImageViewer && !geminiImageViewer.hidden) closeGeminiImageViewer();
+    });
     geminiInput?.addEventListener("paste", (event) => {
       const files = Array.from(event.clipboardData?.files || []);
       if (!files.length) return;
