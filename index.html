@@ -4665,12 +4665,11 @@
         let streamedText = "";
         let typingBuffer = "";
         let typingActive = false;
-        let typingDoneResolve;
-        const typingDone = new Promise(resolve => { typingDoneResolve = resolve; });
+        let typingDrainResolver = null;
         const typeNext = () => {
           if (!typingBuffer.length) {
             typingActive = false;
-            if (typingDoneResolve) { typingDoneResolve(); typingDoneResolve = null; }
+            if (typingDrainResolver) { typingDrainResolver(); typingDrainResolver = null; }
             return;
           }
           typingActive = true;
@@ -4695,7 +4694,9 @@
             }
           }
         }
-        if (typingActive || typingBuffer.length) await typingDone;
+        if (typingActive || typingBuffer.length) {
+          await new Promise(resolve => { typingDrainResolver = resolve; });
+        }
         const finalResponse = await result.response;
         const finalText = finalResponse?.text?.() || streamedText || "Gemini returned an empty response.";
         if (!pending) pending = addGeminiMessage("", "assistant");
