@@ -4663,21 +4663,44 @@
 
         const result = await geminiChatSession.sendMessageStream(messagePayload);
         let streamedText = "";
+        let typingBuffer = "";
+        let typingActive = false;
+        let typingDoneResolve;
+        const typingDone = new Promise(resolve => { typingDoneResolve = resolve; });
+        const typeNext = () => {
+          if (!typingBuffer.length) {
+            typingActive = false;
+            if (typingDoneResolve) { typingDoneResolve(); typingDoneResolve = null; }
+            return;
+          }
+          typingActive = true;
+          if (!pending) pending = addGeminiMessage("", "assistant");
+          // Smooth typewriter reveal: a few characters per frame, with short punctuation pauses.
+          const nextCount = Math.min(typingBuffer.length, 3);
+          const typed = typingBuffer.slice(0, nextCount);
+          typingBuffer = typingBuffer.slice(nextCount);
+          pending.textContent += typed;
+          geminiMessages.scrollTop = geminiMessages.scrollHeight;
+          const lastChar = typed.slice(-1);
+          const delay = /[.!?。！？]/.test(lastChar) ? 95 : /[,;:]/.test(lastChar) ? 45 : 18;
+          setTimeout(typeNext, delay);
+        };
         if (result?.stream) {
           for await (const chunk of result.stream) {
             const piece = chunk?.text?.() || "";
             if (piece) {
               streamedText += piece;
-              if (!pending) pending = addGeminiMessage("", "assistant");
-              pending.textContent = streamedText;
-              geminiMessages.scrollTop = geminiMessages.scrollHeight;
+              typingBuffer += piece;
+              if (!typingActive) typeNext();
             }
           }
         }
+        if (typingActive || typingBuffer.length) await typingDone;
         const finalResponse = await result.response;
         const finalText = finalResponse?.text?.() || streamedText || "Gemini returned an empty response.";
         if (!pending) pending = addGeminiMessage("", "assistant");
-        pending.textContent = finalText;
+        // Keep the completed streamed text; only use the final response as a fallback.
+        if (!streamedText) pending.textContent = finalText;
       } catch (err) {
         console.error("Gemini request failed:", err);
         {
