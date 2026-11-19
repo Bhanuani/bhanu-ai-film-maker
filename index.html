@@ -872,7 +872,7 @@
     .gemini-message.error { color:#fecaca; border-color:rgba(239,68,68,.3); }
     .gemini-composer { margin:10px 13px 0; padding:8px 8px 8px 13px; display:flex; align-items:flex-end; gap:8px; background:#151d2d; border:1px solid rgba(255,255,255,.14); border-radius:14px; }
     .gemini-composer:focus-within { border-color:#9b72cb; box-shadow:0 0 0 2px rgba(155,114,203,.12); }
-    .gemini-composer textarea { flex:1; resize:vertical; min-height:132px; max-height:220px; overflow-y:auto; border:0; outline:0; color:#fff; background:transparent; font: .94rem/1.55 'Plus Jakarta Sans',sans-serif; padding:6px 0; }
+    .gemini-composer textarea { flex:1; resize:none; min-height:38px; max-height:150px; height:38px; overflow-y:hidden; border:0; outline:0; color:#fff; background:transparent; font: .94rem/1.4 'Plus Jakarta Sans',sans-serif; padding:7px 0; }
     .gemini-composer textarea::placeholder { color:#8290a5; }
     .gemini-composer button { width:35px; height:35px; flex:0 0 auto; border:0; border-radius:10px; color:white; background:linear-gradient(135deg,#4285f4,#9b72cb 65%,#d96570); cursor:pointer; }
     .gemini-composer button:disabled { opacity:.45; cursor:wait; }
@@ -1369,7 +1369,7 @@
     #geminiForm textarea {
       min-width: 0;
       min-height: 38px;
-      max-height: 116px;
+      max-height: 150px;
       height: 38px;
       padding: 9px 2px;
       resize: none;
@@ -1514,16 +1514,16 @@
       box-shadow:0 0 12px rgba(0,210,255,.18);
     }
     .header-local-explorer-btn i { position:static; transform:none; color:inherit; font-size:15px; }
-    body.director-mode .vault-container { width:var(--director-split,50vw)!important; border-right:0; }
+    body.director-mode .vault-container { width:var(--director-split,20vw)!important; border-right:0; }
     body.director-mode .gemini-panel,
     body.director-mode .gemini-panel.open {
-      left:var(--director-split,50vw)!important; right:0!important;
-      width:calc(100vw - var(--director-split,50vw))!important;
+      left:var(--director-split,20vw)!important; right:0!important;
+      width:calc(100vw - var(--director-split,20vw))!important;
     }
     .director-split-handle { display:none; }
     body.director-mode .director-split-handle {
       display:flex; position:fixed; z-index:10050; top:82px; bottom:0;
-      left:var(--director-split,50vw); width:12px; transform:translateX(-50%);
+      left:var(--director-split,20vw); width:12px; transform:translateX(-50%);
       align-items:center; justify-content:center; cursor:col-resize;
       touch-action:none; background:transparent;
     }
@@ -3512,7 +3512,7 @@
       <button type="button" id="geminiRemoveAttachment" aria-label="Remove attachment">&times;</button>
     </div>
     <form class="gemini-composer" id="geminiForm">
-      <input type="file" id="geminiFileInput" accept="image/*,application/pdf,text/plain,text/csv,application/json" hidden>
+      <input type="file" id="geminiFileInput" accept="image/*,video/*,application/pdf,text/*,application/json,.xls,.xlsx,.xlsm,.ods,.tif,.tiff,.gif,.webp" hidden>
       <button type="button" class="gemini-upload-btn" id="geminiUploadBtn" aria-label="Upload a file" title="Upload image, PDF or text file">
         <i class="fa-solid fa-arrow-up-from-bracket"></i>
       </button>
@@ -4404,7 +4404,7 @@
       }
       if (geminiMessages) geminiMessages.replaceChildren();
       if (geminiWelcome) geminiWelcome.style.display = "";
-      if (geminiInput) geminiInput.value = "";
+      if (geminiInput) { geminiInput.value = ""; resizeGeminiComposer(); }
       clearGeminiAttachment();
       closeGeminiMenu();
       geminiInput?.focus();
@@ -4634,10 +4634,11 @@
     geminiFileInput?.addEventListener("change", () => {
       const file = geminiFileInput?.files?.[0];
       if (!file) return;
-      const allowed = file.type.startsWith("image/") ||
-        file.type === "application/pdf" ||
-        file.type.startsWith("text/") ||
-        file.type === "application/json";
+      const ext = (file.name.split(".").pop() || "").toLowerCase();
+      const allowed = file.type.startsWith("image/") || file.type.startsWith("video/") ||
+        file.type === "application/pdf" || file.type.startsWith("text/") ||
+        file.type === "application/json" ||
+        ["xls","xlsx","xlsm","ods","tif","tiff","gif","webp","csv","txt","md","json"].includes(ext);
       if (!allowed) {
         clearGeminiAttachment();
         addGeminiMessage("Unsupported file. Please attach an image, PDF, or text file.", "assistant", true);
@@ -4654,14 +4655,38 @@
       geminiInput?.focus();
     });
     geminiRemoveAttachment?.addEventListener("click", clearGeminiAttachment);
+    geminiInput?.addEventListener("paste", (event) => {
+      const files = Array.from(event.clipboardData?.files || []);
+      if (!files.length) return;
+      const file = files[0];
+      const ext = (file.name.split(".").pop() || "").toLowerCase();
+      const allowed = file.type.startsWith("image/") || file.type.startsWith("video/") ||
+        file.type === "application/pdf" || file.type.startsWith("text/") ||
+        file.type === "application/json" ||
+        ["xls","xlsx","xlsm","ods","tif","tiff","gif","webp","csv","txt","md","json"].includes(ext);
+      if (!allowed) { addGeminiMessage("This clipboard file type is not supported.", "assistant", true); return; }
+      event.preventDefault();
+      if (file.size > GEMINI_MAX_FILE_BYTES) { addGeminiMessage("This file is larger than 15 MB. Please choose a smaller file.", "assistant", true); return; }
+      geminiSelectedFile = file;
+      if (geminiAttachmentName) geminiAttachmentName.textContent = file.name || "Pasted file";
+      if (geminiAttachmentPreview) geminiAttachmentPreview.hidden = false;
+    });
     geminiForm?.addEventListener("submit", (event) => {
       event.preventDefault();
       const value = geminiInput?.value || "";
       const file = geminiSelectedFile;
-      if (geminiInput) geminiInput.value = "";
+      if (geminiInput) { geminiInput.value = ""; resizeGeminiComposer(); }
       clearGeminiAttachment();
       sendGeminiMessage(value, file);
     });
+    function resizeGeminiComposer() {
+      if (!geminiInput) return;
+      geminiInput.style.height = "38px";
+      const nextHeight = Math.min(geminiInput.scrollHeight, 150);
+      geminiInput.style.height = nextHeight + "px";
+      geminiInput.style.overflowY = geminiInput.scrollHeight > 150 ? "auto" : "hidden";
+    }
+    geminiInput?.addEventListener("input", resizeGeminiComposer);
     geminiInput?.addEventListener("keydown", (event) => {
       if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
@@ -5209,12 +5234,19 @@
     (() => {
       const handle=document.getElementById("directorSplitHandle");
       if(!handle)return;
-      const setSplit=(clientX)=>{
-        const min=Math.max(320,window.innerWidth*.30), max=Math.min(window.innerWidth-360,window.innerWidth*.70);
-        const percent=Math.min(max,Math.max(min,clientX))/window.innerWidth*100;
-        document.documentElement.style.setProperty("--director-split",percent+"vw");
-        handle.setAttribute("aria-valuenow",String(Math.round(percent)));
+      const storageKey="cinemotion-director-split-v1";
+      const clamp=value=>Math.max(20,Math.min(70,value));
+      let saved=20;
+      try { const stored=parseFloat(localStorage.getItem(storageKey)); if(Number.isFinite(stored)) saved=clamp(stored); } catch(_) {}
+      const applySplit=percent=>{
+        const next=clamp(percent);
+        document.documentElement.style.setProperty("--director-split",next+"vw");
+        handle.setAttribute("aria-valuenow",String(Math.round(next)));
+        try { localStorage.setItem(storageKey,String(next)); } catch(_) {}
+        saved=next;
       };
+      applySplit(saved);
+      const setSplit=clientX=>applySplit(clientX/window.innerWidth*100);
       handle.addEventListener("pointerdown",e=>{
         if(!document.body.classList.contains("director-mode")||window.innerWidth<=820)return;
         e.preventDefault();handle.classList.add("dragging");handle.setPointerCapture(e.pointerId);setSplit(e.clientX);
@@ -5224,10 +5256,9 @@
       handle.addEventListener("pointerup",stop);handle.addEventListener("pointercancel",stop);
       handle.addEventListener("keydown",e=>{
         if(!document.body.classList.contains("director-mode")||!["ArrowLeft","ArrowRight"].includes(e.key))return;
-        e.preventDefault();const current=parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--director-split"))||50;
-        const next=Math.max(30,Math.min(70,current+(e.key==="ArrowRight"?2:-2)));
-        document.documentElement.style.setProperty("--director-split",next+"vw");handle.setAttribute("aria-valuenow",String(Math.round(next)));
+        e.preventDefault();applySplit(saved+(e.key==="ArrowRight"?2:-2));
       });
+      window.addEventListener("resize",()=>applySplit(saved));
     })();
   </script>
 
