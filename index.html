@@ -1626,6 +1626,17 @@
     #geminiVfxQuickBar .vfx-label{flex:0 0 auto;color:#8ca8c8;font-size:10px;font-weight:800;letter-spacing:.08em;padding-left:3px}
     @media(max-width:700px){#geminiVfxQuickBar{width:calc(100% - 14px);gap:6px;margin-top:6px}#geminiVfxQuickBar .vfx-chip{padding:7px 9px;font-size:10px}#geminiVfxQuickBar .vfx-intensity{font-size:10px}}
   </style>
+<style id="cinemotion-ai-director-suite-styles">
+.gemini-director-suite-btn{display:inline-flex;align-items:center;gap:7px;margin-left:auto;padding:8px 11px;border-radius:11px;border:1px solid rgba(94,190,255,.32);background:linear-gradient(135deg,rgba(0,210,255,.12),rgba(126,87,255,.12));color:#e7f5ff;font:600 11px 'Plus Jakarta Sans',sans-serif;cursor:pointer;white-space:nowrap}
+.gemini-director-suite-btn:hover{border-color:#6ee7ff;box-shadow:0 0 16px rgba(0,210,255,.15)}
+.cinemotion-ai-suite[hidden]{display:none!important}.cinemotion-ai-suite{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(2,5,12,.78);backdrop-filter:blur(14px)}
+.cinemotion-ai-suite-card{width:min(920px,96vw);max-height:min(86vh,820px);overflow:auto;border:1px solid rgba(103,199,255,.25);border-radius:22px;background:linear-gradient(145deg,#0b1425,#10142a 65%,#07101c);box-shadow:0 24px 80px rgba(0,0,0,.5),0 0 35px rgba(0,210,255,.08);padding:22px}
+.cinemotion-ai-suite-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px}.cinemotion-ai-suite-eyebrow{font-size:10px;letter-spacing:.18em;color:#65dfff;font-weight:800}.cinemotion-ai-suite-head h2{font:800 24px 'Space Grotesk',sans-serif;color:#fff;margin:6px 0}.cinemotion-ai-suite-head p{color:#9eb2ca;font-size:12px;line-height:1.5;max-width:540px}.cinemotion-ai-suite-head button{border:0;background:transparent;color:#a9c2db;font-size:26px;cursor:pointer}
+.cinemotion-ai-suite-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.cinemotion-ai-tool-card{border:1px solid rgba(148,184,220,.14);background:rgba(255,255,255,.035);border-radius:14px;padding:13px;display:flex;flex-direction:column;gap:8px;min-height:140px}.cinemotion-ai-tool-card .tool-icon{font-size:18px}.cinemotion-ai-tool-card strong{font-size:12px;color:#e9f6ff}.cinemotion-ai-tool-card p{font-size:11px;line-height:1.5;color:#9eb2ca;flex:1}.cinemotion-ai-tool-card button{align-self:flex-start;border:1px solid rgba(0,210,255,.25);border-radius:9px;padding:6px 9px;background:rgba(0,210,255,.08);color:#bfefff;font:600 10px 'Plus Jakarta Sans',sans-serif;cursor:pointer}
+.cinemotion-ai-suite-foot{margin-top:15px;padding:10px 12px;border-radius:11px;background:rgba(0,210,255,.06);color:#a7dfff;font-size:11px;display:flex;gap:8px;align-items:center}
+@media(max-width:700px){.gemini-director-suite-btn span{display:none}.gemini-director-suite-btn{margin-left:0;padding:8px}.cinemotion-ai-suite-card{padding:15px}.cinemotion-ai-suite-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cinemotion-ai-tool-card{min-height:132px}}
+@media(max-width:420px){.cinemotion-ai-suite-grid{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 
@@ -3598,6 +3609,7 @@
         </svg>
         <div><strong>Gemini</strong><small>Powered by Gemini 3.5 Flash-Lite · Fast</small></div>
       </div>
+      <button type="button" class="gemini-director-suite-btn" id="geminiDirectorSuiteBtn" title="Open AI Director Suite"><i class="fa-solid fa-wand-magic-sparkles"></i><span>AI Director Suite</span></button>
       <button type="button" class="gemini-close" id="geminiClose" aria-label="Close Gemini">&times;</button>
     </div>
     <aside class="gemini-menu-drawer" id="geminiMenuDrawer" aria-hidden="true">
@@ -3636,6 +3648,16 @@
       <button type="button" class="vfx-chip" data-vfx="magic">⚡ Magic / Energy FX</button>
       <button type="button" class="vfx-chip" data-vfx="transition">🔄 Transition Designer</button>
     </div>
+    <section class="cinemotion-ai-suite" id="cinemotionAiSuite" hidden role="dialog" aria-modal="true" aria-labelledby="cinemotionAiSuiteTitle">
+      <div class="cinemotion-ai-suite-card">
+        <div class="cinemotion-ai-suite-head">
+          <div><div class="cinemotion-ai-suite-eyebrow">CINEMOTION INTELLIGENCE</div><h2 id="cinemotionAiSuiteTitle">AI Director Suite</h2><p>Specialists activate automatically from your scene. Choose one to focus your next request.</p></div>
+          <button type="button" id="cinemotionAiSuiteClose" aria-label="Close AI Director Suite">&times;</button>
+        </div>
+        <div class="cinemotion-ai-suite-grid" id="cinemotionAiSuiteGrid"></div>
+        <div class="cinemotion-ai-suite-foot"><i class="fa-solid fa-bolt"></i> Automatic mode is enabled — describe your scene normally and CINEMOTION routes relevant specialists.</div>
+      </div>
+    </section>
     <form class="gemini-composer" id="geminiForm">
       <input type="file" id="geminiFileInput" accept="image/*" multiple hidden>
       <div class="gemini-attachment-preview" id="geminiAttachmentPreview" hidden>
@@ -4724,7 +4746,7 @@
       const vfxStatus = document.getElementById("geminiVfxStatus");
       const vfxStatusText = vfxStatus?.querySelector(".vfx-status-text");
       const vfxStatusTools = vfxStatus?.querySelector(".vfx-status-tools");
-      const toolNames = {filmDirector:"AI Film Director",shotBreakdown:"AI Shot Breakdown",cameraDirector:"Camera Director",lightingDirector:"Lighting Director",characterContinuity:"Character Continuity",worldBuilder:"World Builder",soundDirector:"Sound Design Director",storyboardPlanner:"Storyboard Planner",promptOptimizer:"Prompt Optimizer",sceneConsistency:"Scene Consistency Engine",vfx_director:"VFX Auto Director",vfx_atmosphere:"Atmosphere FX",vfx_impact:"Impact FX",vfx_magic:"Magic / Energy FX",vfx_transition:"Transition Designer"};
+      const toolNames = {filmDirector:"AI Film Director",shotBreakdown:"AI Shot Breakdown",cameraDirector:"Camera Director",lightingDirector:"Lighting Director",characterContinuity:"Character Continuity",worldBuilder:"World Builder",soundDirector:"Sound Design Director",storyboardPlanner:"Storyboard Planner",promptOptimizer:"Prompt Optimizer",sceneConsistency:"Scene Consistency Engine",compositionDirector:"Composition Director",colorMoodDirector:"Color & Mood Director",motionPhysicsDirector:"Motion & Physics Director",actingDirector:"Emotion & Acting Director",durationPlanner:"Shot Duration Planner",visualStyleLock:"Visual Style Lock",realismChecker:"Realism Checker",complexityAnalyzer:"Scene Complexity Analyzer",characterBlocking:"Character Blocking Director",vfxSupervisor:"VFX Supervisor",videoMotionPlanner:"Video Motion Planner",vfx_director:"VFX Auto Director",vfx_atmosphere:"Atmosphere FX",vfx_impact:"Impact FX",vfx_magic:"Magic / Energy FX",vfx_transition:"Transition Designer"};
       const vfxToolNames = {director:"Auto Director",atmosphere:"Atmosphere FX",impact:"Impact FX",magic:"Magic / Energy FX",transition:"Transition Designer"};
       const showVfxStatus = () => {
         if (!autoTools.length || !vfxStatus) return;
@@ -4832,7 +4854,18 @@
           soundDirector:"SOUND DESIGN DIRECTOR: suggest timed ambience, Foley and specific SFX only when requested or relevant. Respect explicit silence; do not add music if user says no music.",
           storyboardPlanner:"STORYBOARD PLANNER: structure requested sequence into clear storyboard panels with composition, action, camera and transition notes. Do not claim to create images unless image generation is actually requested.",
           promptOptimizer:"PROMPT OPTIMIZER: convert vague wording into a clear model-ready prompt, preserve user intent and constraints, remove contradictions, prioritize critical instructions, and output the polished prompt first.",
-          sceneConsistency:"SCENE CONSISTENCY ENGINE: preserve continuity across shots including subject position, screen direction, camera geography, lighting, weather, props, damage, wardrobe, action state and timing. Call out any conflicts instead of silently changing them."
+          sceneConsistency:"SCENE CONSISTENCY ENGINE: preserve continuity across shots including subject position, screen direction, camera geography, lighting, weather, props, damage, wardrobe, action state and timing. Call out any conflicts instead of silently changing them.",
+          compositionDirector:"COMPOSITION DIRECTOR: design subject placement, foreground/midground/background layering, frame balance, leading lines, negative space, symmetry or rule-of-thirds only when motivated. Explain the composition briefly and never override user framing.",
+          colorMoodDirector:"COLOR & MOOD DIRECTOR: choose a cohesive palette, contrast, saturation, color temperature and grade that support emotion and story. Avoid arbitrary teal-orange grading; use a motivated palette and preserve specified colors.",
+          motionPhysicsDirector:"MOTION & PHYSICS DIRECTOR: choreograph subject/object movement with believable inertia, weight, acceleration, collision, cloth/hair/water/weather interaction and environmental response. Avoid impossible simultaneous actions.",
+          actingDirector:"EMOTION & ACTING DIRECTOR: translate emotion into precise facial micro-expressions, gaze, breathing, posture, gestures and reaction timing. Keep acting subtle or heightened according to the requested style.",
+          durationPlanner:"SHOT DURATION & PACING PLANNER: recommend realistic shot duration and timing for the requested action, build tension/release and ensure timecodes add up to the stated total. Do not invent a total duration if none was given.",
+          visualStyleLock:"VISUAL STYLE LOCK: define and preserve a compact style bible across outputs—palette, contrast, texture, realism level, production design and atmosphere—without changing subject identity or locked details.",
+          realismChecker:"REALISM & PLAUSIBILITY CHECKER: detect contradictory camera/action instructions, impossible physics, lighting conflicts, scale errors and video-model overload. Flag uncertainty and suggest minimal fixes without changing the core idea.",
+          complexityAnalyzer:"SCENE COMPLEXITY ANALYZER: identify competing actions, too many moving subjects, conflicting camera moves or excessive effects. Simplify into staged beats or separate shots while preserving intent.",
+          characterBlocking:"CHARACTER BLOCKING DIRECTOR: map each character's screen position, facing, eyelines, movement path, distance and interaction. Maintain screen direction and spatial geography across cuts.",
+          vfxSupervisor:"VFX SUPERVISOR: select only story-motivated VFX, specify timing, scale, compositing/lighting integration and environmental interaction. Do not add effects gratuitously.",
+          videoMotionPlanner:"IMAGE-TO-VIDEO / MOTION PLANNER: separate subject motion, background/environment motion, camera motion and temporal progression; create one coherent primary action with a start, middle and end. Respect image composition and locked reference details."
         };
         const selectedSpecialists = autoTools.filter(k=>aiToolInstructions[k]).map(k=>aiToolInstructions[k]);
         if (selectedSpecialists.length) {
@@ -5682,19 +5715,29 @@
   }
   function detectCinemotionAITools(text){
     const p=String(text||"").toLowerCase();
-    if(!/(prompt|cinematic|video|shot|scene|generate|create|make|write|improve|enhance|film|storyboard|camera|lighting|character|environment|sound|dragon|warrior|action|reveal|vfx)/i.test(p)) return [];
+    if(!/(prompt|cinematic|video|shot|scene|generate|create|make|write|improve|enhance|film|storyboard|camera|lighting|character|environment|sound|dragon|warrior|action|reveal|vfx|image|animate|motion|composition|color|colour|acting|duration|style|realism|physics)/i.test(p)) return [];
     const t=[], has=r=>r.test(p);
     const add=(id)=>{if(!t.includes(id))t.push(id)};
-    add("filmDirector");
-    add("cameraDirector");
-    if(has(/(light|lighting|shadow|dark|bright|mood|color temperature|colour temperature|golden hour|night|sunset|sunrise)/)) add("lightingDirector");
-    if(has(/(character|face|costume|clothes|body|identity|same person|continuity|reference|preserve|consistent)/)) add("characterContinuity");
-    if(has(/(world|environment|location|background|weather|forest|city|desert|mountain|temple|planet|setting|atmosphere)/)) add("worldBuilder");
+    add("filmDirector"); add("cameraDirector");
+    if(has(/(light|lighting|shadow|dark|bright|mood|color temperature|colour temperature|golden hour|night|sunset|sunrise|key light|rim light|fill light|practical light)/)) add("lightingDirector");
+    if(has(/(character|face|costume|clothes|body|identity|same person|continuity|reference|preserve|consistent|wardrobe|hair)/)) add("characterContinuity");
+    if(has(/(world|environment|location|background|weather|forest|city|desert|mountain|temple|planet|setting|atmosphere|architecture)/)) add("worldBuilder");
     if(has(/(sound|audio|music|sfx|foley|ambience|sound effect|silence|wind sound|wing sound)/)) add("soundDirector");
-    if(has(/(breakdown|shot by shot|shot-by-shot|multiple shots|sequence|scene by scene|scene-by-scene|shots|shot list)/)) add("shotBreakdown");
+    if(has(/(breakdown|shot by shot|shot-by-shot|multiple shots|sequence|scene by scene|scene-by-scene|shots|shot list|cut list)/)) add("shotBreakdown");
     if(has(/(storyboard|frame|panel|6-frame|six frame|board)/)) add("storyboardPlanner");
     if(has(/(improve|enhance|rewrite|optimize|optimise|refine|professional|detailed prompt|prompt generator|prompt)/)) add("promptOptimizer");
     if(has(/(previous shot|next shot|continuity|match|same scene|keep consistent|preserve|do not change|don't change)/)) add("sceneConsistency");
+    if(has(/(composition|framing|rule of thirds|negative space|foreground|background placement|subject placement|symmetry|visual balance)/)) add("compositionDirector");
+    if(has(/(color palette|colour palette|color grade|colour grade|grading|teal|orange|warm tone|cool tone|monochrome|saturation|palette)/)) add("colorMoodDirector");
+    if(has(/(motion|movement|moving|animate|animation|image.to.video|video generation|action|wind|cloth|hair|water|debris|physics|momentum|impact|falling|flying)/)) add("motionPhysicsDirector");
+    if(has(/(emotion|acting|expression|micro.expression|body language|gesture|eye movement|breathing|angry|fear|sad|romantic|smile|cry|reaction)/)) add("actingDirector");
+    if(has(/(duration|seconds|sec|timing|timecode|pace|pacing|slow motion|fast motion|runtime|length of shot)/)) add("durationPlanner");
+    if(has(/(style lock|visual style|same style|style consistency|consistent look|look development|film look|visual continuity)/)) add("visualStyleLock");
+    if(has(/(realism|realistic|physically accurate|physics check|plausible|natural movement|real world|artifact|impossible|error check)/)) add("realismChecker");
+    if(has(/(too complex|complexity|simplify|simpler|overloaded|too many actions|one action|model limitation|video ai limitation)/)) add("complexityAnalyzer");
+    if(has(/(blocking|positions|where.*stand|stand.*where|left side|right side|foreground character|multiple characters|two characters|group|actors|walk toward|walk away)/)) add("characterBlocking");
+    if(has(/(vfx|visual effects|cgi|fx|effects|explosion|magic|portal|particles|smoke|fire|energy|creature)/)) add("vfxSupervisor");
+    if(has(/(animate|animation|image.to.video|video prompt|motion prompt|moving shot|sequence|action sequence)/)) add("videoMotionPlanner");
     for(const v of detectCinemotionVfxTools(p)) add("vfx_"+v);
     return t;
   }
@@ -5725,5 +5768,36 @@
     });
   })();
   </script>
+<script id="cinemotion-ai-director-suite-ui">
+(()=>{const modal=document.getElementById('cinemotionAiSuite'),grid=document.getElementById('cinemotionAiSuiteGrid'),btn=document.getElementById('geminiDirectorSuiteBtn'),close=document.getElementById('cinemotionAiSuiteClose'),input=document.getElementById('geminiInput'),form=document.getElementById('geminiForm'),launcher=document.getElementById('geminiLauncher');
+const tools=[
+["🎬","AI Film Director","Master director orchestrates relevant specialists and keeps your idea coherent."],
+["🧩","Storyboard Generator","Turns a scene or sequence into ordered storyboard panels and shot beats."],
+["🖼️","Composition Director","Plans subject placement, foreground depth, leading lines, balance and negative space."],
+["🎨","Color & Mood Director","Builds an emotion-led palette, contrast, saturation and color-grade direction."],
+["💡","Lighting Director","Specifies light sources, direction, softness, shadow, practicals and exposure."],
+["🔗","Continuity Checker","Tracks character, wardrobe, props, screen direction, geography and lighting continuity."],
+["🌪️","Motion & Physics Director","Choreographs believable movement, inertia, impact, cloth, hair, water and environment response."],
+["🔊","AI Sound Designer","Adds timed ambience, Foley and SFX while respecting requested silence/music constraints."],
+["🔄","Transition Designer","Selects motivated match cuts, reveals, wipes, camera-motivated transitions or clean cuts."],
+["🏛️","Environment Builder","Expands locations with geography, architecture, materials, weather and atmospheric details."],
+["🎭","Emotion & Acting Director","Converts emotion into expressions, gaze, breathing, posture, gestures and reaction timing."],
+["✨","VFX Supervisor","Designs motivated effects with timing, scale, compositing and environment interaction."],
+["🪄","Prompt Enhancer","Clarifies and improves vague prompts while preserving intent and every stated constraint."],
+["🎞️","Video Motion Planner","Separates subject, environment, camera and temporal motion into a coherent start-middle-end."],
+["⏱️","Shot Duration Planner","Suggests shot length, pacing and timecodes; checks total duration when specified."],
+["🔒","Visual Style Lock","Maintains palette, texture, realism level, production design and overall look across shots."],
+["🧪","Realism Checker","Flags physics, camera, lighting, scale or action contradictions and proposes minimal fixes."],
+["🧠","Complexity Analyzer","Detects overloaded scenes and splits competing actions into clearer beats or shots."],
+["📍","Character Blocking","Maps actor positions, eyelines, paths, facing and screen geography across cuts."],
+["📚","Shot Breakdown","Creates timecoded shot-by-shot plans with camera, action, lighting, transition and continuity."]
+];
+const focusPrompts={"AI Film Director":"Act as the master AI film director and orchestrate all relevant specialists for my scene. Scene: ","Storyboard Generator":"Create a storyboard plan for my scene, with numbered panels, composition, action and continuity. Scene: ","Composition Director":"Act as my composition director. Design subject placement, foreground/midground/background, leading lines and visual balance. Scene: ","Color & Mood Director":"Act as color and mood director. Create a story-motivated palette and grading direction. Scene: ","Lighting Director":"Act as lighting director. Plan physically motivated key, fill, rim and practical lighting. Scene: ","Continuity Checker":"Run a strict continuity check on this scene/sequence and identify locks and possible conflicts. Scene: ","Motion & Physics Director":"Plan natural motion and physics for this scene, including subject, props and environment interaction. Scene: ","AI Sound Designer":"Design timed sound, ambience, Foley and SFX for this scene; respect any silence or music constraints. Scene: ","Transition Designer":"Design motivated transitions between shots and use a clean cut when no transition is justified. Sequence: ","Environment Builder":"Build a detailed cinematic environment while preserving all established setting facts. Scene: ","Emotion & Acting Director":"Direct the actor's emotion, micro-expressions, gaze, breathing, posture and gestures. Scene: ","VFX Supervisor":"Act as VFX supervisor and design only story-motivated effects, timing and integration. Scene: ","Prompt Enhancer":"Enhance my prompt into a clear, model-ready cinematic prompt without changing my intent or constraints. Prompt: ","Video Motion Planner":"Plan image-to-video motion separately for subject, environment, camera and time progression. Scene/reference: ","Shot Duration Planner":"Plan shot durations and pacing. If a total duration is provided, make timecodes add up exactly. Scene: ","Visual Style Lock":"Create a concise visual style bible and apply it consistently to this scene/sequence. Scene: ","Realism Checker":"Analyze realism and plausibility. Flag conflicting instructions, physics, lighting, scale and camera issues. Scene: ","Complexity Analyzer":"Analyze scene complexity for video AI. Identify competing actions and simplify into staged beats without losing intent. Scene: ","Character Blocking":"Plan character positions, facing, eyelines, movement paths and screen geography. Scene: ","Shot Breakdown":"Create a shot-by-shot breakdown with timecodes, shot size, angle, camera movement, action, lighting, transition and continuity. Scene: "};
+if(grid&&!grid.dataset.built){grid.innerHTML=tools.map(([icon,name,desc])=>'<article class="cinemotion-ai-tool-card"><span class="tool-icon">'+icon+'</span><strong>'+name+'</strong><p>'+desc+'</p><button type="button" data-focus-tool="'+name+'">Focus this tool</button></article>').join('');grid.dataset.built='1';}
+function open(){launcher?.click();modal.hidden=false;}function shut(){modal.hidden=true;}
+btn?.addEventListener('click',open);close?.addEventListener('click',shut);modal?.addEventListener('click',e=>{if(e.target===modal)shut();});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)shut();});
+grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]');if(!b)return;const name=b.dataset.focusTool;const phrase=focusPrompts[name]||('Use '+name+' for this scene. Scene: ');launcher?.click();if(input){input.value=phrase;input.focus();input.setSelectionRange(input.value.length,input.value.length);input.dispatchEvent(new Event('input',{bubbles:true}));}shut();});
+})();
+</script>
 </body>
 </html>
