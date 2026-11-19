@@ -4719,16 +4719,18 @@
 
     async function sendGeminiMessageNow(rawText, attachedFile = null) {
       const prompt = String(rawText || "").trim();
+      const autoTools = detectCinemotionAITools(prompt);
       const autoVfx = detectCinemotionVfxTools(prompt);
       const vfxStatus = document.getElementById("geminiVfxStatus");
       const vfxStatusText = vfxStatus?.querySelector(".vfx-status-text");
       const vfxStatusTools = vfxStatus?.querySelector(".vfx-status-tools");
+      const toolNames = {filmDirector:"AI Film Director",shotBreakdown:"AI Shot Breakdown",cameraDirector:"Camera Director",lightingDirector:"Lighting Director",characterContinuity:"Character Continuity",worldBuilder:"World Builder",soundDirector:"Sound Design Director",storyboardPlanner:"Storyboard Planner",promptOptimizer:"Prompt Optimizer",sceneConsistency:"Scene Consistency Engine",vfx_director:"VFX Auto Director",vfx_atmosphere:"Atmosphere FX",vfx_impact:"Impact FX",vfx_magic:"Magic / Energy FX",vfx_transition:"Transition Designer"};
       const vfxToolNames = {director:"Auto Director",atmosphere:"Atmosphere FX",impact:"Impact FX",magic:"Magic / Energy FX",transition:"Transition Designer"};
       const showVfxStatus = () => {
-        if (!autoVfx.length || !vfxStatus) return;
+        if (!autoTools.length || !vfxStatus) return;
         vfxStatus.classList.add("active");
-        if (vfxStatusText) vfxStatusText.textContent = "Analyzing scene · Activating";
-        if (vfxStatusTools) vfxStatusTools.innerHTML = autoVfx.map(k => '<span class="vfx-status-tool">'+vfxToolNames[k]+'</span>').join("");
+        if (vfxStatusText) vfxStatusText.textContent = "AI Film Director · Activating specialists";
+        if (vfxStatusTools) vfxStatusTools.innerHTML = autoTools.map(k => '<span class="vfx-status-tool">'+toolNames[k]+'</span>').join("");
       };
       const hideVfxStatus = () => vfxStatus?.classList.remove("active");
       const attachedFiles = Array.isArray(attachedFile) ? attachedFile : (attachedFile ? [attachedFile] : []);
@@ -4820,6 +4822,24 @@
           }
         }
 
+        const aiToolInstructions = {
+          filmDirector:"AI FILM DIRECTOR: act as the master director and orchestrate only relevant specialists. Identify intent, visual story, subject, action, shot progression, continuity constraints and output format. Do not overload the prompt with unrelated ideas.",
+          shotBreakdown:"AI SHOT BREAKDOWN: when a sequence or multi-shot scene is requested, provide shot-by-shot timing, shot size, angle, camera movement, subject action, transition and continuity. If a single shot is requested, keep it one shot.",
+          cameraDirector:"CAMERA DIRECTOR: select motivated framing, shot size, angle, camera movement, lens/focal-length feel, focus behavior, camera height, composition and movement speed. Never contradict explicit camera instructions.",
+          lightingDirector:"LIGHTING DIRECTOR: define key/fill/rim/practical sources, direction, softness, contrast, color temperature, exposure and mood; keep lighting physically motivated and consistent.",
+          characterContinuity:"CHARACTER CONTINUITY: preserve identity, face, body, costume, hair, props and proportions from supplied references and stated constraints. Explicitly list locked attributes and avoid redesign.",
+          worldBuilder:"WORLD BUILDER: enrich setting, geography, architecture, weather, time of day, materials, environmental details and motivated movement without changing established world facts.",
+          soundDirector:"SOUND DESIGN DIRECTOR: suggest timed ambience, Foley and specific SFX only when requested or relevant. Respect explicit silence; do not add music if user says no music.",
+          storyboardPlanner:"STORYBOARD PLANNER: structure requested sequence into clear storyboard panels with composition, action, camera and transition notes. Do not claim to create images unless image generation is actually requested.",
+          promptOptimizer:"PROMPT OPTIMIZER: convert vague wording into a clear model-ready prompt, preserve user intent and constraints, remove contradictions, prioritize critical instructions, and output the polished prompt first.",
+          sceneConsistency:"SCENE CONSISTENCY ENGINE: preserve continuity across shots including subject position, screen direction, camera geography, lighting, weather, props, damage, wardrobe, action state and timing. Call out any conflicts instead of silently changing them."
+        };
+        const selectedSpecialists = autoTools.filter(k=>aiToolInstructions[k]).map(k=>aiToolInstructions[k]);
+        if (selectedSpecialists.length) {
+          const suiteBlock = "\\n\\nCINEMOTION AI FILM DIRECTOR SUITE — ACTIVATED SPECIALISTS: "+autoTools.map(k=>toolNames[k]).join(", ")+"\\n"+selectedSpecialists.join("\\n")+"\\nDeliver a coherent, ready-to-copy cinematic prompt first. Add concise shot/timing breakdown only when useful. Keep user constraints absolute and do not invent requested media outputs.";
+          if (typeof messagePayload === "string") messagePayload += suiteBlock;
+          else if (Array.isArray(messagePayload) && messagePayload[0]?.text) messagePayload[0].text += suiteBlock;
+        }
         if (autoVfx.length) {
           const vfxInstructions = {
             director:"Act as CINEMOTION VFX Auto Director: preserve the scene's intent and continuity, choose only motivated VFX, integrate camera, lighting, physics, timing and environment interaction into a ready-to-copy cinematic prompt.",
@@ -4832,7 +4852,7 @@
           if (typeof messagePayload === "string") messagePayload += autoBlock;
           else if (Array.isArray(messagePayload) && messagePayload[0]?.text) messagePayload[0].text += autoBlock;
         }
-        if (vfxStatusText) vfxStatusText.textContent = autoVfx.length ? "VFX tools working · Building cinematic prompt" : "Gemini is thinking…";
+        if (vfxStatusText) vfxStatusText.textContent = autoTools.length ? "Specialists working · Building cinematic output" : "Gemini is thinking…";
         const result = await geminiChatSession.sendMessageStream(messagePayload);
         let streamedText = "";
         let typingBuffer = "";
@@ -5651,17 +5671,32 @@
   <script id="cinemotion-vfx-auto-detection">
   function detectCinemotionVfxTools(text){
     const p=String(text||"").toLowerCase();
-    const promptIntent=/(prompt|cinematic|video|shot|scene|generate|create|make|write|improve|enhance|dragon|warrior|action|reveal|film)/i.test(p);
-    if(!promptIntent) return [];
-    const tools=[];
-    const has=(r)=>r.test(p);
-    if(has(/(fog|mist|smoke|dust|cloud|storm|rain|snow|wind|atmosphere|haze|volumetric|particle|environment|weather|clouds|grass|vegetation|fire|flame)/)) tools.push("atmosphere");
+    const intent=/(prompt|cinematic|video|shot|scene|generate|create|make|write|improve|enhance|dragon|warrior|action|reveal|film|camera|lighting|storyboard|sound|vfx)/i.test(p);
+    if(!intent) return [];
+    const tools=[], has=r=>r.test(p);
+    if(has(/(fog|mist|smoke|dust|cloud|storm|rain|snow|wind|atmosphere|haze|volumetric|particle|environment|weather|grass|vegetation|fire|flame)/)) tools.push("atmosphere");
     if(has(/(impact|land|landing|slam|crash|explosion|explode|fight|battle|punch|kick|hit|fall|collision|shockwave|debris|earthquake|ground|footstep|break|smash)/)) tools.push("impact");
     if(has(/(magic|magical|energy|glow|aura|spell|power|lightning|electric|portal|rune|enchanted|sword glow|transformation|teleport)/)) tools.push("magic");
     if(has(/(transition|match cut|cut to|match-cut|morph|wipe|whip pan|next shot|between shots|shot 1|shot 2)/)) tools.push("transition");
-    if(has(/(vfx|visual effect|cinematic|dragon|creature|reveal|camera|epic|film|prompt)/) || !tools.length) tools.unshift("director");
-    if(tools.length>1 && !tools.includes("director")) tools.unshift("director");
     return [...new Set(tools)];
+  }
+  function detectCinemotionAITools(text){
+    const p=String(text||"").toLowerCase();
+    if(!/(prompt|cinematic|video|shot|scene|generate|create|make|write|improve|enhance|film|storyboard|camera|lighting|character|environment|sound|dragon|warrior|action|reveal|vfx)/i.test(p)) return [];
+    const t=[], has=r=>r.test(p);
+    const add=(id)=>{if(!t.includes(id))t.push(id)};
+    add("filmDirector");
+    add("cameraDirector");
+    if(has(/(light|lighting|shadow|dark|bright|mood|color temperature|colour temperature|golden hour|night|sunset|sunrise)/)) add("lightingDirector");
+    if(has(/(character|face|costume|clothes|body|identity|same person|continuity|reference|preserve|consistent)/)) add("characterContinuity");
+    if(has(/(world|environment|location|background|weather|forest|city|desert|mountain|temple|planet|setting|atmosphere)/)) add("worldBuilder");
+    if(has(/(sound|audio|music|sfx|foley|ambience|sound effect|silence|wind sound|wing sound)/)) add("soundDirector");
+    if(has(/(breakdown|shot by shot|shot-by-shot|multiple shots|sequence|scene by scene|scene-by-scene|shots|shot list)/)) add("shotBreakdown");
+    if(has(/(storyboard|frame|panel|6-frame|six frame|board)/)) add("storyboardPlanner");
+    if(has(/(improve|enhance|rewrite|optimize|optimise|refine|professional|detailed prompt|prompt generator|prompt)/)) add("promptOptimizer");
+    if(has(/(previous shot|next shot|continuity|match|same scene|keep consistent|preserve|do not change|don't change)/)) add("sceneConsistency");
+    for(const v of detectCinemotionVfxTools(p)) add("vfx_"+v);
+    return t;
   }
   </script>
   <script id="cinemotion-vfx-smart-controls-script">
