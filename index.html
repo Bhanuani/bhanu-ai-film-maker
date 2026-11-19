@@ -1498,6 +1498,53 @@
     }
   </style>
 
+
+  <style id="cinemotion-workspace-adjustments">
+    .search-box { padding-right:42px; }
+    .search-box input { padding-right:48px; }
+    .header-local-explorer-btn {
+      position:absolute; z-index:2; right:5px; top:50%; transform:translateY(-50%);
+      width:34px; height:34px; display:inline-grid; place-items:center;
+      border-radius:50%; border:1px solid rgba(0,210,255,.32);
+      color:#31d8f5; background:rgba(0,210,255,.09); cursor:pointer;
+      transition:background .18s ease,border-color .18s ease;
+    }
+    .header-local-explorer-btn:hover { background:rgba(0,210,255,.2); border-color:#00d2ff; }
+    body.director-mode .vault-container { width:var(--director-split,50vw)!important; border-right:0; }
+    body.director-mode .gemini-panel,
+    body.director-mode .gemini-panel.open {
+      left:var(--director-split,50vw)!important; right:0!important;
+      width:calc(100vw - var(--director-split,50vw))!important;
+    }
+    .director-split-handle { display:none; }
+    body.director-mode .director-split-handle {
+      display:flex; position:fixed; z-index:10050; top:82px; bottom:0;
+      left:var(--director-split,50vw); width:12px; transform:translateX(-50%);
+      align-items:center; justify-content:center; cursor:col-resize;
+      touch-action:none; background:transparent;
+    }
+    body.director-mode .director-split-handle::before {
+      content:""; position:absolute; inset:0 4px; border-radius:8px;
+      background:rgba(148,163,184,.42); transition:background .15s ease,box-shadow .15s ease;
+    }
+    body.director-mode .director-split-handle span {
+      position:relative; z-index:1; width:3px; height:42px; border-radius:9px;
+      background:#cbd5e1; box-shadow:0 0 8px rgba(0,210,255,.35);
+    }
+    body.director-mode .director-split-handle:hover::before,
+    body.director-mode .director-split-handle.dragging::before {
+      background:rgba(0,210,255,.8); box-shadow:0 0 14px rgba(0,210,255,.35);
+    }
+    @media(max-width:820px) {
+      body.director-mode .director-split-handle { display:none!important; }
+      body.director-mode .vault-container,
+      body.director-mode .gemini-panel,
+      body.director-mode .gemini-panel.open { width:100%!important; left:0!important; }
+      .header-local-explorer-btn { width:30px; height:30px; }
+      .search-box { padding-right:38px; }
+    }
+  </style>
+
 </head>
 <body>
 
@@ -1814,18 +1861,6 @@
       <button class="close-btn" id="closeSidebarBtn">&times;</button>
     </div>
     <div class="sidebar-menu">
-      <button class="sidebar-item admin-only" id="openLocalExplorerBtn" type="button">
-        <i class="fa-solid fa-folder-open"></i>
-        <span>Local File Explorer</span>
-        <span class="sidebar-badge">NEW</span>
-      </button>
-
-
-      <button class="sidebar-item" id="openThemesBtn">
-        <i class="fa-solid fa-palette"></i>
-        <span>10 Classic Themes</span>
-        <span class="sidebar-badge">10</span>
-      </button>
 
       <button class="sidebar-item" onclick="triggerCinematicCategory('Camera Movement'); closeSidebar();">
         <i class="fa-solid fa-film"></i>
@@ -1858,6 +1893,9 @@
       <div class="search-box">
         <i class="fa-solid fa-magnifying-glass"></i>
         <input type="text" id="searchInput" placeholder="Search camera motion, prompt formula, angle..." onkeyup="filterCards()">
+        <button type="button" class="admin-only header-local-explorer-btn" id="openLocalExplorerBtn" title="Local File Explorer" aria-label="Open Local File Explorer">
+          <i class="fa-solid fa-folder-open"></i>
+        </button>
       </div>
 
       <div class="header-actions">
@@ -1903,6 +1941,7 @@
       </div>
     </div>
   </header>
+  <div id="directorSplitHandle" class="director-split-handle" role="separator" aria-label="Resize prompt library and Gemini panels" aria-orientation="vertical" aria-valuemin="30" aria-valuemax="70" aria-valuenow="50" tabindex="0"><span></span></div>
 
   <div class="vault-container">
     <section class="director-library-head" id="directorLibraryHead">
@@ -2076,20 +2115,6 @@
     </div>
   </div>
 
-  <!-- THEMES MODAL -->
-  <div id="themesModal" class="modal-overlay" style="display: none;">
-    <div class="modal-box" style="max-width: 580px;">
-      <div class="modal-header">
-        <div>
-          <h3 style="margin: 0; font-size: 18px; color: var(--accent-cyan);"><i class="fa-solid fa-palette"></i> 10 Classic Master Themes</h3>
-          <p style="font-size: 12px; color: #94a3b8; margin-top: 4px;">Click any theme to copy tags</p>
-        </div>
-        <button type="button" id="closeThemesModalBtn" class="close-btn">&times;</button>
-      </div>
-      <div class="themes-grid" id="themesGrid"></div>
-    </div>
-  </div>
-
   <div id="toast">
     <i class="fa-solid fa-circle-check"></i>
     <span id="toastMsg">Action Successful!</span>
@@ -2250,33 +2275,6 @@
 
     window.allVaultItems = [...defaultMovements, ...cameraAnglesFromPdf, ...cameraShotsFromPdf, ...atmosphereThemesFromPdf, ...masterPromptsList];
     let currentCategory = "All";
-
-    const classicThemes = [
-      { name: "1. Film Noir Monochrome", tag: "35mm black and white film noir, high contrast, hard shadows, dramatic silhouette" },
-      { name: "2. Cyberpunk Neon Dusk", tag: "Blade runner cyberpunk style, cyan and magenta neon rim light, rainy reflections, 8k" },
-      { name: "3. Wes Anderson Symmetrical Pastel", tag: "Wes anderson pastel palette, direct front angle, centered symmetrical framing, retro 70s look" },
-      { name: "4. Christopher Nolan IMAX Epic", tag: "70mm IMAX cinematography, photorealistic, grand scale, cold steel blue tone, sharp detail" },
-      { name: "5. Vintage Kodachrome 1970s", tag: "1970s vintage 35mm film, warm grain, sun-faded saturation, organic halation, nostagia" },
-      { name: "6. Denis Villeneuve Desert Dust", tag: "Dune aesthetic, vast desert haze, muted terracotta and dusty ambient glow, monolithic scale" },
-      { name: "7. Golden Hour Sunburst", tag: "Warm golden hour sunlight, intense anamorphic lens flare, soft bokeh, cinematic romantic glow" },
-      { name: "8. Moody David Fincher Green", tag: "David fincher style, subdued desaturated colors, eerie yellow-green tint, clinical precision" },
-      { name: "9. Studio Ghibli Ethereal", tag: "Ghibli cinematic anime lighting, lush vibrant watercolor tones, dreamy clouds, magical realism" },
-      { name: "10. Dark Gothic Baroque", tag: "Rembrandt chiaroscuro, candlelight illumination, deep rich velvety shadows, gothic atmosphere" }
-    ];
-
-    const themesGrid = document.getElementById("themesGrid");
-    if (themesGrid) {
-      classicThemes.forEach((item) => {
-        const chip = document.createElement("div");
-        chip.className = "theme-chip";
-        chip.innerHTML = `<strong>${item.name}</strong> <i class="fa-solid fa-copy" style="color: var(--accent-cyan);"></i>`;
-        chip.onclick = () => {
-          copyPromptText(`[Theme: ${item.tag}]`);
-          document.getElementById("themesModal").style.display = "none";
-        };
-        themesGrid.appendChild(chip);
-      });
-    }
 
     const heroVid = document.getElementById("heroVideo");
     if (heroVid) {
@@ -3294,23 +3292,12 @@
     const sidebarDrawer = document.getElementById("sidebarDrawer");
     const sidebarOverlay = document.getElementById("sidebarOverlay");
     const closeSidebarBtn = document.getElementById("closeSidebarBtn");
-    const openThemesBtn = document.getElementById("openThemesBtn");
-    const themesModal = document.getElementById("themesModal");
-    const closeThemesModalBtn = document.getElementById("closeThemesModalBtn");
-
     function openSidebar() { if (sidebarDrawer) sidebarDrawer.classList.add("active"); if (sidebarOverlay) sidebarOverlay.classList.add("active"); }
     function closeSidebar() { if (sidebarDrawer) sidebarDrawer.classList.remove("active"); if (sidebarOverlay) sidebarOverlay.classList.remove("active"); }
 
     if (sidebarToggleBtn) sidebarToggleBtn.onclick = openSidebar;
     if (closeSidebarBtn) closeSidebarBtn.onclick = closeSidebar;
     if (sidebarOverlay) sidebarOverlay.onclick = closeSidebar;
-
-    if (openThemesBtn) {
-      openThemesBtn.onclick = () => { closeSidebar(); if (themesModal) themesModal.style.display = "flex"; };
-    }
-    if (closeThemesModalBtn) {
-      closeThemesModalBtn.onclick = () => { if (themesModal) themesModal.style.display = "none"; };
-    }
 
     const profilePillBtn = document.getElementById("profilePillBtn");
     const profileDropdown = document.getElementById("profileDropdown");
@@ -5212,6 +5199,33 @@
   </script>
 
 
+
+
+  <script id="cinemotion-resizable-workspace">
+    (() => {
+      const handle=document.getElementById("directorSplitHandle");
+      if(!handle)return;
+      const setSplit=(clientX)=>{
+        const min=Math.max(320,window.innerWidth*.30), max=Math.min(window.innerWidth-360,window.innerWidth*.70);
+        const percent=Math.min(max,Math.max(min,clientX))/window.innerWidth*100;
+        document.documentElement.style.setProperty("--director-split",percent+"vw");
+        handle.setAttribute("aria-valuenow",String(Math.round(percent)));
+      };
+      handle.addEventListener("pointerdown",e=>{
+        if(!document.body.classList.contains("director-mode")||window.innerWidth<=820)return;
+        e.preventDefault();handle.classList.add("dragging");handle.setPointerCapture(e.pointerId);setSplit(e.clientX);
+      });
+      handle.addEventListener("pointermove",e=>{if(handle.hasPointerCapture(e.pointerId))setSplit(e.clientX);});
+      const stop=e=>{if(handle.hasPointerCapture(e.pointerId))handle.releasePointerCapture(e.pointerId);handle.classList.remove("dragging");};
+      handle.addEventListener("pointerup",stop);handle.addEventListener("pointercancel",stop);
+      handle.addEventListener("keydown",e=>{
+        if(!document.body.classList.contains("director-mode")||!["ArrowLeft","ArrowRight"].includes(e.key))return;
+        e.preventDefault();const current=parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--director-split"))||50;
+        const next=Math.max(30,Math.min(70,current+(e.key==="ArrowRight"?2:-2)));
+        document.documentElement.style.setProperty("--director-split",next+"vw");handle.setAttribute("aria-valuenow",String(Math.round(next)));
+      });
+    })();
+  </script>
 
 </body>
 </html>
