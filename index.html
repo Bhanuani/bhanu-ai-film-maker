@@ -3535,6 +3535,59 @@
     </div>
   </section>
 
+  <style id="gemini-conversation-glass-layout">
+    /* Keep the conversation in a centered, readable lane inside the highlighted area */
+    #geminiMessages {
+      width: min(100%, 1120px);
+      max-width: 1120px;
+      margin-inline: auto;
+      align-self: center;
+      box-sizing: border-box;
+      padding: 22px clamp(14px, 2.2vw, 30px);
+      scroll-padding-block: 24px;
+    }
+    #geminiMessages .gemini-message {
+      position: relative;
+      max-width: min(82%, 820px);
+      border-radius: 18px;
+      padding: 14px 17px;
+      backdrop-filter: blur(22px) saturate(145%);
+      -webkit-backdrop-filter: blur(22px) saturate(145%);
+      transform: perspective(900px) translateZ(0);
+      transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+      box-shadow: 0 12px 28px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.16);
+    }
+    #geminiMessages .gemini-message::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      background: linear-gradient(145deg, rgba(255,255,255,.10), transparent 38%, rgba(255,255,255,.025));
+    }
+    #geminiMessages .gemini-message:hover {
+      transform: perspective(900px) translateY(-2px) translateZ(8px);
+      box-shadow: 0 18px 38px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.22);
+    }
+    #geminiMessages .gemini-message.user {
+      background: linear-gradient(135deg, rgba(64,126,255,.22), rgba(89,69,170,.16));
+      border: 1px solid rgba(122,169,255,.36);
+      box-shadow: 0 14px 30px rgba(32,86,190,.14), inset 0 1px 0 rgba(255,255,255,.22), inset 0 -8px 20px rgba(22,48,110,.12);
+    }
+    #geminiMessages .gemini-message.assistant {
+      background: linear-gradient(145deg, rgba(255,255,255,.105), rgba(124,145,190,.07) 55%, rgba(255,255,255,.035));
+      border: 1px solid rgba(202,218,255,.17);
+      box-shadow: 0 14px 34px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.18), inset 0 -10px 24px rgba(50,75,125,.08);
+    }
+    #geminiMessages .gemini-message.error {
+      background: linear-gradient(145deg, rgba(248,113,113,.13), rgba(255,255,255,.035));
+      border-color: rgba(248,113,113,.3);
+    }
+    @media (max-width: 700px) {
+      #geminiMessages { width:100%; max-width:none; padding:14px 10px; }
+      #geminiMessages .gemini-message { max-width:94%; border-radius:15px; padding:12px 14px; }
+    }
+  </style>
   <!-- FIREBASE AUTH, FORGOT PASSWORD, PHONE OTP, AND FIRESTORE -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
