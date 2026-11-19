@@ -1557,6 +1557,16 @@
     }
   </style>
 
+
+  <style id="cinemotion-vfx-smart-controls">
+    #geminiVfxQuickBar{display:flex;align-items:center;gap:7px;flex-wrap:nowrap;overflow-x:auto;width:min(100% - 28px,900px);margin:8px auto 2px;padding:5px 2px;scrollbar-width:thin}
+    #geminiVfxQuickBar .vfx-chip{flex:0 0 auto;border:1px solid rgba(92,190,255,.22);background:rgba(12,25,44,.75);color:#d9edff;border-radius:999px;padding:7px 10px;font:600 11px/1.2 'Plus Jakarta Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:.18s}
+    #geminiVfxQuickBar .vfx-chip:hover{border-color:#38bdf8;background:rgba(14,165,233,.16);box-shadow:0 0 12px rgba(56,189,248,.12)}
+    #geminiVfxQuickBar .vfx-chip.primary{border-color:rgba(168,85,247,.4);background:linear-gradient(100deg,rgba(2,132,199,.16),rgba(124,58,237,.16))}
+    #geminiVfxQuickBar .vfx-intensity{flex:0 0 auto;background:#0b1424;color:#cfe7ff;border:1px solid rgba(148,163,184,.25);border-radius:999px;padding:7px 9px;font-size:11px;outline:none}
+    #geminiVfxQuickBar .vfx-label{flex:0 0 auto;color:#8ca8c8;font-size:10px;font-weight:800;letter-spacing:.08em;padding-left:3px}
+    @media(max-width:700px){#geminiVfxQuickBar{width:calc(100% - 14px);gap:6px;margin-top:6px}#geminiVfxQuickBar .vfx-chip{padding:7px 9px;font-size:10px}#geminiVfxQuickBar .vfx-intensity{font-size:10px}}
+  </style>
 </head>
 <body>
 
@@ -3514,6 +3524,16 @@
       </video>
     </div>
     <div class="gemini-messages" id="geminiMessages" aria-live="polite"></div>
+
+    <div id="geminiVfxQuickBar" aria-label="Smart VFX tools">
+      <span class="vfx-label">VFX TOOLS</span>
+      <select id="geminiVfxIntensity" class="vfx-intensity" aria-label="VFX intensity"><option value="Subtle">Subtle</option><option value="Balanced" selected>Balanced</option><option value="Epic">Epic</option></select>
+      <button type="button" class="vfx-chip primary" data-vfx="director">✨ VFX Auto Director</button>
+      <button type="button" class="vfx-chip" data-vfx="atmosphere">🌫 Atmosphere FX</button>
+      <button type="button" class="vfx-chip" data-vfx="impact">💥 Impact FX</button>
+      <button type="button" class="vfx-chip" data-vfx="magic">⚡ Magic / Energy FX</button>
+      <button type="button" class="vfx-chip" data-vfx="transition">🔄 Transition Designer</button>
+    </div>
     <form class="gemini-composer" id="geminiForm">
       <input type="file" id="geminiFileInput" accept="image/*" multiple hidden>
       <div class="gemini-attachment-preview" id="geminiAttachmentPreview" hidden>
@@ -5498,5 +5518,32 @@
     })();
   </script>
 
+
+  <script id="cinemotion-vfx-smart-controls-script">
+  (()=> {
+    const bar=document.getElementById('geminiVfxQuickBar');
+    const input=document.getElementById('geminiInput');
+    const form=document.getElementById('geminiForm');
+    const intensity=document.getElementById('geminiVfxIntensity');
+    if(!bar||!input||!form||bar.dataset.bound==='1') return;
+    bar.dataset.bound='1';
+    const instructions={
+      director:'Act as my VFX Auto Director. Analyze the current scene and its established constraints. Recommend only story-motivated visual effects, explain briefly why each fits, then provide a ready-to-copy revised video prompt with the VFX integrated. Include timing, layering, interaction with environment, camera, lighting, and realistic physics. Do not introduce unrelated effects or violate continuity.',
+      atmosphere:'Design Atmosphere FX for the current scene: choose appropriate fog/mist, smoke, dust, rain/snow, wind, volumetric rays, particles, and environmental movement only where motivated. Give time-coded effect behavior and integrate into a final prompt. Avoid clutter and preserve scene continuity.',
+      impact:'Design cinematic Impact FX for the current scene/action: impact timing, shockwave, debris, sparks, ground/environment response, motion blur, camera shake, and optional slow motion only where appropriate. Keep physics believable, effects motivated, and provide an integrated final prompt.',
+      magic:'Design Magic/Energy VFX for the current scene only if story-appropriate: aura, energy arcs, glowing particles, runes, trails, portals, transformation or power build-up. Specify color, shape, intensity, timing, interaction with subject/environment, lighting spill, and a final integrated prompt. Do not add magic if it conflicts with the scene.',
+      transition:'Act as a Transition Designer. If the conversation contains adjacent shots, design the most motivated transition between them; otherwise suggest a transition for the current shot and state what next-shot information is missing. Specify outgoing ending, transition mechanics, duration, incoming beginning, camera/action continuity, and provide a ready-to-copy transition prompt. Prefer a clean cut if no visual connection is justified.'
+    };
+    bar.addEventListener('click',e=>{
+      const button=e.target.closest('[data-vfx]'); if(!button) return;
+      const key=button.dataset.vfx; const level=intensity?intensity.value:'Balanced';
+      const current=input.value.trim();
+      const context=current ? ('My current request/scene:\n'+current+'\n\n') : 'Use the current scene and context from this Gemini conversation.\n\n';
+      const request=context+'VFX intensity: '+level+'.\n'+instructions[key]+'\n\nIntensity guide: Subtle = restrained and realistic; Balanced = clearly visible but controlled; Epic = large-scale cinematic spectacle without breaking realism or continuity. Output the final ready-to-copy prompt first, then a concise effect breakdown.';
+      input.value=request; input.dispatchEvent(new Event('input',{bubbles:true}));
+      form.requestSubmit();
+    });
+  })();
+  </script>
 </body>
 </html>
