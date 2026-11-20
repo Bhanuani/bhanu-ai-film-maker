@@ -4671,6 +4671,7 @@
       if (!geminiMessages) return;
       const message = document.createElement("div");
       message.className = `gemini-message ${role}${isError ? " error" : ""}`;
+      if (!isError && (role === "user" || role === "assistant")) message.classList.add("cinemotion-chat-glow");
       message.textContent = text;
       geminiMessages.appendChild(message);
       geminiMessages.scrollTop = geminiMessages.scrollHeight;
@@ -6022,6 +6023,30 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
     #geminiMessages .gemini-message.user,
     #geminiMessages .gemini-message.assistant:not(.error),
     #geminiPanel.open #geminiForm { animation: none !important; }
+  }
+</style>
+<style id="cinemotion-chat-glow-fix">
+  /* Force visible glow independent of previous Gemini CSS rules. */
+  #geminiMessages .cinemotion-chat-glow {
+    border: 1.5px solid #38cfff !important;
+    box-shadow: 0 0 8px rgba(56,207,255,.38), 0 0 20px rgba(56,207,255,.22), inset 0 0 12px rgba(56,207,255,.08) !important;
+    animation: cinemotionChatGlowPulse 2.8s ease-in-out infinite !important;
+  }
+  @keyframes cinemotionChatGlowPulse {
+    0%,100% { border-color:#31d5ff !important; box-shadow:0 0 8px rgba(49,213,255,.42),0 0 20px rgba(49,213,255,.22),inset 0 0 12px rgba(49,213,255,.08) !important; }
+    50% { border-color:#a879ff !important; box-shadow:0 0 12px rgba(168,121,255,.55),0 0 28px rgba(168,121,255,.32),inset 0 0 16px rgba(168,121,255,.12) !important; }
+  }
+  #geminiForm {
+    border:1.5px solid #31d5ff !important;
+    box-shadow:0 0 8px rgba(49,213,255,.35),0 0 20px rgba(49,213,255,.2) !important;
+    animation:cinemotionComposerGlowPulse 2.8s ease-in-out infinite !important;
+  }
+  @keyframes cinemotionComposerGlowPulse {
+    0%,100% { border-color:#31d5ff !important; box-shadow:0 0 8px rgba(49,213,255,.4),0 0 20px rgba(49,213,255,.2) !important; }
+    50% { border-color:#a879ff !important; box-shadow:0 0 12px rgba(168,121,255,.55),0 0 28px rgba(168,121,255,.3) !important; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #geminiMessages .cinemotion-chat-glow,#geminiForm { animation:none !important; }
   }
 </style>
 </body>
