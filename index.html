@@ -4789,6 +4789,17 @@
         if (progressTimer) { clearInterval(progressTimer); progressTimer = null; }
         if (progressHideTimer) { clearTimeout(progressHideTimer); progressHideTimer = null; }
         if (!progressBubble) return;
+        const rows = progressBubble.querySelectorAll(".progress-tool-row");
+        rows.forEach(row => {
+          row.classList.remove("active");
+          row.classList.add("done");
+          const state = row.querySelector(".progress-tool-state");
+          if (state) state.textContent = "Analyzed";
+        });
+        const heading = progressBubble.querySelector(".progress-head span:last-child");
+        if (heading) heading.textContent = "Specialist analysis complete";
+        const spinner = progressBubble.querySelector(".progress-spinner");
+        if (spinner) { spinner.style.animation = "none"; spinner.style.borderColor = "rgba(112,228,173,.7)"; spinner.style.borderTopColor = "rgba(112,228,173,.7)"; }
         progressBubble.classList.add("is-leaving");
         const bubbleToRemove = progressBubble;
         progressBubble = null;
