@@ -6373,3 +6373,34 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
   /* Hide the authentication gate in private single-user mode. */
   #authGateModal { display: none !important; }
 </style>
+
+<style id="cinemotion-mobile-compact-layout-v2">
+@media screen and (max-width:900px) and (orientation:portrait) {
+  .movements-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:10px !important; }
+  .vault-container { width:calc(100% - 16px) !important; padding-top:8px !important; }
+  .hero-banner-wrapper { margin:8px 0 12px !important; }
+  .hero-banner { min-height:360px !important; padding:24px 18px !important; }
+  .hero-banner h1 { font-size:clamp(32px,8vw,46px) !important; line-height:1.02 !important; }
+  .hero-banner p { font-size:13px !important; line-height:1.5 !important; max-width:95% !important; }
+  .categories-bar-wrapper { margin:8px 0 12px !important; }
+  .categories-bar { gap:7px !important; padding:4px 0 8px !important; }
+  .cat-tab { padding:8px 10px !important; font-size:12px !important; white-space:nowrap !important; }
+  .movement-card { border-radius:11px !important; }
+  .card-video-box { aspect-ratio:16/9 !important; }
+  .card-details { padding:9px !important; }
+  .card-details h3 { font-size:14px !important; line-height:1.25 !important; }
+  .card-details p, .prompt-box { font-size:11px !important; line-height:1.35 !important; }
+  .card-details button { padding:8px 6px !important; min-height:34px !important; font-size:11px !important; }
+}
+@media screen and (max-width:600px) and (orientation:portrait) {
+  .movements-grid { grid-template-columns:1fr !important; gap:9px !important; }
+  .movement-card { display:grid !important; grid-template-columns:38% minmax(0,1fr) !important; grid-template-rows:1fr !important; align-items:stretch !important; }
+  .card-video-box { grid-column:1; grid-row:1; height:100% !important; min-height:112px !important; aspect-ratio:auto !important; border-bottom:0 !important; }
+  .card-details { grid-column:2; grid-row:1; padding:10px !important; min-width:0 !important; }
+  .card-details p, .prompt-box { display:-webkit-box !important; -webkit-line-clamp:3 !important; -webkit-box-orient:vertical !important; overflow:hidden !important; }
+  .card-details button { margin-top:6px !important; }
+  .hero-banner { min-height:300px !important; padding:22px 15px !important; }
+  .hero-banner h1 { font-size:clamp(29px,8vw,38px) !important; }
+  .hero-banner p { font-size:12px !important; }
+}
+</style>
