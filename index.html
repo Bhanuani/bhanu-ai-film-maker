@@ -5128,6 +5128,40 @@
         if (!pending) pending = addGeminiMessage("", "assistant");
         // Keep the completed streamed text; only use the final response as a fallback.
         if (!streamedText) pending.textContent = finalText;
+        // CINEMOTION Cinematic Prompt Quality Checker: automatic local audit after prompt-like responses.
+        const qualityAudit = (() => {
+          if (!responseLooksLikePrompt) return null;
+          const checks = [
+            {label:"Story / action clarity", re:/(action|does|walk|run|fly|move|reveal|turn|enter|exit|interact|beat|sequence)/i, weight:12, fix:"Clarify the exact subject action and how it progresses from beginning to end."},
+            {label:"Shot framing / angle", re:/(wide shot|medium shot|close.?up|extreme close.?up|long shot|over.?the.?shoulder|pov|low angle|high angle|top angle|eye.?level|shot size|framing)/i, weight:12, fix:"Specify shot size and camera angle/height."},
+            {label:"Camera movement", re:/(camera (?:moves|movement|motion|tracks|pans|tilts|dollies|orbits|pushes|pulls|follows)|tracking shot|pan|tilt|dolly|orbit|crane|handheld|static camera|locked.?off)/i, weight:12, fix:"Define camera movement or explicitly state that the camera is static."},
+            {label:"Subject motion", re:/(slowly|quickly|gradually|suddenly|continuous|movement|motion|wings|steps|turns|reaches|runs|walks|flies|falls|rises|breathes|gestures)/i, weight:10, fix:"Describe subject motion with direction, speed and progression."},
+            {label:"Lighting", re:/(lighting|light source|backlight|rim light|key light|fill light|sunlight|moonlight|practical|shadow|lit|illuminat|glow|exposure)/i, weight:10, fix:"Add lighting source, direction and quality."},
+            {label:"Composition / depth", re:/(composition|foreground|midground|background|depth|negative space|leading lines|silhouette|frame|layer|perspective)/i, weight:8, fix:"Describe composition and foreground/background depth."},
+            {label:"Atmosphere / visual style", re:/(atmosphere|fog|mist|rain|smoke|dust|cinematic|realistic|photoreal|color grade|palette|texture|mood)/i, weight:8, fix:"Define atmosphere, mood and visual style more specifically."},
+            {label:"Timing / pacing", re:/(\d+\s*(?:seconds?|secs?)|duration|timecode|slow motion|real.?time|pacing|beat|gradually|hold the shot)/i, weight:8, fix:"Add duration and pacing; ensure actions fit the clip length."},
+            {label:"Continuity / constraints", re:/(continuity|maintain|preserve|consistent|same|do not|don't|without|no sudden|exactly|unchanged|screen direction)/i, weight:10, fix:"Add key continuity locks and explicit constraints."},
+            {label:"Sound direction", re:/(sound|audio|ambience|ambiance|sfx|foley|music|silence|wing sound|footsteps|wind|dialogue)/i, weight:5, fix:"Specify audio/ambience or explicitly request silence."},
+            {label:"Prompt conflicts", re:/(static camera.{0,80}(?:orbit|rotate|moving)|(?:orbit|rotate|moving).{0,80}static camera|(?:slow motion|slowly).{0,80}(?:instant|suddenly|2 seconds)|(?:instant|suddenly).{0,80}(?:slow motion|slowly))/i, weight:5, conflict:true, fix:"Resolve contradictory camera or timing instructions."}
+          ];
+          let score=0; const missing=[]; const conflicts=[];
+          checks.forEach(item=>{ if(item.conflict){ if(item.re.test(finalText)) conflicts.push(item.fix); else score+=item.weight; } else if(item.re.test(finalText)) score+=item.weight; else missing.push(item.fix); });
+          score=Math.max(0,Math.min(100,score));
+          const grade=score>=90?"Production Ready":score>=75?"Strong":score>=60?"Needs Refinement":"Needs Improvement";
+          return {score,grade,missing,conflicts,checks:checks.filter(x=>!x.conflict).map(x=>({label:x.label,ok:x.re.test(finalText)}))};
+        })();
+        if (qualityAudit && pending && !pending.querySelector(".cinemotion-quality-audit")) {
+          const audit=document.createElement("section");
+          audit.className="cinemotion-quality-audit";
+          const scoreColor=qualityAudit.score>=85?"#65e6ad":qualityAudit.score>=65?"#f6c86b":"#ff8a8a";
+          audit.innerHTML='<div class="cinemotion-audit-head"><strong>🎬 Cinematic Prompt Quality Check</strong><span class="cinemotion-audit-score" style="color:'+scoreColor+'">'+qualityAudit.score+'/100</span></div><div class="cinemotion-audit-grade">'+qualityAudit.grade+'</div><div class="cinemotion-audit-checks">'+qualityAudit.checks.map(x=>'<span class="'+(x.ok?'ok':'missing')+'">'+(x.ok?'✓':'○')+' '+x.label+'</span>').join('')+'</div>';
+          const issues=[...qualityAudit.conflicts,...qualityAudit.missing];
+          if(issues.length){const list=document.createElement("ul");list.className="cinemotion-audit-issues";issues.slice(0,5).forEach(issue=>{const li=document.createElement("li");li.textContent=issue;list.appendChild(li);});audit.appendChild(list);}
+          const improve=document.createElement("button");improve.type="button";improve.className="cinemotion-audit-improve";improve.textContent="✨ Improve Prompt";
+          improve.addEventListener("click",()=>{const auditNotes=issues.length?issues.join("\n- "):"Strengthen cinematic specificity, remove ambiguity, and preserve all creative intent and constraints.";sendGeminiMessage("Improve the following generated cinematic prompt using this quality audit. Preserve my original creative intent, story events, named subjects, reference constraints and all explicit negative instructions. Do not add story events. Fix only identified weaknesses and resolve contradictions. Output the improved ready-to-copy prompt first.\n\nAudit notes:\n- "+auditNotes+"\n\nPrompt to improve:\n"+finalText);});
+          audit.appendChild(improve);pending.appendChild(audit);
+        }
+
         const responseLooksLikePrompt = /(?:ready[- ]to[- ]copy|cinematic\s+(?:image|video)?\s*prompt|master\s+prompt|(?:^|\n)\s*(?:prompt\s*:|shot\s*breakdown\s*:)|\bshot\s*\d+\s*\()/i.test(finalText);
         if (userExplicitlyRequestedPrompt && responseLooksLikePrompt && !pending.querySelector(".gemini-copy-prompt")) {
           const copyButton = document.createElement("button");
