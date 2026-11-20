@@ -6049,5 +6049,64 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
     #geminiMessages .cinemotion-chat-glow,#geminiForm { animation:none !important; }
   }
 </style>
+<style id="cinemotion-rotating-border-fix">
+  /* Rotating light arc travelling around rounded chat bubble borders */
+  #geminiMessages .cinemotion-chat-glow {
+    position: relative !important;
+    isolation: isolate !important;
+    overflow: visible !important;
+  }
+  #geminiMessages .cinemotion-chat-glow::after {
+    content: "" !important;
+    position: absolute !important;
+    inset: -2px !important;
+    border-radius: inherit !important;
+    padding: 2px !important;
+    pointer-events: none !important;
+    z-index: 2 !important;
+    background: conic-gradient(from 0deg,
+      transparent 0deg 250deg,
+      rgba(52,214,255,.12) 270deg,
+      #35d9ff 300deg,
+      #a77bff 325deg,
+      rgba(52,214,255,.95) 342deg,
+      transparent 360deg) !important;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0) !important;
+    -webkit-mask-composite: xor !important;
+    mask-composite: exclude !important;
+    filter: drop-shadow(0 0 5px rgba(53,217,255,.55)) drop-shadow(0 0 9px rgba(167,123,255,.3)) !important;
+    animation: cinemotionRotatingBorder 2.4s linear infinite !important;
+  }
+  @keyframes cinemotionRotatingBorder { to { transform: rotate(360deg); } }
+  #geminiForm {
+    position: relative !important;
+    isolation: isolate !important;
+    overflow: visible !important;
+  }
+  #geminiForm::after {
+    content: "" !important;
+    position: absolute !important;
+    inset: -2px !important;
+    border-radius: inherit !important;
+    padding: 2px !important;
+    pointer-events: none !important;
+    z-index: 2 !important;
+    background: conic-gradient(from 0deg,
+      transparent 0deg 250deg,
+      rgba(52,214,255,.12) 270deg,
+      #35d9ff 300deg,
+      #a77bff 325deg,
+      rgba(52,214,255,.95) 342deg,
+      transparent 360deg) !important;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0) !important;
+    -webkit-mask-composite: xor !important;
+    mask-composite: exclude !important;
+    filter: drop-shadow(0 0 5px rgba(53,217,255,.55)) drop-shadow(0 0 9px rgba(167,123,255,.3)) !important;
+    animation: cinemotionRotatingBorder 2.4s linear infinite !important;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #geminiMessages .cinemotion-chat-glow::after,#geminiForm::after { animation:none !important; }
+  }
+</style>
 </body>
 </html>
