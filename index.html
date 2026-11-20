@@ -3664,6 +3664,21 @@
       </div>
     </section>
     <form class="gemini-composer" id="geminiForm">
+      <div class="gemini-story-reference-tools">
+        <button type="button" class="gemini-story-tool" id="geminiFramesToggle"><i class="fa-solid fa-film"></i> Frames</button>
+        <button type="button" class="gemini-story-tool" id="geminiIngredientsToggle"><i class="fa-solid fa-layer-group"></i> Ingredients</button>
+        <span class="gemini-story-ref-count" id="geminiStoryRefCount">0/7 reference images</span>
+      </div>
+      <section class="gemini-frame-panel" id="geminiFramePanel" hidden>
+        <div class="gemini-frame-panel-title">Story continuity frames <span>Arrange the story in order · maximum 7 images total</span></div>
+        <div class="gemini-frame-slots" id="geminiFrameSlots"></div>
+      </section>
+      <section class="gemini-ingredients-panel" id="geminiIngredientsPanel" hidden>
+        <div class="gemini-frame-panel-title">Ingredients <span>Character, prop, location, costume, or style references</span></div>
+        <button type="button" class="gemini-ingredient-upload" id="geminiIngredientUpload"><i class="fa-solid fa-plus"></i> Add ingredient images</button>
+        <input type="file" id="geminiIngredientInput" accept="image/*" multiple hidden>
+        <div class="gemini-ingredient-list" id="geminiIngredientList"></div>
+      </section>
       <input type="file" id="geminiFileInput" accept="image/*,video/*" multiple hidden>
       <div class="gemini-attachment-preview" id="geminiAttachmentPreview" hidden>
         <div class="gemini-attachment-grid" id="geminiAttachmentGrid"></div>
@@ -4604,6 +4619,18 @@
     const geminiNewChat = byId("geminiNewChat");
     const geminiClearChat = byId("geminiClearChat");
     const geminiFileInput = byId("geminiFileInput");
+    const geminiFramesToggle = byId("geminiFramesToggle");
+    const geminiIngredientsToggle = byId("geminiIngredientsToggle");
+    const geminiFramePanel = byId("geminiFramePanel");
+    const geminiIngredientsPanel = byId("geminiIngredientsPanel");
+    const geminiFrameSlots = byId("geminiFrameSlots");
+    const geminiIngredientInput = byId("geminiIngredientInput");
+    const geminiIngredientUpload = byId("geminiIngredientUpload");
+    const geminiIngredientList = byId("geminiIngredientList");
+    const geminiStoryRefCount = byId("geminiStoryRefCount");
+    const geminiFrameLabels = ["Start Frame","Frame 2","Continue Frame 1","Continue Frame 2","Continue Frame 3","Before Ending","Ending Frame"];
+    let geminiStoryFrames = Array(7).fill(null);
+    let geminiStoryIngredients = [];
     const geminiUploadBtn = byId("geminiUploadBtn");
     const geminiAttachmentPreview = byId("geminiAttachmentPreview");
     const geminiAttachmentGrid = byId("geminiAttachmentGrid");
@@ -5250,6 +5277,64 @@
     geminiClearChat?.addEventListener("click", () => {
       resetGeminiConversation();
     });
+    function renderStoryFrameSlots() {
+      if (!geminiFrameSlots) return;
+      geminiFrameSlots.replaceChildren();
+      geminiStoryFrames.forEach((file, slotIndex) => {
+        const slot = document.createElement("div"); slot.className = "gemini-frame-slot";
+        const input = document.createElement("input"); input.type = "file"; input.accept = "image/*"; input.hidden = true;
+        input.addEventListener("change", () => {
+          const selected = input.files?.[0]; if (!selected) return;
+          if (!selected.type.startsWith("image/")) { addGeminiMessage("Story frames must be images.", "assistant", true); return; }
+          if (selected.size > GEMINI_MAX_FILE_BYTES) { addGeminiMessage("Each reference image must be smaller than 15 MB.", "assistant", true); return; }
+          if (storyReferenceCount() >= 7 && !geminiStoryFrames[slotIndex]) { addGeminiMessage("Maximum 7 reference images total. Remove one first.", "assistant", true); return; }
+          geminiStoryFrames[slotIndex] = selected; renderStoryFrameSlots(); renderStoryIngredients(); updateStoryReferenceCount();
+        });
+        const btn = document.createElement("button"); btn.type = "button";
+        btn.innerHTML = "<i class='fa-solid fa-image'></i><strong>" + geminiFrameLabels[slotIndex] + "</strong><span>Choose image</span>";
+        btn.addEventListener("click", () => input.click());
+        slot.append(input,btn);
+        if (file) {
+          const url = URL.createObjectURL(file); const img = document.createElement("img"); img.src = url; img.alt = geminiFrameLabels[slotIndex];
+          const label = document.createElement("span"); label.className = "frame-slot-label"; label.textContent = geminiFrameLabels[slotIndex];
+          const remove = document.createElement("button"); remove.type = "button"; remove.className = "frame-slot-remove"; remove.textContent = "×"; remove.title = "Remove frame";
+          remove.addEventListener("click", () => { geminiStoryFrames[slotIndex] = null; renderStoryFrameSlots(); updateStoryReferenceCount(); });
+          slot.append(img,label,remove);
+        }
+        geminiFrameSlots.appendChild(slot);
+      });
+    }
+    function storyReferenceCount() { return geminiStoryFrames.filter(Boolean).length + geminiStoryIngredients.length; }
+    function updateStoryReferenceCount() { if (geminiStoryRefCount) geminiStoryRefCount.textContent = storyReferenceCount() + "/7 reference images"; }
+    function renderStoryIngredients() {
+      if (!geminiIngredientList) return;
+      geminiIngredientList.replaceChildren();
+      geminiStoryIngredients.forEach((file,index) => {
+        const chip=document.createElement("span"); chip.className="gemini-ingredient-chip";
+        chip.textContent=file.name;
+        const remove=document.createElement("button"); remove.type="button"; remove.textContent=" ×"; remove.style.cssText="border:0;background:none;color:#f6a9bd;cursor:pointer";
+        remove.addEventListener("click",()=>{geminiStoryIngredients.splice(index,1);renderStoryIngredients();updateStoryReferenceCount();});
+        chip.appendChild(remove); geminiIngredientList.appendChild(chip);
+      });
+    }
+    function clearStoryReferences() { geminiStoryFrames=Array(7).fill(null); geminiStoryIngredients=[]; renderStoryFrameSlots(); renderStoryIngredients(); updateStoryReferenceCount(); if(geminiIngredientInput)geminiIngredientInput.value=""; }
+    function buildStoryReferencePrompt(userPrompt) {
+      const orderedFrames=geminiStoryFrames.map((file,index)=>file?{file,label:geminiFrameLabels[index]}:null).filter(Boolean);
+      if (!orderedFrames.length && !geminiStoryIngredients.length) return {prompt:userPrompt,files:[]};
+      const frameInstructions=orderedFrames.length ? "\\n\\nSTORY CONTINUITY FRAME REFERENCES (images attached in this exact order):\\n"+orderedFrames.map((f,i)=>"Reference "+(i+1)+": "+f.label+" — "+f.file.name).join("\\n")+"\\nTreat these as ordered visual checkpoints of one continuous story. Preserve subject identity, costume, props, location, lighting direction, screen direction, geometry, and spatial continuity. Do not invent intermediate events that contradict the images. Build a coherent cinematic prompt that connects each checkpoint smoothly; explicitly describe the action and transitions between frames. Respect Start Frame, Frame 2, continuation frames, Before Ending, and Ending Frame as chronology. If some slots are empty, infer only the minimal connective action needed.";
+      const ingredientInstructions=geminiStoryIngredients.length ? "\\n\\nINGREDIENT REFERENCES (attached after the continuity frames):\\n"+geminiStoryIngredients.map((f,i)=>"Ingredient "+(i+1)+": "+f.name).join("\\n")+"\\nUse ingredients as persistent reference locks for character, object, costume, environment, or visual style. Do not treat ingredients as chronological story frames.";
+      return {prompt:(userPrompt||"Create a cinematic story prompt using the supplied reference images.")+frameInstructions+ingredientInstructions,files:[...orderedFrames.map(x=>x.file),...geminiStoryIngredients]};
+    }
+    geminiFramesToggle?.addEventListener("click",()=>{geminiFramePanel.hidden=!geminiFramePanel.hidden;geminiFramesToggle.classList.toggle("active",!geminiFramePanel.hidden);if(!geminiFramePanel.hidden){geminiIngredientsPanel.hidden=true;geminiIngredientsToggle.classList.remove("active");}});
+    geminiIngredientsToggle?.addEventListener("click",()=>{geminiIngredientsPanel.hidden=!geminiIngredientsPanel.hidden;geminiIngredientsToggle.classList.toggle("active",!geminiIngredientsPanel.hidden);if(!geminiIngredientsPanel.hidden){geminiFramePanel.hidden=true;geminiFramesToggle.classList.remove("active");}});
+    geminiIngredientUpload?.addEventListener("click",()=>geminiIngredientInput?.click());
+    geminiIngredientInput?.addEventListener("change",()=>{
+      const files=Array.from(geminiIngredientInput.files||[]).filter(f=>f.type.startsWith("image/"));
+      const room=Math.max(0,7-storyReferenceCount()); if(files.some(f=>f.size>GEMINI_MAX_FILE_BYTES)){addGeminiMessage("Each reference image must be smaller than 15 MB.","assistant",true);return;}
+      if(files.length>room){addGeminiMessage("Maximum 7 reference images total. Only "+room+" more can be added.","assistant",true);return;}
+      geminiStoryIngredients.push(...files);renderStoryIngredients();updateStoryReferenceCount();geminiIngredientInput.value="";
+    });
+    renderStoryFrameSlots(); updateStoryReferenceCount();
     geminiUploadBtn?.addEventListener("click", () => geminiFileInput?.click());
     geminiFileInput?.addEventListener("change", () => {
       const files = Array.from(geminiFileInput.files || []);
@@ -5292,10 +5377,14 @@
     geminiForm?.addEventListener("submit", (event) => {
       event.preventDefault();
       const value = geminiInput?.value || "";
-      const files = [...geminiSelectedFiles];
+      const storyRefs = buildStoryReferencePrompt(value);
+      const allFiles = [...storyRefs.files, ...geminiSelectedFiles];
+      if (allFiles.length > 7) { addGeminiMessage("Gemini supports up to 7 image references per request in this panel. Please remove extras.", "assistant", true); return; }
+      const files = allFiles;
       if (geminiInput) { geminiInput.value = ""; resizeGeminiComposer(); }
       clearGeminiAttachment();
-      sendGeminiMessage(value, files);
+      clearStoryReferences();
+      sendGeminiMessage(storyRefs.prompt, files);
     });
     function resizeGeminiComposer() {
       if (!geminiInput) return;
@@ -6090,6 +6179,27 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
   @media (prefers-reduced-motion: reduce) {
     #geminiMessages .cinemotion-chat-glow::after,#geminiForm::after { animation:none !important; }
   }
+</style>
+<style id="gemini-story-reference-ui">
+  #geminiForm { display:flex; flex-wrap:wrap; }
+  .gemini-story-reference-tools { display:flex; align-items:center; gap:7px; flex:0 0 100%; padding:0 4px 5px; }
+  .gemini-story-tool,.gemini-ingredient-upload { border:1px solid rgba(84,190,255,.28); border-radius:10px; background:rgba(24,36,58,.85); color:#dce9ff; padding:7px 11px; font-size:12px; font-weight:700; cursor:pointer; }
+  .gemini-story-tool.active { border-color:#43d9ff; color:#55ddff; box-shadow:0 0 10px rgba(50,210,255,.13); }
+  .gemini-story-ref-count { margin-left:auto; font-size:11px; color:#8294b2; }
+  .gemini-frame-panel,.gemini-ingredients-panel { flex:0 0 100%; padding:9px 6px 11px; border:1px solid rgba(80,155,255,.18); border-radius:13px; margin-bottom:5px; background:rgba(10,16,29,.55); }
+  .gemini-frame-panel-title { font-size:12px; color:#d8e7ff; font-weight:700; margin:0 0 8px; }
+  .gemini-frame-panel-title span { display:block; color:#8192ad; font-size:10px; font-weight:400; margin-top:3px; }
+  .gemini-frame-slots { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; }
+  .gemini-frame-slot { min-height:70px; border:1px dashed rgba(74,191,255,.42); border-radius:10px; overflow:hidden; background:rgba(20,30,48,.7); position:relative; }
+  .gemini-frame-slot button { width:100%; height:100%; min-height:70px; border:0; background:transparent; color:#a8bad5; padding:6px; cursor:pointer; display:flex; flex-direction:column; gap:4px; align-items:center; justify-content:center; font-size:10px; text-align:center; }
+  .gemini-frame-slot button strong { color:#cde7ff; font-size:10px; }
+  .gemini-frame-slot img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .gemini-frame-slot .frame-slot-label { position:absolute; left:0; right:0; bottom:0; background:rgba(4,9,18,.82); color:#eaf5ff; padding:4px; font-size:9px; z-index:2; text-align:center; }
+  .gemini-frame-slot .frame-slot-remove { position:absolute; top:3px; right:3px; z-index:3; border:0; border-radius:50%; width:20px; height:20px; color:white; background:rgba(0,0,0,.72); cursor:pointer; }
+  .gemini-ingredient-upload { display:inline-flex; gap:6px; align-items:center; }
+  .gemini-ingredient-list { display:flex; flex-wrap:wrap; gap:6px; margin-top:7px; }
+  .gemini-ingredient-chip { font-size:10px; color:#c7d8f3; padding:5px 8px; background:#172238; border:1px solid rgba(76,170,255,.25); border-radius:8px; }
+  @media(max-width:540px) { .gemini-frame-slots { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 </style>
 </body>
 </html>
