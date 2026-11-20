@@ -3719,22 +3719,28 @@
       transform: none;
       box-shadow: 0 14px 34px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.18);
     }
+    #geminiMessages .gemini-message:has(.gemini-copy-prompt) {
+      padding-bottom: 54px;
+    }
     #geminiMessages .gemini-copy-prompt {
-      position: relative;
-      z-index: 2;
+      position: absolute;
+      z-index: 3;
+      right: 14px;
+      bottom: 13px;
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      margin-top: 12px;
-      padding: 7px 12px;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      padding: 0;
       border-radius: 10px;
       color: #e8f5ff;
-      font: 600 12px/1.2 inherit;
+      font: 600 15px/1 inherit;
       background: linear-gradient(145deg, rgba(39,197,255,.20), rgba(113,85,255,.17));
       border: 1px solid rgba(120,196,255,.42);
       box-shadow: 0 5px 12px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.28);
       cursor: pointer;
-      transition: background .18s ease, box-shadow .18s ease;
+      transition: background .18s ease, box-shadow .18s ease, transform .18s ease;
     }
     #geminiMessages .gemini-copy-prompt:hover {
       background: linear-gradient(145deg, rgba(39,197,255,.3), rgba(113,85,255,.25));
@@ -4952,21 +4958,21 @@
           const copyButton = document.createElement("button");
           copyButton.type = "button";
           copyButton.className = "gemini-copy-prompt";
-          copyButton.innerHTML = "▣ <span>Copy Prompt</span>";
+          copyButton.innerHTML = '<i class="fa-regular fa-copy" aria-hidden="true"></i>';\n          copyButton.setAttribute("aria-label", "Copy prompt");\n          copyButton.title = "Copy prompt";
           copyButton.addEventListener("click", async () => {
             const displayed = pending.textContent || finalText;
             const promptMatch = displayed.match(/(?:\*\*Prompt:\*\*|Prompt:)([\s\S]*?)(?=\n\s*(?:\*\*Shot Breakdown:?\*\*|\*\*Continuity Locks:?\*\*|\*\*Director Notes:?\*\*)|$)/i);
             const textToCopy = (promptMatch ? promptMatch[1] : displayed).trim();
             try {
               await navigator.clipboard.writeText(textToCopy);
-              copyButton.innerHTML = "✓ <span>Copied!</span>";
-              setTimeout(() => { copyButton.innerHTML = "▣ <span>Copy Prompt</span>"; }, 1500);
+              copyButton.innerHTML = '<i class="fa-solid fa-check" aria-hidden="true"></i>';\n              copyButton.title = "Copied!";
+              setTimeout(() => { copyButton.innerHTML = '<i class="fa-regular fa-copy" aria-hidden="true"></i>';\n              copyButton.title = "Copy prompt"; }, 1500);
             } catch (_) {
               const temp = document.createElement("textarea");
               temp.value = textToCopy; document.body.appendChild(temp); temp.select();
               document.execCommand("copy"); temp.remove();
-              copyButton.innerHTML = "✓ <span>Copied!</span>";
-              setTimeout(() => { copyButton.innerHTML = "▣ <span>Copy Prompt</span>"; }, 1500);
+              copyButton.innerHTML = '<i class="fa-solid fa-check" aria-hidden="true"></i>';\n              copyButton.title = "Copied!";
+              setTimeout(() => { copyButton.innerHTML = '<i class="fa-regular fa-copy" aria-hidden="true"></i>';\n              copyButton.title = "Copy prompt"; }, 1500);
             }
           });
           pending.appendChild(copyButton);
