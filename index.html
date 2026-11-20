@@ -1803,8 +1803,8 @@
     </div>
   </div>
 
-  <!-- AUTHENTICATION GATE TEMPORARILY ON HOLD -->
-  <div id="authGateModal" class="auth-gate-modal" style="display: none !important;" hidden aria-hidden="true">
+  <!-- AUTHENTICATION GATE -->
+  <div id="authGateModal" class="auth-gate-modal" style="display: none;">
     <div class="auth-card">
       <div style="text-align: center; margin-bottom: 1.5rem;">
         <img src="assets/cinemotion/icon-128.png" alt="CINEMOTION logo" style="width:76px;height:76px;object-fit:contain;display:block;margin:0 auto 10px;filter:drop-shadow(0 0 14px rgba(0,210,255,.25));">
@@ -3957,16 +3957,9 @@ When the user submits a cinematic idea, image prompt, video prompt, scene descri
         }
         loadFirebaseMovements().then(() => loadVaultCategories());
       } else {
-        // TEMPORARY LOGIN HOLD: keep the studio accessible without sign-in.
-        // Verified-admin controls remain locked by requireVerifiedAdmin().
-        document.body.classList.remove("is-admin-active");
-        if (gate) { gate.style.display = "none"; gate.hidden = true; gate.setAttribute("aria-hidden", "true"); }
-        if (byId("profileDisplayName")) byId("profileDisplayName").innerText = "Director";
-        if (byId("profileDisplayEmail")) byId("profileDisplayEmail").innerText = "Login temporarily disabled";
-        if (byId("headerUserAvatar")) byId("headerUserAvatar").innerText = "D";
-        if (byId("profileAvatarLarge")) byId("profileAvatarLarge").innerText = "D";
-        if (byId("profileBadgeRole")) byId("profileBadgeRole").innerText = "GUEST MODE";
-        loadFirebaseMovements().then(() => loadVaultCategories()).catch(err => console.warn("Guest vault load:", err));
+        document.body.classList.remove("is-admin-active", "director-mode", "director-show-gemini");
+        byId("geminiPanel")?.classList.remove("open");
+        if (gate) gate.style.display = "flex";
       }
     }, (err) => showAuthMessage(explainFirebaseError(err, "Authentication state check")));
 
@@ -4611,7 +4604,9 @@ When the user submits a cinematic idea, image prompt, video prompt, scene descri
       geminiPanel?.classList.add("open");
       geminiPanel?.setAttribute("aria-hidden", "false");
       syncDirectorLibrary(geminiInput?.value || "");
-      // Login temporarily disabled: open Gemini without showing sign-in prompts.
+      if (!auth.currentUser && geminiMessages && !geminiMessages.querySelector(".gemini-message")) {
+        addGeminiMessage("Please sign in to use Gemini. Sign in with your account, then reopen Gemini.", "assistant", true);
+      }
       geminiInput?.focus();
     }
     function closeGeminiPanel() {
@@ -4817,7 +4812,10 @@ When the user submits a cinematic idea, image prompt, video prompt, scene descri
       if (hasReferenceVideo) ["filmDirector","shotBreakdown","cameraDirector","compositionDirector","lightingDirector","colorMoodDirector","motionPhysicsDirector","durationPlanner","sceneConsistency","visualStyleLock","realismChecker","complexityAnalyzer","videoMotionPlanner","referenceVideoDirector"].forEach(id => { if (!autoTools.includes(id)) autoTools.push(id); });
       const userExplicitlyRequestedPrompt = /(?:\b(?:generate|create|write|make|give|provide|improve|enhance|rewrite|craft)\b.{0,70}\bprompt\b|\bprompt\b.{0,50}\b(?:ivvu|generate|create|write|give|make|chey|provide)\b|\b(?:image|video|cinematic|animation)\s+prompt\b)/i.test(prompt);
       if (!prompt && !attachedFiles.length) return;
-      // Login temporarily disabled: Gemini can be used without a sign-in prompt.
+      if (!auth.currentUser) {
+        addGeminiMessage("Please sign in to use Gemini.", "assistant", true);
+        return;
+      }
       if (!window.cinemotionGeminiModel) {
         addGeminiMessage("Gemini is not initialized. Check that Firebase AI Logic is enabled for this project and that App Check is correctly registered for this web app.", "assistant", true);
         return;
@@ -5180,7 +5178,10 @@ When the user submits a cinematic idea, image prompt, video prompt, scene descri
       if (!prompt && !hasAttachments) return;
 
       // Validate authentication/model before spending time on the intro animation.
-      // Login temporarily disabled: Gemini can be used without a sign-in prompt.
+      if (!auth.currentUser) {
+        addGeminiMessage("Please sign in to use Gemini.", "assistant", true);
+        return;
+      }
       if (!window.cinemotionGeminiModel) {
         addGeminiMessage("Gemini is not initialized. Check Firebase AI Logic and App Check configuration.", "assistant", true);
         return;
@@ -5522,7 +5523,11 @@ When the user submits a cinematic idea, image prompt, video prompt, scene descri
         landing.setAttribute("aria-hidden", "true");
         document.body.classList.remove("cinemotion-landing-active");
         const gate = document.getElementById("authGateModal");
-        // Login is temporarily on hold; do not show the authentication gate on entry.
+        // The existing Firebase onAuthStateChanged handler remains responsible for
+        // deciding whether the user sees the app or the current sign-in gate.
+        if (gate && !window.__cinemotionAuthStateResolved) {
+          gate.style.display = "flex";
+        }
       };
 
       landing.querySelectorAll("[data-enter-cinemotion]").forEach((control) => {
