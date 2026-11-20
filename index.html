@@ -6049,60 +6049,43 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
     #geminiMessages .cinemotion-chat-glow,#geminiForm { animation:none !important; }
   }
 </style>
-<style id="cinemotion-rotating-border-fix">
-  /* Rotating light arc travelling around rounded chat bubble borders */
-  #geminiMessages .cinemotion-chat-glow {
-    position: relative !important;
-    isolation: isolate !important;
-    overflow: visible !important;
+<style id="cinemotion-small-rotating-border">
+  /* A small traveling light arc on the rounded border only — no diagonal sweep across the bubble. */
+  @property --cinemotion-border-angle {
+    syntax: "<angle>";
+    inherits: false;
+    initial-value: 0deg;
   }
-  #geminiMessages .cinemotion-chat-glow::after {
-    content: "" !important;
-    position: absolute !important;
-    inset: -2px !important;
-    border-radius: inherit !important;
-    padding: 2px !important;
-    pointer-events: none !important;
-    z-index: 2 !important;
-    background: conic-gradient(from 0deg,
-      transparent 0deg 250deg,
-      rgba(52,214,255,.12) 270deg,
-      #35d9ff 300deg,
-      #a77bff 325deg,
-      rgba(52,214,255,.95) 342deg,
-      transparent 360deg) !important;
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0) !important;
-    -webkit-mask-composite: xor !important;
-    mask-composite: exclude !important;
-    filter: drop-shadow(0 0 5px rgba(53,217,255,.55)) drop-shadow(0 0 9px rgba(167,123,255,.3)) !important;
-    animation: cinemotionRotatingBorder 2.4s linear infinite !important;
-  }
-  @keyframes cinemotionRotatingBorder { to { transform: rotate(360deg); } }
+  #geminiMessages .cinemotion-chat-glow,
   #geminiForm {
     position: relative !important;
     isolation: isolate !important;
-    overflow: visible !important;
   }
+  #geminiMessages .cinemotion-chat-glow::after,
   #geminiForm::after {
     content: "" !important;
     position: absolute !important;
-    inset: -2px !important;
+    inset: -1.5px !important;
     border-radius: inherit !important;
-    padding: 2px !important;
+    padding: 1.5px !important;
     pointer-events: none !important;
-    z-index: 2 !important;
-    background: conic-gradient(from 0deg,
-      transparent 0deg 250deg,
-      rgba(52,214,255,.12) 270deg,
-      #35d9ff 300deg,
-      #a77bff 325deg,
-      rgba(52,214,255,.95) 342deg,
-      transparent 360deg) !important;
+    z-index: 3 !important;
+    background: conic-gradient(from var(--cinemotion-border-angle),
+      transparent 0deg 324deg,
+      rgba(40,210,255,.18) 330deg,
+      #39d8ff 337deg,
+      #a875ff 344deg,
+      #ffffff 348deg,
+      #39d8ff 352deg,
+      transparent 358deg 360deg) !important;
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0) !important;
     -webkit-mask-composite: xor !important;
     mask-composite: exclude !important;
-    filter: drop-shadow(0 0 5px rgba(53,217,255,.55)) drop-shadow(0 0 9px rgba(167,123,255,.3)) !important;
-    animation: cinemotionRotatingBorder 2.4s linear infinite !important;
+    filter: drop-shadow(0 0 3px rgba(55,215,255,.5)) !important;
+    animation: cinemotionSmallArcRotate 3.2s linear infinite !important;
+  }
+  @keyframes cinemotionSmallArcRotate {
+    to { --cinemotion-border-angle: 360deg; }
   }
   @media (prefers-reduced-motion: reduce) {
     #geminiMessages .cinemotion-chat-glow::after,#geminiForm::after { animation:none !important; }
