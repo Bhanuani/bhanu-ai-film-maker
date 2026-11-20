@@ -5522,10 +5522,13 @@
     });
     function resizeGeminiComposer() {
       if (!geminiInput) return;
-      geminiInput.style.height = "38px";
-      const nextHeight = Math.min(geminiInput.scrollHeight, 150);
+      const mobile = window.matchMedia("(max-width: 700px)").matches;
+      const baseHeight = mobile ? 42 : 38;
+      const maxHeight = mobile ? 88 : 150;
+      geminiInput.style.height = baseHeight + "px";
+      const nextHeight = Math.min(geminiInput.scrollHeight, maxHeight);
       geminiInput.style.height = nextHeight + "px";
-      geminiInput.style.overflowY = geminiInput.scrollHeight > 150 ? "auto" : "hidden";
+      geminiInput.style.overflowY = geminiInput.scrollHeight > maxHeight ? "auto" : "hidden";
     }
     geminiInput?.addEventListener("input", resizeGeminiComposer);
     geminiInput?.addEventListener("keydown", (event) => {
@@ -6449,5 +6452,20 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
 }
 </style>
 
+
+<style id="cinemotion-gemini-mobile-chatgpt-compact-composer">
+@media (max-width:700px) {
+  #geminiPanel #geminiForm { display:flex !important; flex-wrap:wrap !important; align-items:center !important; gap:5px !important; width:calc(100% - 16px) !important; margin:6px 8px 0 !important; padding:6px 8px !important; min-height:0 !important; border-radius:22px !important; background:rgba(22,29,43,.98) !important; }
+  #geminiPanel .gemini-story-reference-tools { flex:0 0 100% !important; width:100% !important; margin:0 !important; padding:0 1px 3px !important; min-height:30px !important; align-items:center !important; }
+  #geminiPanel .gemini-story-tool { min-height:29px !important; padding:5px 8px !important; border-radius:999px !important; font-size:10px !important; }
+  #geminiPanel .gemini-story-ref-count { margin-left:auto !important; font-size:9px !important; }
+  #geminiPanel #geminiInput { flex:1 1 0 !important; width:0 !important; min-width:0 !important; min-height:42px !important; height:42px !important; max-height:88px !important; margin:0 !important; padding:10px 5px !important; border:0 !important; border-radius:14px !important; background:transparent !important; color:#f5f7fb !important; font-size:16px !important; line-height:1.35 !important; resize:none !important; outline:none !important; box-shadow:none !important; transform:none !important; }
+  #geminiPanel #geminiInput:focus { min-height:42px !important; border:0 !important; outline:none !important; box-shadow:none !important; background:transparent !important; }
+  #geminiPanel .gemini-upload-btn, #geminiPanel #geminiSend { flex:0 0 36px !important; width:36px !important; height:36px !important; min-width:36px !important; min-height:36px !important; border-radius:50% !important; margin:0 !important; align-self:center !important; }
+  #geminiPanel #geminiSend { background:#e8edf5 !important; color:#101521 !important; }
+  #geminiPanel #geminiSend i { color:inherit !important; }
+  #geminiPanel #geminiForm:focus-within { transform:none !important; min-height:0 !important; }
+}
+</style>
 </body>
 </html>
