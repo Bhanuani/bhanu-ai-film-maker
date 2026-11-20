@@ -1,0 +1,16 @@
+{
+  "name": "CINEMOTION STUDIO — AI Filmmaking",
+  "short_name": "CINEMOTION",
+  "description": "Cinematic prompt creation studio and AI filmmaking toolkit.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#040711",
+  "theme_color": "#040711",
+  "icons": [
+    { "src": "assets/cinemotion/icon-128.png", "sizes": "128x128", "type": "image/png" },
+    { "src": "assets/cinemotion/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "assets/cinemotion/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}
