@@ -1,4 +1,4 @@
-const CACHE_NAME = "cinemotion-shell-v1";
+const CACHE_NAME = "cinemotion-shell-v2";
 const SHELL = ["./", "./index.html", "./site.webmanifest"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(SHELL)).catch(() => {}));
