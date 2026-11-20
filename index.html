@@ -3451,7 +3451,7 @@
       if (profileDropdown && !clickedInsideProfile) {
         profileDropdown.classList.remove("show");
       }
-      if (themesModal && e.target === themesModal) themesModal.style.display = "none";
+
     });
 
     window.openForgotPasswordModal = function() {
@@ -4751,7 +4751,7 @@
 
     async function sendGeminiMessageNow(rawText, attachedFile = null) {
       const prompt = String(rawText || "").trim();
-      const autoTools = detectCinemotionAITools(prompt);
+      const autoTools = (window.detectCinemotionAITools || window.detectCinemationAITools || detectCinemotionAITools)(prompt);
       const autoVfx = detectCinemotionVfxTools(prompt);
       const vfxStatus = document.getElementById("geminiVfxStatus");
       const vfxStatusText = vfxStatus?.querySelector(".vfx-status-text");
@@ -5735,7 +5735,9 @@
     if(!/(prompt|cinematic|video|shot|scene|generate|create|make|write|improve|enhance|film|storyboard|camera|lighting|character|environment|sound|dragon|warrior|action|reveal|vfx|image|animate|motion|composition|color|colour|acting|duration|style|realism|physics)/i.test(p)) return [];
     const t=[], has=r=>r.test(p);
     const add=(id)=>{if(!t.includes(id))t.push(id)};
-    add("filmDirector"); add("cameraDirector");\n    // Core specialists run automatically for every cinematic request; context-specific specialists are added below.\n    add("promptOptimizer"); add("compositionDirector"); add("colorMoodDirector"); add("lightingDirector"); add("visualStyleLock"); add("realismChecker"); add("complexityAnalyzer");
+    add("filmDirector"); add("cameraDirector");
+    // Core specialists run automatically for every cinematic request; context-specific specialists are added below.
+    add("promptOptimizer"); add("compositionDirector"); add("colorMoodDirector"); add("lightingDirector"); add("visualStyleLock"); add("realismChecker"); add("complexityAnalyzer");
     if(has(/(light|lighting|shadow|dark|bright|mood|color temperature|colour temperature|golden hour|night|sunset|sunrise|key light|rim light|fill light|practical light)/)) add("lightingDirector");
     if(has(/(character|face|costume|clothes|body|identity|same person|continuity|reference|preserve|consistent|wardrobe|hair)/)) add("characterContinuity");
     if(has(/(world|environment|location|background|weather|forest|city|desert|mountain|temple|planet|setting|atmosphere|architecture)/)) add("worldBuilder");
@@ -5759,6 +5761,9 @@
     for(const v of detectCinemotionVfxTools(p)) add("vfx_"+v);
     return t;
   }
+  // Compatibility aliases for older deployed code that used the alternate spelling.
+  window.detectCinemotionAITools = detectCinemotionAITools;
+  window.detectCinemationAITools = detectCinemotionAITools;
   </script>
   <script id="cinemotion-vfx-smart-controls-script">
   (()=> {
