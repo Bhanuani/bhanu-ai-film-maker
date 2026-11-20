@@ -4745,7 +4745,7 @@
       const prompt = String(rawText || "").trim();
       const autoTools = (window.detectCinemotionAITools || window.detectCinemationAITools || detectCinemotionAITools)(prompt);
       const autoVfx = detectCinemotionVfxTools(prompt);
-      const toolNames = {referenceVideoDirector:"Reference Video Replication Director",filmDirector:"AI Film Director",shotBreakdown:"AI Shot Breakdown",cameraDirector:"Camera Director",lightingDirector:"Lighting Director",characterContinuity:"Character Continuity",worldBuilder:"World Builder",soundDirector:"Sound Design Director",storyboardPlanner:"Storyboard Planner",promptOptimizer:"Prompt Optimizer",sceneConsistency:"Scene Consistency Engine",compositionDirector:"Composition Director",colorMoodDirector:"Color & Mood Director",motionPhysicsDirector:"Motion & Physics Director",actingDirector:"Emotion & Acting Director",durationPlanner:"Shot Duration Planner",visualStyleLock:"Visual Style Lock",realismChecker:"Realism Checker",complexityAnalyzer:"Scene Complexity Analyzer",characterBlocking:"Character Blocking Director",vfxSupervisor:"VFX Supervisor",videoMotionPlanner:"Video Motion Planner",vfx_director:"VFX Auto Director",vfx_atmosphere:"Atmosphere FX",vfx_impact:"Impact FX",vfx_magic:"Magic / Energy FX",vfx_transition:"Transition Designer"};
+      const toolNames = {referenceVideoDirector:"Reference Video Replication Director",filmDirector:"AI Film Director",shotBreakdown:"AI Shot Breakdown",cameraDirector:"Camera Director",lightingDirector:"Lighting Director",characterContinuity:"Character Continuity",worldBuilder:"World Builder",soundDirector:"Sound Design Director",storyboardPlanner:"Storyboard Planner",promptOptimizer:"Prompt Optimizer",sceneConsistency:"Scene Consistency Engine",compositionDirector:"Composition Director",colorMoodDirector:"Color & Mood Director",motionPhysicsDirector:"Motion & Physics Director",actingDirector:"Emotion & Acting Director",durationPlanner:"Shot Duration Planner",visualStyleLock:"Visual Style Lock",realismChecker:"Realism Checker",complexityAnalyzer:"Scene Complexity Analyzer",characterBlocking:"Character Blocking Director",vfxSupervisor:"VFX Supervisor",videoMotionPlanner:"Video Motion Planner",shotAnalysisAI:"Cinematic Shot Analysis AI",lensIntelligenceAI:"Lens Intelligence AI",cameraAngleAI:"Camera Angle Intelligence AI",cameraMovementAI:"Camera Movement Intelligence AI",motionAnalysisAI:"Subject Motion Analysis AI",physicsAI:"Physics & Motion AI",compositionAI:"Composition Intelligence AI",depthFocusAI:"Depth & Focus AI",editingIntelligenceAI:"Editing Intelligence AI",audioVisualSyncAI:"Audio-Visual Sync AI",videoQualityAI:"Video Quality & Rendering AI",continuityAI:"Cinematic Continuity AI",cinematicDirectorAI:"Cinematic Director Intelligence AI",vfx_director:"VFX Auto Director",vfx_atmosphere:"Atmosphere FX",vfx_impact:"Impact FX",vfx_magic:"Magic / Energy FX",vfx_transition:"Transition Designer"};
       const vfxToolNames = {director:"Auto Director",atmosphere:"Atmosphere FX",impact:"Impact FX",magic:"Magic / Energy FX",transition:"Transition Designer"};
       let progressBubble = null, progressTimer = null, progressIndex = 0, progressHideTimer = null;
       let progressTools = [];
@@ -4921,8 +4921,165 @@
           characterBlocking:"CHARACTER BLOCKING DIRECTOR: map each character's screen position, facing, eyelines, movement path, distance and interaction. Maintain screen direction and spatial geography across cuts.",
           vfxSupervisor:"VFX SUPERVISOR: select only story-motivated VFX, specify timing, scale, compositing/lighting integration and environmental interaction. Do not add effects gratuitously.",
           videoMotionPlanner:"IMAGE-TO-VIDEO / MOTION PLANNER: separate subject motion, background/environment motion, camera motion and temporal progression; create one coherent primary action with a start, middle and end. Respect image composition and locked reference details.",
+          shotAnalysisAI:"CINEMATIC SHOT ANALYSIS AI: analyze scene purpose, emotional beat, subject hierarchy, reveal/build-up/climax, shot size and whether one shot or a shot sequence is justified. State observed details versus recommendations; do not claim exact detection from text alone.",
+          lensIntelligenceAI:"LENS INTELLIGENCE AI: choose a motivated focal length/lens type for every shot (e.g. 18/24/35/50/85/100mm, anamorphic if appropriate). Explain how lens affects perspective, distortion, compression, subject distance and story. If no reference image/video or metadata exists, label this as a recommendation—not a detected physical lens.",
+          cameraAngleAI:"CAMERA ANGLE INTELLIGENCE AI: choose and specify camera height/orientation and motivated angle (eye-level, low, high, overhead, worm's-eye, Dutch, etc.) for each shot; preserve explicit user direction.",
+          cameraMovementAI:"CAMERA MOVEMENT INTELLIGENCE AI: plan camera rig/movement, path, direction, speed, acceleration/deceleration, start/end position and stabilization for each shot. Avoid conflicting simultaneous moves; specify static camera when appropriate.",
+          motionAnalysisAI:"SUBJECT MOTION ANALYSIS AI: describe subject motion vectors, trajectory, timing, speed changes, pose/action progression, interaction and start/end states. Separate subject motion from camera and environment motion.",
+          physicsAI:"PHYSICS & MOTION AI: specify believable gravity, mass/scale, momentum, inertia, acceleration, drag, collisions, lift/thrust, wing/body mechanics, fluid/cloth/hair/particle behavior and environmental reaction. Identify uncertainty and avoid pseudo-precise physical claims.",
+          compositionAI:"COMPOSITION INTELLIGENCE AI: design framing, subject placement, foreground/midground/background, scale cues, leading lines, negative space, horizon, frame balance and camera-to-subject distance for each shot.",
+          depthFocusAI:"DEPTH & FOCUS AI: select focus target, focus distance behavior, depth-of-field, aperture feel, deep/shallow focus, bokeh and motivated rack/tracking focus; avoid contradictory focus instructions.",
+          editingIntelligenceAI:"EDITING INTELLIGENCE AI: determine if cuts or edits are needed and choose only relevant techniques—montage, beat sync, auto-cut pacing, reframe, scene detection, freeze frame, flash cut, reverse, loop, jump cut, cross dissolve, glitch, masking/rotoscoping, background replacement, object removal, keyframe motion, stabilization, film grain, HDR/tone mapping, audio ducking, voice isolation, audio fades, dialogue timing and continuity checks. For each selected technique specify purpose, shot/time, duration and constraints. Do not imply actual media processing is performed; this is prompt-level direction unless a real editing engine is connected.",
+          audioVisualSyncAI:"AUDIO-VISUAL SYNC AI: when audio/music/dialogue is provided or requested, plan beat/action/cut/SFX/dialogue synchronization, audio ducking, voice isolation, fades and intentional silence. Without audio input, describe cues rather than claim beat detection.",
+          videoQualityAI:"VIDEO QUALITY & RENDERING AI: recommend target resolution, aspect ratio, FPS, visual fidelity, texture/detail, dynamic range/HDR, color depth, natural sharpness, motion blur, noise/grain, temporal consistency and artifact prevention appropriate to scene and target model. Distinguish prompt recommendations from actual model capabilities; never promise unsupported 4K/8K/FPS output.",
+          continuityAI:"CINEMATIC CONTINUITY AI: validate camera geography, screen direction, character/prop/shape locks, action states, lighting, weather, lens logic, motion, style and temporal consistency across shots. Flag conflicts and preserve user constraints.",
+          cinematicDirectorAI:"CINEMATIC DIRECTOR INTELLIGENCE AI: synthesize scene/story/emotion, shot design, lens, angle, movement, physics, lighting, composition, editing, audio and quality into a coherent production plan. Activate only relevant techniques; avoid overloading the final prompt and explain major choices briefly.",
           referenceVideoDirector:"REFERENCE VIDEO REVERSE-ENGINEERING DIRECTOR: Treat the uploaded video as evidence, not inspiration. Reconstruct its visible sequence as faithfully as possible: shot boundaries and timestamps, shot duration, shot size, camera angle/height, lens feel, movement and speed, subject appearance/position/actions/gestures/timing, environment motion, lighting direction/intensity/color temperature/shadows, palette/grade, focus/depth of field, cuts/transitions, visible VFX, and audio cues only if audio is available. Output a timecoded shot-by-shot recreation prompt and a unified ready-to-copy prompt. Preserve original order and visual intent; do not invent, embellish, add subjects, change camera/action, or redesign. Separate observed facts from uncertain inference and mark unknowns. Do not claim frame-perfect reconstruction."
         };
+        // CINEMOTION EDITING INTELLIGENCE: context-triggered prompt-level editing specialists.
+        const editingToolInstructions = {
+          beatSyncEditor:"BEAT SYNC EDITOR: if audio/music is supplied or described, map cuts and visual accents to beats/drops; otherwise do not claim audio analysis.",
+          autoMontageBuilder:"AUTO MONTAGE BUILDER: construct a motivated sequence of varied shots with ordering, durations, escalation and climax; do not montage a requested single continuous shot.",
+          autoCutEditor:"AUTO CUT EDITOR: recommend cut points and pacing based on action, reactions and emotional beats; use longer holds for emotion and shorter cuts for action when justified.",
+          autoReframing:"AUTO REFRAMING: recommend composition-safe reframing for target aspect ratio, keeping subject and important action visible; actual tracking/cropping requires an editing engine.",
+          sceneDetectionAI:"SCENE DETECTION AI: identify scene/shot boundaries from supplied media if accessible, otherwise infer boundaries from the text and mark them as proposed.",
+          freezeFrameDirector:"FREEZE FRAME DIRECTOR: choose a motivated freeze point, hold duration, optional title/graphic and resume behavior.",
+          flashCutEditor:"FLASH CUT EDITOR: use brief flash transitions only when motivated by light, impact or story; specify timing and exposure behavior.",
+          reversePlaybackEditor:"REVERSE PLAYBACK EDITOR: specify which motion reverses and ensure reverse movement is physically/visually coherent.",
+          seamlessLoopBuilder:"SEAMLESS LOOP BUILDER: match start/end pose, camera, motion, lighting and environment for a seamless loop.",
+          jumpCutEditor:"JUMP CUT EDITOR: design intentional time/position jumps and maintain clarity; avoid accidental continuity errors.",
+          crossDissolveDirector:"CROSS DISSOLVE DIRECTOR: specify overlap duration and blend only where a soft time/location transition fits.",
+          glitchTransitionAI:"GLITCH TRANSITION AI: use controlled digital distortion for an appropriate style; specify duration, intensity and clean recovery.",
+          maskingRotoscopingAI:"MASKING/ROTOSCOPING AI: plan subject masks, edge handling, motion blur and layer separation; actual masking requires a capable editor.",
+          backgroundReplacementAI:"BACKGROUND REPLACEMENT AI: plan subject separation, perspective, lighting, color, shadows and edge integration; actual compositing requires an editing engine.",
+          objectRemovalAI:"OBJECT REMOVAL AI: identify unwanted object and preserve surrounding texture/motion; actual removal requires a video editing/inpainting engine.",
+          keyframeMotionAI:"KEYFRAME MOTION AI: define start/end keyframes, path, easing, rotation/scale and timing for a motivated animated element.",
+          stabilizationAI:"VIDEO STABILIZATION AI: recommend stabilization strength and preserve intentional camera motion; actual stabilization requires processing.",
+          filmTextureAI:"FILM GRAIN/TEXTURE AI: choose restrained grain/texture appropriate to style and avoid flickering or overlaid noise.",
+          hdrToneMappingAI:"HDR/TONE MAPPING AI: protect highlights, shadows, contrast and color while matching the scene; don't promise actual HDR mastering unless supported.",
+          audioDuckingAI:"AUDIO DUCKING AI: lower music/ambience under dialogue or important SFX and restore smoothly; actual mixing requires audio processing.",
+          voiceIsolationAI:"VOICE ISOLATION AI: plan dialogue clarity and noise reduction; actual isolation requires audio processing.",
+          audioFadeAI:"AUDIO FADE AI: specify music/ambience fade-in/out duration and curve.",
+          dialogueTimingAI:"DIALOGUE TIMING AI: plan pauses, delivery, reaction windows, silence and dialogue timing without changing wording unless requested.",
+          soundVisualSyncAI:"SOUND-TO-VISUAL SYNC AI: align impact/footsteps/wingbeats/objects with visible contact or motion; actual frame-accurate sync requires media/audio analysis.",
+          editingContinuityAI:"EDITING CONTINUITY CHECKER: inspect cuts for screen direction, eyelines, action matching, prop/character continuity, lighting, pacing and transition conflicts."
+        };
+        const editingRegexes = {
+          beatSyncEditor:/(beat.?sync|sync.*beat|music beat|beat drop|rhythm|music sync)/,
+          autoMontageBuilder:/(montage|montage builder|sequence of shots|rapid sequence|multiple clips)/,
+          autoCutEditor:/(auto.?cut|cutting|cut points|edit pacing|pacing edits)/,
+          autoReframing:/(reframe|reframing|vertical crop|9:16|aspect ratio|social format)/,
+          sceneDetectionAI:/(scene detection|detect scenes|shot detection|scene boundaries)/,
+          freezeFrameDirector:/(freeze frame|freeze shot|freeze moment|hold frame)/,
+          flashCutEditor:/(flash cut|flash transition|white flash)/,
+          reversePlaybackEditor:/(reverse playback|play backwards|reverse motion|reverse video)/,
+          seamlessLoopBuilder:/(seamless loop|loop video|perfect loop|looping)/,
+          jumpCutEditor:/(jump cut|jumpcuts)/,
+          crossDissolveDirector:/(cross dissolve|dissolve transition|soft dissolve)/,
+          glitchTransitionAI:/(glitch transition|digital glitch|glitch effect)/,
+          maskingRotoscopingAI:/(masking|rotoscop|subject mask|cutout subject)/,
+          backgroundReplacementAI:/(background replacement|replace background|change background|green screen)/,
+          objectRemovalAI:/(object removal|remove object|remove person|remove unwanted)/,
+          keyframeMotionAI:/(keyframe|keyframe motion|animate.*path|motion path)/,
+          stabilizationAI:/(stabiliz|camera shake removal|steady video)/,
+          filmTextureAI:/(film grain|film texture|analog texture|35mm grain)/,
+          hdrToneMappingAI:/(hdr|tone mapping|tone map|dynamic range)/,
+          audioDuckingAI:/(audio ducking|duck music|lower music under)/,
+          voiceIsolationAI:/(voice isolation|isolate voice|remove background noise|clean dialogue)/,
+          audioFadeAI:/(audio fade|fade in music|fade out music|sound fade)/,
+          dialogueTimingAI:/(dialogue timing|pause between dialogue|dramatic silence|voice timing)/,
+          soundVisualSyncAI:/(sound.?to.?visual sync|sync.*impact|sync.*footstep|wingbeat sync|sound sync)/,
+          editingContinuityAI:/(editing continuity|continuity between cuts|check the cuts|cut continuity)/
+        };
+        const detectedEditingTools = Object.keys(editingRegexes).filter(id=>editingRegexes[id].test(prompt.toLowerCase()));
+        if (autoTools.includes("editingIntelligenceAI")) detectedEditingTools.forEach(id=>{if(!autoTools.includes(id))autoTools.push(id);});
+        Object.keys(editingToolInstructions).forEach(id=>{if(detectedEditingTools.includes(id))aiToolInstructions[id]=editingToolInstructions[id];});
+        const editingToolNames = {
+          beatSyncEditor:"Beat Sync Editor",autoMontageBuilder:"Auto Montage Builder",autoCutEditor:"Auto Cut Editor",autoReframing:"Auto Reframing AI",
+          sceneDetectionAI:"Scene Detection AI",freezeFrameDirector:"Freeze Frame Director",flashCutEditor:"Flash Cut Editor",reversePlaybackEditor:"Reverse Playback Editor",
+          seamlessLoopBuilder:"Seamless Loop Builder",jumpCutEditor:"Jump Cut Editor",crossDissolveDirector:"Cross Dissolve Director",glitchTransitionAI:"Glitch Transition AI",
+          maskingRotoscopingAI:"AI Masking / Rotoscoping",backgroundReplacementAI:"Background Replacement AI",objectRemovalAI:"Object Removal AI",
+          keyframeMotionAI:"Keyframe Motion Planner",stabilizationAI:"Video Stabilization AI",filmTextureAI:"Film Grain & Texture AI",hdrToneMappingAI:"HDR & Tone Mapping AI",
+          audioDuckingAI:"Audio Ducking AI",voiceIsolationAI:"Voice Isolation AI",audioFadeAI:"Audio Fade AI",dialogueTimingAI:"Dialogue Timing AI",
+          soundVisualSyncAI:"Sound-to-Visual Sync AI",editingContinuityAI:"Editing Continuity Checker"
+        };
+        Object.assign(toolNames,editingToolNames);
+        const editingSpecialists = detectedEditingTools.map(id=>editingToolInstructions[id]);
+        if (editingSpecialists.length) {
+          autoTools.push(...detectedEditingTools.filter(id=>!autoTools.includes(id)));
+        }
+        // CINEMOTION EDITING INTELLIGENCE: context-triggered prompt-level editing specialists.
+        const editingToolInstructions = {
+          beatSyncEditor:"BEAT SYNC EDITOR: if audio/music is supplied or described, map cuts and visual accents to beats/drops; otherwise do not claim audio analysis.",
+          autoMontageBuilder:"AUTO MONTAGE BUILDER: construct a motivated sequence of varied shots with ordering, durations, escalation and climax; do not montage a requested single continuous shot.",
+          autoCutEditor:"AUTO CUT EDITOR: recommend cut points and pacing based on action, reactions and emotional beats; use longer holds for emotion and shorter cuts for action when justified.",
+          autoReframing:"AUTO REFRAMING: recommend composition-safe reframing for target aspect ratio, keeping subject and important action visible; actual tracking/cropping requires an editing engine.",
+          sceneDetectionAI:"SCENE DETECTION AI: identify scene/shot boundaries from supplied media if accessible, otherwise infer boundaries from the text and mark them as proposed.",
+          freezeFrameDirector:"FREEZE FRAME DIRECTOR: choose a motivated freeze point, hold duration, optional title/graphic and resume behavior.",
+          flashCutEditor:"FLASH CUT EDITOR: use brief flash transitions only when motivated by light, impact or story; specify timing and exposure behavior.",
+          reversePlaybackEditor:"REVERSE PLAYBACK EDITOR: specify which motion reverses and ensure reverse movement is physically/visually coherent.",
+          seamlessLoopBuilder:"SEAMLESS LOOP BUILDER: match start/end pose, camera, motion, lighting and environment for a seamless loop.",
+          jumpCutEditor:"JUMP CUT EDITOR: design intentional time/position jumps and maintain clarity; avoid accidental continuity errors.",
+          crossDissolveDirector:"CROSS DISSOLVE DIRECTOR: specify overlap duration and blend only where a soft time/location transition fits.",
+          glitchTransitionAI:"GLITCH TRANSITION AI: use controlled digital distortion for an appropriate style; specify duration, intensity and clean recovery.",
+          maskingRotoscopingAI:"MASKING/ROTOSCOPING AI: plan subject masks, edge handling, motion blur and layer separation; actual masking requires a capable editor.",
+          backgroundReplacementAI:"BACKGROUND REPLACEMENT AI: plan subject separation, perspective, lighting, color, shadows and edge integration; actual compositing requires an editing engine.",
+          objectRemovalAI:"OBJECT REMOVAL AI: identify unwanted object and preserve surrounding texture/motion; actual removal requires a video editing/inpainting engine.",
+          keyframeMotionAI:"KEYFRAME MOTION AI: define start/end keyframes, path, easing, rotation/scale and timing for a motivated animated element.",
+          stabilizationAI:"VIDEO STABILIZATION AI: recommend stabilization strength and preserve intentional camera motion; actual stabilization requires processing.",
+          filmTextureAI:"FILM GRAIN/TEXTURE AI: choose restrained grain/texture appropriate to style and avoid flickering or overlaid noise.",
+          hdrToneMappingAI:"HDR/TONE MAPPING AI: protect highlights, shadows, contrast and color while matching the scene; don't promise actual HDR mastering unless supported.",
+          audioDuckingAI:"AUDIO DUCKING AI: lower music/ambience under dialogue or important SFX and restore smoothly; actual mixing requires audio processing.",
+          voiceIsolationAI:"VOICE ISOLATION AI: plan dialogue clarity and noise reduction; actual isolation requires audio processing.",
+          audioFadeAI:"AUDIO FADE AI: specify music/ambience fade-in/out duration and curve.",
+          dialogueTimingAI:"DIALOGUE TIMING AI: plan pauses, delivery, reaction windows, silence and dialogue timing without changing wording unless requested.",
+          soundVisualSyncAI:"SOUND-TO-VISUAL SYNC AI: align impact/footsteps/wingbeats/objects with visible contact or motion; actual frame-accurate sync requires media/audio analysis.",
+          editingContinuityAI:"EDITING CONTINUITY CHECKER: inspect cuts for screen direction, eyelines, action matching, prop/character continuity, lighting, pacing and transition conflicts."
+        };
+        const editingRegexes = {
+          beatSyncEditor:/(beat.?sync|sync.*beat|music beat|beat drop|rhythm|music sync)/,
+          autoMontageBuilder:/(montage|montage builder|sequence of shots|rapid sequence|multiple clips)/,
+          autoCutEditor:/(auto.?cut|cutting|cut points|edit pacing|pacing edits)/,
+          autoReframing:/(reframe|reframing|vertical crop|9:16|aspect ratio|social format)/,
+          sceneDetectionAI:/(scene detection|detect scenes|shot detection|scene boundaries)/,
+          freezeFrameDirector:/(freeze frame|freeze shot|freeze moment|hold frame)/,
+          flashCutEditor:/(flash cut|flash transition|white flash)/,
+          reversePlaybackEditor:/(reverse playback|play backwards|reverse motion|reverse video)/,
+          seamlessLoopBuilder:/(seamless loop|loop video|perfect loop|looping)/,
+          jumpCutEditor:/(jump cut|jumpcuts)/,
+          crossDissolveDirector:/(cross dissolve|dissolve transition|soft dissolve)/,
+          glitchTransitionAI:/(glitch transition|digital glitch|glitch effect)/,
+          maskingRotoscopingAI:/(masking|rotoscop|subject mask|cutout subject)/,
+          backgroundReplacementAI:/(background replacement|replace background|change background|green screen)/,
+          objectRemovalAI:/(object removal|remove object|remove person|remove unwanted)/,
+          keyframeMotionAI:/(keyframe|keyframe motion|animate.*path|motion path)/,
+          stabilizationAI:/(stabiliz|camera shake removal|steady video)/,
+          filmTextureAI:/(film grain|film texture|analog texture|35mm grain)/,
+          hdrToneMappingAI:/(hdr|tone mapping|tone map|dynamic range)/,
+          audioDuckingAI:/(audio ducking|duck music|lower music under)/,
+          voiceIsolationAI:/(voice isolation|isolate voice|remove background noise|clean dialogue)/,
+          audioFadeAI:/(audio fade|fade in music|fade out music|sound fade)/,
+          dialogueTimingAI:/(dialogue timing|pause between dialogue|dramatic silence|voice timing)/,
+          soundVisualSyncAI:/(sound.?to.?visual sync|sync.*impact|sync.*footstep|wingbeat sync|sound sync)/,
+          editingContinuityAI:/(editing continuity|continuity between cuts|check the cuts|cut continuity)/
+        };
+        const detectedEditingTools = Object.keys(editingRegexes).filter(id=>editingRegexes[id].test(prompt.toLowerCase()));
+        if (autoTools.includes("editingIntelligenceAI")) detectedEditingTools.forEach(id=>{if(!autoTools.includes(id))autoTools.push(id);});
+        Object.keys(editingToolInstructions).forEach(id=>{if(detectedEditingTools.includes(id))aiToolInstructions[id]=editingToolInstructions[id];});
+        const editingToolNames = {
+          beatSyncEditor:"Beat Sync Editor",autoMontageBuilder:"Auto Montage Builder",autoCutEditor:"Auto Cut Editor",autoReframing:"Auto Reframing AI",
+          sceneDetectionAI:"Scene Detection AI",freezeFrameDirector:"Freeze Frame Director",flashCutEditor:"Flash Cut Editor",reversePlaybackEditor:"Reverse Playback Editor",
+          seamlessLoopBuilder:"Seamless Loop Builder",jumpCutEditor:"Jump Cut Editor",crossDissolveDirector:"Cross Dissolve Director",glitchTransitionAI:"Glitch Transition AI",
+          maskingRotoscopingAI:"AI Masking / Rotoscoping",backgroundReplacementAI:"Background Replacement AI",objectRemovalAI:"Object Removal AI",
+          keyframeMotionAI:"Keyframe Motion Planner",stabilizationAI:"Video Stabilization AI",filmTextureAI:"Film Grain & Texture AI",hdrToneMappingAI:"HDR & Tone Mapping AI",
+          audioDuckingAI:"Audio Ducking AI",voiceIsolationAI:"Voice Isolation AI",audioFadeAI:"Audio Fade AI",dialogueTimingAI:"Dialogue Timing AI",
+          soundVisualSyncAI:"Sound-to-Visual Sync AI",editingContinuityAI:"Editing Continuity Checker"
+        };
+        Object.assign(toolNames,editingToolNames);
+        const editingSpecialists = detectedEditingTools.map(id=>editingToolInstructions[id]);
+        if (editingSpecialists.length) {
+          autoTools.push(...detectedEditingTools.filter(id=>!autoTools.includes(id)));
+        }
         const selectedSpecialists = autoTools.filter(k=>aiToolInstructions[k]).map(k=>aiToolInstructions[k]);
         if (hasReferenceVideo) {
           const reverseEngineeringBlock = "\n\nREFERENCE VIDEO REVERSE-ENGINEERING MODE — PRIORITY: recreate the uploaded video as closely as possible, not creatively reinterpret it. Analyze the video directly. Provide (1) observed shot-by-shot timecodes, (2) detailed camera/framing/movement, (3) subject action and timing, (4) environment, lighting, color and effects, (5) transitions and sound only if available, (6) uncertainties/unknowns, and (7) one ready-to-copy recreation prompt. Preserve original order and timing. Do not add content not supported by the reference. If exact duration is known, timecodes must cover the full duration.";
@@ -5789,6 +5946,17 @@
     add("filmDirector"); add("cameraDirector");
     // Core specialists run automatically for every cinematic request; context-specific specialists are added below.
     add("promptOptimizer"); add("compositionDirector"); add("colorMoodDirector"); add("lightingDirector"); add("visualStyleLock"); add("realismChecker"); add("complexityAnalyzer");
+    // Cinematic Intelligence core: automatically analyzes every cinematic prompt.
+    ["shotAnalysisAI","lensIntelligenceAI","cameraAngleAI","cameraMovementAI","compositionAI","depthFocusAI","videoQualityAI","cinematicDirectorAI","editingIntelligenceAI","continuityAI"].forEach(add);
+    if(has(/(physics|realistic|realism|gravity|momentum|inertia|collision|impact|flying|falling|jump|wing|dragon|water|cloth|hair|debris|explosion|motion)/)) { add("physicsAI"); add("motionAnalysisAI"); }
+    if(has(/(lens|focal|mm|wide.angle|telephoto|macro|anamorphic|close.up|portrait|perspective)/)) add("lensIntelligenceAI");
+    if(has(/(angle|low.angle|high.angle|top.down|overhead|worm's.eye|eye.level|dutch|bird's.eye)/)) add("cameraAngleAI");
+    if(has(/(camera movement|camera move|dolly|tracking|track|pan|tilt|crane|orbit|push.in|pull.out|handheld|steadicam|drone|whip|zoom|pedestal|truck)/)) add("cameraMovementAI");
+    if(has(/(focus|depth of field|dof|bokeh|rack focus|foreground|background|composition|framing|rule of thirds|symmetry)/)) { add("compositionAI"); add("depthFocusAI"); }
+    if(has(/(edit|editing|cut|montage|sequence|transition|slow motion|speed ramp|freeze frame|flash cut|reverse|loop|jump cut|dissolve|glitch|reframe|stabiliz|mask|rotoscop|background replacement|remove object|keyframe)/)) add("editingIntelligenceAI");
+    if(has(/(beat|music|audio|sound|dialogue|voice|foley|sfx|sync|ducking|fade|isolate)/)) add("audioVisualSyncAI");
+    if(has(/(quality|4k|8k|1080|resolution|fps|frame rate|hdr|photoreal|photorealistic|render|texture|detail|flicker|artifact|grain|sharpness|cinematic quality)/)) add("videoQualityAI");
+    if(has(/(reference|previous shot|next shot|same character|same scene|continuity|match|consistent|preserve|do not change|don't change)/)) add("continuityAI");
     if(has(/(light|lighting|shadow|dark|bright|mood|color temperature|colour temperature|golden hour|night|sunset|sunrise|key light|rim light|fill light|practical light)/)) add("lightingDirector");
     if(has(/(character|face|costume|clothes|body|identity|same person|continuity|reference|preserve|consistent|wardrobe|hair)/)) add("characterContinuity");
     if(has(/(world|environment|location|background|weather|forest|city|desert|mountain|temple|planet|setting|atmosphere|architecture)/)) add("worldBuilder");
