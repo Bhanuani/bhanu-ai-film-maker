@@ -8,7 +8,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="assets/cinemotion/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="assets/cinemotion/favicon-16.png">
   <link rel="apple-touch-icon" href="assets/cinemotion/apple-touch-icon.png">
-  <!-- Manifest temporarily removed: site.webmanifest is not present in the repository. -->
+  <link rel="manifest" href="./site.webmanifest">
   <title>CINEMOTION STUDIO - Master Directors Vault</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1369,6 +1369,49 @@
     .local-preview-foot { padding:11px 16px; color:#94a3b8; font-size:.7rem; overflow-wrap:anywhere; }
     @media(max-width:600px) { .local-explorer-head { padding:14px; } .local-explorer-toolbar,.local-explorer-filters,.local-explorer-status,.local-explorer-results { padding-left:13px; padding-right:13px; } .local-explorer-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; } .local-file-thumb { height:105px; } }
 
+
+
+/* MOBILE APP EXPERIENCE — scoped to small screens; desktop layout remains unchanged */
+@media (max-width: 700px) {
+  body { -webkit-text-size-adjust: 100%; }
+  header { padding-top: env(safe-area-inset-top); }
+  .header-inner { width: calc(100% - 16px); gap: 8px; padding: 8px 0; }
+  .brand-group { gap: 7px; min-width: 0; }
+  .menu-btn { min-width: 40px; min-height: 40px; padding: 8px; }
+  .brand-logo { white-space: nowrap; }
+  .brand-logo .studio-pill { display: none; }
+  .header-actions { min-width: 0; gap: 5px; }
+  .header-actions > button { min-height: 38px; }
+  .header-add-category, #addMovementBtn, #openLocalExplorerBtn { display: none !important; }
+  .profile-pill { padding: 4px; min-height: 38px; }
+  .profile-pill > i { display: none; }
+  .profile-pill .avatar { width: 29px; height: 29px; }
+  .vault-container { width: calc(100% - 16px) !important; padding: 10px 0 calc(24px + env(safe-area-inset-bottom)) !important; }
+  .hero-banner-wrapper { min-height: 390px; border-radius: 16px; padding: 24px 18px !important; margin-bottom: 16px; }
+  .hero-title { font-size: clamp(2.2rem, 11vw, 3.3rem) !important; line-height: .98 !important; }
+  .hero-description { max-width: 36ch; font-size: .9rem !important; line-height: 1.55 !important; }
+  .hero-actions { flex-wrap: wrap; gap: 9px; }
+  .hero-actions button { min-height: 44px; }
+  .categories-bar-wrapper { margin-bottom: 12px; }
+  .categories-bar, .category-tabs, .categories-list { -webkit-overflow-scrolling: touch; }
+  .cat-tab, .sidebar-item, button, input, select, textarea { touch-action: manipulation; }
+  .cat-tab { min-height: 40px; }
+  .movements-grid { gap: 10px !important; }
+  .card-details { padding: 12px !important; }
+  .copy-btn, .use-gemini-btn { min-height: 42px; }
+  .modal-content, .ai-smart-shell { max-width: calc(100vw - 16px); }
+  .profile-dropdown { right: 0; width: min(280px, calc(100vw - 20px)); }
+}
+@media (max-width: 390px) {
+  .brand-logo { font-size: .95rem !important; }
+  .brand-logo-mark { width: 30px !important; height: 30px !important; flex-basis: 30px !important; }
+  .header-inner { gap: 5px; }
+  .hero-banner-wrapper { min-height: 360px; }
+}
+@media (display-mode: standalone) {
+  header { padding-top: env(safe-area-inset-top); }
+  .vault-container { padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
+}
 </style>
   <link rel="stylesheet" href="assets/cinemotion/space-galaxy-theme.css">
 
@@ -6245,5 +6288,36 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
 .cinemotion-audit-improve{margin-top:9px;border:1px solid rgba(57,215,255,.35);border-radius:9px;background:rgba(30,170,220,.12);color:#70e7ff;padding:8px 11px;font-weight:700;font-size:11px;cursor:pointer}
 .cinemotion-audit-improve:hover{background:rgba(30,170,220,.22)}
 </style>
+
+<script>
+(() => {
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(err => console.warn("CINEMOTION offline support registration failed:", err)));
+  }
+  let installPrompt = null;
+  const installBtn = document.createElement("button");
+  installBtn.type = "button";
+  installBtn.id = "cinemotionInstallBtn";
+  installBtn.className = "menu-btn";
+  installBtn.innerHTML = '<i class="fa-solid fa-download"></i>';
+  installBtn.setAttribute("aria-label", "Install CINEMOTION app");
+  installBtn.title = "Install CINEMOTION app";
+  installBtn.style.display = "none";
+  installBtn.style.color = "var(--accent-cyan)";
+  const actions = document.querySelector(".header-actions");
+  if (actions) actions.insertBefore(installBtn, actions.firstChild);
+  window.addEventListener("beforeinstallprompt", event => {
+    event.preventDefault(); installPrompt = event; installBtn.style.display = "inline-flex";
+  });
+  installBtn.addEventListener("click", async () => {
+    if (!installPrompt) { alert("To install: open your browser menu and choose 'Add to Home screen' or 'Install app'."); return; }
+    installPrompt.prompt();
+    await installPrompt.userChoice;
+    installPrompt = null; installBtn.style.display = "none";
+  });
+  window.addEventListener("appinstalled", () => { installBtn.style.display = "none"; installPrompt = null; });
+  if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true) installBtn.style.display = "none";
+})();
+</script>
 </body>
 </html>
