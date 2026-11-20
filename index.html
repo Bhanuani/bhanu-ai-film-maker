@@ -3932,17 +3932,8 @@
         catch (refreshError) { console.warn("Could not refresh email verification state:", refreshError); }
       }
 
-      if (user && user.email && !user.emailVerified) {
-        document.body.classList.remove("is-admin-active");
-        if (gate) gate.style.display = "flex";
-        if (resendBtn) resendBtn.style.display = "block";
-        if (verificationText) {
-          verificationText.style.display = "block";
-          verificationText.textContent = "Your email is not verified. Check your inbox or click Resend Verification Email. If Firebase temporarily blocked requests, wait before retrying.";
-        }
-        return;
-      }
-
+      // Email verification does not block basic studio access.
+      // Admin privileges remain restricted to verified admin accounts below.
       if (resendBtn) resendBtn.style.display = "none";
       if (verificationText) verificationText.style.display = "none";
 
@@ -4025,17 +4016,12 @@
         const loginCredential = await signInWithEmailAndPassword(auth, email, password);
         await loginCredential.user.reload();
 
-        if (!loginCredential.user.emailVerified) {
-          if (byId("resendVerificationBtn")) byId("resendVerificationBtn").style.display = "block";
-          if (byId("verificationStatusText")) {
-            byId("verificationStatusText").style.display = "block";
-            byId("verificationStatusText").textContent = "Email verification is pending. Use the Resend Verification Email button only when needed. Check Inbox, Spam and Promotions.";
-          }
-          showAuthMessage("Please verify your email before entering CINEMOTION. No automatic email was sent, to avoid Firebase rate limits.");
-          return;
-        }
-
+        // Successful Firebase sign-in grants normal studio access.
+        // Unverified accounts are treated as non-admin; verification is required only for admin privileges.
         await notifyAdminOnLogin(email, "Email Login");
+        if (!loginCredential.user.emailVerified) {
+          console.info("CINEMOTION: Login succeeded; email is unverified, admin-only features remain locked.");
+        }
       } catch (err) {
         showAuthMessage(explainFirebaseError(err, "Login"));
       } finally {
