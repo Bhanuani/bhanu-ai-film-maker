@@ -1611,15 +1611,22 @@
 
   <style id="cinemotion-vfx-smart-controls">
     #geminiVfxQuickBar{display:none!important}
-    .gemini-message.gemini-tool-progress{width:min(100%,900px);margin:10px auto 12px;padding:12px 14px;border:1px solid rgba(0,210,255,.22);border-radius:12px;background:linear-gradient(100deg,rgba(5,18,34,.94),rgba(19,18,44,.94));color:#d9edff;box-shadow:0 0 18px rgba(0,210,255,.06)}
-    .gemini-tool-progress .progress-head{display:flex;align-items:center;gap:8px;color:#91a8c4;font:600 12px/1.4 'Plus Jakarta Sans',sans-serif;margin-bottom:8px}
-    .gemini-tool-progress .progress-spinner{width:13px;height:13px;flex:0 0 13px;border:2px solid rgba(0,210,255,.22);border-top-color:#00d2ff;border-radius:50%;animation:gemini-progress-spin .8s linear infinite}
-    .gemini-tool-progress .progress-current{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:8px 10px;border-radius:9px;background:rgba(0,210,255,.055);border:1px solid rgba(0,210,255,.12);animation:gemini-progress-in .2s ease}
-    .gemini-tool-progress .progress-tool-name{color:#d9edff;font-size:11px;font-weight:600}
-    .gemini-tool-progress .progress-tool-state{color:#35d7ff;font-size:10px}
+    .gemini-message.gemini-tool-progress{width:min(440px,72%);max-width:440px;margin:8px 0 10px auto;padding:10px 12px;border:1px solid rgba(135,205,255,.30);border-radius:15px;background:linear-gradient(145deg,rgba(224,244,255,.12),rgba(20,48,82,.46) 42%,rgba(44,30,82,.35));color:#d9edff;backdrop-filter:blur(24px) saturate(165%);-webkit-backdrop-filter:blur(24px) saturate(165%);box-shadow:0 12px 24px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.24),inset 0 -8px 16px rgba(12,28,60,.22),0 0 18px rgba(0,210,255,.08);transform:perspective(900px) rotateX(2deg);transform-origin:bottom right;overflow:hidden}
+    .gemini-tool-progress .progress-head{display:flex;align-items:center;gap:7px;color:#91a8c4;font:600 10px/1.35 'Plus Jakarta Sans',sans-serif;margin-bottom:6px}
+    .gemini-tool-progress .progress-spinner{width:11px;height:11px;flex:0 0 11px;border:2px solid rgba(0,210,255,.22);border-top-color:#00d2ff;border-radius:50%;animation:gemini-progress-spin .8s linear infinite}
+    .gemini-tool-progress .progress-tools-list{display:flex;flex-direction:column;gap:3px;max-height:118px;overflow:auto;scrollbar-width:thin}
+    .gemini-tool-progress .progress-tool-row{display:flex;align-items:center;justify-content:space-between;gap:7px;min-height:20px;padding:3px 7px;border-radius:7px;background:linear-gradient(110deg,rgba(0,210,255,.075),rgba(125,92,255,.07));border:1px solid rgba(125,190,255,.13);font-size:9px;line-height:1.2}
+    .gemini-tool-progress .progress-tool-name{color:#d9edff;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .gemini-tool-progress .progress-tool-state{flex:0 0 auto;font-size:9px;color:#35d7ff}
+    .gemini-tool-progress .progress-tool-row.done .progress-tool-state{color:#70e4ad}
+    .gemini-tool-progress .progress-tool-row.done .progress-tool-state:before{content:'✓ ';color:#70e4ad}
+    .gemini-tool-progress .progress-tool-row.active{border-color:rgba(0,210,255,.28);box-shadow:inset 0 0 10px rgba(0,210,255,.04)}
+    .gemini-tool-progress.is-leaving{animation:gemini-progress-out .42s cubic-bezier(.2,.75,.2,1) forwards;pointer-events:none}
     @keyframes gemini-progress-spin{to{transform:rotate(360deg)}}
     @keyframes gemini-progress-in{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
-    @media(prefers-reduced-motion:reduce){.gemini-tool-progress .progress-spinner{animation:none}.gemini-tool-progress .progress-current{animation:none}}
+    @keyframes gemini-progress-out{to{opacity:0;transform:perspective(900px) rotateX(-12deg) translateY(12px) scale(.88);filter:blur(4px)}}
+    @media(max-width:700px){.gemini-message.gemini-tool-progress{width:min(420px,90%);max-width:90%;margin-right:2px}}
+    @media(prefers-reduced-motion:reduce){.gemini-tool-progress .progress-spinner{animation:none}.gemini-tool-progress.is-leaving{animation:none;opacity:0}}
     #geminiVfxQuickBar .vfx-chip{flex:0 0 auto;border:1px solid rgba(92,190,255,.22);background:rgba(12,25,44,.75);color:#d9edff;border-radius:999px;padding:7px 10px;font:600 11px/1.2 'Plus Jakarta Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:.18s}
     #geminiVfxQuickBar .vfx-chip:hover{border-color:#38bdf8;background:rgba(14,165,233,.16);box-shadow:0 0 12px rgba(56,189,248,.12)}
     #geminiVfxQuickBar .vfx-chip.primary{border-color:rgba(168,85,247,.4);background:linear-gradient(100deg,rgba(2,132,199,.16),rgba(124,58,237,.16))}
@@ -4740,7 +4747,7 @@
       const autoVfx = detectCinemotionVfxTools(prompt);
       const toolNames = {referenceVideoDirector:"Reference Video Replication Director",filmDirector:"AI Film Director",shotBreakdown:"AI Shot Breakdown",cameraDirector:"Camera Director",lightingDirector:"Lighting Director",characterContinuity:"Character Continuity",worldBuilder:"World Builder",soundDirector:"Sound Design Director",storyboardPlanner:"Storyboard Planner",promptOptimizer:"Prompt Optimizer",sceneConsistency:"Scene Consistency Engine",compositionDirector:"Composition Director",colorMoodDirector:"Color & Mood Director",motionPhysicsDirector:"Motion & Physics Director",actingDirector:"Emotion & Acting Director",durationPlanner:"Shot Duration Planner",visualStyleLock:"Visual Style Lock",realismChecker:"Realism Checker",complexityAnalyzer:"Scene Complexity Analyzer",characterBlocking:"Character Blocking Director",vfxSupervisor:"VFX Supervisor",videoMotionPlanner:"Video Motion Planner",vfx_director:"VFX Auto Director",vfx_atmosphere:"Atmosphere FX",vfx_impact:"Impact FX",vfx_magic:"Magic / Energy FX",vfx_transition:"Transition Designer"};
       const vfxToolNames = {director:"Auto Director",atmosphere:"Atmosphere FX",impact:"Impact FX",magic:"Magic / Energy FX",transition:"Transition Designer"};
-      let progressBubble = null, progressTimer = null, progressIndex = 0;
+      let progressBubble = null, progressTimer = null, progressIndex = 0, progressHideTimer = null;
       let progressTools = [];
       const showVfxStatus = () => {
         progressTools = [...new Set([...autoTools.map(k=>toolNames[k]||k), ...autoVfx.map(k=>vfxToolNames[k]||k)])];
@@ -4750,23 +4757,42 @@
         progressBubble.classList.add("gemini-tool-progress");
         progressBubble.setAttribute("role","status");
         progressBubble.setAttribute("aria-live","polite");
-        progressBubble.innerHTML = '<div class="progress-head"><span class="progress-spinner"></span><span>AI Director is analyzing your prompt…</span></div><div class="progress-current"><span class="progress-tool-name"></span><span class="progress-tool-state">Working…</span></div>';
-        const updateProgress = () => {
-          const name = progressBubble?.querySelector(".progress-tool-name");
-          const state = progressBubble?.querySelector(".progress-tool-state");
-          if (!name || !state) return;
-          name.textContent = progressTools[progressIndex % progressTools.length];
-          state.textContent = "Working…";
-          progressIndex++;
+        progressBubble.innerHTML = '<div class="progress-head"><span class="progress-spinner"></span><span>AI Director · Specialist analysis</span></div><div class="progress-tools-list"></div>';
+        const list = progressBubble.querySelector(".progress-tools-list");
+        const renderProgress = () => {
+          if (!list || !progressBubble) return;
+          list.innerHTML = progressTools.slice(0, progressIndex + 1).map((name, i) => {
+            const done = i < progressIndex;
+            const active = i === progressIndex && progressIndex < progressTools.length;
+            return '<div class="progress-tool-row '+(done?'done':active?'active':'')+'"><span class="progress-tool-name">'+name+'</span><span class="progress-tool-state">'+(done?'Analyzed':active?'Working…':'Queued')+'</span></div>';
+          }).join("");
+          list.scrollTop = list.scrollHeight;
           geminiMessages.scrollTop = geminiMessages.scrollHeight;
         };
-        updateProgress();
-        if (progressTools.length > 1) progressTimer = setInterval(updateProgress, 1100);
+        const advanceProgress = () => {
+          if (progressIndex >= progressTools.length) {
+            if (progressTimer) { clearInterval(progressTimer); progressTimer = null; }
+            return;
+          }
+          progressIndex++;
+          renderProgress();
+          if (progressIndex >= progressTools.length && progressTimer) {
+            clearInterval(progressTimer);
+            progressTimer = null;
+          }
+        };
+        progressIndex = 0;
+        renderProgress();
+        if (progressTools.length > 1) progressTimer = setInterval(advanceProgress, 850);
       };
       const hideVfxStatus = () => {
         if (progressTimer) { clearInterval(progressTimer); progressTimer = null; }
-        progressBubble?.remove();
+        if (progressHideTimer) { clearTimeout(progressHideTimer); progressHideTimer = null; }
+        if (!progressBubble) return;
+        progressBubble.classList.add("is-leaving");
+        const bubbleToRemove = progressBubble;
         progressBubble = null;
+        progressHideTimer = setTimeout(() => { bubbleToRemove.remove(); progressHideTimer = null; }, 430);
       };
       const attachedFiles = Array.isArray(attachedFile) ? attachedFile : (attachedFile ? [attachedFile] : []);
       const hasReferenceVideo = attachedFiles.some(file => file.type.startsWith("video/"));
@@ -4951,7 +4977,8 @@
         if (!pending) pending = addGeminiMessage("", "assistant");
         // Keep the completed streamed text; only use the final response as a fallback.
         if (!streamedText) pending.textContent = finalText;
-        if (userExplicitlyRequestedPrompt && !pending.querySelector(".gemini-copy-prompt")) {
+        const responseLooksLikePrompt = /(?:ready[- ]to[- ]copy|cinematic\s+(?:image|video)?\s*prompt|master\s+prompt|(?:^|\n)\s*(?:prompt\s*:|shot\s*breakdown\s*:)|\bshot\s*\d+\s*\()/i.test(finalText);
+        if (userExplicitlyRequestedPrompt && responseLooksLikePrompt && !pending.querySelector(".gemini-copy-prompt")) {
           const copyButton = document.createElement("button");
           copyButton.type = "button";
           copyButton.className = "gemini-copy-prompt";
@@ -4960,7 +4987,7 @@
           copyButton.title = "Copy prompt";
           copyButton.addEventListener("click", async () => {
             const displayed = pending.textContent || finalText;
-            const promptMatch = displayed.match(/(?:\*\*Prompt:\*\*|Prompt:)([\s\S]*?)(?=\n\s*(?:\*\*Shot Breakdown:?\*\*|\*\*Continuity Locks:?\*\*|\*\*Director Notes:?\*\*)|$)/i);
+            const promptMatch = displayed.match(/(?:\*\*(?:Ready-to-copy\s+)?(?:Cinematic\s+)?(?:Video|Image)?\s*Prompt:?\*\*|(?:Ready-to-copy\s+)?(?:Cinematic\s+)?(?:Video|Image)?\s*Prompt:|\*\*Prompt:\*\*|Prompt:)([\s\S]*?)(?=\n\s*(?:\*\*Shot Breakdown:?\*\*|###\s*Shot Breakdown|\*\*Continuity Locks:?\*\*|\*\*Director Notes:?\*\*)|$)/i);
             const textToCopy = (promptMatch ? promptMatch[1] : displayed).trim();
             try {
               await navigator.clipboard.writeText(textToCopy);
