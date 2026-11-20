@@ -4936,10 +4936,7 @@
       if (hasReferenceVideo) ["filmDirector","shotBreakdown","cameraDirector","compositionDirector","lightingDirector","colorMoodDirector","motionPhysicsDirector","durationPlanner","sceneConsistency","visualStyleLock","realismChecker","complexityAnalyzer","videoMotionPlanner","referenceVideoDirector"].forEach(id => { if (!autoTools.includes(id)) autoTools.push(id); });
       const userExplicitlyRequestedPrompt = /(?:\b(?:generate|create|write|make|give|provide|improve|enhance|rewrite|craft)\b.{0,70}\bprompt\b|\bprompt\b.{0,50}\b(?:ivvu|generate|create|write|give|make|chey|provide)\b|\b(?:image|video|cinematic|animation)\s+prompt\b)/i.test(prompt);
       if (!prompt && !attachedFiles.length) return;
-      if (!auth.currentUser) {
-        addGeminiMessage("Please sign in to use Gemini.", "assistant", true);
-        return;
-      }
+      // Single-user private mode: do not block Gemini on Firebase Auth.
       if (!window.cinemotionGeminiModel) {
         addGeminiMessage("Gemini is not initialized. Check that Firebase AI Logic is enabled for this project and that App Check is correctly registered for this web app.", "assistant", true);
         return;
