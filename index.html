@@ -1689,6 +1689,62 @@
 @media(max-width:700px){.gemini-director-suite-btn span{display:none}.gemini-director-suite-btn{margin-left:0;padding:8px}.cinemotion-ai-suite-card{padding:15px}.cinemotion-ai-suite-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cinemotion-ai-tool-card{min-height:132px}}
 @media(max-width:420px){.cinemotion-ai-suite-grid{grid-template-columns:1fr}}
 </style>
+
+<style id="cinemotion-mobile-readability-and-gemini-fullscreen-fix">
+@media (max-width:700px) {
+  html, body { font-size:16px !important; -webkit-text-size-adjust:100%; }
+  body { min-height:100dvh; }
+  button, input, select, textarea { font-size:16px !important; }
+  button { min-height:42px; }
+  .header-inner { width:calc(100% - 16px) !important; padding:8px 0 !important; gap:8px !important; }
+  .brand-logo { font-size:clamp(14px,4vw,18px) !important; }
+  .brand-logo .studio-pill { font-size:10px !important; }
+  .menu-btn { min-width:42px; min-height:42px; padding:9px !important; }
+  .profile-pill { min-height:42px; padding:6px 10px !important; font-size:14px !important; }
+  .profile-pill .avatar { width:30px; height:30px; font-size:14px; }
+  .vault-container { width:calc(100% - 20px) !important; }
+  .cat-tab { font-size:14px !important; padding:10px 13px !important; }
+  .movement-card .card-details, .card-details { padding:14px !important; }
+  .card-details h3 { font-size:17px !important; }
+  .card-details p, .prompt-box, .card-details button { font-size:14px !important; line-height:1.5 !important; }
+  .auth-gate-modal { padding:12px !important; align-items:center !important; overflow-y:auto !important; }
+  .auth-card { width:100% !important; max-width:480px !important; padding:20px 16px !important; border-radius:18px !important; max-height:calc(100dvh - 24px) !important; overflow-y:auto !important; }
+  .auth-card h2 { font-size:clamp(20px,6vw,26px) !important; line-height:1.25 !important; }
+  .auth-card p { font-size:14px !important; line-height:1.5 !important; }
+  .auth-tab-btn { padding:12px 8px !important; font-size:16px !important; min-height:46px !important; }
+  .auth-card input, .auth-card select, .auth-card textarea { width:100%; min-height:46px; padding:12px !important; font-size:16px !important; }
+  .auth-card button { min-height:46px !important; font-size:16px !important; }
+  .forgot-pass-link { font-size:14px !important; }
+  /* Gemini is a true fullscreen mobile workspace—no website split/left panel. */
+  .gemini-panel, #geminiPanel {
+    position:fixed !important; inset:0 !important; top:0 !important; right:0 !important; bottom:0 !important; left:0 !important;
+    width:100vw !important; max-width:none !important; height:100dvh !important; max-height:none !important;
+    border:0 !important; border-radius:0 !important; margin:0 !important; z-index:2147483000 !important;
+    padding-top:env(safe-area-inset-top) !important; padding-bottom:env(safe-area-inset-bottom) !important;
+    background:#080d18 !important; box-shadow:none !important;
+  }
+  #geminiPanel.open { display:flex !important; }
+  #geminiPanel .gemini-panel-head { min-height:60px !important; padding:10px 14px !important; flex:0 0 auto; }
+  #geminiPanel .gemini-panel-brand strong { font-size:17px !important; }
+  #geminiPanel .gemini-panel-brand small { font-size:12px !important; }
+  #geminiPanel .gemini-close, #geminiPanel .gemini-menu-toggle { width:44px !important; height:44px !important; font-size:20px !important; }
+  #geminiMessages, #geminiPanel .gemini-messages { flex:1 1 auto !important; min-height:0 !important; padding:14px 12px !important; overflow-y:auto !important; }
+  #geminiMessages .gemini-message, #geminiPanel .gemini-message { max-width:96% !important; font-size:16px !important; line-height:1.65 !important; padding:13px 15px !important; }
+  #geminiForm { flex:0 0 auto !important; width:calc(100% - 16px) !important; max-width:none !important; margin:8px !important; min-height:60px !important; border-radius:22px !important; padding:9px !important; gap:8px !important; }
+  #geminiForm textarea { font-size:16px !important; min-height:42px !important; height:42px !important; max-height:130px !important; padding:10px 5px !important; }
+  #geminiForm .gemini-upload-btn, #geminiForm #geminiSend { width:42px !important; height:42px !important; flex-basis:42px !important; }
+  #geminiPanel .gemini-disclaimer { font-size:11px !important; padding:4px 8px 8px !important; text-align:center; }
+  #geminiPanel .gemini-menu-drawer { width:min(280px,82vw) !important; top:60px !important; }
+  #geminiPanel .gemini-menu-item { font-size:15px !important; padding:14px 12px !important; min-height:48px !important; }
+  #geminiPanel .gemini-story-tool, #geminiPanel .gemini-ingredient-upload { font-size:14px !important; padding:10px 12px !important; min-height:42px !important; }
+}
+@media (max-width:390px) {
+  .header-actions { gap:5px !important; }
+  .profile-pill { padding:5px 7px !important; }
+  .brand-logo .studio-pill { display:none !important; }
+}
+</style>
+
 </head>
 <body>
 
