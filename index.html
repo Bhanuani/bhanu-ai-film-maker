@@ -6517,3 +6517,27 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
  }
 }
 </style>
+<script id="cinemotion-mobile-gemini-send-submit-guard">
+(function(){
+ function sendThroughGeminiForm(){
+   const form=document.getElementById("geminiForm");
+   const send=document.getElementById("geminiSend");
+   if(!form)return;
+   // Dispatch a cancelable submit event so the existing Gemini submit handler runs,
+   // while preventing the browser from performing any page navigation/reload.
+   form.dispatchEvent(new SubmitEvent("submit",{bubbles:true,cancelable:true,submitter:send||undefined}));
+ }
+ document.addEventListener("click",function(e){
+   const btn=e.target.closest("#geminiSend");
+   if(!btn)return;
+   e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+   sendThroughGeminiForm();
+ },true);
+ document.addEventListener("keydown",function(e){
+   const input=e.target.closest("#geminiInput");
+   if(!input||e.key!=="Enter"||e.shiftKey)return;
+   e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+   sendThroughGeminiForm();
+ },true);
+})();
+</script>
