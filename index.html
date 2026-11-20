@@ -4741,8 +4741,9 @@
       const toolNames = {referenceVideoDirector:"Reference Video Replication Director",filmDirector:"AI Film Director",shotBreakdown:"AI Shot Breakdown",cameraDirector:"Camera Director",lightingDirector:"Lighting Director",characterContinuity:"Character Continuity",worldBuilder:"World Builder",soundDirector:"Sound Design Director",storyboardPlanner:"Storyboard Planner",promptOptimizer:"Prompt Optimizer",sceneConsistency:"Scene Consistency Engine",compositionDirector:"Composition Director",colorMoodDirector:"Color & Mood Director",motionPhysicsDirector:"Motion & Physics Director",actingDirector:"Emotion & Acting Director",durationPlanner:"Shot Duration Planner",visualStyleLock:"Visual Style Lock",realismChecker:"Realism Checker",complexityAnalyzer:"Scene Complexity Analyzer",characterBlocking:"Character Blocking Director",vfxSupervisor:"VFX Supervisor",videoMotionPlanner:"Video Motion Planner",vfx_director:"VFX Auto Director",vfx_atmosphere:"Atmosphere FX",vfx_impact:"Impact FX",vfx_magic:"Magic / Energy FX",vfx_transition:"Transition Designer"};
       const vfxToolNames = {director:"Auto Director",atmosphere:"Atmosphere FX",impact:"Impact FX",magic:"Magic / Energy FX",transition:"Transition Designer"};
       let progressBubble = null, progressTimer = null, progressIndex = 0;
-      const progressTools = [...new Set([...autoTools.map(k=>toolNames[k]||k), ...autoVfx.map(k=>vfxToolNames[k]||k)])];
+      let progressTools = [];
       const showVfxStatus = () => {
+        progressTools = [...new Set([...autoTools.map(k=>toolNames[k]||k), ...autoVfx.map(k=>vfxToolNames[k]||k)])];
         if (!progressTools.length || !geminiMessages) return;
         progressBubble = addGeminiMessage("", "assistant");
         if (!progressBubble) return;
