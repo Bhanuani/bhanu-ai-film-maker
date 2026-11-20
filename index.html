@@ -4728,9 +4728,7 @@
       geminiPanel?.classList.add("open");
       geminiPanel?.setAttribute("aria-hidden", "false");
       syncDirectorLibrary(geminiInput?.value || "");
-      if (!auth.currentUser && geminiMessages && !geminiMessages.querySelector(".gemini-message")) {
-        addGeminiMessage("Please sign in to use Gemini. Sign in with your account, then reopen Gemini.", "assistant", true);
-      }
+      // Login gate is hidden in private single-user mode; Gemini is available without sign-in.
       geminiInput?.focus();
     }
     function closeGeminiPanel() {
@@ -5337,11 +5335,7 @@
       const hasAttachments = Array.isArray(attachedFile) ? attachedFile.length > 0 : !!attachedFile;
       if (!prompt && !hasAttachments) return;
 
-      // Validate authentication/model before spending time on the intro animation.
-      if (!auth.currentUser) {
-        addGeminiMessage("Please sign in to use Gemini.", "assistant", true);
-        return;
-      }
+      // Single-user mode: Gemini no longer requires Firebase sign-in.
       if (!window.cinemotionGeminiModel) {
         addGeminiMessage("Gemini is not initialized. Check Firebase AI Logic and App Check configuration.", "assistant", true);
         return;
