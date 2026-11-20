@@ -4069,9 +4069,9 @@
         }
         loadFirebaseMovements().then(() => loadVaultCategories());
       } else {
-        document.body.classList.remove("is-admin-active", "director-mode", "director-show-gemini");
-        byId("geminiPanel")?.classList.remove("open");
-        if (gate) gate.style.display = "flex";
+        // Login gate is hidden for this private, single-user studio.
+        document.body.classList.remove("is-admin-active");
+        if (gate) gate.style.display = "none";
       }
     }, (err) => showAuthMessage(explainFirebaseError(err, "Authentication state check")));
 
@@ -5765,11 +5765,8 @@
         landing.setAttribute("aria-hidden", "true");
         document.body.classList.remove("cinemotion-landing-active");
         const gate = document.getElementById("authGateModal");
-        // The existing Firebase onAuthStateChanged handler remains responsible for
-        // deciding whether the user sees the app or the current sign-in gate.
-        if (gate && !window.__cinemotionAuthStateResolved) {
-          gate.style.display = "flex";
-        }
+        // Private single-user mode: bypass the login gate and enter the studio.
+        if (gate) gate.style.display = "none";
       };
 
       landing.querySelectorAll("[data-enter-cinemotion]").forEach((control) => {
@@ -6377,3 +6374,8 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
 </script>
 </body>
 </html>
+
+<style id="cinemotion-private-single-user-login-hide">
+  /* Hide the authentication gate in private single-user mode. */
+  #authGateModal { display: none !important; }
+</style>
