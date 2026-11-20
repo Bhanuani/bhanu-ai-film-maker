@@ -6439,12 +6439,20 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
     panel.style.setProperty("visibility","visible","important");
     panel.style.setProperty("opacity","1","important");
     panel.style.setProperty("position","fixed","important");
-    panel.style.setProperty("inset","0","important");
-    panel.style.setProperty("width","100vw","important");
-    panel.style.setProperty("height","100dvh","important");
-    panel.style.setProperty("max-height","none","important");
+    if(window.matchMedia("(max-width:700px)").matches){
+      panel.style.setProperty("inset","3dvh 6px","important");
+      panel.style.setProperty("width","calc(100vw - 12px)","important");
+      panel.style.setProperty("height","94dvh","important");
+      panel.style.setProperty("max-height","94dvh","important");
+      panel.style.setProperty("border-radius","18px","important");
+    } else {
+      panel.style.setProperty("inset","0","important");
+      panel.style.setProperty("width","100vw","important");
+      panel.style.setProperty("height","100dvh","important");
+      panel.style.setProperty("max-height","none","important");
+    }
     panel.style.setProperty("z-index","2147483000","important");
-    document.getElementById("geminiInput")?.focus();
+    // Do not auto-focus the composer on open; keep the mobile keyboard closed.
   }
   document.addEventListener("click",function(e){
     const launcher=e.target.closest("#geminiLauncher");
@@ -6497,5 +6505,15 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
   #geminiPanel .gemini-attachment-preview{flex:0 0 100%!important;}
   #geminiPanel .gemini-attachment-grid{max-height:75px!important;overflow:auto!important;}
   #geminiPanel #geminiIngredientsPanel,#geminiPanel #geminiFramePanel{max-height:35vh!important;overflow:auto!important;}
+}
+</style>
+
+<style id="cinemotion-gemini-mobile-windowed-compact-v4">
+@media(max-width:700px){
+ #geminiPanel.open{
+   inset:3dvh 6px!important;width:calc(100vw - 12px)!important;
+   height:94dvh!important;max-height:94dvh!important;
+   border:1px solid rgba(155,114,203,.4)!important;border-radius:18px!important;
+ }
 }
 </style>
