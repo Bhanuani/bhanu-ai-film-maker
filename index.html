@@ -892,6 +892,12 @@
       padding:0; margin:0; color:#dbeafe; background:transparent; border:0; border-radius:8px; font-size:.72rem;
     }
     .gemini-attachment-preview[hidden] { display:none; }
+    .cinemotion-attachment-intelligence { display:flex; align-items:center; gap:8px; flex:0 0 100%; width:100%; margin-top:2px; padding:7px 10px; border:1px solid rgba(59,215,255,.22); border-radius:10px; background:rgba(9,30,48,.72); color:#bfeeff; font-size:11px; }
+    .cinemotion-attachment-intelligence small { display:block; margin-top:2px; color:#84aeca; font-size:10px; }
+    .cinemotion-intelligence-pulse { position:relative; width:13px; height:13px; flex:0 0 13px; border-radius:50%; background:#42d9ff; box-shadow:0 0 8px rgba(66,217,255,.7); animation:cinemotionIntelligencePulse 1.15s ease-in-out infinite; }
+    .cinemotion-intelligence-pulse::after { content:""; position:absolute; inset:-4px; border:1px solid rgba(66,217,255,.45); border-radius:50%; animation:cinemotionIntelligenceRing 1.15s ease-out infinite; }
+    @keyframes cinemotionIntelligencePulse { 50% { opacity:.45; transform:scale(.72); } }
+    @keyframes cinemotionIntelligenceRing { from { transform:scale(.6); opacity:.9; } to { transform:scale(1.5); opacity:0; } }
     .gemini-composer { flex-wrap:wrap; }
     .gemini-attachment-grid { display:flex; flex-wrap:wrap; gap:8px; width:100%; }
     .gemini-attachment-item { position:relative; width:68px; height:68px; flex:0 0 68px; }
@@ -4736,6 +4742,14 @@
       });
       if (geminiAttachmentCount) geminiAttachmentCount.textContent = files.some(file => file.type.startsWith("video/")) ? files.length + " attachment(s) · Reference video mode" : files.length + "/7 images";
       if (geminiAttachmentPreview) geminiAttachmentPreview.hidden = files.length === 0;
+      let intelligenceBadge = geminiAttachmentPreview?.querySelector(".cinemotion-attachment-intelligence");
+      if (intelligenceBadge) intelligenceBadge.remove();
+      if (files.some(file => file.type && file.type.startsWith("image/")) && geminiAttachmentPreview) {
+        intelligenceBadge = document.createElement("div");
+        intelligenceBadge.className = "cinemotion-attachment-intelligence";
+        intelligenceBadge.innerHTML = '<span class="cinemotion-intelligence-pulse"></span><span><strong>Image Intelligence detected</strong><small>Ready to analyze when you send</small></span>';
+        geminiAttachmentPreview.appendChild(intelligenceBadge);
+      }
     }
     function loadGeminiHelper(src, globalName) {
       if (window[globalName]) return Promise.resolve(window[globalName]);
