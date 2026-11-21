@@ -5064,7 +5064,8 @@
         if (editingSpecialists.length) {
           autoTools.push(...detectedEditingTools.filter(id=>!autoTools.includes(id)));
         }
-        if (userExplicitlyRequestedPrompt && !autoTools.includes("promptQualityChecker")) autoTools.push("promptQualityChecker");\n        const selectedSpecialists = autoTools.filter(k=>aiToolInstructions[k]).map(k=>aiToolInstructions[k]);
+        if (userExplicitlyRequestedPrompt && !autoTools.includes("promptQualityChecker")) autoTools.push("promptQualityChecker");
+        const selectedSpecialists = autoTools.filter(k=>aiToolInstructions[k]).map(k=>aiToolInstructions[k]);
         if (hasReferenceVideo) {
           const reverseEngineeringBlock = "\n\nREFERENCE VIDEO REVERSE-ENGINEERING MODE — PRIORITY: recreate the uploaded video as closely as possible, not creatively reinterpret it. Analyze the video directly. Provide (1) observed shot-by-shot timecodes, (2) detailed camera/framing/movement, (3) subject action and timing, (4) environment, lighting, color and effects, (5) transitions and sound only if available, (6) uncertainties/unknowns, and (7) one ready-to-copy recreation prompt. Preserve original order and timing. Do not add content not supported by the reference. If exact duration is known, timecodes must cover the full duration.";
           if (typeof messagePayload === "string") messagePayload += reverseEngineeringBlock;
