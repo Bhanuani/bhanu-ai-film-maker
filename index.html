@@ -4842,10 +4842,6 @@
       };
       const attachedFiles = Array.isArray(attachedFile) ? attachedFile : (attachedFile ? [attachedFile] : []);
       const hasReferenceVideo = attachedFiles.some(file => file.type.startsWith("video/"));
-      if (geminiReferenceAnalysisMode && !attachedFiles.some(file => file.type.startsWith("image/"))) {
-        addGeminiMessage("Reference Image Intelligence needs at least one image. Upload or paste a reference image, then send your request.","assistant",true);
-        return;
-      }
       if (hasReferenceVideo) ["filmDirector","shotBreakdown","cameraDirector","compositionDirector","lightingDirector","colorMoodDirector","motionPhysicsDirector","durationPlanner","sceneConsistency","visualStyleLock","realismChecker","complexityAnalyzer","videoMotionPlanner","referenceVideoDirector"].forEach(id => { if (!autoTools.includes(id)) autoTools.push(id); });
       const userExplicitlyRequestedPrompt = /(?:\b(?:generate|create|write|make|give|provide|improve|enhance|rewrite|craft)\b.{0,70}\bprompt\b|\bprompt\b.{0,50}\b(?:ivvu|generate|create|write|give|make|chey|provide)\b|\b(?:image|video|cinematic|animation)\s+prompt\b)/i.test(prompt);
       if (!prompt && !attachedFiles.length) return;
