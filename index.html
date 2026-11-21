@@ -3638,13 +3638,6 @@
       </div>
     </section>
     <form class="gemini-composer" id="geminiForm">
-      <div class="gemini-image-options">
-        <button type="button" class="gemini-images-trigger" id="geminiImagesTrigger">Images</button>
-        <div class="gemini-images-menu" id="geminiImagesMenu" hidden>
-          <button type="button" id="geminiImagesFramesOption"><i class="fa-solid fa-film"></i> Frames</button>
-          <button type="button" id="geminiImagesIngredientsOption"><i class="fa-solid fa-layer-group"></i> Ingredients</button>
-        </div>
-      </div>
       <button type="button" class="gemini-story-tool" id="geminiFramesToggle" hidden>Frames</button>
       <button type="button" class="gemini-story-tool" id="geminiIngredientsToggle" hidden>Ingredients</button>
       <section class="gemini-frame-panel" id="geminiFramePanel" hidden tabindex="0">
@@ -3668,6 +3661,13 @@
         <i class="fa-solid fa-arrow-up-from-bracket"></i>
       </button>
       <textarea id="geminiInput" rows="1" maxlength="12000" placeholder="Ask Gemini..." aria-label="Message Gemini"></textarea>
+      <div class="gemini-image-options">
+        <button type="button" class="gemini-images-trigger" id="geminiImagesTrigger">Images</button>
+        <div class="gemini-images-menu" id="geminiImagesMenu" hidden>
+          <button type="button" id="geminiImagesFramesOption"><i class="fa-solid fa-film"></i> Frames</button>
+          <button type="button" id="geminiImagesIngredientsOption"><i class="fa-solid fa-layer-group"></i> Ingredients</button>
+        </div>
+      </div>
       <button type="submit" id="geminiSend" aria-label="Send message">
         <i class="fa-solid fa-arrow-up"></i>
       </button>
@@ -6255,7 +6255,7 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
   .gemini-image-options { position:relative; flex:0 0 auto; align-self:center; z-index:6; }
   .gemini-images-trigger { width:auto!important; min-width:58px; height:35px!important; padding:0 12px!important; border:1px solid rgba(84,190,255,.32)!important; border-radius:10px!important; background:rgba(24,36,58,.85)!important; color:#dce9ff!important; font-size:12px!important; font-weight:700!important; white-space:nowrap; box-shadow:none!important; }
   .gemini-images-trigger:hover,.gemini-images-trigger.active { border-color:#43d9ff!important; color:#55ddff!important; }
-  .gemini-images-menu { position:absolute; bottom:calc(100% + 10px); left:0; z-index:50; min-width:145px; padding:6px; border:1px solid rgba(84,190,255,.3); border-radius:12px; background:rgba(13,20,36,.98); box-shadow:0 12px 30px rgba(0,0,0,.4); }
+  .gemini-images-menu { position:absolute; bottom:calc(100% + 10px); right:0; left:auto; z-index:50; min-width:145px; padding:6px; border:1px solid rgba(84,190,255,.3); border-radius:12px; background:rgba(13,20,36,.98); box-shadow:0 12px 30px rgba(0,0,0,.4); }
   .gemini-images-menu button { display:flex!important; align-items:center; gap:9px; width:100%!important; height:auto!important; border:0!important; border-radius:8px!important; padding:10px 12px!important; background:transparent!important; color:#dce9ff!important; font-size:12px!important; font-weight:700!important; cursor:pointer; text-align:left; }
   .gemini-images-menu button:hover { background:rgba(61,170,255,.14)!important; color:#55ddff!important; }
   #geminiInput { overflow-y:hidden!important; resize:none!important; scrollbar-width:none!important; }
