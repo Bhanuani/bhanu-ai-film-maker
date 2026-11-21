@@ -3639,7 +3639,7 @@
     </section>
     <form class="gemini-composer" id="geminiForm">
       <div class="gemini-image-options">
-        <button type="button" class="gemini-images-trigger" id="geminiImagesTrigger"><i class="fa-regular fa-images"></i> Images</button>
+        <button type="button" class="gemini-images-trigger" id="geminiImagesTrigger">Images</button>
         <div class="gemini-images-menu" id="geminiImagesMenu" hidden>
           <button type="button" id="geminiImagesFramesOption"><i class="fa-solid fa-film"></i> Frames</button>
           <button type="button" id="geminiImagesIngredientsOption"><i class="fa-solid fa-layer-group"></i> Ingredients</button>
@@ -3647,11 +3647,13 @@
       </div>
       <button type="button" class="gemini-story-tool" id="geminiFramesToggle" hidden>Frames</button>
       <button type="button" class="gemini-story-tool" id="geminiIngredientsToggle" hidden>Ingredients</button>
-      <section class="gemini-frame-panel" id="geminiFramePanel" hidden>
+      <section class="gemini-frame-panel" id="geminiFramePanel" hidden tabindex="0">
+        <button type="button" class="gemini-reference-close" id="geminiFramesClose" aria-label="Close frames">×</button>
         <div class="gemini-frame-panel-title">Story continuity frames <span>Arrange the story in order · maximum 7 images total</span></div>
         <div class="gemini-frame-slots" id="geminiFrameSlots"></div>
       </section>
-      <section class="gemini-ingredients-panel" id="geminiIngredientsPanel" hidden>
+      <section class="gemini-ingredients-panel" id="geminiIngredientsPanel" hidden tabindex="0">
+        <button type="button" class="gemini-reference-close" id="geminiIngredientsClose" aria-label="Close ingredients">×</button>
         <div class="gemini-frame-panel-title">Ingredients <span>Character, prop, location, costume, or style references</span></div>
         <button type="button" class="gemini-ingredient-upload" id="geminiIngredientUpload"><i class="fa-solid fa-plus"></i> Add ingredient images</button>
         <input type="file" id="geminiIngredientInput" accept="image/*" multiple hidden>
@@ -5366,6 +5368,27 @@
     byId("geminiImagesIngredientsOption")?.addEventListener("click",()=>{geminiIngredientsToggle?.click();if(geminiImagesMenu)geminiImagesMenu.hidden=true;geminiImagesTrigger?.classList.remove("active");});
     geminiImagesTrigger?.addEventListener("click",()=>{if(!geminiImagesMenu)return;geminiImagesMenu.hidden=!geminiImagesMenu.hidden;geminiImagesTrigger.classList.toggle("active",!geminiImagesMenu.hidden);});
     document.addEventListener("click",(event)=>{if(geminiImagesMenu&&!geminiImagesMenu.hidden&&!event.target.closest(".gemini-image-options")){geminiImagesMenu.hidden=true;geminiImagesTrigger?.classList.remove("active");}});
+    byId("geminiFramesClose")?.addEventListener("click",()=>{geminiFramePanel.hidden=true;geminiFramesToggle?.classList.remove("active");});
+    byId("geminiIngredientsClose")?.addEventListener("click",()=>{geminiIngredientsPanel.hidden=true;geminiIngredientsToggle?.classList.remove("active");});
+    function handleReferencePaste(event,mode){
+      const pasted=Array.from(event.clipboardData?.items||[]).filter(item=>item.type.startsWith("image/")).map(item=>item.getAsFile()).filter(Boolean);
+      if(!pasted.length)return;
+      event.preventDefault();
+      for(const file of pasted){
+        if(file.size>GEMINI_MAX_FILE_BYTES){addGeminiMessage("Each reference image must be smaller than 15 MB.","assistant",true);continue;}
+        if(storyReferenceCount()>=7){addGeminiMessage("Maximum 7 reference images total. Remove one first.","assistant",true);break;}
+        if(mode==="frames"){
+          const emptySlot=geminiStoryFrames.findIndex(frame=>!frame);
+          if(emptySlot<0){addGeminiMessage("All 7 story frame slots are filled.","assistant",true);break;}
+          geminiStoryFrames[emptySlot]=file;renderStoryFrameSlots();
+        }else{
+          geminiStoryIngredients.push(file);renderStoryIngredients();
+        }
+      }
+      updateStoryReferenceCount();
+    }
+    geminiFramePanel?.addEventListener("paste",event=>handleReferencePaste(event,"frames"));
+    geminiIngredientsPanel?.addEventListener("paste",event=>handleReferencePaste(event,"ingredients"));
     geminiFramesToggle?.addEventListener("click",()=>{geminiFramePanel.hidden=!geminiFramePanel.hidden;geminiFramesToggle.classList.toggle("active",!geminiFramePanel.hidden);if(!geminiFramePanel.hidden){geminiIngredientsPanel.hidden=true;geminiIngredientsToggle.classList.remove("active");}});
     geminiIngredientsToggle?.addEventListener("click",()=>{geminiIngredientsPanel.hidden=!geminiIngredientsPanel.hidden;geminiIngredientsToggle.classList.toggle("active",!geminiIngredientsPanel.hidden);if(!geminiIngredientsPanel.hidden){geminiFramePanel.hidden=true;geminiFramesToggle.classList.remove("active");}});
     geminiIngredientUpload?.addEventListener("click",()=>geminiIngredientInput?.click());
@@ -6229,6 +6252,17 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
   .gemini-images-menu { position:absolute; bottom:calc(100% + 10px); right:0; z-index:50; min-width:145px; padding:6px; border:1px solid rgba(84,190,255,.3); border-radius:12px; background:rgba(13,20,36,.98); box-shadow:0 12px 30px rgba(0,0,0,.4); }
   .gemini-images-menu button { display:flex; align-items:center; gap:9px; width:100%; border:0; border-radius:8px; padding:10px 12px; background:transparent; color:#dce9ff; font-size:12px; font-weight:700; cursor:pointer; text-align:left; }
   .gemini-images-menu button:hover { background:rgba(61,170,255,.14); color:#55ddff; }
+  .gemini-image-options { position:relative; flex:0 0 auto; align-self:center; z-index:6; }
+  .gemini-images-trigger { width:auto!important; min-width:58px; height:35px!important; padding:0 12px!important; border:1px solid rgba(84,190,255,.32)!important; border-radius:10px!important; background:rgba(24,36,58,.85)!important; color:#dce9ff!important; font-size:12px!important; font-weight:700!important; white-space:nowrap; box-shadow:none!important; }
+  .gemini-images-trigger:hover,.gemini-images-trigger.active { border-color:#43d9ff!important; color:#55ddff!important; }
+  .gemini-images-menu { position:absolute; bottom:calc(100% + 10px); left:0; z-index:50; min-width:145px; padding:6px; border:1px solid rgba(84,190,255,.3); border-radius:12px; background:rgba(13,20,36,.98); box-shadow:0 12px 30px rgba(0,0,0,.4); }
+  .gemini-images-menu button { display:flex!important; align-items:center; gap:9px; width:100%!important; height:auto!important; border:0!important; border-radius:8px!important; padding:10px 12px!important; background:transparent!important; color:#dce9ff!important; font-size:12px!important; font-weight:700!important; cursor:pointer; text-align:left; }
+  .gemini-images-menu button:hover { background:rgba(61,170,255,.14)!important; color:#55ddff!important; }
+  #geminiInput { overflow-y:hidden!important; resize:none!important; scrollbar-width:none!important; }
+  #geminiInput::-webkit-scrollbar { display:none!important; width:0!important; }
+  .gemini-frame-panel,.gemini-ingredients-panel { position:relative; }
+  .gemini-reference-close { position:absolute; top:5px; right:6px; z-index:3; width:26px!important; height:26px!important; min-width:26px; border:1px solid rgba(255,255,255,.18)!important; border-radius:50%!important; background:rgba(30,42,62,.95)!important; color:#cbd5e1!important; font-size:19px!important; line-height:1!important; padding:0!important; cursor:pointer; }
+  .gemini-frame-panel-title { padding-right:32px; }
   .gemini-story-reference-tools { display:flex; align-items:center; gap:7px; flex:0 0 100%; padding:0 4px 5px; }
   .gemini-story-tool,.gemini-ingredient-upload { border:1px solid rgba(84,190,255,.28); border-radius:10px; background:rgba(24,36,58,.85); color:#dce9ff; padding:7px 11px; font-size:12px; font-weight:700; cursor:pointer; }
   .gemini-story-tool.active { border-color:#43d9ff; color:#55ddff; box-shadow:0 0 10px rgba(50,210,255,.13); }
