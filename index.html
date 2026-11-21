@@ -5104,6 +5104,7 @@
         if (!pending) pending = addGeminiMessage("", "assistant");
         // Keep the completed streamed text; only use the final response as a fallback.
         if (!streamedText) pending.textContent = finalText;
+        const responseLooksLikePrompt = /(?:ready[- ]to[- ]copy|cinematic\s+(?:image|video)?\s*prompt|master\s+prompt|(?:^|\n)\s*(?:prompt\s*:|shot\s*breakdown\s*:)|\bshot\s*\d+\s*\()/i.test(finalText);
         // CINEMOTION Cinematic Prompt Quality Checker: automatic local audit after prompt-like responses.
         const qualityAudit = (() => {
           if (!responseLooksLikePrompt) return null;
@@ -5138,7 +5139,6 @@
           audit.appendChild(improve);pending.appendChild(audit);
         }
 
-        const responseLooksLikePrompt = /(?:ready[- ]to[- ]copy|cinematic\s+(?:image|video)?\s*prompt|master\s+prompt|(?:^|\n)\s*(?:prompt\s*:|shot\s*breakdown\s*:)|\bshot\s*\d+\s*\()/i.test(finalText);
         if (userExplicitlyRequestedPrompt && responseLooksLikePrompt && !pending.querySelector(".gemini-copy-prompt")) {
           const copyButton = document.createElement("button");
           copyButton.type = "button";
