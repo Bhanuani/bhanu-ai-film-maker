@@ -5160,11 +5160,12 @@
           else if (Array.isArray(messagePayload) && messagePayload[0]?.text) messagePayload[0].text += autoBlock;
         }
         // Inline progress already shows one selected specialist at a time.
-        const result = await geminiChatSession.sendMessageStream(messagePayload);
+        let result = null;
         let streamedText = "";
         let typingBuffer = "";
         let typingActive = false;
         let typingDrainResolver = null;
+        let streamFailed = false;
         const typeNext = () => {
           if (!typingBuffer.length) {
             typingActive = false;
@@ -5173,7 +5174,6 @@
           }
           typingActive = true;
           if (!pending) pending = addGeminiMessage("", "assistant");
-          // Smooth typewriter reveal: a few characters per frame, with short punctuation pauses.
           const nextCount = Math.min(typingBuffer.length, 3);
           const typed = typingBuffer.slice(0, nextCount);
           typingBuffer = typingBuffer.slice(nextCount);
@@ -5183,18 +5183,35 @@
           const delay = /[.!?。！？]/.test(lastChar) ? 95 : /[,;:]/.test(lastChar) ? 45 : 18;
           setTimeout(typeNext, delay);
         };
-        if (result?.stream) {
-          for await (const chunk of result.stream) {
-            const piece = chunk?.text?.() || "";
-            if (piece) {
-              streamedText += piece;
-              typingBuffer += piece;
-              if (!typingActive) typeNext();
+        try {
+          result = await geminiChatSession.sendMessageStream(messagePayload);
+          if (result?.stream) {
+            for await (const chunk of result.stream) {
+              const piece = chunk?.text?.() || "";
+              if (piece) {
+                streamedText += piece;
+                typingBuffer += piece;
+                if (!typingActive) typeNext();
+              }
             }
           }
-        }
-        if (typingActive || typingBuffer.length) {
-          await new Promise(resolve => { typingDrainResolver = resolve; });
+          if (typingActive || typingBuffer.length) {
+            await new Promise(resolve => { typingDrainResolver = resolve; });
+          }
+        } catch (streamError) {
+          streamFailed = true;
+          console.warn("Gemini streaming failed; retrying with non-stream response:", streamError);
+          // Clear any incomplete streamed output so the fallback is not mixed with it.
+          typingBuffer = "";
+          if (typingDrainResolver) { typingDrainResolver(); typingDrainResolver = null; }
+          typingActive = false;
+          if (pending) pending.textContent = "";
+          streamedText = "";
+          try {
+            result = await geminiChatSession.sendMessage(messagePayload);
+          } catch (fallbackError) {
+            throw new Error("Streaming failed ("+(streamError?.message||streamError)+") and standard Gemini response also failed ("+(fallbackError?.message||fallbackError)+").");
+          }
         }
         const finalResponse = await result.response;
         if (imageAnalysisBubble) {
