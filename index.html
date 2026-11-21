@@ -4609,6 +4609,7 @@
     const geminiFrameLabels = ["Start Frame","Frame 2","Continue Frame 1","Continue Frame 2","Continue Frame 3","Before Ending","Ending Frame"];
     let geminiStoryFrames = Array(7).fill(null);
     let geminiStoryIngredients = [];
+    let geminiActiveFrameSlot = 0; // Paste goes into the slot currently under the pointer or selected.
     const geminiUploadBtn = byId("geminiUploadBtn");
     const geminiAttachmentPreview = byId("geminiAttachmentPreview");
     const geminiAttachmentGrid = byId("geminiAttachmentGrid");
@@ -5296,24 +5297,29 @@
       if (!geminiFrameSlots) return;
       geminiFrameSlots.replaceChildren();
       geminiStoryFrames.forEach((file, slotIndex) => {
-        const slot = document.createElement("div"); slot.className = "gemini-frame-slot";
+        const slot = document.createElement("div"); slot.className = "gemini-frame-slot"; slot.tabIndex = 0; slot.dataset.frameSlot = String(slotIndex);
+        const activateSlot = () => { geminiActiveFrameSlot = slotIndex; geminiFramePanel?.focus({ preventScroll: true }); };
+        slot.addEventListener("pointerenter", activateSlot);
+        slot.addEventListener("focusin", activateSlot);
+        slot.addEventListener("click", activateSlot);
         const input = document.createElement("input"); input.type = "file"; input.accept = "image/*"; input.hidden = true;
         input.addEventListener("change", () => {
           const selected = input.files?.[0]; if (!selected) return;
           if (!selected.type.startsWith("image/")) { addGeminiMessage("Story frames must be images.", "assistant", true); return; }
           if (selected.size > GEMINI_MAX_FILE_BYTES) { addGeminiMessage("Each reference image must be smaller than 15 MB.", "assistant", true); return; }
           if (storyReferenceCount() >= 7 && !geminiStoryFrames[slotIndex]) { addGeminiMessage("Maximum 7 reference images total. Remove one first.", "assistant", true); return; }
+          geminiActiveFrameSlot = slotIndex;
           geminiStoryFrames[slotIndex] = selected; renderStoryFrameSlots(); renderStoryIngredients(); updateStoryReferenceCount();
         });
         const btn = document.createElement("button"); btn.type = "button";
-        btn.innerHTML = "<i class='fa-solid fa-image'></i><strong>" + geminiFrameLabels[slotIndex] + "</strong><span>Choose image</span>";
-        btn.addEventListener("click", () => input.click());
+        btn.innerHTML = "<i class='fa-solid fa-image'></i><strong>" + geminiFrameLabels[slotIndex] + "</strong><span>Choose image or hover and Ctrl+V</span>";
+        btn.addEventListener("click", (event) => { event.stopPropagation(); activateSlot(); input.click(); });
         slot.append(input,btn);
         if (file) { btn.hidden = true;
           const url = URL.createObjectURL(file); const img = document.createElement("img"); img.src = url; img.alt = geminiFrameLabels[slotIndex];
           const label = document.createElement("span"); label.className = "frame-slot-label"; label.textContent = geminiFrameLabels[slotIndex];
           const remove = document.createElement("button"); remove.type = "button"; remove.className = "frame-slot-remove"; remove.textContent = "×"; remove.title = "Remove frame";
-          remove.addEventListener("click", () => { geminiStoryFrames[slotIndex] = null; renderStoryFrameSlots(); updateStoryReferenceCount(); });
+          remove.addEventListener("click", (event) => { event.stopPropagation(); geminiActiveFrameSlot = slotIndex; geminiStoryFrames[slotIndex] = null; renderStoryFrameSlots(); updateStoryReferenceCount(); });
           slot.append(img,label,remove);
         }
         geminiFrameSlots.appendChild(slot);
@@ -5342,9 +5348,9 @@
       const frameInstructions = orderedFrames.length ? [
         "",
         "",
-        "STORY CONTINUITY FRAME REFERENCES (images attached in this exact order):",
-        ...orderedFrames.map((f, i) => "Reference " + (i + 1) + ": " + f.label + " — " + f.file.name),
-        "Treat these as ordered visual checkpoints of one continuous story and use the frames as faithfully as possible. Preserve subject identity, costume, props, location, lighting direction, screen direction, geometry, and spatial continuity. Do not redesign or contradict any supplied frame. Build a coherent cinematic prompt that connects each checkpoint smoothly; explicitly describe only the action needed between frames and transitions. Respect Start Frame, Frame 2, continuation frames, Before Ending, and Ending Frame as chronology. Keep the final prompt story-driven, continuous, and reference-faithful; if some slots are empty, infer only the minimal connective action needed."
+        "STORY VISUAL REFERENCES (images supplied by the user; use only the intent they describe):",
+        ...orderedFrames.map((f, i) => "Image " + (i + 1) + " (slot: " + f.label + "): " + f.file.name),
+        "Do not assume these images must be chronological or impose a start-to-end sequence. Use them as independent visual references unless the user's message explicitly describes an order, start frame, ending frame, or sequence. Preserve the visual details the user asks to preserve, and only connect images into a sequence when explicitly requested."
       ].join("\\n") : "";
 
       const ingredientInstructions = geminiStoryIngredients.length ? [
@@ -5383,14 +5389,25 @@
     function handleReferencePaste(event,mode){
       const pasted=Array.from(event.clipboardData?.items||[]).filter(item=>item.type.startsWith("image/")).map(item=>item.getAsFile()).filter(Boolean);
       if(!pasted.length)return;
+      // Consume reference pastes here so the site's card-upload handler never sees them.
       event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation?.();
       for(const file of pasted){
         if(file.size>GEMINI_MAX_FILE_BYTES){addGeminiMessage("Each reference image must be smaller than 15 MB.","assistant",true);continue;}
         if(storyReferenceCount()>=7){addGeminiMessage("Maximum 7 reference images total. Remove one first.","assistant",true);break;}
         if(mode==="frames"){
-          const emptySlot=geminiStoryFrames.findIndex(frame=>!frame);
-          if(emptySlot<0){addGeminiMessage("All 7 story frame slots are filled.","assistant",true);break;}
-          geminiStoryFrames[emptySlot]=file;renderStoryFrameSlots();
+          let targetIndex = Math.max(0, Math.min(6, geminiActiveFrameSlot));
+          // Replace the hovered/selected slot; if more than one clipboard image is supplied,
+          // place subsequent images into the next available slots without enforcing chronology.
+          if(geminiStoryFrames[targetIndex] && pasted.length > 1){
+            targetIndex = geminiStoryFrames.findIndex(frame=>!frame);
+          }
+          if(targetIndex<0 || targetIndex>6){addGeminiMessage("All 7 story frame slots are filled.","assistant",true);break;}
+          geminiStoryFrames[targetIndex]=file;
+          geminiActiveFrameSlot=targetIndex;
+          if(pasted.length>1){const next=geminiStoryFrames.findIndex((frame,index)=>index>targetIndex&&!frame);if(next>=0)geminiActiveFrameSlot=next;}
+          renderStoryFrameSlots();
         }else{
           geminiStoryIngredients.push(file);renderStoryIngredients();
         }
@@ -5399,6 +5416,11 @@
     }
     geminiFramePanel?.addEventListener("paste",event=>handleReferencePaste(event,"frames"));
     geminiIngredientsPanel?.addEventListener("paste",event=>handleReferencePaste(event,"ingredients"));
+    // Hovering any frame makes it the paste destination, even if the panel itself is focused.
+    geminiFrameSlots?.addEventListener("pointerover",event=>{
+      const slot=event.target.closest?.("[data-frame-slot]");
+      if(slot) geminiActiveFrameSlot=Number(slot.dataset.frameSlot);
+    });
 
     geminiIngredientUpload?.addEventListener("click",()=>geminiIngredientInput?.click());
     geminiIngredientInput?.addEventListener("change",()=>{
