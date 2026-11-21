@@ -2,6 +2,8 @@ const FLOW_CONNECTOR_MESSAGE = "CINEMOTION_FLOW_FILL";
 if (!window.__cinemotionFlowBridgeInstalled) {
   window.__cinemotionFlowBridgeInstalled = true;
 
+  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
   function visible(el) {
     if (!el || el.hidden || el.disabled) return false;
     const s = getComputedStyle(el);
@@ -22,39 +24,50 @@ if (!window.__cinemotionFlowBridgeInstalled) {
   function scorePromptElement(el) {
     const meta = [el.getAttribute("aria-label"), el.getAttribute("placeholder"), el.getAttribute("name"), el.getAttribute("data-placeholder"), el.getAttribute("title"), el.getAttribute("aria-describedby")].join(" ").toLowerCase();
     let score = 0;
-    if (/prompt|describe|what.*create|generate|ask flow|write/i.test(meta)) score += 30;
-    if (/search|email|password|login|comment|filter/i.test(meta)) score -= 50;
-    if (el.tagName === "TEXTAREA") score += 8;
-    if (el.isContentEditable || el.getAttribute("contenteditable") === "true") score += 15;
-    if (el.getAttribute("role") === "textbox") score += 8;
-    if (el.closest("main")) score += 2;
+    if (/prompt|describe|what.*create|generate|ask flow|write|video/i.test(meta)) score += 40;
+    if (/search|email|password|login|comment|filter/i.test(meta)) score -= 60;
+    if (el.tagName === "TEXTAREA") score += 15;
+    if (el.isContentEditable || el.getAttribute("contenteditable") === "true") score += 20;
+    if (el.getAttribute("role") === "textbox") score += 12;
+    if (el.closest("main")) score += 3;
     return score;
   }
 
   function findPrompt() {
-    const candidates = deepQueryAll('textarea, input:not([type]), input[type="text"], [contenteditable="true"], [role="textbox"]')
+    const candidates = deepQueryAll('textarea, input:not([type="hidden"]):not([type="file"]), [contenteditable="true"], [role="textbox"]')
       .filter(visible).filter(el => !el.readOnly && !el.disabled);
     candidates.sort((a,b) => scorePromptElement(b)-scorePromptElement(a));
-    return candidates.length && scorePromptElement(candidates[0]) >= 8 ? candidates[0] : null;
+    return candidates.length && scorePromptElement(candidates[0]) >= 12 ? candidates[0] : null;
+  }
+
+  function findNewProjectTarget() {
+    const candidates = deepQueryAll('button, [role="button"], a, div, span').filter(visible);
+    const match = candidates.find(el => {
+      const text = (el.innerText || el.textContent || "").replace(/\s+/g, " ").trim();
+      return /^new project$/i.test(text) && text.length < 40;
+    });
+    if (!match) return null;
+    return match.closest('button, [role="button"], a') || match;
   }
 
   async function openNewProjectIfNeeded() {
-    if (findPrompt()) return;
-    const buttons = deepQueryAll('button, [role="button"], a').filter(visible);
-    const newProject = buttons.find(el => /^\s*new project\s*$/i.test((el.innerText || el.textContent || "").trim()));
-    if (newProject) {
-      newProject.click();
-      await new Promise(r => setTimeout(r, 1500));
+    if (findPrompt()) return true;
+    const target = findNewProjectTarget();
+    if (target) {
+      target.click();
+      await sleep(2500);
+      return true;
     }
+    return false;
   }
 
-  async function waitForPrompt(timeoutMs = 45000) {
+  async function waitForPrompt(timeoutMs = 60000) {
     await openNewProjectIfNeeded();
     const started = Date.now();
     while (Date.now() - started < timeoutMs) {
       const prompt = findPrompt();
       if (prompt) return prompt;
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await sleep(500);
     }
     return null;
   }
@@ -88,22 +101,23 @@ if (!window.__cinemotionFlowBridgeInstalled) {
       return !accept || /image|video|media/.test(accept);
     });
     const input=inputs.find(el=>el.multiple)||inputs[0];
-    if (!input) throw new Error("Prompt filled, but Flow upload control was not found. Attach references manually.");
+    if (!input) throw new Error("Prompt was inserted, but Flow's upload input wasn't found. Attach reference files manually.");
     const files=refs.map(base64ToFile);
     const transfer=new DataTransfer();
     files.forEach(file=>transfer.items.add(file));
     input.files=transfer.files;
     input.dispatchEvent(new Event("input",{bubbles:true}));
     input.dispatchEvent(new Event("change",{bubbles:true}));
-    await new Promise(r=>setTimeout(r,1500));
+    await sleep(2500);
     return files.length;
   }
 
   async function fillFlow(payload) {
     if (!location.hostname.endsWith("labs.google") || !location.pathname.includes("/fx/tools/flow")) return {ok:false,message:"Not on Google Flow."};
     const promptEl=await waitForPrompt();
-    if (!promptEl) return {ok:false,message:"Flow home was opened, but prompt box was not found. Click New project once, wait for the editor, then click Resend to Flow."};
+    if (!promptEl) return {ok:false,message:"Google Flow home opened, but the prompt editor wasn't detected. Click New project manually, wait until the prompt editor appears, then press Resend to Flow."};
     setPromptValue(promptEl,String(payload.prompt||""));
+    await sleep(500);
     let attached=0, warning="";
     try { attached=await attachReferences(payload.references||[]); }
     catch(e) { warning=" Reference upload issue: "+(e?.message||"attach manually."); }
