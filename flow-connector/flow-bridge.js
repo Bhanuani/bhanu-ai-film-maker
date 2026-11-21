@@ -78,9 +78,15 @@ if (!window.__cinemotionFlowBridgeInstalled) {
     if (findPrompt()) return true;
     const target = findNewProjectTarget();
     if (target) {
+      // Flow's "New project" card is often an anchor with a real project URL.
+      // Navigate directly when available; synthetic clicks can be ignored by its SPA.
+      const href = target.closest("a[href]")?.href || target.getAttribute("href") || "";
+      if (href && /^https:\/\/flow\.google\/project\//i.test(href)) {
+        location.assign(href);
+        return true;
+      }
       clickLikeUser(target);
-      await sleep(1200);
-      // Flow navigation/project creation may take several seconds.
+      await sleep(1800);
       return true;
     }
     return false;
