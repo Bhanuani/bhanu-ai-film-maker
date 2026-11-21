@@ -1,23 +1,36 @@
 {
   "manifest_version": 3,
   "name": "Cinemotion Studio — Google Flow Connector",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Send generated Cinemotion prompts and reference media to Google Flow without copying and pasting.",
-  "permissions": ["tabs", "scripting"],
+  "permissions": [
+    "tabs",
+    "scripting"
+  ],
   "host_permissions": [
     "https://labs.google/fx/tools/flow*",
     "https://bhanuani.github.io/bhanu-ai-film-maker/*"
   ],
-  "background": { "service_worker": "background.js" },
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [
     {
-      "matches": ["https://bhanuani.github.io/bhanu-ai-film-maker/*"],
-      "js": ["website-bridge.js"],
+      "matches": [
+        "https://bhanuani.github.io/bhanu-ai-film-maker/*"
+      ],
+      "js": [
+        "website-bridge.js"
+      ],
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://labs.google/fx/tools/flow*"],
-      "js": ["flow-bridge.js"],
+      "matches": [
+        "https://labs.google/fx/tools/flow*"
+      ],
+      "js": [
+        "flow-bridge.js"
+      ],
       "run_at": "document_idle"
     }
   ]
