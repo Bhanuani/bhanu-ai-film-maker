@@ -892,10 +892,10 @@
       padding:0; margin:0; color:#dbeafe; background:transparent; border:0; border-radius:8px; font-size:.72rem;
     }
     .gemini-attachment-preview[hidden] { display:none; }
-    .gemini-user-image-gallery { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
-    .gemini-user-image-card { position:relative; width:min(190px,38vw); aspect-ratio:4/3; border:1px solid rgba(78,190,255,.35); border-radius:11px; overflow:hidden; background:#08111e; }
+    .gemini-user-image-gallery { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+    .gemini-user-image-card { position:relative; width:min(135px,30vw); aspect-ratio:4/3; border:1px solid rgba(78,190,255,.28); border-radius:9px; overflow:hidden; background:#08111e; }
     .gemini-user-image-card img { width:100%; height:100%; object-fit:contain; cursor:zoom-in; display:block; }
-    .gemini-user-image-copy { position:absolute; right:6px; top:6px; width:30px; height:30px; border-radius:8px; border:1px solid rgba(255,255,255,.24); background:rgba(12,22,40,.86); color:#eaf5ff; cursor:pointer; }
+    .gemini-user-image-copy { position:absolute; right:4px; top:4px; width:22px; height:22px; padding:0; display:grid; place-items:center; font-size:11px; line-height:1; border-radius:5px; border:1px solid rgba(255,255,255,.2); background:rgba(12,22,40,.86); color:#eaf5ff; cursor:pointer; }
     .cinemotion-intelligence-pulse.completed { background:#65e6ad; box-shadow:0 0 8px rgba(101,230,173,.6); animation:none; }
     .cinemotion-image-analysis-status.is-complete { border-color:rgba(101,230,173,.3); }
     .cinemotion-attachment-intelligence { display:flex; align-items:center; gap:8px; flex:0 0 100%; width:100%; margin-top:2px; padding:7px 10px; border:1px solid rgba(59,215,255,.22); border-radius:10px; background:rgba(9,30,48,.72); color:#bfeeff; font-size:11px; }
@@ -5193,6 +5193,8 @@
           tick.style.fontWeight = "800";
           imageAnalysisBubble.appendChild(tick);
           imageAnalysisBubble.classList.add("is-complete");
+          // Keep the completion confirmation briefly, then remove the status line.
+          window.setTimeout(() => imageAnalysisBubble?.remove(), 2000);
         }
         const finalText = finalResponse?.text?.() || streamedText || "Gemini returned an empty response.";
         if (!pending) pending = addGeminiMessage("", "assistant");
