@@ -888,12 +888,16 @@
     .gemini-menu-item i { width:17px; color:#a78bfa; text-align:center; }
     .gemini-menu-item.gemini-clear-item i { color:#f28b82; }
     .gemini-attachment-preview {
-      position:absolute; left:10px; bottom:calc(100% + 8px); z-index:8;
-      display:flex; flex-direction:column; align-items:flex-start; justify-content:flex-start; gap:4px;
-      width:min(340px,70vw); min-width:0; max-width:min(340px,70vw); overflow:visible; box-sizing:border-box;
+      position:absolute; left:10px; bottom:calc(100% + 2px); z-index:8;
+      display:grid; grid-template-columns:minmax(0,1fr) auto; grid-template-rows:auto auto;
+      align-items:center; justify-content:flex-start; column-gap:6px; row-gap:2px;
+      width:min(100%,70vw); min-width:0; max-width:min(100%,70vw); overflow:visible; box-sizing:border-box;
       padding:0; margin:0; color:#dbeafe; background:transparent; border:0; border-radius:0; font-size:.72rem;
     }
     .gemini-attachment-preview[hidden] { display:none; }
+    .gemini-attachment-preview .cinemotion-attachment-intelligence { grid-column:1 / -1; margin:0 0 0 3px; }
+    .gemini-attachment-preview .gemini-attachment-grid { width:auto; min-width:0; padding:0 3px 0 0; gap:4px; }
+    .gemini-attachment-preview .gemini-attachment-count { grid-column:2; grid-row:2; white-space:nowrap; align-self:center; margin:0; }
     .gemini-user-image-gallery { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; } .gemini-user-image-gallery--conversation { align-self:flex-end; max-width:92%; width:auto; display:flex; flex-wrap:nowrap; justify-content:flex-end; gap:6px; margin:0 0 -5px; padding:0; border:0; background:transparent; } .gemini-user-image-gallery--conversation .gemini-user-image-card { width:72px; height:72px; flex:0 0 72px; aspect-ratio:1/1; border:0; border-radius:7px; background:transparent; overflow:visible; } .gemini-user-image-gallery--conversation .gemini-user-image-card img { border-radius:7px; border:1px solid rgba(78,190,255,.22); background:transparent; } .gemini-user-image-gallery--conversation .gemini-user-image-copy { width:18px; height:18px; right:-3px; top:-3px; font-size:9px; border-radius:4px; }
     .gemini-user-image-card { position:relative; width:min(135px,30vw); aspect-ratio:4/3; border:1px solid rgba(78,190,255,.28); border-radius:9px; overflow:hidden; background:#08111e; }
     .gemini-user-image-card img { width:100%; height:100%; object-fit:contain; cursor:zoom-in; display:block; }
