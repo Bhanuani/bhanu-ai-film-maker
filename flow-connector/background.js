@@ -14,29 +14,29 @@ async function waitForTabReady(tabId, timeoutMs = 30000) {
   const started = Date.now();
   while (Date.now() - started < timeoutMs) {
     try { const tab = await chrome.tabs.get(tabId); if (tab.status === "complete") return tab; } catch (_) {}
-    await delay(500);
+    await delay(400);
   }
-  throw new Error("Google Flow is still loading. Wait for it to finish, then click Send to Flow again.");
+  throw new Error("Google Flow is still loading. Wait for it to finish, then click Resend to Flow.");
 }
 async function injectFlowBridge(tabId) {
   await chrome.scripting.executeScript({ target: { tabId }, files: ["flow-bridge.js"] });
-  await delay(250);
+  await delay(400);
 }
 async function sendToFlowTab(tabId, payload) {
   let lastError;
-  for (let attempt = 0; attempt < 15; attempt++) {
+  for (let attempt = 0; attempt < 8; attempt++) {
     await waitForTabReady(tabId, 30000);
     try {
       await injectFlowBridge(tabId);
       const result = await chrome.tabs.sendMessage(tabId, { type: "CINEMOTION_FLOW_FILL", payload });
       if (result?.ok) return result;
-      if (result?.retry) { lastError = new Error(result.message || "Flow project is opening."); await delay(1500); continue; }
+      if (result?.retry) { lastError = new Error(result.message || "Flow project is opening."); await delay(1800); continue; }
       if (result) return result;
       lastError = new Error("Flow bridge returned no response.");
     } catch (error) { lastError = error; }
     await delay(1000);
   }
-  throw new Error(lastError?.message || "Flow prompt editor was not detected. Open a project and resend.");
+  throw new Error(lastError?.message || "Flow prompt editor was not detected. Open New project and click Resend to Flow.");
 }
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type !== "CINEMOTION_SEND_TO_FLOW") return;
