@@ -6481,5 +6481,88 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
   .cinemotion-image-analysis-status.is-complete { color:#cbd5e1 !important; }
   .cinemotion-image-analysis-status.is-error { color:#fca5a5 !important; }
 </style>
+
+<style id="gemini-attachment-preview-final-fix">
+/* Final attachment preview: readable thumbnails, no horizontal scroll, tiny remove controls. */
+#geminiPanel .gemini-attachment-preview {
+  width: min(680px, calc(100vw - 40px)) !important;
+  max-width: min(680px, calc(100vw - 40px)) !important;
+  left: 8px !important;
+  right: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 4px !important;
+  overflow: visible !important;
+  padding: 0 !important;
+}
+#geminiPanel .gemini-attachment-grid {
+  display: flex !important;
+  flex-flow: row wrap !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  gap: 7px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+  padding: 2px 2px 4px !important;
+  scrollbar-width: none !important;
+}
+#geminiPanel .gemini-attachment-item {
+  width: 68px !important;
+  height: 68px !important;
+  flex: 0 0 68px !important;
+  position: relative !important;
+  overflow: visible !important;
+}
+#geminiPanel .gemini-attachment-item img,
+#geminiPanel .gemini-attachment-item video {
+  width: 68px !important;
+  height: 68px !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  background: #0b1220 !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(95,190,255,.42) !important;
+  display: block !important;
+}
+#geminiPanel .gemini-attachment-item button {
+  top: -3px !important;
+  right: -3px !important;
+  width: 13px !important;
+  height: 13px !important;
+  min-width: 13px !important;
+  padding: 0 !important;
+  font-size: 9px !important;
+  line-height: 11px !important;
+  border-radius: 50% !important;
+  background: rgba(24,32,48,.96) !important;
+  border: 1px solid rgba(255,255,255,.42) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,.4) !important;
+}
+#geminiPanel .gemini-attachment-count {
+  font-size: 11px !important;
+  line-height: 1.2 !important;
+  margin: 1px 0 0 2px !important;
+}
+#geminiPanel .cinemotion-attachment-intelligence {
+  margin: 0 0 2px 2px !important;
+}
+@media(max-width:600px) {
+  #geminiPanel .gemini-attachment-preview {
+    width: calc(100vw - 28px) !important;
+    max-width: calc(100vw - 28px) !important;
+  }
+  #geminiPanel .gemini-attachment-item,
+  #geminiPanel .gemini-attachment-item img,
+  #geminiPanel .gemini-attachment-item video {
+    width: 58px !important;
+    height: 58px !important;
+  }
+  #geminiPanel .gemini-attachment-item { flex-basis: 58px !important; }
+}
+</style>
+
 </body>
 </html>
