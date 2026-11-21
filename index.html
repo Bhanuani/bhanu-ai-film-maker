@@ -893,7 +893,7 @@
       padding:0; margin:0 0 6px; color:#dbeafe; background:transparent; border:0; border-radius:0; font-size:.72rem;
     }
     .gemini-attachment-preview[hidden] { display:none; }
-    .gemini-user-image-gallery { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+    .gemini-user-image-gallery { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; } .gemini-user-image-gallery--conversation { align-self:flex-end; max-width:92%; width:auto; display:flex; flex-wrap:nowrap; justify-content:flex-end; gap:6px; margin:0 0 -5px; padding:0; border:0; background:transparent; } .gemini-user-image-gallery--conversation .gemini-user-image-card { width:72px; height:72px; flex:0 0 72px; aspect-ratio:1/1; border:0; border-radius:7px; background:transparent; overflow:visible; } .gemini-user-image-gallery--conversation .gemini-user-image-card img { border-radius:7px; border:1px solid rgba(78,190,255,.22); background:transparent; } .gemini-user-image-gallery--conversation .gemini-user-image-copy { width:18px; height:18px; right:-3px; top:-3px; font-size:9px; border-radius:4px; }
     .gemini-user-image-card { position:relative; width:min(135px,30vw); aspect-ratio:4/3; border:1px solid rgba(78,190,255,.28); border-radius:9px; overflow:hidden; background:#08111e; }
     .gemini-user-image-card img { width:100%; height:100%; object-fit:contain; cursor:zoom-in; display:block; }
     .gemini-user-image-copy { position:absolute; right:4px; top:4px; width:22px; height:22px; padding:0; display:grid; place-items:center; font-size:11px; line-height:1; border-radius:5px; border:1px solid rgba(255,255,255,.2); background:rgba(12,22,40,.86); color:#eaf5ff; cursor:pointer; }
@@ -4730,7 +4730,9 @@
         copy.addEventListener("click",()=>copyImageFileToClipboard(file,copy));
         card.append(img,copy);gallery.appendChild(card);
       });
-      message.appendChild(gallery);
+      // Render image references as a separate unboxed row above the user's text bubble.
+      message.parentNode.insertBefore(gallery, message);
+      gallery.classList.add("gemini-user-image-gallery--conversation");
     }
     // Image Intelligence is triggered only when the user presses Enter/Send.
     // Uploading/pasting an image only prepares the reference; it does not run a separate analysis.
@@ -4918,7 +4920,7 @@
       }
 
       const userLabel = attachedFiles.length
-        ? (prompt || (hasReferenceVideo ? "Please reverse-engineer this reference video and generate a recreation prompt." : "Please analyze the attached images.")) + "\n\n📎 " + attachedFiles.map(file => file.name).join(", ")
+        ? (prompt || (hasReferenceVideo ? "Please reverse-engineer this reference video and generate a recreation prompt." : "Please analyze the attached images."))
         : prompt;
       const userMessageBubble = addGeminiMessage(userLabel, "user");
       addUserImagePreviews(userMessageBubble, attachedFiles);
