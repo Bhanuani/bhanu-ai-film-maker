@@ -1,166 +1,101 @@
-const FLOW_CONNECTOR_MESSAGE = "CINEMOTION_FLOW_FILL";
-if (!window.__cinemotionFlowBridgeInstalled) {
-  window.__cinemotionFlowBridgeInstalled = true;
-
-  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-
-  function visible(el) {
-    if (!el || el.hidden || el.disabled) return false;
-    try {
-      const s = getComputedStyle(el);
-      return s.display !== "none" && s.visibility !== "hidden" && Number(s.opacity || 1) > 0 && el.getClientRects().length > 0;
-    } catch (_) { return false; }
-  }
-
-  function deepQueryAll(selector) {
-    const found = [];
-    const visit = root => {
-      try { found.push(...root.querySelectorAll(selector)); } catch (_) {}
-      let all = [];
-      try { all = root.querySelectorAll("*"); } catch (_) {}
-      for (const el of all) {
-        if (el.shadowRoot) visit(el.shadowRoot);
-      }
+// Cinemotion Studio Google Flow connector — robust prompt editor detection/fill.
+(() => {
+  const MESSAGE = "CINEMOTION_FLOW_FILL";
+  if (window.__cinemotionFlowBridgeV2) return;
+  window.__cinemotionFlowBridgeV2 = true;
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const visible = el => {
+    if (!el || el.disabled || el.hidden) return false;
+    const s = getComputedStyle(el);
+    return s.display !== "none" && s.visibility !== "hidden" && Number(s.opacity || 1) > 0 && el.getClientRects().length > 0;
+  };
+  function deepAll(selector) {
+    const out = [];
+    const walk = root => {
+      try { out.push(...root.querySelectorAll(selector)); } catch {}
+      let nodes=[]; try { nodes=root.querySelectorAll("*"); } catch {}
+      for (const n of nodes) if (n.shadowRoot) walk(n.shadowRoot);
     };
-    visit(document);
-    return [...new Set(found)];
+    walk(document); return [...new Set(out)];
   }
-
-  function textOf(el) {
-    return (el?.innerText || el?.textContent || "").replace(/\\s+/g, " ").trim();
-  }
-
-  function scorePromptElement(el) {
-    const meta = [el.getAttribute("aria-label"), el.getAttribute("placeholder"), el.getAttribute("name"), el.getAttribute("data-placeholder"), el.getAttribute("title"), el.getAttribute("aria-describedby")].join(" ").toLowerCase();
-    const surrounding = (el.closest("main")?.innerText || "").slice(0, 500).toLowerCase();
-    let score = 0;
-    if (/prompt|describe|what.*create|generate|write.*video|video.*prompt|create.*video/i.test(meta)) score += 70;
-    if (/search|email|password|login|comment|filter|project name/i.test(meta)) score -= 100;
-    if (el.tagName === "TEXTAREA") score += 30;
-    if (el.isContentEditable || el.getAttribute("contenteditable") === "true") score += 35;
-    if (el.getAttribute("role") === "textbox") score += 20;
-    if (el.closest("main")) score += 8;
-    if (/video|prompt|create/i.test(surrounding)) score += 3;
-    if ((el.value || el.textContent || "").length > 500) score -= 15;
-    return score;
-  }
-
+  const meta = el => [el.getAttribute("placeholder"),el.getAttribute("aria-label"),el.getAttribute("data-placeholder"),el.getAttribute("name"),el.getAttribute("title")].join(" ").toLowerCase();
   function findPrompt() {
-    const selectors = 'textarea, input:not([type="hidden"]):not([type="file"]), [contenteditable="true"], [role="textbox"]';
-    const candidates = deepQueryAll(selectors).filter(visible).filter(el => !el.readOnly && !el.disabled);
-    candidates.sort((a,b) => scorePromptElement(b)-scorePromptElement(a));
-    const best = candidates[0];
-    return best && scorePromptElement(best) >= 18 ? best : null;
+    const selectors='textarea, [contenteditable="true"], [role="textbox"], input:not([type="hidden"]):not([type="file"])';
+    const list=deepAll(selectors).filter(visible).filter(el=>!el.readOnly && !el.disabled);
+    list.sort((a,b)=>{
+      const score=el=>{
+        const m=meta(el); let n=0;
+        if (/prompt|describe|create|video|image|generate|write/.test(m)) n+=100;
+        if (/search|email|password|login|comment|filter|project name/.test(m)) n-=100;
+        if (el.tagName==="TEXTAREA") n+=35;
+        if (el.isContentEditable || el.getAttribute("contenteditable")==="true") n+=40;
+        if (el.getAttribute("role")==="textbox") n+=25;
+        if (el.closest("main")) n+=10;
+        const v=el.value||el.textContent||""; if (v.length>1000) n-=20;
+        return n;
+      };
+      return score(b)-score(a);
+    });
+    return list[0] && (()=>{const el=list[0];const m=meta(el);return /prompt|describe|create|video|image|generate|write/.test(m)||el.tagName==="TEXTAREA"||el.isContentEditable||el.getAttribute("role")==="textbox";})() ? list[0] : null;
   }
-
-  function findNewProjectTarget() {
-    const selectors = 'button, [role="button"], a';
-    const candidates = deepQueryAll(selectors).filter(visible);
-    const match = candidates.find(el => /^new project$/i.test(textOf(el)) || /new project/i.test(el.getAttribute("aria-label") || ""));
-    if (match) return match;
-    // Flow's home screen sometimes renders the card as a clickable non-button.
-    const loose = deepQueryAll('div, span').filter(visible).find(el => /^new project$/i.test(textOf(el)) && textOf(el).length < 40);
-    return loose?.closest('button, [role="button"], a') || loose || null;
+  function findProjectLink() {
+    const links=deepAll('a[href], button, [role="button"], div, span').filter(visible);
+    return links.find(el=>{
+      const t=(el.innerText||el.textContent||"").trim();
+      return /^new project$/i.test(t) && t.length<40;
+    });
   }
-
-  function clickLikeUser(target) {
+  async function openProject() {
+    if (findPrompt()) return;
+    const target=findProjectLink();
     if (!target) return;
-    target.scrollIntoView?.({block:"center", inline:"center"});
-    const rect = target.getBoundingClientRect();
-    const x = rect.left + rect.width/2, y = rect.top + rect.height/2;
-    for (const type of ["pointerdown","mousedown","pointerup","mouseup","click"]) {
-      try { target.dispatchEvent(new MouseEvent(type,{bubbles:true,cancelable:true,view:window,clientX:x,clientY:y,button:0})); } catch (_) {}
-    }
-    try { target.click(); } catch (_) {}
+    const a=target.closest("a[href]") || (target.matches("a[href]")?target:null);
+    const href=a?.href || target.getAttribute("href") || "";
+    if (href && /\/project\//i.test(href)) { location.href=href; return; }
+    target.click();
   }
-
-  async function openNewProjectIfNeeded() {
-    if (findPrompt()) return true;
-    const target = findNewProjectTarget();
-    if (target) {
-      // Flow's "New project" card is often an anchor with a real project URL.
-      // Navigate directly when available; synthetic clicks can be ignored by its SPA.
-      const href = target.closest("a[href]")?.href || target.getAttribute("href") || "";
-      if (href && /^https:\/\/flow\.google\/project\//i.test(href)) {
-        location.assign(href);
-        return true;
-      }
-      clickLikeUser(target);
-      await sleep(1800);
-      return true;
-    }
-    return false;
-  }
-
-  async function waitForPrompt(timeoutMs = 9000) {
-    if (findPrompt()) return findPrompt();
-    await openNewProjectIfNeeded();
-    const started = Date.now();
-    while (Date.now() - started < timeoutMs) {
-      const prompt = findPrompt();
-      if (prompt) return prompt;
-      await sleep(400);
-    }
+  async function waitPrompt() {
+    let p=findPrompt(); if(p) return p;
+    await openProject();
+    const start=Date.now();
+    while(Date.now()-start<25000){ p=findPrompt(); if(p) return p; await sleep(350); }
     return null;
   }
-  function setPromptValue(el, value) {
+  function fill(el,text) {
     el.focus();
-    if (el.isContentEditable || el.getAttribute("contenteditable") === "true") {
-      el.replaceChildren(document.createTextNode(value));
-      el.dispatchEvent(new InputEvent("input", {bubbles:true, inputType:"insertText", data:value}));
-      el.dispatchEvent(new Event("change", {bubbles:true}));
-      return;
+    if(el.isContentEditable || el.getAttribute("contenteditable")==="true"){
+      try { document.execCommand("selectAll",false,null); document.execCommand("insertText",false,text); } catch {}
+      if((el.innerText||el.textContent||"").trim()!==text){ el.replaceChildren(document.createTextNode(text)); }
+      el.dispatchEvent(new InputEvent("input",{bubbles:true,inputType:"insertText",data:text}));
+      el.dispatchEvent(new Event("change",{bubbles:true}));
+    } else {
+      const proto=el.tagName==="TEXTAREA"?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;
+      const setter=Object.getOwnPropertyDescriptor(proto,"value")?.set;
+      setter?setter.call(el,text):el.value=text;
+      el.dispatchEvent(new InputEvent("input",{bubbles:true,inputType:"insertText",data:text}));
+      el.dispatchEvent(new Event("change",{bubbles:true}));
     }
-    const proto = el.tagName === "TEXTAREA" ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
-    const setter = Object.getOwnPropertyDescriptor(proto, "value")?.set;
-    if (setter) setter.call(el, value); else el.value = value;
-    el.dispatchEvent(new InputEvent("input", {bubbles:true, inputType:"insertText", data:value}));
-    el.dispatchEvent(new Event("change", {bubbles:true}));
   }
-
-  function base64ToFile(ref) {
-    const binary = atob(ref.base64 || "");
-    const bytes = new Uint8Array(binary.length);
-    for (let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
-    return new File([bytes], ref.name || "reference", {type:ref.mimeType || "image/png"});
+  function toFile(r){const raw=atob(r.base64||"");const bytes=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);return new File([bytes],r.name||"reference",{type:r.mimeType||"image/png"});}
+  async function upload(refs){
+    if(!refs?.length) return 0;
+    const inputs=deepAll('input[type="file"]').filter(i=>{const a=(i.accept||"").toLowerCase();return !a||/image|video|media/.test(a);});
+    const input=inputs.find(i=>i.multiple)||inputs[0];
+    if(!input) throw new Error("Prompt was filled, but Flow's file-upload control is not available yet.");
+    const dt=new DataTransfer(); refs.forEach(r=>dt.items.add(toFile(r))); input.files=dt.files;
+    input.dispatchEvent(new Event("input",{bubbles:true})); input.dispatchEvent(new Event("change",{bubbles:true})); await sleep(2000); return refs.length;
   }
-
-  async function attachReferences(refs) {
-    if (!refs?.length) return 0;
-    // Look for Flow's image/media file input. Hidden inputs are intentionally included.
-    const inputs = deepQueryAll('input[type="file"]').filter(input => {
-      const accept=(input.getAttribute("accept")||"").toLowerCase();
-      return !accept || /image|video|media/.test(accept);
-    });
-    const input=inputs.find(el=>el.multiple)||inputs[0];
-    if (!input) throw new Error("Prompt was inserted, but Flow's upload input wasn't found. Attach reference files manually.");
-    const files=refs.map(base64ToFile);
-    const transfer=new DataTransfer();
-    files.forEach(file=>transfer.items.add(file));
-    input.files=transfer.files;
-    input.dispatchEvent(new Event("input",{bubbles:true}));
-    input.dispatchEvent(new Event("change",{bubbles:true}));
-    await sleep(2500);
-    return files.length;
-  }
-
-  async function fillFlow(payload) {
-    if (!(location.hostname === "flow.google" || location.hostname.endsWith(".flow.google") || (location.hostname.endsWith("labs.google") && location.pathname.includes("/fx/tools/flow")))) return {ok:false,message:"Not on Google Flow."};
-    const prompt=await waitForPrompt();
-    if (!prompt) return {ok:false,retry:true,message:"Flow is opening a new project. Retrying prompt detection…"};
-    setPromptValue(prompt,String(payload.prompt||""));
-    await sleep(700);
-    const actualValue = prompt.isContentEditable ? prompt.textContent : prompt.value;
-    if (!actualValue || !actualValue.trim()) return {ok:false,message:"Flow prompt field was found, but text insertion was rejected by the editor. Please click the prompt box and use Resend to Flow again."};
+  async function handle(payload){
+    if(!location.hostname.includes("flow.google") && !(location.hostname.endsWith("labs.google")&&location.pathname.includes("flow"))) return {ok:false,message:"Flow tab is not on the supported page."};
+    const prompt=await waitPrompt();
+    if(!prompt) return {ok:false,retry:true,message:"Flow project editor is not ready yet. Open New project, then resend."};
+    const text=String(payload.prompt||"").trim(); if(!text) return {ok:false,message:"The prompt text was empty."};
+    fill(prompt,text); await sleep(800);
+    const actual=(prompt.isContentEditable?prompt.innerText:prompt.value||prompt.textContent||"").trim();
+    if(!actual) return {ok:false,message:"Flow editor rejected the text. Click its prompt field and resend."};
     let attached=0, warning="";
-    try { attached=await attachReferences(payload.references||[]); }
-    catch(e) { warning=" Reference upload issue: "+(e?.message||"attach manually."); }
-    return {ok:true,message:"Prompt inserted into Flow"+(attached?" and "+attached+" reference file(s) attached.":".")+warning+" Review it and click Generate yourself."};
+    try{attached=await upload(payload.references||[]);}catch(e){warning=" "+(e.message||"Reference files could not be attached; attach them manually.");}
+    return {ok:true,message:"Prompt inserted"+(attached?"; attached "+attached+" reference(s)": "")+"."+warning+" Generate was NOT clicked."};
   }
-
-  chrome.runtime.onMessage.addListener((message,sender,sendResponse)=>{
-    if (message?.type!==FLOW_CONNECTOR_MESSAGE) return;
-    fillFlow(message.payload||{}).then(sendResponse).catch(error=>sendResponse({ok:false,message:error?.message||"Flow fill failed."}));
-    return true;
-  });
-}
+  chrome.runtime.onMessage.addListener((msg,sender,sendResponse)=>{if(msg?.type!==MESSAGE)return;handle(msg.payload||{}).then(sendResponse).catch(e=>sendResponse({ok:false,message:e.message||"Flow handoff failed."}));return true;});
+})();
