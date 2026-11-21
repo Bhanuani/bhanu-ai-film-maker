@@ -4606,7 +4606,7 @@
     const geminiIngredientUpload = byId("geminiIngredientUpload");
     const geminiIngredientList = byId("geminiIngredientList");
     const geminiStoryRefCount = byId("geminiStoryRefCount");
-    const geminiFrameLabels = ["Start Frame","Frame 2","Continue Frame 1","Continue Frame 2","Continue Frame 3","Before Ending","Ending Frame"];
+    const geminiFrameLabels = ["1st Frame","2nd Frame","3rd Frame","4th Frame","5th Frame","6th Frame","7th Frame"];
     let geminiStoryFrames = Array(7).fill(null);
     let geminiStoryIngredients = [];
     let geminiActiveFrameSlot = 0; // Paste goes into the slot currently under the pointer or selected.
@@ -5312,7 +5312,7 @@
           geminiStoryFrames[slotIndex] = selected; renderStoryFrameSlots(); renderStoryIngredients(); updateStoryReferenceCount();
         });
         const btn = document.createElement("button"); btn.type = "button";
-        btn.innerHTML = "<i class='fa-solid fa-image'></i><strong>" + geminiFrameLabels[slotIndex] + "</strong><span>Choose image or hover and Ctrl+V</span>";
+        btn.innerHTML = "<strong>" + geminiFrameLabels[slotIndex] + "</strong>";
         btn.addEventListener("click", (event) => { event.stopPropagation(); activateSlot(); input.click(); });
         slot.append(input,btn);
         if (file) { btn.hidden = true;
@@ -6309,7 +6309,7 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
   .gemini-frame-slot button strong { color:#cde7ff; font-size:10px; }
   .gemini-frame-slot img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
   .gemini-frame-slot .frame-slot-label { position:absolute; left:0; right:0; bottom:0; background:rgba(4,9,18,.82); color:#eaf5ff; padding:4px; font-size:9px; z-index:2; text-align:center; }
-  .gemini-frame-slot .frame-slot-remove { position:absolute; top:3px; right:3px; z-index:3; border:0; border-radius:50%; width:20px; height:20px; color:white; background:rgba(0,0,0,.72); cursor:pointer; }
+  .gemini-frame-slot .frame-slot-remove { position:absolute !important; top:4px !important; right:4px !important; z-index:20 !important; border:1px solid rgba(255,255,255,.65) !important; border-radius:50% !important; width:24px !important; height:24px !important; min-height:24px !important; color:#fff !important; background:rgba(8,13,24,.92) !important; cursor:pointer; display:flex !important; align-items:center !important; justify-content:center !important; padding:0 !important; font-size:16px !important; line-height:1 !important; box-shadow:0 2px 8px rgba(0,0,0,.5) !important; }
   .gemini-ingredient-upload { display:inline-flex; gap:6px; align-items:center; }
   .gemini-ingredient-list { display:flex; flex-wrap:wrap; gap:6px; margin-top:7px; }
   .gemini-ingredient-chip { font-size:10px; color:#c7d8f3; padding:5px 8px; background:#172238; border:1px solid rgba(76,170,255,.25); border-radius:8px; }
