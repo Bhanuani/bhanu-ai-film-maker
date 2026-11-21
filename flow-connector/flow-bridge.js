@@ -96,7 +96,7 @@ async function fillFlow(payload) {
     message: "Prompt inserted into Flow" + (attached ? " and " + attached + " reference file(s) attached." : ".") + mediaWarning + " Review it and click Generate yourself."
   };
 }
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+if (window.__cinemotionFlowBridgeInstalled) { /* prevent duplicate injection */ } else { window.__cinemotionFlowBridgeInstalled = true;\nchrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type !== FLOW_CONNECTOR_MESSAGE) return;
   fillFlow(message.payload || {}).then(sendResponse).catch(error => sendResponse({ ok: false, message: error?.message || "Flow fill failed." }));
   return true;
