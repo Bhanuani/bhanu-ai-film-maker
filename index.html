@@ -3639,7 +3639,7 @@
     </section>
     <section class="gemini-frame-panel gemini-reference-panel" id="geminiFramePanel" hidden tabindex="0">
       <button type="button" class="gemini-reference-close" id="geminiFramesClose" aria-label="Close frames">×</button>
-      <div class="gemini-frame-panel-title">Story continuity frames <span>Arrange the story in order · maximum 7 images total</span></div>
+      <div class="gemini-frame-panel-title">Story continuity frames</div>
       <div class="gemini-frame-slots" id="geminiFrameSlots"></div>
     </section>
     <section class="gemini-ingredients-panel gemini-reference-panel" id="geminiIngredientsPanel" hidden tabindex="0">
@@ -6301,14 +6301,14 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
   .gemini-story-tool.active { border-color:#43d9ff; color:#55ddff; box-shadow:0 0 10px rgba(50,210,255,.13); }
   .gemini-story-ref-count { margin-left:auto; font-size:11px; color:#8294b2; }
   .gemini-frame-panel,.gemini-ingredients-panel { flex:0 0 100%; padding:9px 6px 11px; border:1px solid rgba(80,155,255,.18); border-radius:13px; margin-bottom:5px; background:rgba(10,16,29,.55); }
-  .gemini-frame-panel-title { font-size:12px; color:#d8e7ff; font-weight:700; margin:0 0 8px; }
+  .gemini-frame-panel-title { font-size:14px; color:#d8e7ff; font-weight:700; margin:0 0 9px; }
   .gemini-frame-panel-title span { display:block; color:#8192ad; font-size:10px; font-weight:400; margin-top:3px; }
-  .gemini-frame-slots { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; }
-  .gemini-frame-slot { min-height:70px; border:1px dashed rgba(74,191,255,.42); border-radius:10px; overflow:hidden; background:rgba(20,30,48,.7); position:relative; }
-  .gemini-frame-slot button { width:100%; height:100%; min-height:70px; border:0; background:transparent; color:#a8bad5; padding:6px; cursor:pointer; display:flex; flex-direction:column; gap:4px; align-items:center; justify-content:center; font-size:10px; text-align:center; }
-  .gemini-frame-slot button strong { color:#cde7ff; font-size:10px; }
+  .gemini-frame-slots { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+  .gemini-frame-slot { min-height:86px; border:1px dashed rgba(74,191,255,.42); border-radius:10px; overflow:hidden; background:rgba(20,30,48,.7); position:relative; }
+  .gemini-frame-slot button { width:100%; height:100%; min-height:86px; border:0; background:transparent; color:#a8bad5; padding:7px; cursor:pointer; display:flex; flex-direction:column; gap:4px; align-items:center; justify-content:center; font-size:12px; text-align:center; }
+  .gemini-frame-slot button strong { color:#cde7ff; font-size:12px; }
   .gemini-frame-slot img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-  .gemini-frame-slot .frame-slot-label { position:absolute; left:0; right:0; bottom:0; background:rgba(4,9,18,.82); color:#eaf5ff; padding:4px; font-size:9px; z-index:2; text-align:center; }
+  .gemini-frame-slot .frame-slot-label { position:absolute; left:0; right:0; bottom:0; background:rgba(4,9,18,.82); color:#eaf5ff; padding:5px; font-size:11px; z-index:2; text-align:center; }
   .gemini-frame-slot .frame-slot-remove { position:absolute !important; top:4px !important; right:4px !important; z-index:20 !important; border:1px solid rgba(255,255,255,.65) !important; border-radius:50% !important; width:24px !important; height:24px !important; min-height:24px !important; color:#fff !important; background:rgba(8,13,24,.92) !important; cursor:pointer; display:flex !important; align-items:center !important; justify-content:center !important; padding:0 !important; font-size:16px !important; line-height:1 !important; box-shadow:0 2px 8px rgba(0,0,0,.5) !important; }
   .gemini-ingredient-upload { display:inline-flex; gap:6px; align-items:center; }
   .gemini-ingredient-list { display:flex; flex-wrap:wrap; gap:6px; margin-top:7px; }
