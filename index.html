@@ -3637,21 +3637,19 @@
         <div class="cinemotion-ai-suite-foot"><i class="fa-solid fa-bolt"></i> Automatic mode is enabled — describe your scene normally and CINEMOTION routes relevant specialists.</div>
       </div>
     </section>
+    <section class="gemini-frame-panel gemini-reference-panel" id="geminiFramePanel" hidden tabindex="0">
+      <button type="button" class="gemini-reference-close" id="geminiFramesClose" aria-label="Close frames">×</button>
+      <div class="gemini-frame-panel-title">Story continuity frames <span>Arrange the story in order · maximum 7 images total</span></div>
+      <div class="gemini-frame-slots" id="geminiFrameSlots"></div>
+    </section>
+    <section class="gemini-ingredients-panel gemini-reference-panel" id="geminiIngredientsPanel" hidden tabindex="0">
+      <button type="button" class="gemini-reference-close" id="geminiIngredientsClose" aria-label="Close ingredients">×</button>
+      <div class="gemini-frame-panel-title">Ingredients <span>Character, prop, location, costume, or style references</span></div>
+      <button type="button" class="gemini-ingredient-upload" id="geminiIngredientUpload"><i class="fa-solid fa-plus"></i> Add ingredient images</button>
+      <input type="file" id="geminiIngredientInput" accept="image/*" multiple hidden>
+      <div class="gemini-ingredient-list" id="geminiIngredientList"></div>
+    </section>
     <form class="gemini-composer" id="geminiForm">
-      <button type="button" class="gemini-story-tool" id="geminiFramesToggle" hidden>Frames</button>
-      <button type="button" class="gemini-story-tool" id="geminiIngredientsToggle" hidden>Ingredients</button>
-      <section class="gemini-frame-panel" id="geminiFramePanel" hidden tabindex="0">
-        <button type="button" class="gemini-reference-close" id="geminiFramesClose" aria-label="Close frames">×</button>
-        <div class="gemini-frame-panel-title">Story continuity frames <span>Arrange the story in order · maximum 7 images total</span></div>
-        <div class="gemini-frame-slots" id="geminiFrameSlots"></div>
-      </section>
-      <section class="gemini-ingredients-panel" id="geminiIngredientsPanel" hidden tabindex="0">
-        <button type="button" class="gemini-reference-close" id="geminiIngredientsClose" aria-label="Close ingredients">×</button>
-        <div class="gemini-frame-panel-title">Ingredients <span>Character, prop, location, costume, or style references</span></div>
-        <button type="button" class="gemini-ingredient-upload" id="geminiIngredientUpload"><i class="fa-solid fa-plus"></i> Add ingredient images</button>
-        <input type="file" id="geminiIngredientInput" accept="image/*" multiple hidden>
-        <div class="gemini-ingredient-list" id="geminiIngredientList"></div>
-      </section>
       <input type="file" id="geminiFileInput" accept="image/*,video/*" multiple hidden>
       <div class="gemini-attachment-preview" id="geminiAttachmentPreview" hidden>
         <div class="gemini-attachment-grid" id="geminiAttachmentGrid"></div>
@@ -6261,6 +6259,8 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
   #geminiInput { overflow-y:hidden!important; resize:none!important; scrollbar-width:none!important; }
   #geminiInput::-webkit-scrollbar { display:none!important; width:0!important; }
   .gemini-frame-panel,.gemini-ingredients-panel { position:relative; }
+  .gemini-reference-panel { margin:0 13px 8px; width:calc(100% - 26px); box-sizing:border-box; }
+  .gemini-reference-panel[hidden] { display:none!important; }
   .gemini-reference-close { position:absolute; top:5px; right:6px; z-index:3; width:26px!important; height:26px!important; min-width:26px; border:1px solid rgba(255,255,255,.18)!important; border-radius:50%!important; background:rgba(30,42,62,.95)!important; color:#cbd5e1!important; font-size:19px!important; line-height:1!important; padding:0!important; cursor:pointer; }
   .gemini-frame-panel-title { padding-right:32px; }
   .gemini-story-reference-tools { display:flex; align-items:center; gap:7px; flex:0 0 100%; padding:0 4px 5px; }
