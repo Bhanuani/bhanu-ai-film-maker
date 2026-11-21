@@ -6308,5 +6308,45 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
 .cinemotion-audit-improve{margin-top:9px;border:1px solid rgba(57,215,255,.35);border-radius:9px;background:rgba(30,170,220,.12);color:#70e7ff;padding:8px 11px;font-weight:700;font-size:11px;cursor:pointer}
 .cinemotion-audit-improve:hover{background:rgba(30,170,220,.22)}
 </style>
+<style id="gemini-reference-panels-compact">
+  /* Keep reference selectors in a compact strip directly above the composer. */
+  #geminiPanel .gemini-reference-panel {
+    flex: 0 0 auto !important;
+    width: min(calc(100% - 36px), 760px) !important;
+    max-width: 760px !important;
+    margin: 0 auto 2px !important;
+    max-height: 158px !important;
+    overflow: auto !important;
+    padding: 7px 8px 8px !important;
+    box-sizing: border-box !important;
+    border-radius: 12px !important;
+  }
+  #geminiPanel .gemini-reference-panel[hidden] { display: none !important; }
+  #geminiPanel .gemini-frame-panel-title {
+    font-size: 11px !important;
+    margin: 0 0 5px !important;
+    padding-right: 30px !important;
+  }
+  #geminiPanel .gemini-frame-panel-title span { font-size: 9px !important; margin-top: 1px !important; }
+  #geminiPanel .gemini-frame-slots {
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    gap: 4px !important;
+  }
+  #geminiPanel .gemini-frame-slot,
+  #geminiPanel .gemini-frame-slot button {
+    min-height: 56px !important;
+    height: 56px !important;
+  }
+  #geminiPanel .gemini-frame-slot button { padding: 3px !important; gap: 2px !important; font-size: 8px !important; }
+  #geminiPanel .gemini-frame-slot button strong { font-size: 8px !important; }
+  #geminiPanel .gemini-reference-close { width: 22px !important; height: 22px !important; min-width: 22px !important; top: 3px !important; right: 4px !important; font-size: 16px !important; }
+  #geminiPanel .gemini-ingredient-upload { padding: 5px 8px !important; font-size: 10px !important; }
+  #geminiPanel .gemini-ingredient-list { gap: 4px !important; margin-top: 5px !important; }
+  #geminiPanel .gemini-ingredient-chip { font-size: 9px !important; padding: 4px 6px !important; }
+  @media (max-width: 700px) {
+    #geminiPanel .gemini-reference-panel { width: calc(100% - 22px) !important; max-height: 145px !important; }
+    #geminiPanel .gemini-frame-slots { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+  }
+</style>
 </body>
 </html>
