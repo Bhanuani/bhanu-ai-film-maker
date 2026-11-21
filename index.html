@@ -1015,6 +1015,14 @@
       color:#e9ddff; font:700 .78rem 'Plus Jakarta Sans',sans-serif; cursor:pointer;
     }
     .use-gemini-btn:hover { background:rgba(155,114,203,.25); border-color:#b794f4; }
+    .send-flow-card-btn {
+      display:none; width:100%; margin-top:7px; padding:9px 10px; border-radius:8px;
+      border:1px solid rgba(0,210,255,.42); background:rgba(0,210,255,.12);
+      color:#dff8ff; font:700 .78rem 'Plus Jakarta Sans',sans-serif; cursor:pointer;
+    }
+    .send-flow-card-btn:hover { background:rgba(0,210,255,.24); border-color:#00d2ff; }
+    .send-flow-card-btn:disabled { opacity:.65; cursor:wait; }
+    body.director-mode .send-flow-card-btn { display:block; }
     body.director-mode { overflow:hidden; }
     body.director-mode .vault-container {
       position:fixed; z-index:101; left:0; top:82px; bottom:0;
@@ -2567,6 +2575,9 @@
             </button>
             <button type="button" class="use-gemini-btn" onclick="insertPromptIntoGemini('${item.id}')">
               <i class="fa-solid fa-wand-magic-sparkles"></i> Use in Gemini
+            </button>
+            <button type="button" class="send-flow-card-btn" onclick="sendCardPromptToFlow('${item.id}')">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Send to Flow
             </button>
           </div>
         </div>
@@ -4528,6 +4539,28 @@
 
       // Avoid moving the prompt grid while the user is typing in Gemini.
     }
+
+    window.sendCardPromptToFlow = async function(itemId) {
+      const item = window.allVaultItems?.find(entry => String(entry.id) === String(itemId));
+      const button = document.querySelector(`[onclick="sendCardPromptToFlow('${itemId}')"]`);
+      const promptText = String(item?.prompt || "").trim();
+      if (!promptText) { if (directorLibraryStatus) directorLibraryStatus.textContent = "This card has no prompt text."; return; }
+      if (button) { button.disabled = true; button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending…'; }
+      const requestId = "flow-card-" + Date.now() + "-" + Math.random().toString(36).slice(2,8);
+      const timeout = setTimeout(() => {
+        window.removeEventListener("message", handler);
+        if (button) { button.disabled=false; button.innerHTML='<i class="fa-solid fa-arrow-up-right-from-square"></i> Send to Flow'; }
+        if (directorLibraryStatus) directorLibraryStatus.textContent = "Flow Connector timed out. Ensure the extension is enabled, then retry.";
+      }, 30000);
+      const handler = event => {
+        if (event.source !== window || event.data?.source !== "cinemotion-flow-extension" || event.data?.requestId !== requestId) return;
+        clearTimeout(timeout); window.removeEventListener("message",handler);
+        if (button) { button.disabled=false; button.innerHTML=event.data.ok?'<i class="fa-solid fa-check"></i> Resend to Flow':'<i class="fa-solid fa-arrow-up-right-from-square"></i> Send to Flow'; }
+        if (directorLibraryStatus) directorLibraryStatus.textContent = event.data.message || (event.data.ok?"Prompt sent to Flow. Review it; Generate is not clicked.":"Flow send failed.");
+      };
+      window.addEventListener("message",handler);
+      window.postMessage({source:"cinemotion-studio",type:"CINEMOTION_SEND_TO_FLOW",requestId,prompt:promptText,references:[]},"*");
+    };
 
     window.insertPromptIntoGemini = function(itemId) {
       const item = window.allVaultItems?.find(entry => String(entry.id) === String(itemId));
