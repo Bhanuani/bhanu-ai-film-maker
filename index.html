@@ -6570,5 +6570,15 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
 
 
 
+
+<style id="gemini-composer-layout-hard-fix">
+/* Keep Gemini composer controls in one stable horizontal row. */
+#geminiPanel #geminiForm { display:flex !important; flex-direction:row !important; flex-wrap:nowrap !important; align-items:center !important; justify-content:flex-start !important; position:relative !important; min-height:54px !important; height:auto !important; box-sizing:border-box !important; overflow:visible !important; }
+#geminiPanel #geminiForm > #geminiUploadBtn { position:static !important; order:0 !important; flex:0 0 35px !important; width:35px !important; height:35px !important; margin:0 !important; }
+#geminiPanel #geminiForm > #geminiInput { position:static !important; order:1 !important; display:block !important; flex:1 1 0% !important; width:0 !important; min-width:0 !important; max-width:none !important; margin:0 !important; height:38px !important; }
+#geminiPanel #geminiForm > .gemini-image-options { position:static !important; order:2 !important; flex:0 0 auto !important; width:auto !important; min-width:0 !important; margin:0 !important; }
+#geminiPanel #geminiForm > #geminiSend { position:static !important; order:3 !important; flex:0 0 35px !important; width:35px !important; height:35px !important; margin:0 !important; }
+#geminiPanel #geminiForm > #geminiAttachmentPreview { position:absolute !important; left:8px !important; right:8px !important; bottom:calc(100% + 2px) !important; top:auto !important; width:auto !important; max-width:none !important; min-width:0 !important; height:auto !important; margin:0 !important; z-index:20 !important; }
+</style>
 </body>
 </html>
