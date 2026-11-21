@@ -86,22 +86,17 @@ if (!window.__cinemotionFlowBridgeInstalled) {
     return false;
   }
 
-  async function waitForPrompt(timeoutMs = 60000) {
+  async function waitForPrompt(timeoutMs = 9000) {
+    if (findPrompt()) return findPrompt();
     await openNewProjectIfNeeded();
     const started = Date.now();
     while (Date.now() - started < timeoutMs) {
       const prompt = findPrompt();
       if (prompt) return prompt;
-      // Retry clicking the New Project card if the first click didn't transition.
-      if (Date.now() - started > 5000 && Math.floor((Date.now()-started)/5000) % 2 === 0) {
-        const target = findNewProjectTarget();
-        if (target) clickLikeUser(target);
-      }
-      await sleep(500);
+      await sleep(400);
     }
     return null;
   }
-
   function setPromptValue(el, value) {
     el.focus();
     if (el.isContentEditable || el.getAttribute("contenteditable") === "true") {
