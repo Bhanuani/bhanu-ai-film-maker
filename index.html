@@ -4871,6 +4871,15 @@
         }
       }
 
+      const hasImageRefs = attachedFiles.some(file => file.type && file.type.startsWith("image/"));
+      let imageAnalysisBubble = null;
+      if (hasImageRefs && geminiMessages) {
+        imageAnalysisBubble = addGeminiMessage("", "assistant");
+        if (imageAnalysisBubble) {
+          imageAnalysisBubble.classList.add("cinemotion-image-analysis-status");
+          imageAnalysisBubble.innerHTML = '<span class="cinemotion-image-analysis-spinner"></span><span><strong>Image Intelligence</strong><small>Scanning geometry · materials · lighting · composition</small></span>';
+        }
+      }
       showVfxStatus();
       // Do not create a "thinking" bubble. The assistant bubble appears with the first streamed text.
       let pending = null;
@@ -5115,6 +5124,7 @@
           await new Promise(resolve => { typingDrainResolver = resolve; });
         }
         const finalResponse = await result.response;
+        if (imageAnalysisBubble) imageAnalysisBubble.remove();
         const finalText = finalResponse?.text?.() || streamedText || "Gemini returned an empty response.";
         if (!pending) pending = addGeminiMessage("", "assistant");
         // Keep the completed streamed text; only use the final response as a fallback.
@@ -5188,6 +5198,7 @@
           pending.appendChild(copyButton);
         }
       } catch (err) {
+        if (imageAnalysisBubble) imageAnalysisBubble.remove();
         console.error("Gemini request failed:", err);
         {
           if (!pending) pending = addGeminiMessage("", "assistant", true);
@@ -5308,7 +5319,7 @@
       geminiFrameSlots.replaceChildren();
       geminiStoryFrames.forEach((file, slotIndex) => {
         const slot = document.createElement("div"); slot.className = "gemini-frame-slot"; slot.tabIndex = 0; slot.dataset.frameSlot = String(slotIndex);
-        const activateSlot = () => { geminiActiveFrameSlot = slotIndex; geminiFramePanel?.focus({ preventScroll: true }); };
+        const activateSlot = () => { geminiActiveFrameSlot = slotIndex; slot.focus({ preventScroll: true }); };
         slot.addEventListener("pointerenter", activateSlot);
         slot.addEventListener("focusin", activateSlot);
         slot.addEventListener("click", activateSlot);
@@ -6381,6 +6392,11 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
     #geminiPanel .gemini-reference-panel { width: calc(100% - 22px) !important; max-height: 145px !important; }
     #geminiPanel .gemini-frame-slots { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
   }
+  .cinemotion-image-analysis-status { display:flex !important; align-items:center !important; gap:10px !important; padding:10px 13px !important; border:1px solid rgba(65,210,255,.25) !important; border-radius:13px !important; background:rgba(12,28,48,.75) !important; color:#d9f5ff !important; }
+  .cinemotion-image-analysis-status small { display:block; margin-top:3px; color:#8db7cb; font-size:10px; letter-spacing:.25px; }
+  .cinemotion-image-analysis-spinner { width:24px; height:24px; flex:0 0 24px; border-radius:50%; border:2px solid rgba(70,215,255,.18); border-top-color:#49ddff; border-right-color:#a779ff; animation:cinemotionImageScanSpin .8s linear infinite; box-shadow:0 0 10px rgba(62,212,255,.18); }
+  @keyframes cinemotionImageScanSpin { to { transform:rotate(360deg); } }
+  @media (prefers-reduced-motion:reduce) { .cinemotion-image-analysis-spinner { animation:none; } }
 </style>
 </body>
 </html>
