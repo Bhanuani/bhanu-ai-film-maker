@@ -3664,6 +3664,7 @@
         <div class="gemini-images-menu" id="geminiImagesMenu" hidden>
           <button type="button" id="geminiImagesFramesOption"><i class="fa-solid fa-film"></i> Frames</button>
           <button type="button" id="geminiImagesIngredientsOption"><i class="fa-solid fa-layer-group"></i> Ingredients</button>
+          <button type="button" id="geminiReferenceAnalysisOption"><i class="fa-solid fa-magnifying-glass-chart"></i> Reference Image Intelligence</button>
         </div>
       </div>
       <button type="submit" id="geminiSend" aria-label="Send message">
@@ -4880,6 +4881,11 @@
         }
 
         let messagePayload = prompt || (hasReferenceVideo ? "Reverse-engineer the attached reference video and create a recreation prompt." : "Please inspect the attached image(s) and help me with them.");
+        if (geminiReferenceAnalysisMode) {
+          const referenceImageIntelligenceInstructions = "\\n\\nCINEMOTION REFERENCE IMAGE INTELLIGENCE — DEEP VISUAL REVERSE ENGINEERING MODE:\\nAnalyze every attached reference image carefully. Do not invent facts or exact physical measurements that cannot be determined from the image. Separate directly visible observations from inferences and mark confidence (High/Medium/Low). Return a structured report with: (1) Main subject and secondary objects, (2) exact visible silhouette/shape and geometry including curves, edges, bevels, joints, layers, symmetry and relative proportions, (3) material and surface finish including texture, roughness, gloss, transparency, reflections and wear, (4) colour palette with approximate HEX values where feasible and note lighting-induced colour shifts, (5) lighting setup including key/fill/rim direction, softness, intensity, shadows, highlights and reflections, (6) camera/framing including shot size, angle, perspective, subject placement, crop, depth of field and lens characteristics as estimates, (7) composition and spatial relationships: foreground/midground/background, overlap, alignment and relative positions, (8) environment and atmosphere, (9) visible text/logos/typography using OCR-like transcription and placement, (10) fidelity constraints: what must not change. Include a compact confidence table and unknowns. Then produce a ready-to-copy image/video prompt based on the reference and the user's request, preserving silhouette, geometry, proportions, materials, colours, composition and key details unless the user explicitly asks to change them. Add a concise negative prompt for unwanted alterations. If multiple images are attached, analyze each separately and explain their roles; do not assume chronological order unless the user specifies it.\\nPRIVACY: Use attached image data only for this Gemini request; do not claim to save, upload to site storage, create media metadata, or persist reference images.";
+          if (typeof messagePayload === "string") messagePayload += referenceImageIntelligenceInstructions;
+          else if (Array.isArray(messagePayload) && messagePayload[0]?.text) messagePayload[0].text += referenceImageIntelligenceInstructions;
+        }
         if (hasReferenceVideo) {
           const mediaParts = await Promise.all(attachedFiles.map(async file => ({ inlineData: { data: await fileToBase64(file), mimeType: file.type || (file.name.toLowerCase().endsWith(".mp4") ? "video/mp4" : "application/octet-stream") } })));
           messagePayload = [{ text: messagePayload }, ...mediaParts];
@@ -5368,6 +5374,19 @@
     }
     const geminiImagesTrigger = byId("geminiImagesTrigger");
     const geminiImagesMenu = byId("geminiImagesMenu");
+    let geminiReferenceAnalysisMode = false;
+    const geminiReferenceAnalysisOption = byId("geminiReferenceAnalysisOption");
+    geminiReferenceAnalysisOption?.addEventListener("click",()=>{
+      geminiReferenceAnalysisMode = !geminiReferenceAnalysisMode;
+      geminiReferenceAnalysisOption.classList.toggle("reference-analysis-active",geminiReferenceAnalysisMode);
+      if(geminiImagesMenu) geminiImagesMenu.hidden=true;
+      geminiImagesTrigger?.classList.remove("active");
+      if(geminiInput) geminiInput.placeholder = geminiReferenceAnalysisMode ? "Reference analysis mode — attach image(s), then ask..." : "Ask Gemini...";
+      geminiImagesTrigger.textContent = geminiReferenceAnalysisMode ? "Analyze" : "Images";
+      addGeminiMessage(geminiReferenceAnalysisMode
+        ? "Reference Image Intelligence enabled. Attach or paste your reference image(s), then send. I will analyze visual details and create a reference-locked prompt. Images are processed for this request only; the site does not save them to its own storage."
+        : "Reference Image Intelligence disabled.","assistant");
+    });
     byId("geminiImagesFramesOption")?.addEventListener("click",()=>{
       if(geminiFramePanel){geminiFramePanel.hidden=false;geminiIngredientsPanel.hidden=true;}
       if(geminiImagesMenu)geminiImagesMenu.hidden=true;
@@ -6283,6 +6302,7 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
   .gemini-images-menu { position:absolute; bottom:calc(100% + 10px); right:0; z-index:50; min-width:145px; padding:6px; border:1px solid rgba(84,190,255,.3); border-radius:12px; background:rgba(13,20,36,.98); box-shadow:0 12px 30px rgba(0,0,0,.4); }
   .gemini-images-menu button { display:flex; align-items:center; gap:9px; width:100%; border:0; border-radius:8px; padding:10px 12px; background:transparent; color:#dce9ff; font-size:12px; font-weight:700; cursor:pointer; text-align:left; }
   .gemini-images-menu button:hover { background:rgba(61,170,255,.14); color:#55ddff; }
+  .gemini-images-menu button.reference-analysis-active { background:rgba(60,210,255,.16); color:#55ddff; border:1px solid rgba(67,217,255,.25); }
   .gemini-image-options { position:relative; flex:0 0 auto; align-self:center; z-index:6; }
   .gemini-images-trigger { width:auto!important; min-width:58px; height:35px!important; padding:0 12px!important; border:1px solid rgba(84,190,255,.32)!important; border-radius:10px!important; background:rgba(24,36,58,.85)!important; color:#dce9ff!important; font-size:12px!important; font-weight:700!important; white-space:nowrap; box-shadow:none!important; }
   .gemini-images-trigger:hover,.gemini-images-trigger.active { border-color:#43d9ff!important; color:#55ddff!important; }
