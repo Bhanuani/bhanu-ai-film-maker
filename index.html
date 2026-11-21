@@ -5264,7 +5264,7 @@
           audit.appendChild(improve);pending.appendChild(audit);
         }
 
-        if (userExplicitlyRequestedPrompt && responseLooksLikePrompt && !pending.querySelector(".gemini-copy-prompt")) {
+        if (responseLooksLikePrompt && !pending.querySelector(".gemini-copy-prompt")) {
           const copyButton = document.createElement("button");
           copyButton.type = "button";
           copyButton.className = "gemini-copy-prompt";
@@ -5299,7 +5299,7 @@
         }
 
         // CINEMOTION -> Google Flow handoff (requires the companion Chrome extension).
-        if (userExplicitlyRequestedPrompt && responseLooksLikePrompt && !pending.querySelector(".gemini-send-flow")) {
+        if (responseLooksLikePrompt && !pending.querySelector(".gemini-send-flow")) {
           const flowButton = document.createElement("button");
           flowButton.type = "button";
           flowButton.className = "gemini-send-flow";
