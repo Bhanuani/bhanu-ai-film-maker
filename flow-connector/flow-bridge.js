@@ -139,7 +139,7 @@ if (!window.__cinemotionFlowBridgeInstalled) {
   }
 
   async function fillFlow(payload) {
-    if (!location.hostname.endsWith("labs.google") || !location.pathname.includes("/fx/tools/flow")) return {ok:false,message:"Not on Google Flow."};
+    if (!(location.hostname === "flow.google" || location.hostname.endsWith(".flow.google") || (location.hostname.endsWith("labs.google") && location.pathname.includes("/fx/tools/flow")))) return {ok:false,message:"Not on Google Flow."};
     const prompt=await waitForPrompt();
     if (!prompt) return {ok:false,retry:true,message:"Flow is opening a new project. Retrying prompt detection…"};
     setPromptValue(prompt,String(payload.prompt||""));
