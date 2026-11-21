@@ -892,6 +892,12 @@
       padding:0; margin:0; color:#dbeafe; background:transparent; border:0; border-radius:8px; font-size:.72rem;
     }
     .gemini-attachment-preview[hidden] { display:none; }
+    .gemini-user-image-gallery { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    .gemini-user-image-card { position:relative; width:min(190px,38vw); aspect-ratio:4/3; border:1px solid rgba(78,190,255,.35); border-radius:11px; overflow:hidden; background:#08111e; }
+    .gemini-user-image-card img { width:100%; height:100%; object-fit:contain; cursor:zoom-in; display:block; }
+    .gemini-user-image-copy { position:absolute; right:6px; top:6px; width:30px; height:30px; border-radius:8px; border:1px solid rgba(255,255,255,.24); background:rgba(12,22,40,.86); color:#eaf5ff; cursor:pointer; }
+    .cinemotion-intelligence-pulse.completed { background:#65e6ad; box-shadow:0 0 8px rgba(101,230,173,.6); animation:none; }
+    .cinemotion-image-analysis-status.is-complete { border-color:rgba(101,230,173,.3); }
     .cinemotion-attachment-intelligence { display:flex; align-items:center; gap:8px; flex:0 0 100%; width:100%; margin-top:2px; padding:7px 10px; border:1px solid rgba(59,215,255,.22); border-radius:10px; background:rgba(9,30,48,.72); color:#bfeeff; font-size:11px; }
     .cinemotion-attachment-intelligence small { display:block; margin-top:2px; color:#84aeca; font-size:10px; }
     .cinemotion-intelligence-pulse { position:relative; width:13px; height:13px; flex:0 0 13px; border-radius:50%; background:#42d9ff; box-shadow:0 0 8px rgba(66,217,255,.7); animation:cinemotionIntelligencePulse 1.15s ease-in-out infinite; }
@@ -4208,7 +4214,9 @@
 
         await signOut(auth);
         geminiChatSession = null;
-        if (geminiMessages) geminiMessages.replaceChildren();
+        geminiChatImageObjectUrls.forEach(url=>URL.revokeObjectURL(url)); geminiChatImageObjectUrls.length=0;
+      geminiUploadImageAnalysis=""; if(geminiUploadAnalysisBubble){geminiUploadAnalysisBubble.remove();geminiUploadAnalysisBubble=null;}
+      if (geminiMessages) geminiMessages.replaceChildren();
         if (geminiInput) geminiInput.value = "";
         const gate = byId("authGateModal");
         if (gate) gate.style.display = "flex";
@@ -4627,6 +4635,9 @@
     let geminiAttachmentObjectUrls = [];
     let geminiChatSession = null;
     let geminiSelectedFiles = [];
+    let geminiUploadImageAnalysis = "";
+    let geminiUploadAnalysisBubble = null;
+    const geminiChatImageObjectUrls = [];
     const GEMINI_MAX_FILE_BYTES = 15 * 1024 * 1024;
 
     function openGeminiPanel() {
@@ -4691,6 +4702,62 @@
       geminiMessages.scrollTop = geminiMessages.scrollHeight;
       if (geminiWelcome) geminiWelcome.style.display = "none";
       return message;
+    }
+    async function copyImageFileToClipboard(file, button) {
+      try {
+        if (!navigator.clipboard?.write || !window.ClipboardItem) throw new Error("Image clipboard unavailable");
+        await navigator.clipboard.write([new ClipboardItem({[file.type || "image/png"]: file})]);
+        if (button) { button.innerHTML = '<i class="fa-solid fa-check"></i>'; button.title = "Copied image"; setTimeout(()=>{button.innerHTML='<i class="fa-regular fa-copy"></i>';button.title="Copy image";},1300); }
+      } catch (err) {
+        addGeminiMessage("Image copy is not supported by this browser. Right-click the preview and choose Copy image, or open it and copy manually.","assistant",true);
+      }
+    }
+    function addUserImagePreviews(message, files) {
+      if (!message || !files?.length) return;
+      const imageFiles = files.filter(file=>file.type && file.type.startsWith("image/"));
+      if (!imageFiles.length) return;
+      const gallery=document.createElement("div"); gallery.className="gemini-user-image-gallery";
+      imageFiles.forEach(file=>{
+        const url=URL.createObjectURL(file); geminiChatImageObjectUrls.push(url);
+        const card=document.createElement("div");card.className="gemini-user-image-card";
+        const img=document.createElement("img");img.src=url;img.alt=file.name;img.title=file.name;
+        img.addEventListener("click",()=>openGeminiImageViewer(url));
+        const copy=document.createElement("button");copy.type="button";copy.className="gemini-user-image-copy";copy.title="Copy image";copy.setAttribute("aria-label","Copy image");copy.innerHTML='<i class="fa-regular fa-copy"></i>';
+        copy.addEventListener("click",()=>copyImageFileToClipboard(file,copy));
+        card.append(img,copy);gallery.appendChild(card);
+      });
+      message.appendChild(gallery);
+    }
+    function startUploadImageIntelligence(files) {
+      const images=(files||[]).filter(file=>file.type&&file.type.startsWith("image/"));
+      geminiUploadImageAnalysis="";
+      if(geminiUploadAnalysisBubble)geminiUploadAnalysisBubble.remove();
+      geminiUploadAnalysisBubble=null;
+      if(!images.length||!window.cinemotionGeminiModel) return;
+      if(geminiAttachmentPreview){
+        let badge=geminiAttachmentPreview.querySelector(".cinemotion-attachment-intelligence");
+        if(badge){badge.innerHTML='<span class="cinemotion-intelligence-pulse"></span><span><strong>Image Intelligence · Analyzing now</strong><small>Inspecting visual details before you send</small></span>';}
+      }
+      geminiUploadAnalysisBubble=addGeminiMessage("","assistant");
+      if(geminiUploadAnalysisBubble){
+        geminiUploadAnalysisBubble.classList.add("cinemotion-image-analysis-status");
+        geminiUploadAnalysisBubble.innerHTML='<span class="cinemotion-image-analysis-spinner"></span><span><strong>Image Intelligence · Analyzing upload</strong><small>Geometry · materials · lighting · composition · camera</small></span>';
+      }
+      const task=(async()=>{
+        try{
+          const parts=[{text:"Analyze the attached image references in detail. Report subject, geometry and proportions, materials and texture, colours, lighting and shadows, camera/framing/perspective, composition/spatial relations, environment, visible text/logos, and exact details that should remain unchanged. Distinguish visible facts from estimates. Do not create a storyboard or cinematic prompt. This is a reference-analysis pass only."},...await Promise.all(images.map(async file=>({inlineData:{data:await fileToBase64(file),mimeType:file.type||"image/jpeg"}})))];
+          const result=await window.cinemotionGeminiModel.generateContent(parts);
+          geminiUploadImageAnalysis=result?.response?.text?.()||"";
+          if(geminiUploadAnalysisBubble){geminiUploadAnalysisBubble.innerHTML='<span class="cinemotion-intelligence-pulse completed"></span><span><strong>Image Intelligence · Analysis ready</strong><small>Visual reference analysis completed; it will guide your request.</small></span>';geminiUploadAnalysisBubble.classList.add("is-complete");}
+          if(geminiAttachmentPreview){const badge=geminiAttachmentPreview.querySelector(".cinemotion-attachment-intelligence");if(badge)badge.innerHTML='<span class="cinemotion-intelligence-pulse completed"></span><span><strong>Image Intelligence ready</strong><small>Analysis complete · waiting for your instruction</small></span>';}
+        }catch(err){
+          geminiUploadImageAnalysis="";
+          if(geminiUploadAnalysisBubble){geminiUploadAnalysisBubble.remove();geminiUploadAnalysisBubble=null;}
+          if(geminiAttachmentPreview){const badge=geminiAttachmentPreview.querySelector(".cinemotion-attachment-intelligence");if(badge)badge.innerHTML='<span class="cinemotion-intelligence-pulse"></span><span><strong>Image Intelligence queued</strong><small>Will analyze with your message when sent</small></span>';}
+          console.warn("Upload-time image analysis failed:",err);
+        }
+      })();
+      return task;
     }
     function closeGeminiImageViewer() {
       if (geminiImageViewer) geminiImageViewer.hidden = true;
@@ -4871,7 +4938,8 @@
       const userLabel = attachedFiles.length
         ? (prompt || (hasReferenceVideo ? "Please reverse-engineer this reference video and generate a recreation prompt." : "Please analyze the attached images.")) + "\n\n📎 " + attachedFiles.map(file => file.name).join(", ")
         : prompt;
-      addGeminiMessage(userLabel, "user");
+      const userMessageBubble = addGeminiMessage(userLabel, "user");
+      addUserImagePreviews(userMessageBubble, attachedFiles);
 
       if (!attachedFiles.length) {
         const instantReply = getInstantGreetingReply(prompt);
@@ -4903,7 +4971,8 @@
           geminiChatSession = window.cinemotionGeminiModel.startChat();
         }
 
-        let messagePayload = prompt || (hasReferenceVideo ? "Reverse-engineer the attached reference video and create a recreation prompt." : "Please inspect the attached image(s) and help me with them.");
+        let messagePayload = prompt || (hasReferenceVideo ? "Reverse-engineer the attached reference video and create a recreation prompt." : "Analyze the attached image references and respond to my request without automatically generating a storyboard or prompt.");
+        if (geminiUploadImageAnalysis) messagePayload += "\\n\\nUPLOAD-TIME IMAGE INTELLIGENCE ANALYSIS (use this as visual context, but follow the user's actual request and do not default to a storyboard):\\n" + geminiUploadImageAnalysis;
         if (attachedFiles.some(file => file.type && file.type.startsWith("image/"))) {
           const referenceImageIntelligenceInstructions = "\\n\\nCINEMOTION AUTO IMAGE INTELLIGENCE — AUTOMATICALLY ACTIVATED FOR EVERY ATTACHED IMAGE, REGARDLESS OF WHERE IT WAS ADDED (composer, Frames, or Ingredients):\\nAnalyze each image individually and in detail before answering. Identify subject and secondary objects; visible silhouette, geometry, shape, curves, edges, bevels, joints, layers, symmetry and relative proportions; material, surface texture, roughness, gloss, transparency, reflections and wear; colours and approximate HEX values when reasonably estimable; lighting direction, key/fill/rim, softness, intensity, shadows, highlights and reflections; camera angle, framing, perspective, crop, depth of field and lens characteristics as estimates; composition and spatial relationships including foreground/midground/background, overlap, alignment and positions; environment; visible text/logos and their placement; and details that must remain unchanged. Clearly separate observations from inferences and note uncertainty rather than inventing measurements. Use the image(s) as context-specific references for the user's request: Frames are visual/story references with no assumed chronology unless the user specifies order; Ingredients are persistent object/character/style references, not story frames. Combine image analysis with the user's text and preserve requested constraints. When the user asks to recreate, provide a high-fidelity ready-to-copy prompt plus concise negative constraints. When the user asks another task, apply the image analysis directly to that task instead of producing an unrelated report. For multiple images, analyze each separately and maintain their intended roles. Images are used for this request only; do not claim site storage or persistence.";
           if (typeof messagePayload === "string") messagePayload += referenceImageIntelligenceInstructions;
@@ -5393,7 +5462,7 @@
       ].join("\\n") : "";
 
       return {
-        prompt: (userPrompt || "Create a cinematic story prompt using the supplied reference images.") + frameInstructions + ingredientInstructions,
+        prompt: (userPrompt || "Analyze the supplied reference images. Describe their visual details and use them only as context; do not automatically create a storyboard or cinematic prompt unless I ask for one.") + frameInstructions + ingredientInstructions,
         files: [...orderedFrames.map(x => x.file), ...geminiStoryIngredients]
       };
     }
@@ -5480,6 +5549,7 @@
       clearGeminiAttachment();
       geminiSelectedFiles = files;
       showGeminiAttachments(files);
+      startUploadImageIntelligence(files);
       geminiInput?.focus();
     });
     geminiImageViewerClose?.addEventListener("click", closeGeminiImageViewer);
@@ -5500,6 +5570,7 @@
       clearGeminiAttachment();
       geminiSelectedFiles = combined;
       showGeminiAttachments(combined);
+      startUploadImageIntelligence(combined);
     });
     geminiForm?.addEventListener("submit", (event) => {
       event.preventDefault();
