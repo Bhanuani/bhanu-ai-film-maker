@@ -3664,7 +3664,7 @@
         <div class="gemini-images-menu" id="geminiImagesMenu" hidden>
           <button type="button" id="geminiImagesFramesOption"><i class="fa-solid fa-film"></i> Frames</button>
           <button type="button" id="geminiImagesIngredientsOption"><i class="fa-solid fa-layer-group"></i> Ingredients</button>
-          <button type="button" id="geminiReferenceAnalysisOption"><i class="fa-solid fa-magnifying-glass-chart"></i> Reference Image Intelligence</button>
+          
         </div>
       </div>
       <button type="submit" id="geminiSend" aria-label="Send message">
@@ -4885,8 +4885,8 @@
         }
 
         let messagePayload = prompt || (hasReferenceVideo ? "Reverse-engineer the attached reference video and create a recreation prompt." : "Please inspect the attached image(s) and help me with them.");
-        if (geminiReferenceAnalysisMode) {
-          const referenceImageIntelligenceInstructions = "\n\nCINEMOTION REFERENCE IMAGE INTELLIGENCE — DEEP VISUAL REVERSE ENGINEERING MODE:\nAnalyze every attached reference image carefully. Do not invent facts or exact physical measurements that cannot be determined from the image. Separate directly visible observations from inferences and mark confidence (High/Medium/Low). Return a structured report with: (1) Main subject and secondary objects, (2) exact visible silhouette/shape and geometry including curves, edges, bevels, joints, layers, symmetry and relative proportions, (3) material and surface finish including texture, roughness, gloss, transparency, reflections and wear, (4) colour palette with approximate HEX values where feasible and note lighting-induced colour shifts, (5) lighting setup including key/fill/rim direction, softness, intensity, shadows, highlights and reflections, (6) camera/framing including shot size, angle, perspective, subject placement, crop, depth of field and lens characteristics as estimates, (7) composition and spatial relationships: foreground/midground/background, overlap, alignment and relative positions, (8) environment and atmosphere, (9) visible text/logos/typography using OCR-like transcription and placement, (10) fidelity constraints: what must not change. Include a compact confidence table and unknowns. Then produce a ready-to-copy image/video prompt based on the reference and the user's request, preserving silhouette, geometry, proportions, materials, colours, composition and key details unless the user explicitly asks to change them. Add a concise negative prompt for unwanted alterations. If multiple images are attached, analyze each separately and explain their roles; do not assume chronological order unless the user specifies it.\nPRIVACY: Use attached image data only for this Gemini request; do not claim to save, upload to site storage, create media metadata, or persist reference images.";
+        if (attachedFiles.some(file => file.type && file.type.startsWith("image/"))) {
+          const referenceImageIntelligenceInstructions = "\\n\\nCINEMOTION AUTO IMAGE INTELLIGENCE — AUTOMATICALLY ACTIVATED FOR EVERY ATTACHED IMAGE, REGARDLESS OF WHERE IT WAS ADDED (composer, Frames, or Ingredients):\\nAnalyze each image individually and in detail before answering. Identify subject and secondary objects; visible silhouette, geometry, shape, curves, edges, bevels, joints, layers, symmetry and relative proportions; material, surface texture, roughness, gloss, transparency, reflections and wear; colours and approximate HEX values when reasonably estimable; lighting direction, key/fill/rim, softness, intensity, shadows, highlights and reflections; camera angle, framing, perspective, crop, depth of field and lens characteristics as estimates; composition and spatial relationships including foreground/midground/background, overlap, alignment and positions; environment; visible text/logos and their placement; and details that must remain unchanged. Clearly separate observations from inferences and note uncertainty rather than inventing measurements. Use the image(s) as context-specific references for the user's request: Frames are visual/story references with no assumed chronology unless the user specifies order; Ingredients are persistent object/character/style references, not story frames. Combine image analysis with the user's text and preserve requested constraints. When the user asks to recreate, provide a high-fidelity ready-to-copy prompt plus concise negative constraints. When the user asks another task, apply the image analysis directly to that task instead of producing an unrelated report. For multiple images, analyze each separately and maintain their intended roles. Images are used for this request only; do not claim site storage or persistence.";
           if (typeof messagePayload === "string") messagePayload += referenceImageIntelligenceInstructions;
           else if (Array.isArray(messagePayload) && messagePayload[0]?.text) messagePayload[0].text += referenceImageIntelligenceInstructions;
         }
@@ -5209,12 +5209,6 @@
           pending.textContent = friendlyError;
         }
       } finally {
-        if (geminiReferenceAnalysisMode) {
-          geminiReferenceAnalysisMode = false;
-          geminiReferenceAnalysisOption?.classList.remove("reference-analysis-active");
-          if (geminiImagesTrigger) geminiImagesTrigger.textContent = "Images";
-          if (geminiInput) geminiInput.placeholder = "Ask Gemini...";
-        }
         hideVfxStatus();
         if (sendButton) sendButton.disabled = false;
         if (geminiInput) { geminiInput.disabled = false; geminiInput.focus(); }
@@ -5384,19 +5378,7 @@
     }
     const geminiImagesTrigger = byId("geminiImagesTrigger");
     const geminiImagesMenu = byId("geminiImagesMenu");
-    let geminiReferenceAnalysisMode = false;
-    const geminiReferenceAnalysisOption = byId("geminiReferenceAnalysisOption");
-    geminiReferenceAnalysisOption?.addEventListener("click",()=>{
-      geminiReferenceAnalysisMode = !geminiReferenceAnalysisMode;
-      geminiReferenceAnalysisOption.classList.toggle("reference-analysis-active",geminiReferenceAnalysisMode);
-      if(geminiImagesMenu) geminiImagesMenu.hidden=true;
-      geminiImagesTrigger?.classList.remove("active");
-      if(geminiInput) geminiInput.placeholder = geminiReferenceAnalysisMode ? "Reference analysis mode — attach image(s), then ask..." : "Ask Gemini...";
-      geminiImagesTrigger.textContent = geminiReferenceAnalysisMode ? "Analyze" : "Images";
-      addGeminiMessage(geminiReferenceAnalysisMode
-        ? "Reference Image Intelligence enabled. Attach or paste your reference image(s), then send. I will analyze visual details and create a reference-locked prompt. Images are processed for this request only; the site does not save them to its own storage."
-        : "Reference Image Intelligence disabled.","assistant");
-    });
+    // Image intelligence activates automatically whenever image files are attached in any input area.
     byId("geminiImagesFramesOption")?.addEventListener("click",()=>{
       if(geminiFramePanel){geminiFramePanel.hidden=false;geminiIngredientsPanel.hidden=true;}
       if(geminiImagesMenu)geminiImagesMenu.hidden=true;
