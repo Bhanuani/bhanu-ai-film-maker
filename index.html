@@ -5280,6 +5280,69 @@
           });
           pending.appendChild(copyButton);
         }
+
+        // CINEMOTION -> Google Flow handoff (requires the companion Chrome extension).
+        if (userExplicitlyRequestedPrompt && responseLooksLikePrompt && !pending.querySelector(".gemini-send-flow")) {
+          const flowButton = document.createElement("button");
+          flowButton.type = "button";
+          flowButton.className = "gemini-send-flow";
+          flowButton.innerHTML = '<i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i><span>Send to Flow</span>';
+          flowButton.setAttribute("aria-label", "Send prompt and reference images to Google Flow");
+          flowButton.title = "Send prompt and reference images to Google Flow";
+          flowButton.addEventListener("click", async () => {
+            if (flowButton.disabled) return;
+            const promptMatch = finalText.match(/(?:\*\*(?:Ready[- ]to[- ]copy\s+)?(?:Cinematic\s+)?(?:Video|Image)?\s*Prompt:?\*\*|(?:Ready[- ]to[- ]copy\s+)?(?:Cinematic\s+)?(?:Video|Image)?\s*Prompt:|\*\*Prompt:\*\*|Prompt:)([\s\S]*?)(?=\n\s*(?:\*\*Shot Breakdown:?\*\*|###\s*Shot Breakdown|\*\*Continuity Locks:?\*\*|\*\*Director Notes:?\*\*)|$)/i);
+            const promptToSend = (promptMatch ? promptMatch[1] : finalText).trim();
+            const sourceFiles = (Array.isArray(attachedFile) ? attachedFile : attachedFile ? [attachedFile] : [])
+              .filter(file => file && (file.type.startsWith("image/") || file.type.startsWith("video/")));
+            const totalBytes = sourceFiles.reduce((sum, file) => sum + (file.size || 0), 0);
+            if (totalBytes > 25 * 1024 * 1024) {
+              flowButton.querySelector("span").textContent = "Reduce image size";
+              flowButton.title = "Reference files exceed the 25 MB extension transfer limit. Send fewer/smaller files.";
+              setTimeout(() => { flowButton.querySelector("span").textContent = "Send to Flow"; flowButton.title = "Send prompt and reference images to Google Flow"; }, 2500);
+              return;
+            }
+            flowButton.disabled = true;
+            flowButton.querySelector("span").textContent = "Sending…";
+            flowButton.title = "Preparing prompt and references";
+            const requestId = "flow-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8);
+            const statusHandler = event => {
+              if (event.source !== window || event.data?.source !== "cinemotion-flow-extension" || event.data?.requestId !== requestId) return;
+              window.removeEventListener("message", statusHandler);
+              flowButton.disabled = false;
+              if (event.data.ok) {
+                flowButton.querySelector("span").textContent = "Resend to Flow";
+                flowButton.title = event.data.message || "Sent to Google Flow. Switch accounts there and click Resend to Flow again.";
+                flowButton.classList.add("sent");
+              } else {
+                flowButton.querySelector("span").textContent = "Send to Flow";
+                flowButton.title = event.data.message || "Could not send to Google Flow. Check the Chrome extension.";
+              }
+            };
+            window.addEventListener("message", statusHandler);
+            try {
+              const references = [];
+              for (const file of sourceFiles) {
+                references.push({ name: file.name, mimeType: file.type || "application/octet-stream", base64: await fileToBase64(file) });
+              }
+              window.postMessage({ source: "cinemotion-studio", type: "CINEMOTION_SEND_TO_FLOW", requestId, prompt: promptToSend, references }, "*");
+              setTimeout(() => {
+                if (flowButton.disabled) {
+                  window.removeEventListener("message", statusHandler);
+                  flowButton.disabled = false;
+                  flowButton.querySelector("span").textContent = "Send to Flow";
+                  flowButton.title = "Flow Connector not detected or timed out. Install/enable the extension and retry.";
+                }
+              }, 30000);
+            } catch (error) {
+              window.removeEventListener("message", statusHandler);
+              flowButton.disabled = false;
+              flowButton.querySelector("span").textContent = "Send to Flow";
+              flowButton.title = "Could not prepare reference files: " + (error?.message || error);
+            }
+          });
+          pending.appendChild(flowButton);
+        }
       } catch (err) {
         if (imageAnalysisBubble) {
           imageAnalysisBubble.textContent = "Image Intelligence failed";
@@ -6579,6 +6642,14 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
 #geminiPanel #geminiForm > .gemini-image-options { position:static !important; order:2 !important; flex:0 0 auto !important; width:auto !important; min-width:0 !important; margin:0 !important; }
 #geminiPanel #geminiForm > #geminiSend { position:static !important; order:3 !important; flex:0 0 35px !important; width:35px !important; height:35px !important; margin:0 !important; }
 #geminiPanel #geminiForm > #geminiAttachmentPreview { position:absolute !important; left:8px !important; right:8px !important; bottom:calc(100% + 2px) !important; top:auto !important; width:auto !important; max-width:none !important; min-width:0 !important; height:auto !important; margin:0 !important; z-index:20 !important; }
+</style>
+<style id="cinemotion-send-flow-style">
+.gemini-message.assistant:has(.gemini-send-flow){padding-bottom:58px!important}
+.gemini-send-flow{position:absolute;z-index:4;right:56px;bottom:13px;height:34px;padding:0 10px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;gap:6px;color:#dff8ff;font:700 11px/1 'Plus Jakarta Sans',sans-serif;background:linear-gradient(145deg,rgba(0,210,255,.18),rgba(70,90,210,.2));border:1px solid rgba(0,210,255,.42);box-shadow:0 5px 12px rgba(0,0,0,.2);cursor:pointer;white-space:nowrap}
+.gemini-send-flow:hover{background:linear-gradient(145deg,rgba(0,210,255,.3),rgba(70,90,210,.28))}
+.gemini-send-flow:disabled{opacity:.6;cursor:wait}
+.gemini-send-flow.sent{border-color:rgba(74,222,128,.55);color:#bbf7d0}
+@media(max-width:540px){.gemini-send-flow{right:54px;padding:0 8px;font-size:10px}}
 </style>
 </body>
 </html>
