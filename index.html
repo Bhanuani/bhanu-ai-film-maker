@@ -899,7 +899,7 @@
     .gemini-user-image-copy { position:absolute; right:4px; top:4px; width:22px; height:22px; padding:0; display:grid; place-items:center; font-size:11px; line-height:1; border-radius:5px; border:1px solid rgba(255,255,255,.2); background:rgba(12,22,40,.86); color:#eaf5ff; cursor:pointer; }
     .cinemotion-intelligence-pulse.completed { background:#65e6ad; box-shadow:0 0 8px rgba(101,230,173,.6); animation:none; }
     .cinemotion-image-analysis-status.is-complete { border-color:rgba(101,230,173,.3); }
-    .cinemotion-attachment-intelligence { display:inline-flex; align-items:center; gap:6px; flex:0 1 auto; width:max-content; max-width:min(320px,100%); min-width:0; box-sizing:border-box; margin:0; padding:5px 8px; border:1px solid rgba(59,215,255,.22); border-radius:8px; background:rgba(9,30,48,.72); color:#bfeeff; font-size:10px; line-height:1.25; overflow:hidden; }
+    .cinemotion-attachment-intelligence { position:absolute; left:12px; top:-42px; display:inline-flex; align-items:center; gap:6px; flex:0 1 auto; width:max-content; max-width:min(320px,100%); min-width:0; box-sizing:border-box; margin:0; padding:5px 8px; border:1px solid rgba(59,215,255,.22); border-radius:8px; background:rgba(9,30,48,.88); color:#bfeeff; font-size:10px; line-height:1.25; overflow:hidden; z-index:5; }
     .cinemotion-attachment-intelligence > span:last-child { min-width:0; }
     .cinemotion-attachment-intelligence strong { display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .cinemotion-attachment-intelligence small { display:block; margin-top:1px; color:#84aeca; font-size:9px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -907,7 +907,7 @@
     .cinemotion-intelligence-pulse::after { content:""; position:absolute; inset:-4px; border:1px solid rgba(66,217,255,.45); border-radius:50%; animation:cinemotionIntelligenceRing 1.15s ease-out infinite; }
     @keyframes cinemotionIntelligencePulse { 50% { opacity:.45; transform:scale(.72); } }
     @keyframes cinemotionIntelligenceRing { from { transform:scale(.6); opacity:.9; } to { transform:scale(1.5); opacity:0; } }
-    .gemini-composer { flex-wrap:wrap; }
+    .gemini-composer { flex-wrap:wrap; position:relative; }
     .gemini-attachment-grid { display:flex; flex-direction:row; flex-wrap:nowrap; align-items:center; gap:7px; width:100%; min-width:0; max-width:100%; overflow-x:auto; overflow-y:hidden; padding:2px 3px 5px; box-sizing:border-box; }
     .gemini-attachment-item { position:relative; width:58px; height:58px; flex:0 0 58px; }
     .gemini-attachment-item img,.gemini-attachment-item video { width:100%; height:100%; display:block; object-fit:cover; border-radius:9px; border:1px solid rgba(255,255,255,.18); background:#080d18; cursor:pointer; }
