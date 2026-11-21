@@ -6565,17 +6565,6 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
 </style>
 
 
-<style id="gemini-attachment-hidden-state-fix">
-/* Keep the native hidden state authoritative despite the preview's flex layout. */
-#geminiPanel .gemini-attachment-preview[hidden] {
-  display: none !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-#geminiPanel .gemini-attachment-preview:not([hidden]) {
-  visibility: visible !important;
-  pointer-events: auto !important;
-}
-</style>
+
 </body>
 </html>
