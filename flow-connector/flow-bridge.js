@@ -3,7 +3,7 @@ const FLOW_CONNECTOR_MESSAGE = "CINEMOTION_FLOW_FILL";
 function visible(el) {
   if (!el || el.hidden || el.disabled) return false;
   const style = getComputedStyle(el);
-  return style.display !== "none" && style.visibility !== "hidden" && Number(style.opacity || 1) > 0 && (el.getClientRects().length > 0 || el.type === "file");
+  return style.display !== "none" && style.visibility !== "hidden" && Number(style.opacity || 1) > 0 && el.getClientRects().length > 0;
 }
 function deepQueryAll(selector) {
   const found = [];
@@ -16,31 +16,31 @@ function deepQueryAll(selector) {
   return [...new Set(found)];
 }
 function scorePromptElement(el) {
-  const meta = [el.getAttribute("aria-label"), el.getAttribute("placeholder"), el.getAttribute("name"), el.getAttribute("data-placeholder"), el.getAttribute("title")].join(" ").toLowerCase();
+  const meta = [el.getAttribute("aria-label"), el.getAttribute("placeholder"), el.getAttribute("name"), el.getAttribute("data-placeholder"), el.getAttribute("title"), el.getAttribute("aria-describedby")].join(" ").toLowerCase();
   let score = 0;
-  if (/prompt|describe|create|generate|ask flow|write/i.test(meta)) score += 15;
-  if (/search|email|password|login|comment/i.test(meta)) score -= 30;
-  if (el.tagName === "TEXTAREA") score += 5;
-  if (el.isContentEditable || el.getAttribute("contenteditable") === "true") score += 7;
-  if (el.getAttribute("role") === "textbox") score += 3;
+  if (/what do you want to create|prompt|describe|create|generate|ask flow|write/i.test(meta)) score += 20;
+  if (/search|email|password|login|comment|filter/i.test(meta)) score -= 40;
+  if (el.tagName === "TEXTAREA") score += 8;
+  if (el.isContentEditable || el.getAttribute("contenteditable") === "true") score += 10;
+  if (el.getAttribute("role") === "textbox") score += 5;
   if (el.closest("main")) score += 2;
   return score;
 }
-async function waitForPrompt(timeoutMs = 28000) {
+async function waitForPrompt(timeoutMs = 30000) {
   const started = Date.now();
   while (Date.now() - started < timeoutMs) {
-    const candidates = deepQueryAll("textarea, input:not([type]), input[type=text], [contenteditable=true], [role=textbox]")
+    const candidates = deepQueryAll('textarea, input:not([type]), input[type="text"], [contenteditable="true"], [role="textbox"]')
       .filter(visible)
       .filter(el => !el.readOnly && !el.disabled);
-    candidates.sort((a,b) => scorePromptElement(b) - scorePromptElement(a));
+    candidates.sort((a, b) => scorePromptElement(b) - scorePromptElement(a));
     if (candidates.length && scorePromptElement(candidates[0]) > 0) return candidates[0];
     await new Promise(resolve => setTimeout(resolve, 500));
   }
   return null;
 }
 function setPromptValue(el, value) {
+  el.focus();
   if (el.isContentEditable || el.getAttribute("contenteditable") === "true") {
-    el.focus();
     el.textContent = value;
     el.dispatchEvent(new InputEvent("input", { bubbles: true, inputType: "insertText", data: value }));
     el.dispatchEvent(new Event("change", { bubbles: true }));
@@ -49,7 +49,6 @@ function setPromptValue(el, value) {
   const proto = el.tagName === "TEXTAREA" ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
   const setter = Object.getOwnPropertyDescriptor(proto, "value")?.set;
   if (setter) setter.call(el, value); else el.value = value;
-  el.focus();
   el.dispatchEvent(new InputEvent("input", { bubbles: true, inputType: "insertText", data: value }));
   el.dispatchEvent(new Event("change", { bubbles: true }));
 }
@@ -66,15 +65,14 @@ async function attachReferences(refs) {
     return !accept || /image|video|media/.test(accept);
   });
   const input = inputs.find(el => el.multiple) || inputs[0];
-  if (!input) throw new Error("Flow prompt field was found, but its upload input is not available. Please attach the references directly in Flow.");
+  if (!input) throw new Error("Prompt was filled, but Flow's media upload input was not detected. Please attach references manually.");
   const files = refs.map(base64ToFile);
   const transfer = new DataTransfer();
   files.forEach(file => transfer.items.add(file));
-  try { input.files = transfer.files; }
-  catch (_) { throw new Error("Flow's upload field did not accept the reference files. Attach them directly in Flow."); }
+  input.files = transfer.files;
   input.dispatchEvent(new Event("input", { bubbles: true }));
   input.dispatchEvent(new Event("change", { bubbles: true }));
-  await new Promise(resolve => setTimeout(resolve, 900));
+  await new Promise(resolve => setTimeout(resolve, 1200));
   return files.length;
 }
 async function fillFlow(payload) {
@@ -82,12 +80,21 @@ async function fillFlow(payload) {
     return { ok: false, message: "This tab is not Google Flow." };
   }
   const promptEl = await waitForPrompt();
-  if (!promptEl) return { ok: false, message: "Flow opened, but no project prompt box was found. Open or create a Flow project, then click Send to Flow again." };
-  let attached = 0;
-  try { attached = await attachReferences(payload.references || []); }
-  catch (error) { return { ok: false, message: error.message || "Could not attach reference files." }; }
+  if (!promptEl) return { ok: false, message: "Google Flow opened, but its prompt composer was not detected. Open the Flow creation screen and retry." };
+
+  // IMPORTANT: Fill the prompt first. Reference-upload failures must never block prompt transfer.
   setPromptValue(promptEl, String(payload.prompt || ""));
-  return { ok: true, message: "Prompt sent to Flow" + (attached ? " with " + attached + " reference file(s)." : ".") + " Review it in Flow and click Generate yourself." };
+  let attached = 0;
+  let mediaWarning = "";
+  try {
+    attached = await attachReferences(payload.references || []);
+  } catch (error) {
+    mediaWarning = " " + (error?.message || "Reference media could not be attached.");
+  }
+  return {
+    ok: true,
+    message: "Prompt inserted into Flow" + (attached ? " and " + attached + " reference file(s) attached." : ".") + mediaWarning + " Review it and click Generate yourself."
+  };
 }
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type !== FLOW_CONNECTOR_MESSAGE) return;
