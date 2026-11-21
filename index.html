@@ -4215,7 +4215,7 @@
         await signOut(auth);
         geminiChatSession = null;
         geminiChatImageObjectUrls.forEach(url=>URL.revokeObjectURL(url)); geminiChatImageObjectUrls.length=0;
-      geminiUploadImageAnalysis=""; if(geminiUploadAnalysisBubble){geminiUploadAnalysisBubble.remove();geminiUploadAnalysisBubble=null;}
+      geminiUploadImageAnalysis=""; geminiUploadAnalysisPromise=null; if(geminiUploadAnalysisBubble){geminiUploadAnalysisBubble.remove();geminiUploadAnalysisBubble=null;}
       if (geminiMessages) geminiMessages.replaceChildren();
         if (geminiInput) geminiInput.value = "";
         const gate = byId("authGateModal");
@@ -4636,6 +4636,7 @@
     let geminiChatSession = null;
     let geminiSelectedFiles = [];
     let geminiUploadImageAnalysis = "";
+    let geminiUploadAnalysisPromise = null;
     let geminiUploadAnalysisBubble = null;
     const geminiChatImageObjectUrls = [];
     const GEMINI_MAX_FILE_BYTES = 15 * 1024 * 1024;
@@ -4757,6 +4758,7 @@
           console.warn("Upload-time image analysis failed:",err);
         }
       })();
+      geminiUploadAnalysisPromise=task;
       return task;
     }
     function closeGeminiImageViewer() {
@@ -4949,6 +4951,9 @@
         }
       }
 
+      if (geminiUploadAnalysisPromise && attachedFiles.some(file=>file.type&&file.type.startsWith("image/"))) {
+        try { await geminiUploadAnalysisPromise; } catch (_) {}
+      }
       const hasImageRefs = attachedFiles.some(file => file.type && file.type.startsWith("image/"));
       let imageAnalysisBubble = null;
       if (hasImageRefs && geminiMessages) {
@@ -5409,7 +5414,7 @@
           if (selected.size > GEMINI_MAX_FILE_BYTES) { addGeminiMessage("Each reference image must be smaller than 15 MB.", "assistant", true); return; }
           if (storyReferenceCount() >= 7 && !geminiStoryFrames[slotIndex]) { addGeminiMessage("Maximum 7 reference images total. Remove one first.", "assistant", true); return; }
           geminiActiveFrameSlot = slotIndex;
-          geminiStoryFrames[slotIndex] = selected; renderStoryFrameSlots(); renderStoryIngredients(); updateStoryReferenceCount();
+          geminiStoryFrames[slotIndex] = selected; renderStoryFrameSlots(); renderStoryIngredients(); updateStoryReferenceCount(); startUploadImageIntelligence([...geminiStoryFrames.filter(Boolean),...geminiStoryIngredients]);
         });
         const btn = document.createElement("button"); btn.type = "button";
         btn.innerHTML = "<strong>" + geminiFrameLabels[slotIndex] + "</strong>";
@@ -5514,6 +5519,7 @@
         }
       }
       updateStoryReferenceCount();
+      startUploadImageIntelligence([...geminiStoryFrames.filter(Boolean),...geminiStoryIngredients]);
     }
     geminiFramePanel?.addEventListener("paste",event=>handleReferencePaste(event,"frames"));
     geminiIngredientsPanel?.addEventListener("paste",event=>handleReferencePaste(event,"ingredients"));
@@ -5528,7 +5534,7 @@
       const files=Array.from(geminiIngredientInput.files||[]).filter(f=>f.type.startsWith("image/"));
       const room=Math.max(0,7-storyReferenceCount()); if(files.some(f=>f.size>GEMINI_MAX_FILE_BYTES)){addGeminiMessage("Each reference image must be smaller than 15 MB.","assistant",true);return;}
       if(files.length>room){addGeminiMessage("Maximum 7 reference images total. Only "+room+" more can be added.","assistant",true);return;}
-      geminiStoryIngredients.push(...files);renderStoryIngredients();updateStoryReferenceCount();geminiIngredientInput.value="";
+      geminiStoryIngredients.push(...files);renderStoryIngredients();updateStoryReferenceCount();startUploadImageIntelligence([...geminiStoryFrames.filter(Boolean),...geminiStoryIngredients]);geminiIngredientInput.value="";
     });
     renderStoryFrameSlots(); updateStoryReferenceCount();
     geminiUploadBtn?.addEventListener("click", () => geminiFileInput?.click());
