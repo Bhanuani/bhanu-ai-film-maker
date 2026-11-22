@@ -4948,7 +4948,7 @@
       const attachedFiles = Array.isArray(attachedFile) ? attachedFile : (attachedFile ? [attachedFile] : []);
       const hasReferenceVideo = attachedFiles.some(file => file.type.startsWith("video/"));
       if (hasReferenceVideo) ["filmDirector","shotBreakdown","cameraDirector","compositionDirector","lightingDirector","colorMoodDirector","motionPhysicsDirector","durationPlanner","sceneConsistency","visualStyleLock","realismChecker","complexityAnalyzer","videoMotionPlanner","referenceVideoDirector"].forEach(id => { if (!autoTools.includes(id)) autoTools.push(id); });
-      const userExplicitlyRequestedPrompt = /(?:\b(?:generate|create|write|make|give|provide|improve|enhance|rewrite|craft)\b.{0,70}\bprompt\b|\bprompt\b.{0,50}\b(?:ivvu|generate|create|write|give|make|chey|provide)\b|\b(?:image|video|cinematic|animation)\s+prompt\b)/i.test(prompt);
+      const userExplicitlyRequestedPrompt = /(?:\b(?:generate|create|write|make|give|provide|improve|enhance|rewrite|craft)\b.{0,70}\bprompt\b|\bprompt\b.{0,50}\b(?:ivvu|generate|create|write|give|make|chey|provide)\b|\b(?:image|video|cinematic|animation)\s+prompt\b|\b(?:generate|create|make|write|craft)\b.{0,90}\b(?:cinematic|video|film|scene|advert(?:isement)?|commercial|product\s+(?:ad|commercial))\b)/i.test(prompt);
       if (!prompt && !attachedFiles.length) return;
       if (!auth.currentUser) {
         addGeminiMessage("Please sign in to use Gemini.", "assistant", true);
@@ -5268,7 +5268,7 @@
         // Keep the completed streamed text; only use the final response as a fallback.
         if (!streamedText) pending.textContent = finalText;
         const promptTextLower = finalText.toLowerCase();
-        const responseLooksLikePrompt = promptTextLower.includes("ready-to-copy") || promptTextLower.includes("ready to copy") || promptTextLower.includes("cinematic prompt") || promptTextLower.includes("master prompt") || promptTextLower.includes("prompt:") || promptTextLower.includes("shot breakdown:") || /shot\s*\d+/i.test(finalText) || (["timecode","shot size & angle","camera movement","lighting & atmosphere","transition & sound"].some(term => promptTextLower.includes(term)) && (promptTextLower.includes("shot size & angle") || /\d{1,2}:\d{2}\s*[-–]\s*\d{1,2}:\d{2}/.test(finalText)));
+        const responseLooksLikePrompt = promptTextLower.includes("ready-to-copy") || promptTextLower.includes("ready to copy") || promptTextLower.includes("cinematic prompt") || promptTextLower.includes("master prompt") || promptTextLower.includes("prompt:") || promptTextLower.includes("shot breakdown:") || /shot\s*\d+/i.test(finalText) || /timecode|shot size\s*&\s*angle|camera movement|lighting\s*&\s*atmosphere|transition\s*&\s*sound/i.test(finalText) || (userExplicitlyRequestedPrompt && finalText.length > 80);
         // CINEMOTION Cinematic Prompt Quality Checker: automatic local audit after prompt-like responses.
         const qualityAudit = (() => {
           if (!responseLooksLikePrompt) return null;
@@ -5311,9 +5311,7 @@
           copyButton.setAttribute("aria-label", "Copy prompt");
           copyButton.title = "Copy prompt";
           copyButton.addEventListener("click", async () => {
-            const copySource = String(streamedText || finalText || "").replace(/(?:^|\n)\s*(?:🎬\s*)?(?:Cinematic Prompt Quality Check|Prompt Quality Check|Quality Check)[\s\S]*$/i, "").trim();
-            const promptMatch = copySource.match(/(?:\*\*(?:Ready-to-copy\s+)?(?:Cinematic\s+)?(?:Video|Image)?\s*Prompt:?\*\*|(?:Ready-to-copy\s+)?(?:Cinematic\s+)?(?:Video|Image)?\s*Prompt:|(?:Cinematic\s+)?(?:Video|Image)?\s*Prompt:?|\*\*Prompt:\*\*|Prompt:)([\s\S]*?)(?=\n\s*(?:\*\*Shot Breakdown:?\*\*|###\s*Shot Breakdown|\*\*Continuity Locks:?\*\*|\*\*Director Notes:?\*\*|(?:🎬\s*)?(?:Cinematic Prompt Quality Check|Prompt Quality Check|Quality Check))|$)/i);
-            const textToCopy = (promptMatch ? promptMatch[1] : copySource).trim();
+            const textToCopy = String(streamedText || finalText || "").replace(/(?:^|\n)\s*(?:🎬\s*)?(?:Cinematic Prompt Quality Check|Prompt Quality Check|Quality Check)[\s\S]*$/i, "").trim();
             try {
               await navigator.clipboard.writeText(textToCopy);
               copyButton.innerHTML = '<i class="fa-solid fa-check" aria-hidden="true"></i>';
