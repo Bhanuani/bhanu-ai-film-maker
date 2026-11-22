@@ -4974,15 +4974,7 @@
       }
 
       const hasImageRefs = attachedFiles.some(file => file.type && file.type.startsWith("image/"));
-      let imageAnalysisBubble = null;
-      if (hasImageRefs && geminiMessages) {
-        imageAnalysisBubble = addGeminiMessage("Image Intelligence working...", "assistant");
-        if (imageAnalysisBubble) {
-          imageAnalysisBubble.classList.add("cinemotion-image-analysis-status");
-          imageAnalysisBubble.setAttribute("role", "status");
-          imageAnalysisBubble.setAttribute("aria-live", "polite");
-        }
-      }
+      // Image Intelligence status stays only in the attachment preview badge; do not add a chat bubble after sending.
       showVfxStatus();
       // Do not create a "thinking" bubble. The assistant bubble appears with the first streamed text.
       let pending = null;
