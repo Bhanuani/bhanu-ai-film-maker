@@ -5274,7 +5274,7 @@
         let finalText = finalResponse?.text?.() || streamedText || "Gemini returned an empty response.";
         // Robust final prompt formatter: section order is enforced locally,
         // independent of Gemini's ordering or heading capitalization/markdown.
-        const promptSectionHeading = /^\s*(?:#{1,6}\s*)?(?:\*\*|__)?(MAIN CINEMATIC PROMPT|CINEMATIC PROMPT|READY[- ]TO[- ]COPY|SHOT BREAKDOWN(?:\s*\([^)]*\))?|SHOT\s+\d+|CONSTRAINTS|NEGATIVE PROMPT)(?:\*\*|__)?\s*:?\s*$/gim;
+        const promptSectionHeading = /^\s*(?:#{1,6}\s*)?(?:\*\*|__)?(MAIN CINEMATIC PROMPT|CINEMATIC PROMPT|READY[- ]TO[- ]COPY|SHOT BREAKDOWN(?:\s*\([^)]*\))?|SHOT\s+\d+|CONSTRAINTS|NEGATIVE PROMPT)(?:\s*:)?(?:\*\*|__)?\s*:?\s*$/gim;
         const looksLikePromptOutput = userExplicitlyRequestedPrompt ||
           /ready[- ]to[- ]copy|cinematic prompt|master prompt|shot breakdown|\bshot\s*\d+|timecode|constraints:|negative prompt:/i.test(finalText);
         if (looksLikePromptOutput) {
