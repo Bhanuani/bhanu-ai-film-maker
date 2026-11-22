@@ -6616,6 +6616,8 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
   overflow: visible !important;
   padding: 0 !important;
 }
+/* Hidden composer attachment preview must stay hidden after send despite display:flex above. */
+#geminiPanel .gemini-attachment-preview[hidden] { display:none !important; }
 #geminiPanel .gemini-attachment-grid {
   display: flex !important;
   flex-flow: row wrap !important;
