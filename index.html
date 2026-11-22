@@ -5272,9 +5272,39 @@
           window.setTimeout(() => imageAnalysisBubble?.remove(), 2000);
         }
         let finalText = finalResponse?.text?.() || streamedText || "Gemini returned an empty response.";
-        // Preserve Gemini's original prompt formatting. Avoid destructive
-        // section extraction: it can swallow shot breakdowns when headings are
-        // returned in an unexpected order. Ordering is requested in the prompt.
+        // Conservative order enforcement: only move clearly headed sections.
+        // If boundaries are ambiguous, leave Gemini's text untouched.
+        const promptSectionHeading = /^\s*(?:#{1,6}\s*)?(?:\*\*|__)?(MAIN CINEMATIC PROMPT|CINEMATIC PROMPT|READY[- ]TO[- ]COPY|SHOT BREAKDOWN(?:\s*\([^)]*\))?|SHOT\s+\d+|CONSTRAINTS|NEGATIVE PROMPT)(?:\s*:)?(?:\*\*|__)?\s*:?\s*$/gim;
+        const isPromptOutput = userExplicitlyRequestedPrompt || /ready[- ]to[- ]copy|cinematic prompt|master prompt|shot breakdown|\bshot\s*\d+|timecode|constraints:|negative prompt:/i.test(finalText);
+        if (isPromptOutput) {
+          const headings = [...finalText.matchAll(promptSectionHeading)];
+          const targets = headings.filter(m => /^(CONSTRAINTS|NEGATIVE PROMPT)$/i.test(m[1]));
+          const hasMainHeading = headings.some(m => /^(MAIN CINEMATIC PROMPT|CINEMATIC PROMPT|READY[- ]TO[- ]COPY|SHOT BREAKDOWN|SHOT\s+\d+)$/i.test(m[1]));
+          // Require recognizable section boundaries and both target headings; otherwise don't risk flattening/moving text.
+          if (targets.length >= 2 && hasMainHeading) {
+            const moved = { constraints: [], negative: [] };
+            const ranges = [];
+            for (let i = 0; i < headings.length; i++) {
+              const h = headings[i];
+              const kind = h[1].toUpperCase();
+              if (kind !== "CONSTRAINTS" && kind !== "NEGATIVE PROMPT") continue;
+              const next = headings[i + 1];
+              if (!next) continue; // ambiguous section-to-end: preserve unchanged
+              const from = h.index + h[0].length;
+              const to = next.index;
+              const body = finalText.slice(from, to).trim();
+              if (!body) continue;
+              moved[kind === "CONSTRAINTS" ? "constraints" : "negative"].push(body);
+              ranges.push([h.index, to]);
+            }
+            if (moved.constraints.length && moved.negative.length && ranges.length) {
+              for (const [a, b] of ranges.reverse()) finalText = finalText.slice(0, a) + finalText.slice(b);
+              finalText = finalText.replace(/\n{3,}/g, "\n\n").trim();
+              finalText += "\n\nCONSTRAINTS:\n" + moved.constraints.join("\n\n");
+              finalText += "\n\nNEGATIVE PROMPT:\n" + moved.negative.join("\n\n");
+            }
+          }
+        }
         if (!pending) pending = addGeminiMessage("", "assistant");
         // Replace streamed display with the normalized final response so visible order is guaranteed.
         pending.textContent = finalText;
