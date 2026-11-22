@@ -5274,8 +5274,8 @@
         let finalText = finalResponse?.text?.() || streamedText || "Gemini returned an empty response.";
         // Deterministic prompt-section ordering: main prompt + shot breakdown first,
         // then CONSTRAINTS, and NEGATIVE PROMPT last (even if Gemini ignores instructions).
-        if (userExplicitlyRequestedPrompt || /(?:ready[- ]to[- ]copy|cinematic prompt|master prompt|shot breakdown|\\bshot\\s*\\d+|timecode)/i.test(finalText)) {
-          const sectionPattern = /(^|\n)\\s*(?:\\*\\*)?(CONSTRAINTS|NEGATIVE PROMPT)(?:\\*\\*)?\\s*:?\\s*([\\s\\S]*?)(?=\n\\s*(?:\\*\\*)?(?:CONSTRAINTS|NEGATIVE PROMPT|SHOT BREAKDOWN|SHOT\\s+\\d+|MAIN CINEMATIC PROMPT|CINEMATIC PROMPT|READY[- ]TO[- ]COPY)(?:\\*\\*)?\\s*:?|$)/gi;
+        if (userExplicitlyRequestedPrompt || /(?:ready[- ]to[- ]copy|cinematic prompt|master prompt|shot breakdown|\bshot\s*\d+|timecode)/i.test(finalText)) {
+          const sectionPattern = /(^|\n)\s*(?:\*\*)?(CONSTRAINTS|NEGATIVE PROMPT)(?:\*\*)?\s*:?\s*([\s\S]*?)(?=\n\s*(?:\*\*)?(?:CONSTRAINTS|NEGATIVE PROMPT|SHOT BREAKDOWN|SHOT\s+\d+|MAIN CINEMATIC PROMPT|CINEMATIC PROMPT|READY[- ]TO[- ]COPY)(?:\*\*)?\s*:?|$)/gi;
           const extracted = { constraints: "", negative: "" };
           finalText = finalText.replace(sectionPattern, (match, lead, heading, body) => {
             const key = heading.toUpperCase() === "CONSTRAINTS" ? "constraints" : "negative";
