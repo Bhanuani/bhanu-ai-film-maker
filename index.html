@@ -5271,10 +5271,23 @@
           // Keep the completion confirmation briefly, then remove the status line.
           window.setTimeout(() => imageAnalysisBubble?.remove(), 2000);
         }
-        const finalText = finalResponse?.text?.() || streamedText || "Gemini returned an empty response.";
+        let finalText = finalResponse?.text?.() || streamedText || "Gemini returned an empty response.";
+        // Deterministic prompt-section ordering: main prompt + shot breakdown first,
+        // then CONSTRAINTS, and NEGATIVE PROMPT last (even if Gemini ignores instructions).
+        if (responseLooksLikePrompt || userExplicitlyRequestedPrompt) {
+          const sectionPattern = /(^|\\n)\\s*(?:\\*\\*)?(CONSTRAINTS|NEGATIVE PROMPT)(?:\\*\\*)?\\s*:?\\s*([\\s\\S]*?)(?=\\n\\s*(?:\\*\\*)?(?:CONSTRAINTS|NEGATIVE PROMPT|SHOT BREAKDOWN|SHOT\\s+\\d+|MAIN CINEMATIC PROMPT|CINEMATIC PROMPT|READY[- ]TO[- ]COPY)(?:\\*\\*)?\\s*:?|$)/gi;
+          const extracted = { constraints: "", negative: "" };
+          finalText = finalText.replace(sectionPattern, (match, lead, heading, body) => {
+            const key = heading.toUpperCase() === "CONSTRAINTS" ? "constraints" : "negative";
+            extracted[key] = body.trim();
+            return lead || "";
+          }).trim();
+          if (extracted.constraints) finalText += "\\n\\nCONSTRAINTS:\\n" + extracted.constraints;
+          if (extracted.negative) finalText += "\\n\\nNEGATIVE PROMPT:\\n" + extracted.negative;
+        }
         if (!pending) pending = addGeminiMessage("", "assistant");
-        // Keep the completed streamed text; only use the final response as a fallback.
-        if (!streamedText) pending.textContent = finalText;
+        // Replace streamed display with the normalized final response so visible order is guaranteed.
+        pending.textContent = finalText;
         const promptTextLower = finalText.toLowerCase();
         const responseLooksLikePrompt = promptTextLower.includes("ready-to-copy") || promptTextLower.includes("ready to copy") || promptTextLower.includes("cinematic prompt") || promptTextLower.includes("master prompt") || promptTextLower.includes("prompt:") || promptTextLower.includes("shot breakdown:") || /shot\s*\d+/i.test(finalText) || /timecode|shot size\s*&\s*angle|camera movement|lighting\s*&\s*atmosphere|transition\s*&\s*sound/i.test(finalText) || (userExplicitlyRequestedPrompt && finalText.length > 80);
         // CINEMOTION Cinematic Prompt Quality Checker: automatic local audit after prompt-like responses.
