@@ -3775,6 +3775,14 @@
     #geminiMessages .gemini-message:has(.gemini-copy-prompt) {
       padding-bottom: 54px;
     }
+    #geminiMessages .cinemotion-improve-prompt {
+      display:inline-flex; align-items:center; gap:8px; margin-top:12px;
+      padding:9px 14px; border-radius:10px; border:1px solid rgba(75,205,255,.48);
+      color:#eaf8ff; background:linear-gradient(110deg,rgba(30,185,238,.20),rgba(126,95,255,.22));
+      font:600 13px/1.2 inherit; cursor:pointer;
+    }
+    #geminiMessages .cinemotion-improve-prompt:hover { background:linear-gradient(110deg,rgba(30,185,238,.32),rgba(126,95,255,.32)); }
+    #geminiMessages .cinemotion-improve-prompt:disabled { opacity:.65; cursor:wait; }
     #geminiMessages .gemini-copy-prompt {
       position: absolute;
       z-index: 3;
@@ -5300,6 +5308,19 @@
           audit.innerHTML='<div class="cinemotion-audit-head"><strong>🎬 Cinematic Prompt Quality Check</strong><span class="cinemotion-audit-score" style="color:'+scoreColor+'">'+qualityAudit.score+'/100</span></div><div class="cinemotion-audit-grade">'+qualityAudit.grade+'</div><div class="cinemotion-audit-checks">'+qualityAudit.checks.map(x=>'<span class="'+(x.ok?'ok':'missing')+'">'+(x.ok?'✓':'○')+' '+x.label+'</span>').join('')+'</div>';
           const issues=[...qualityAudit.conflicts,...qualityAudit.missing];
           if(issues.length){const list=document.createElement("ul");list.className="cinemotion-audit-issues";issues.slice(0,5).forEach(issue=>{const li=document.createElement("li");li.textContent=issue;list.appendChild(li);});audit.appendChild(list);}
+          const improveButton=document.createElement("button");
+          improveButton.type="button";
+          improveButton.className="cinemotion-improve-prompt";
+          improveButton.innerHTML='<i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Improve Prompt';
+          improveButton.addEventListener("click",()=>{
+            const originalPrompt=String(finalText||"").replace(/(?:^|\\n)\\s*(?:🎬\\s*)?(?:Cinematic Prompt Quality Check|Prompt Quality Check|Quality Check)[\\s\\S]*$/i,"").trim();
+            const auditIssues=[...qualityAudit.conflicts,...qualityAudit.missing].slice(0,8);
+            const improveRequest="Improve and rewrite the following cinematic prompt using the Quality Check findings. Preserve the user's original concept, subjects, product/reference identity, design, storyline, and all explicit constraints. Do not invent new story elements or change requested details. Fix only the identified gaps; improve shot framing/angles, camera movement, timing/pacing, and sound direction where missing and relevant. Keep the full main prompt and shot breakdown first, then append CONSTRAINTS, then NEGATIVE PROMPT as the final section. Return the complete improved prompt only, ready to copy.\\n\\nQUALITY CHECK FINDINGS:\\n"+(auditIssues.length?auditIssues.map(x=>"- "+x).join("\\n"):"Improve clarity and cinematic specificity without changing intent.")+"\\n\\nORIGINAL PROMPT:\\n"+originalPrompt;
+            improveButton.disabled=true;
+            improveButton.innerHTML='<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Improving…';
+            sendGeminiMessage(improveRequest);
+          });
+          audit.appendChild(improveButton);
           pending.appendChild(audit);
         }
 
