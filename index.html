@@ -5298,9 +5298,7 @@
           audit.innerHTML='<div class="cinemotion-audit-head"><strong>🎬 Cinematic Prompt Quality Check</strong><span class="cinemotion-audit-score" style="color:'+scoreColor+'">'+qualityAudit.score+'/100</span></div><div class="cinemotion-audit-grade">'+qualityAudit.grade+'</div><div class="cinemotion-audit-checks">'+qualityAudit.checks.map(x=>'<span class="'+(x.ok?'ok':'missing')+'">'+(x.ok?'✓':'○')+' '+x.label+'</span>').join('')+'</div>';
           const issues=[...qualityAudit.conflicts,...qualityAudit.missing];
           if(issues.length){const list=document.createElement("ul");list.className="cinemotion-audit-issues";issues.slice(0,5).forEach(issue=>{const li=document.createElement("li");li.textContent=issue;list.appendChild(li);});audit.appendChild(list);}
-          const improve=document.createElement("button");improve.type="button";improve.className="cinemotion-audit-improve";improve.textContent="✨ Improve Prompt";
-          improve.addEventListener("click",()=>{const auditNotes=issues.length?issues.join("\n- "):"Strengthen cinematic specificity, remove ambiguity, and preserve all creative intent and constraints.";sendGeminiMessage("Improve the following generated cinematic prompt using this quality audit. Preserve my original creative intent, story events, named subjects, reference constraints and all explicit negative instructions. Do not add story events. Fix only identified weaknesses and resolve contradictions. Output the improved ready-to-copy prompt first.\n\nAudit notes:\n- "+auditNotes+"\n\nPrompt to improve:\n"+finalText);});
-          audit.appendChild(improve);pending.appendChild(audit);
+          pending.appendChild(audit);
         }
 
         if (responseLooksLikePrompt && !pending.querySelector(".gemini-copy-prompt")) {
@@ -6317,7 +6315,7 @@
     add("promptOptimizer"); add("compositionDirector"); add("colorMoodDirector"); add("lightingDirector"); add("visualStyleLock"); add("realismChecker"); add("complexityAnalyzer"); add("cameraCreativityAI"); add("promptFidelityAI");
     // Cinematic Intelligence core: automatically analyzes every cinematic prompt.
     ["shotAnalysisAI","lensIntelligenceAI","cameraAngleAI","cameraMovementAI","compositionAI","depthFocusAI","videoQualityAI","cinematicDirectorAI","editingIntelligenceAI","continuityAI"].forEach(add);
-    if(has(/(compare prompts|prompt comparison|compare.*(?:gemini|chatgpt|website)|which prompt is better|best of both|combine prompts|merge prompts|prompt a.*prompt b)/)) add("promptComparisonAI");
+    if(has(/(compare.{0,40}prompts|prompts.{0,40}compare|prompt comparison|compare.*(?:gemini|chatgpt|website)|which prompt is better|best of both|combine prompts|merge prompts|prompt a.*prompt b)/)) add("promptComparisonAI");
     if(has(/(physics|realistic|realism|gravity|momentum|inertia|collision|impact|flying|falling|jump|wing|dragon|water|cloth|hair|debris|explosion|motion)/)) { add("physicsAI"); add("motionAnalysisAI"); }
     if(has(/(lens|focal|mm|wide.angle|telephoto|macro|anamorphic|close.up|portrait|perspective)/)) add("lensIntelligenceAI");
     if(has(/(angle|low.angle|high.angle|top.down|overhead|worm's.eye|eye.level|dutch|bird's.eye)/)) add("cameraAngleAI");
@@ -6559,8 +6557,6 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
 .cinemotion-audit-checks .missing{color:#ffd18a;border:1px solid rgba(255,209,138,.15)}
 .cinemotion-audit-issues{padding-left:18px;margin:9px 0;color:#d6dfef}
 .cinemotion-audit-issues li{margin:3px 0}
-.cinemotion-audit-improve{margin-top:9px;border:1px solid rgba(57,215,255,.35);border-radius:9px;background:rgba(30,170,220,.12);color:#70e7ff;padding:8px 11px;font-weight:700;font-size:11px;cursor:pointer}
-.cinemotion-audit-improve:hover{background:rgba(30,170,220,.22)}
 </style>
 <style id="gemini-reference-panels-compact">
   /* Keep reference selectors in a compact strip directly above the composer. */
