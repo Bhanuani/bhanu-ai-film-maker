@@ -2717,7 +2717,7 @@ body::after{
 
               <h3 id="title_${item.id}">${item.name}</h3>
               
-              <div class="prompt-wrapper ${index < 2 ? "prompt-border-glow" : ""}" id="prompt_wrap_${item.id}">
+              <div class="prompt-wrapper prompt-border-glow" id="prompt_wrap_${item.id}">
                 <div class="prompt-content" id="content_${item.id}">
                   <p class="prompt-box" id="text_${item.id}">${item.prompt}</p>
                 </div>
@@ -7071,9 +7071,9 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
 @media(prefers-reduced-motion:reduce){.movement-card{transition:none!important}.movement-card:hover{transform:none!important}}
 </style>
 
-<style id="cinemotion-first-two-prompt-border-glow">
-/* Strong, clearly visible BORDER glow only for the first two prompt description boxes. */
-.movement-card .prompt-wrapper.prompt-border-glow{
+<style id="cinemotion-all-prompt-border-glow">
+/* Apply the same visible cyan BORDER glow to every prompt description box across all categories. */
+.movement-card .prompt-wrapper{
   border:1.5px solid #00d9ff!important;
   border-radius:12px!important;
   position:relative!important;
@@ -7086,6 +7086,6 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
   50%{border-color:rgba(0,245,255,1)!important;box-shadow:0 0 12px rgba(0,217,255,.72),0 0 24px rgba(0,217,255,.52),0 0 38px rgba(0,217,255,.3),inset 0 0 9px rgba(0,217,255,.2)!important}
 }
 @media(prefers-reduced-motion:reduce){
- .movement-card .prompt-wrapper.prompt-border-glow{animation:none!important;border-color:#00d9ff!important;box-shadow:0 0 12px rgba(0,217,255,.55),0 0 24px rgba(0,217,255,.3)!important}
+ .movement-card .prompt-wrapper{animation:none!important;border-color:#00d9ff!important;box-shadow:0 0 12px rgba(0,217,255,.55),0 0 24px rgba(0,217,255,.3)!important}
 }
 </style>
