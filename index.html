@@ -1803,6 +1803,40 @@ body::after{
   *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}
 }
 </style>
+<!-- LANDING HERO CONTRAST REFINEMENT — visual-only -->
+<style id="cinematic-landing-contrast-fix">
+#cinemotionLanding .lp-nav{
+  background:rgba(5,9,18,.84)!important;
+  border-color:rgba(120,190,255,.17)!important;
+  box-shadow:0 16px 42px rgba(0,0,0,.32),inset 0 1px rgba(255,255,255,.045)!important;
+}
+#cinemotionLanding .lp-links{color:#d6e2f3!important}
+#cinemotionLanding .lp-links a{color:#d6e2f3!important;transition:color .2s, text-shadow .2s}
+#cinemotionLanding .lp-links a:hover{color:#35d9ff!important;text-shadow:0 0 12px rgba(53,217,255,.25)}
+#cinemotionLanding .lp-hero::before{
+  opacity:.62!important;
+  filter:brightness(1.12) saturate(1.08)!important;
+}
+#cinemotionLanding .lp-hero::after{
+  background:linear-gradient(90deg,rgba(3,7,15,.72) 0%,rgba(3,7,15,.42) 46%,rgba(3,7,15,.18) 100%),linear-gradient(180deg,rgba(3,7,15,.12),rgba(3,7,15,.32))!important;
+}
+#cinemotionLanding .lp-hero-content{
+  text-shadow:0 5px 26px rgba(0,0,0,.56)!important;
+}
+#cinemotionLanding .lp-hero h1{
+  background:linear-gradient(100deg,#ffffff 0%,#f1f7ff 48%,#c6d7ee 100%)!important;
+  -webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important;
+  filter:drop-shadow(0 8px 18px rgba(0,0,0,.36));
+}
+#cinemotionLanding .lp-hero p{color:#e0e9f5!important;text-shadow:0 3px 16px rgba(0,0,0,.52)}
+#cinemotionLanding .lp-proof{border-top-color:rgba(180,210,255,.24)!important}
+#cinemotionLanding .lp-proof span{color:#b6c7dc!important}
+#cinemotionLanding .lp-scroll-note{color:#b7c9df!important}
+@media(max-width:700px){
+  #cinemotionLanding .lp-hero::after{background:linear-gradient(180deg,rgba(3,7,15,.36),rgba(3,7,15,.64))!important}
+  #cinemotionLanding .lp-links a{color:#d6e2f3!important}
+}
+</style>
 </head>
 <body>
 
