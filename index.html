@@ -7035,8 +7035,8 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
 }
 #geminiPanel #geminiForm>*:not(.gemini-reference-glow){position:relative!important;z-index:1!important}
 @keyframes geminiReferenceLightMove{
- from{transform:translate(-95px,0)!important;opacity:.65!important}
- to{transform:translate(95px,0)!important;opacity:1!important}
+ 0%{transform:translateX(-95px);opacity:.55}
+ 100%{transform:translateX(95px);opacity:1}
 }
 </style>
 </body>
