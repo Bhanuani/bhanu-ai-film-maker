@@ -1838,26 +1838,7 @@ body::after{
 }
 </style>
 
-<style id="cinemotion-prompt-glow">
-/* BORDER GLOW ONLY - all prompt boxes, all categories */
-.movement-card .prompt-wrapper {
-  border: 1px solid rgba(0,210,255,.32) !important;
-  box-shadow: 0 0 6px rgba(0,210,255,.16), 0 0 12px rgba(0,210,255,.08) !important;
-  animation: cinemotionPromptBorderGlow 2.8s ease-in-out infinite !important;
-  transition: border-color .25s ease, box-shadow .25s ease !important;
-}
-@keyframes cinemotionPromptBorderGlow {
-  0%,100% { border-color: rgba(0,210,255,.25); box-shadow: 0 0 5px rgba(0,210,255,.12), 0 0 9px rgba(0,210,255,.05); }
-  50% { border-color: rgba(0,220,255,.65); box-shadow: 0 0 10px rgba(0,210,255,.28), 0 0 20px rgba(0,210,255,.14); }
-}
-@media(hover:hover) and (pointer:fine){
-  .movement-card:hover .prompt-wrapper {
-    border-color: rgba(0,230,255,.78) !important;
-    box-shadow: 0 0 12px rgba(0,210,255,.36), 0 0 24px rgba(0,210,255,.18) !important;
-  }
-}
-@media(prefers-reduced-motion:reduce){ .movement-card .prompt-wrapper { animation:none !important; } }
-</style>
+
 </head>
 <body>
 
