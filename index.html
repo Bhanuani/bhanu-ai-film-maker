@@ -1687,6 +1687,122 @@
 @media(max-width:700px){.gemini-director-suite-btn span{display:none}.gemini-director-suite-btn{margin-left:0;padding:8px}.cinemotion-ai-suite-card{padding:15px}.cinemotion-ai-suite-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cinemotion-ai-tool-card{min-height:132px}}
 @media(max-width:420px){.cinemotion-ai-suite-grid{grid-template-columns:1fr}}
 </style>
+<!-- CINEMATIC 3D UI LAYER — visual-only overrides; no app logic changed -->
+<style id="cinematic-3d-ui">
+:root{
+  --cinematic-glass:rgba(12,18,32,.72);
+  --cinematic-line:rgba(116,190,255,.20);
+  --cinematic-glow:rgba(35,160,255,.16);
+}
+html{background:#03050b!important}
+body{
+  background:
+    radial-gradient(ellipse at 18% 12%,rgba(22,65,115,.20),transparent 42%),
+    radial-gradient(ellipse at 82% 78%,rgba(48,25,102,.15),transparent 38%),
+    #03050b!important;
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(120deg,rgba(1,5,13,.18),transparent 38%,rgba(2,5,15,.22));
+}
+.header-inner,.vault-container,.gemini-panel,.modal-box,.auth-card,
+.local-preview-modal,.ai-smart-shell,.cinemotion-ai-suite-card{
+  border-color:var(--cinematic-line)!important;
+  box-shadow:0 24px 70px rgba(0,0,0,.48),0 0 32px rgba(35,160,255,.055),inset 0 1px 0 rgba(255,255,255,.035)!important;
+}
+.header-inner{
+  background:linear-gradient(135deg,rgba(10,16,29,.92),rgba(7,11,21,.78))!important;
+  backdrop-filter:blur(22px) saturate(135%)!important;
+}
+.movement-card,.beam-card,.local-file-card,.gemini-user-image-card{
+  transform-style:preserve-3d;
+  transition:transform .28s cubic-bezier(.2,.75,.25,1),border-color .28s,box-shadow .28s,background .28s!important;
+  border:1px solid rgba(128,185,255,.13)!important;
+  background:linear-gradient(145deg,rgba(18,27,45,.92),rgba(7,11,20,.94))!important;
+  box-shadow:0 14px 34px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,255,255,.045)!important;
+}
+@media(hover:hover) and (pointer:fine){
+  .movement-card:hover,.beam-card:hover,.local-file-card:hover,.gemini-user-image-card:hover{
+    transform:perspective(1100px) translateY(-5px) rotateX(1.1deg)!important;
+    border-color:rgba(70,190,255,.40)!important;
+    box-shadow:0 22px 42px rgba(0,0,0,.38),0 0 22px rgba(35,160,255,.11),inset 0 1px 0 rgba(255,255,255,.07)!important;
+  }
+}
+.card-video-box,.hero-banner-wrapper{
+  overflow:hidden;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 18px 45px rgba(0,0,0,.34)!important;
+}
+.card-video-box video{transition:transform .55s cubic-bezier(.2,.7,.2,1),filter .55s!important;filter:saturate(1.04) contrast(1.04)}
+@media(hover:hover) and (pointer:fine){.movement-card:hover .card-video-box video{transform:scale(1.035);filter:saturate(1.13) contrast(1.06)}}
+.copy-btn,.prompt-action-btn,.use-gemini-btn,.meta-action-btn,.add-btn,.hero-start-btn,.hero-secondary-btn,.submit-btn,.lp-cta,.lp-cta-secondary{
+  transition:transform .2s ease,box-shadow .25s ease,border-color .25s ease,filter .25s ease!important;
+}
+@media(hover:hover) and (pointer:fine){
+  .copy-btn:hover,.prompt-action-btn:hover,.use-gemini-btn:hover,.meta-action-btn:hover,.add-btn:hover,.hero-start-btn:hover,.hero-secondary-btn:hover,.submit-btn:hover,.lp-cta:hover,.lp-cta-secondary:hover{
+    transform:translateY(-2px)!important;filter:brightness(1.08);
+    box-shadow:0 8px 22px rgba(0,0,0,.26),0 0 16px rgba(40,180,255,.10)!important;
+  }
+}
+.gemini-panel,.gemini-panel.open{
+  background:linear-gradient(155deg,rgba(7,12,23,.96),rgba(12,16,30,.92))!important;
+  backdrop-filter:blur(24px) saturate(135%)!important;
+}
+.gemini-panel-head{
+  background:linear-gradient(110deg,rgba(13,22,39,.96),rgba(10,14,26,.92))!important;
+  box-shadow:inset 0 -1px rgba(120,190,255,.10)!important;
+}
+#geminiForm{
+  background:linear-gradient(145deg,rgba(15,23,39,.97),rgba(8,12,23,.97))!important;
+  box-shadow:0 12px 35px rgba(0,0,0,.32),0 0 24px rgba(0,210,255,.08),inset 0 1px 0 rgba(255,255,255,.05)!important;
+}
+#cinemotionLanding{
+  background:
+    radial-gradient(ellipse at 50% 8%,rgba(20,85,150,.20),transparent 48%),
+    radial-gradient(ellipse at 86% 42%,rgba(80,35,140,.13),transparent 34%),
+    linear-gradient(180deg,#03060c 0%,#050914 55%,#03050a 100%)!important;
+}
+#cinemotionLanding .lp-nav-shell{
+  background:rgba(4,7,14,.72)!important;backdrop-filter:blur(24px) saturate(140%)!important;
+  border-bottom:1px solid rgba(130,190,255,.10)!important;
+}
+#cinemotionLanding .lp-nav{filter:drop-shadow(0 8px 20px rgba(0,0,0,.18))}
+#cinemotionLanding .lp-hero{
+  perspective:1200px;
+  isolation:isolate;
+}
+#cinemotionLanding .lp-hero-content{
+  transform-style:preserve-3d;
+  text-shadow:0 10px 42px rgba(0,0,0,.50);
+}
+#cinemotionLanding .lp-card,#cinemotionLanding .lp-step,#cinemotionLanding .lp-vault{
+  transform-style:preserve-3d;
+  background:linear-gradient(145deg,rgba(16,24,40,.78),rgba(5,10,19,.88))!important;
+  border:1px solid rgba(120,190,255,.16)!important;
+  box-shadow:0 18px 46px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.045)!important;
+  backdrop-filter:blur(18px) saturate(130%)!important;
+  transition:transform .3s cubic-bezier(.2,.75,.25,1),border-color .3s,box-shadow .3s!important;
+}
+@media(hover:hover) and (pointer:fine){
+  #cinemotionLanding .lp-card:hover,#cinemotionLanding .lp-step:hover{
+    transform:perspective(1000px) translateY(-5px) rotateX(1deg)!important;
+    border-color:rgba(65,195,255,.34)!important;
+    box-shadow:0 25px 50px rgba(0,0,0,.38),0 0 25px rgba(30,155,255,.10)!important;
+  }
+}
+#cinemotionLanding .lp-section-head,#cinemotionLanding .lp-final{
+  text-shadow:0 8px 32px rgba(0,0,0,.32);
+}
+#cinemotionLanding .lp-cta{
+  box-shadow:0 10px 26px rgba(0,125,255,.16),inset 0 1px 0 rgba(255,255,255,.16)!important;
+}
+@media(max-width:700px){
+  .movement-card,.beam-card,.local-file-card,.gemini-user-image-card,#cinemotionLanding .lp-card,#cinemotionLanding .lp-step{transform:none!important}
+  .header-inner{backdrop-filter:blur(12px)!important}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}
+}
+</style>
 </head>
 <body>
 
