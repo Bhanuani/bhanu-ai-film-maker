@@ -7025,21 +7025,24 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
 </body>
 </html>
 <style id="gemini-glow-final-override">
+/* ONLY Gemini composer glow: softer, blended into surrounding dark background */
 #geminiPanel #geminiForm{position:relative!important;overflow:visible!important;isolation:isolate!important}
 #geminiPanel #geminiForm .gemini-reference-glow{
  position:absolute!important;display:block!important;visibility:visible!important;
- left:50%!important;bottom:-4px!important;top:auto!important;right:auto!important;
- width:150px!important;height:9px!important;margin:0!important;padding:0!important;
- border:0!important;border-radius:50%!important;z-index:20!important;
+ left:0!important;bottom:-10px!important;top:auto!important;right:auto!important;
+ width:360px!important;height:18px!important;margin:0!important;padding:0!important;
+ border:0!important;border-radius:50%!important;z-index:0!important;
  pointer-events:none!important;opacity:0!important;
- background:linear-gradient(90deg,transparent,#18ddff 18%,#7773ff 38%,#ff62c9 58%,#ffb24e 78%,#4beec0,transparent)!important;
- filter:blur(8px)!important;
- animation:geminiGlowSweepFinal 2.6s linear infinite!important;
+ background:linear-gradient(90deg,transparent 0%,rgba(24,221,255,.28) 18%,rgba(119,115,255,.3) 38%,rgba(255,98,201,.26) 58%,rgba(255,178,78,.24) 78%,rgba(75,238,192,.2) 90%,transparent 100%)!important;
+ filter:blur(18px)!important;mix-blend-mode:screen!important;
+ animation:geminiGlowSweepFinal 3.4s ease-in-out infinite!important;
 }
+#geminiPanel #geminiForm>*:not(.gemini-reference-glow){position:relative!important;z-index:1!important}
 @keyframes geminiGlowSweepFinal{
- 0%{transform:translateX(-420px);opacity:0}
- 10%{opacity:1}
- 80%{opacity:.9}
- 100%{transform:translateX(420px);opacity:0}
+ 0%{transform:translateX(-380px);opacity:0}
+ 12%{opacity:.5}
+ 55%{opacity:.36}
+ 88%{opacity:.22}
+ 100%{transform:translateX(100%);opacity:0}
 }
 </style>
