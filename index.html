@@ -5348,6 +5348,9 @@ body::after{
         if (userExplicitlyRequestedPrompt && !autoTools.includes("promptQualityChecker")) autoTools.push("promptQualityChecker");
         if (userExplicitlyRequestedPrompt && !autoTools.includes("constraintsNegativeAI")) autoTools.push("constraintsNegativeAI");
         const selectedSpecialists = autoTools.filter(k=>aiToolInstructions[k]).map(k=>aiToolInstructions[k]);
+        // Share the existing specialist instruction set with Prompt Engine without duplicating it.
+        window.cinemotionPromptEngineSpecialistInstructionCache = aiToolInstructions;
+        window.cinemotionPromptEngineSpecialistNameCache = toolNames;
         if (hasReferenceVideo) {
           const reverseEngineeringBlock = "\n\nREFERENCE VIDEO REVERSE-ENGINEERING MODE — PRIORITY: recreate the uploaded video as closely as possible, not creatively reinterpret it. Analyze the video directly. Provide (1) observed shot-by-shot timecodes, (2) detailed camera/framing/movement, (3) subject action and timing, (4) environment, lighting, color and effects, (5) transitions and sound only if available, (6) uncertainties/unknowns, and (7) one ready-to-copy recreation prompt. Preserve original order and timing. Do not add content not supported by the reference. If exact duration is known, timecodes must cover the full duration.";
           if (typeof messagePayload === "string") messagePayload += reverseEngineeringBlock;
@@ -5366,6 +5369,8 @@ body::after{
             magic:"Magic/Energy FX: if appropriate, design aura, energy arcs, particles, runes, trails or portals with color, build-up, timing, lighting spill and subject/environment interaction. Do not force magic into unrelated scenes.",
             transition:"Transition Designer: create a motivated transition with outgoing/incoming shot details, mechanics, duration and visual/action continuity. Prefer a clean cut if no connection is justified."
           };
+          window.cinemotionPromptEngineVfxInstructionCache = vfxInstructions;
+          window.cinemotionPromptEngineVfxNameCache = vfxToolNames;
           const autoBlock = "\n\nCINEMOTION AUTO VFX WORKFLOW (selected tools: "+autoVfx.map(k=>vfxToolNames[k]).join(", ")+")\n"+autoVfx.map(k=>vfxInstructions[k]).join("\n")+"\nOutput the final integrated prompt first, then a concise breakdown of which effects were applied and their timing. Intensity: Balanced.";
           if (typeof messagePayload === "string") messagePayload += autoBlock;
           else if (Array.isArray(messagePayload) && messagePayload[0]?.text) messagePayload[0].text += autoBlock;
@@ -7031,7 +7036,7 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
     <section class="prompt-engine-panel" role="dialog" aria-modal="true" aria-labelledby="promptEngineTitle">
       <header class="prompt-engine-head"><div class="prompt-engine-title" id="promptEngineTitle"><i class="fa-solid fa-clapperboard"></i> Cinematic Prompt Engine</div><button class="prompt-engine-close" id="promptEngineClose" aria-label="Close Prompt Engine">&times;</button></header>
       <div class="prompt-engine-body">
-        <div class="prompt-engine-input-column"><label class="prompt-engine-label" for="promptEngineStory">Story / Scene Brief</label><textarea id="promptEngineStory" placeholder="Describe your story, scene, action, characters, location, mood, or constraints..."></textarea><label class="prompt-engine-duration"><span>Video duration (seconds)</span><input id="promptEngineDuration" type="number" min="1" max="300" value="10"></label><button id="promptEngineGenerate" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i> Design Cinematic Shots</button><div class="prompt-engine-data-note">Uses the live Directors Vault data, including custom categories and added entries. Master Prompts are excluded completely.</div><div id="promptEngineStatus" aria-live="polite"></div></div>
+        <div class="prompt-engine-input-column"><label class="prompt-engine-label" for="promptEngineStory">Story / Scene Brief</label><textarea id="promptEngineStory" placeholder="Describe your story, scene, action, characters, location, mood, or constraints..."></textarea><div class="prompt-engine-reference-row"><button type="button" id="promptEngineAddReference"><i class="fa-solid fa-paperclip"></i> Add Image / Video Reference</button><input id="promptEngineReferenceInput" type="file" accept="image/*,video/*" multiple hidden><div id="promptEngineReferenceList" aria-live="polite"></div></div><label class="prompt-engine-duration"><span>Video duration (seconds)</span><input id="promptEngineDuration" type="number" min="1" max="300" value="10"></label><div class="prompt-engine-specialist-wrap"><div class="prompt-engine-label">Auto-selected AI specialists</div><div id="promptEngineSpecialists" class="prompt-engine-specialists">Specialists will be selected from your brief.</div></div><button id="promptEngineGenerate" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i> Design Cinematic Shots</button><div class="prompt-engine-data-note">Reuses Gemini specialist detection, VFX routing, media reference analysis, and live Directors Vault data. Master Prompts are excluded.</div><div id="promptEngineStatus" aria-live="polite"></div></div>
         <div class="prompt-engine-result-column"><div class="prompt-engine-result-header"><div class="prompt-engine-label">Director's Shot Design</div><button id="promptEngineCopy" type="button"><i class="fa-solid fa-copy"></i> Copy Result</button></div><div id="promptEngineOutput">Your cinematic shot design will appear here.</div></div>
       </div>
     </section>
@@ -7047,7 +7052,13 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
     const output=document.getElementById("promptEngineOutput");
     const status=document.getElementById("promptEngineStatus");
     const copyBtn=document.getElementById("promptEngineCopy");
+    const referenceButton=document.getElementById("promptEngineAddReference");
+    const referenceInput=document.getElementById("promptEngineReferenceInput");
+    const referenceList=document.getElementById("promptEngineReferenceList");
+    const specialistsBox=document.getElementById("promptEngineSpecialists");
     if(!modal||!launcher||!generateBtn||!output)return;
+    let referenceFiles=[];
+    const MAX_BYTES=15*1024*1024;
     function open(){modal.classList.add("open");modal.setAttribute("aria-hidden","false");setTimeout(()=>storyInput&&storyInput.focus(),80)}
     function close(){modal.classList.remove("open");modal.setAttribute("aria-hidden","true")}
     launcher.addEventListener("click",open);closeBtn&&closeBtn.addEventListener("click",close);
@@ -7057,28 +7068,159 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
       const items=Array.isArray(window.allVaultItems)?window.allVaultItems:[];
       return items.filter(item=>String(item&&item.category||"").trim().toLowerCase()!=="master prompts").map(item=>({category:String(item.category||"Uncategorized"),name:String(item.name||"Unnamed"),prompt:String(item.prompt||""),description:item.description?String(item.description):""})).filter(item=>item.name||item.prompt);
     }
+    const specialistNames={
+      filmDirector:"AI Film Director",cameraDirector:"Camera Director",shotBreakdown:"Smart Shot Distribution & AI Shot Breakdown",durationPlanner:"Shot Duration Planner",
+      promptOptimizer:"Prompt Optimizer",compositionDirector:"Composition Director",colorMoodDirector:"Color & Mood Director",lightingDirector:"Lighting Director",
+      visualStyleLock:"Visual Style Lock",realismChecker:"Realism Checker",complexityAnalyzer:"Scene Complexity Analyzer",cameraCreativityAI:"Camera Creativity Director",
+      promptFidelityAI:"Prompt Fidelity Auditor",shotAnalysisAI:"Cinematic Shot Analysis AI",lensIntelligenceAI:"Lens Intelligence AI",cameraAngleAI:"Camera Angle Intelligence AI",
+      cameraMovementAI:"Camera Movement Intelligence AI",compositionAI:"Composition Intelligence AI",depthFocusAI:"Depth & Focus AI",videoQualityAI:"Video Quality & Rendering AI",
+      cinematicDirectorAI:"Cinematic Director Intelligence AI",editingIntelligenceAI:"Editing Intelligence AI",continuityAI:"Cinematic Continuity AI",promptComparisonAI:"Prompt Comparison & Synthesis AI",
+      physicsAI:"Physics & Motion AI",motionAnalysisAI:"Subject Motion Analysis AI",audioVisualSyncAI:"Audio-Visual Sync AI",characterContinuity:"Character Continuity",
+      worldBuilder:"World Builder",soundDirector:"Sound Design Director",storyboardPlanner:"Storyboard Planner",sceneConsistency:"Scene Consistency Engine",
+      motionPhysicsDirector:"Motion & Physics Director",actingDirector:"Emotion & Acting Director",characterBlocking:"Character Blocking Director",vfxSupervisor:"VFX Supervisor",
+      videoMotionPlanner:"Video Motion Planner",referenceVideoDirector:"Reference Video Replication Director",promptQualityChecker:"Cinematic Prompt Quality Checker",
+      constraintsNegativeAI:"Constraints & Negative Prompt Director"
+    };
+    const vfxNames={director:"VFX Auto Director",atmosphere:"Atmosphere FX",impact:"Impact FX",magic:"Magic / Energy FX",transition:"Transition Designer"};
+    function detectTools(text,hasVideo){
+      let ids=[];
+      try{if(typeof window.detectCinemotionAITools==="function")ids=window.detectCinemotionAITools(text)||[]}catch(e){console.warn("AI specialist detection unavailable",e)}
+      if(hasVideo){["filmDirector","shotBreakdown","cameraDirector","compositionDirector","lightingDirector","colorMoodDirector","motionPhysicsDirector","durationPlanner","sceneConsistency","visualStyleLock","realismChecker","complexityAnalyzer","videoMotionPlanner","referenceVideoDirector"].forEach(id=>{if(!ids.includes(id))ids.push(id)})}
+      return [...new Set(ids)];
+    }
+    function detectVfx(text){
+      try{return typeof window.detectCinemotionVfxTools==="function"?window.detectCinemotionVfxTools(text)||[]:[]}catch(e){console.warn("VFX detection unavailable",e);return[]}
+    }
+    function renderSpecialists(ids,vfx){
+      const labels=[...ids.map(id=>window.cinemotionPromptEngineSpecialistNameCache?.[id]||specialistNames[id]||id),...vfx.map(k=>window.cinemotionPromptEngineVfxNameCache?.[k]||vfxNames[k]||k)];
+      if(specialistsBox)specialistsBox.innerHTML=labels.length?labels.map(name=>'<span class="prompt-engine-specialist-chip">'+escapeHtml(name)+'</span>').join(""):'<span class="prompt-engine-specialist-chip">Cinematic Director</span>';
+      return labels;
+    }
+    function escapeHtml(value){return String(value||"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]))}
+    function renderReferences(){
+      if(!referenceList)return;
+      referenceList.innerHTML=referenceFiles.length?referenceFiles.map((file,i)=>'<div class="prompt-engine-reference-item"><span>'+escapeHtml(file.name)+' ('+(file.type.startsWith("video/")?"Video":"Image")+')</span><button type="button" data-remove-reference="'+i+'" aria-label="Remove '+escapeHtml(file.name)+'">×</button></div>').join(""):"";
+    }
+    referenceButton?.addEventListener("click",()=>referenceInput?.click());
+    referenceInput?.addEventListener("change",()=>{
+      const incoming=Array.from(referenceInput.files||[]);
+      if(incoming.some(f=>f.size>MAX_BYTES)){status.textContent="Each reference must be smaller than 15 MB.";referenceInput.value="";return}
+      const all=[...referenceFiles,...incoming];
+      const videos=all.filter(f=>f.type.startsWith("video/")),images=all.filter(f=>f.type.startsWith("image/"));
+      if(all.some(f=>!f.type.startsWith("image/")&&!f.type.startsWith("video/"))||videos.length>1||videos.length>0&&images.length>3||videos.length===0&&images.length>7){
+        status.textContent="Attach up to 7 images, or 1 video with up to 3 supporting images.";referenceInput.value="";return
+      }
+      referenceFiles=all;renderReferences();referenceInput.value="";
+      status.textContent=referenceFiles.length+" reference file(s) ready. Gemini analyzes them when you generate.";
+    });
+    referenceList?.addEventListener("click",e=>{
+      const btn=e.target.closest("[data-remove-reference]");if(!btn)return;
+      referenceFiles.splice(Number(btn.dataset.removeReference),1);renderReferences();
+    });
+    function specialistFallback(id){
+      const descriptions={
+        filmDirector:"Analyze narrative intent, emotional arc, story beats, stakes, pacing and visual storytelling; direct the sequence scene-specifically.",
+        shotBreakdown:"Create duration-aware shot distribution; each shot must have distinct story purpose and readable action.",
+        cameraDirector:"Choose motivated framing, shot size, angle, height, lens, movement, speed and camera path.",
+        lightingDirector:"Specify motivated key/fill/rim/practical light, direction, softness, contrast, color temperature and exposure.",
+        compositionDirector:"Design frame balance, subject placement, foreground/midground/background, negative space and leading lines.",
+        colorMoodDirector:"Create story-motivated palette, contrast, saturation and grade; avoid arbitrary looks.",
+        promptOptimizer:"Clarify, prioritize and optimize the prompt while preserving the exact user intent and constraints.",
+        promptFidelityAI:"Audit against the user's premise, subjects, location, action and explicit constraints; flag assumptions and contradictions.",
+        promptQualityChecker:"Score prompt quality and report concrete strengths, weaknesses and conflicts; only revise if needed.",
+        durationPlanner:"Make timecodes sum exactly to requested duration and pace actions realistically.",
+        realismChecker:"Check physical plausibility, camera/action conflicts, lighting and model feasibility.",
+        complexityAnalyzer:"Identify overloaded simultaneous actions and simplify into readable beats without losing intent.",
+        physicsAI:"Specify believable weight, gravity, momentum, inertia, collision and environmental response.",
+        motionAnalysisAI:"Separate subject movement, camera movement and environment movement; specify trajectory and start/end states.",
+        cameraAngleAI:"Specify motivated camera height and orientation, preserving explicit requested angle.",
+        cameraMovementAI:"Plan rig, path, direction, speed and stabilization; avoid contradictory simultaneous moves.",
+        lensIntelligenceAI:"Choose a motivated lens/focal-length feel and explain perspective; label as recommendation.",
+        compositionAI:"Specify framing, subject placement, layers, scale, horizon, leading lines and negative space.",
+        depthFocusAI:"Choose focus target, DOF and rack/tracking focus only when motivated.",
+        actingDirector:"Direct precise expression, gaze, posture, gesture, breathing and reaction timing.",
+        characterContinuity:"Preserve identity, face, body, costume, hair, props and proportions from references.",
+        worldBuilder:"Define environment, geography, architecture, weather, materials and motivated environmental movement.",
+        soundDirector:"Add relevant ambience, Foley and SFX; respect explicit silence and no-music constraints.",
+        storyboardPlanner:"Structure sequence into visual panels with composition, action, camera and transitions.",
+        sceneConsistency:"Maintain continuity of subject position, screen direction, lighting, weather, props and action state.",
+        vfxSupervisor:"Select motivated VFX and specify timing, scale, lighting integration and environmental interaction.",
+        videoMotionPlanner:"Create coherent start-middle-end motion; separate subject, environment and camera movement.",
+        referenceVideoDirector:"Recreate uploaded video faithfully; analyze supported visible shot timing, camera, motion and transitions; report uncertainty.",
+        editingIntelligenceAI:"Recommend editing techniques only as prompt-level direction, with purpose and timing; do not claim actual editing is performed.",
+        audioVisualSyncAI:"Plan audio, beats, action, cut and SFX synchronization only when audio is provided or requested.",
+        videoQualityAI:"Recommend feasible resolution, aspect ratio, FPS, texture, dynamic range and artifact prevention; do not promise unsupported output.",
+        cinematicDirectorAI:"Orchestrate scene-specific cinematic decisions across story, camera, lighting, motion, sound, editing and continuity.",
+        cameraCreativityAI:"Invent purposeful but feasible camera approaches; avoid gimmicks and repetitive shots.",
+        promptComparisonAI:"Compare prompts by fidelity, clarity, camera, lighting, motion, continuity and feasibility; synthesize strongest elements if asked.",
+        characterBlocking:"Map positions, facing, eyelines, paths, distance and screen geography.",
+        constraintsNegativeAI:"Append relevant concise CONSTRAINTS then NEGATIVE PROMPT at the very end of the copy-ready prompt.",
+        vfx_director:"Select only story-motivated VFX and integrate their timing, camera, physics and lighting.",
+        vfx_atmosphere:"Design motivated atmosphere such as fog, smoke, dust, rain, wind or volumetric light with timing and movement.",
+        vfx_impact:"Design impact timing, debris, shockwave, environmental response and camera shake with credible physics.",
+        vfx_magic:"Design magic/energy only when story appropriate, specifying shape, color, build-up, interaction and lighting spill.",
+        vfx_transition:"Design motivated outgoing/incoming shot transition mechanics, timing and continuity."
+      };
+      return descriptions[id]||"Apply the "+(specialistNames[id]||id)+" specialist perspective to the user's scene, with specific and non-generic recommendations.";
+    }
+    function buildInstruction(story,duration,vault,ids,vfx,files){
+      const cached=window.cinemotionPromptEngineSpecialistInstructionCache||{};
+      const cachedVfx=window.cinemotionPromptEngineVfxInstructionCache||{};
+      const specialistText=ids.map(id=>cached[id]||specialistFallback(id)).filter(Boolean);
+      const vfxText=vfx.map(id=>cachedVfx[id]||specialistFallback("vfx_"+id)).filter(Boolean);
+      const hasVideo=files.some(f=>f.type.startsWith("video/"));
+      const vaultText=JSON.stringify(vault,null,2);
+      const sections=[
+        "You are CINEMOTION STUDIO's unified cinematic AI director. Work as one coordinated director, not as disconnected agents. The following specialist perspectives are selected by the website's existing automatic detection logic; apply each relevant perspective and reconcile conflicts.",
+        "SPECIALISTS SELECTED: "+[...ids.map(id=>window.cinemotionPromptEngineSpecialistNameCache?.[id]||specialistNames[id]||id),...vfx.map(k=>window.cinemotionPromptEngineVfxNameCache?.[k]||vfxNames[k]||k)].join(", "),
+        "SPECIALIST INSTRUCTIONS:\n"+specialistText.join("\n\n"),
+        vfxText.length?"VFX INSTRUCTIONS:\n"+vfxText.join("\n\n"):"",
+        "LIVE DIRECTORS VAULT: use dynamically loaded built-in, user-added and future categories/entries as inspiration only. Exclude Master Prompts completely. Select relevant technique entries; never dump the entire Vault or mechanically combine techniques.\n"+vaultText,
+        "DIRECTING RULES: Be original, cinematic and scene-specific; avoid generic filler, repetitive shot patterns, cliché reveals and random spectacle. Preserve all explicit constraints. Do not invent plot events, extra subjects, props, weather or effects. Separate subject, camera and environmental motion. Make physical action readable and feasible.",
+        "OUTPUT FORMAT: 1) DIRECTOR'S VISION 2) STORY BEATS 3) SHOT-BY-SHOT DESIGN with timecodes adding exactly to the requested runtime; each shot on its own block with purpose, shot size/angle/height, lens, camera rig/path/speed, composition/layers, subject action/blocking, focus/DOF, lighting, color, environment, motivated VFX, sound and transition as relevant; 4) FINAL COPY-READY VIDEO PROMPT with clear labeled sections and line breaks; 5) CONSTRAINTS; 6) NEGATIVE PROMPT at the very end; 7) QUALITY AUDIT score 0-100, specific strengths, weaknesses and conflicts. Do not place main prompt content after Constraints/Negative Prompt.",
+        "Requested total duration: "+duration+" seconds. Use only the user's requested duration. Timecodes must add up exactly.",
+        hasVideo?"REFERENCE VIDEO MODE: prioritize faithful recreation. Analyze attached video input; report what is visually supported, preserve sequence and timing, distinguish observations from uncertain inference, do not creatively reinterpret or add unsupported events.":"REFERENCE MEDIA MODE: inspect attached images as visual references, preserve their visible identity/design details when relevant and distinguish observed details from recommendations.",
+        "USER BRIEF:\n"+story
+      ].filter(Boolean);
+      return sections.join("\n\n");
+    }
+    async function fileToBase64(file){
+      return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>{const data=String(reader.result||"");resolve(data.slice(data.indexOf(",")+1))};reader.onerror=()=>reject(new Error("Could not read reference file: "+file.name));reader.readAsDataURL(file)});
+    }
     generateBtn.addEventListener("click",async()=>{
       const story=String(storyInput.value||"").trim();if(!story){status.textContent="First enter your story or scene brief.";storyInput.focus();return}
       const model=window.cinemotionGeminiModel;if(!model){status.textContent="Gemini model is not ready. Please wait or reload the page.";return}
-      const vault=getVaultData();const duration=Math.max(1,Math.min(300,Number(durationInput.value)||10));
-      const dataText=JSON.stringify(vault,null,2);
-      const engineInstruction=[
-        "You are CINEMOTION STUDIO'S CREATIVE CINEMATOGRAPHER, FILM DIRECTOR, VISUAL STORYTELLER, EDITOR, LIGHTING DIRECTOR, LENS EXPERT, SOUND DESIGNER AND CONTINUITY SUPERVISOR. Transform the user's story into an exceptionally creative, emotionally effective, visually memorable, production-ready cinematic shot sequence.",
-        "SOURCE DATA RULE: Use the live Directors Vault data as a cinematography reference library. It includes built-in entries and dynamically loaded user-added entries/custom categories. The category Master Prompts is deliberately excluded and MUST NOT be used, recreated, quoted, or referenced. Select techniques that fit the story; do not dump or mechanically combine the database.",
-        "CREATIVE DIRECTING: Read the story deeply: intent, emotional arc, stakes, subtext, visual motif, action beats, reveal, pacing and audience impact. Design every shot with a distinct purpose. Seek a memorable visual hook or WOW moment earned by the story, not random spectacle. Avoid clichés, predictable shot lists, generic cinematic filler, repetitive framing/movement, unnecessary effects, or invented plot events. Respect every user constraint and maintain subject, costume, prop, geography, screen direction, lighting and action continuity. Keep movements physically possible and clearly separate subject movement, camera movement and environmental movement.",
-        "For every shot specify timecode/duration; story beat and purpose; shot size; camera angle and exact height/orientation; lens/focal length and perspective; camera rig/path/direction/speed/acceleration; composition and foreground/midground/background; subject blocking/action; focus/DOF/rack focus; lighting source/direction/quality/contrast/color temperature; color palette/grade; atmosphere and environmental interaction only if motivated; VFX only if story-relevant; sound/Foley/ambience/music/silence cues; cut/transition and continuity notes. Use Vault techniques by name and briefly explain fit. Include creative transitions when motivated, not forced. Allocate time realistically for readable action.",
-        "OUTPUT: 1) concise Director's Vision (core visual idea + emotion); 2) Story beats; 3) detailed shot-by-shot sequence covering the requested duration with timecodes that add up; 4) one unified ready-to-copy final video prompt preserving shot order, continuity, camera/lighting/action details and constraints; 5) brief continuity/negative constraints. Write in the user's language. Be specific, imaginative and technically coherent.",
-        "USER STORY/BRIEF:\n"+story,
-        "REQUESTED DURATION: "+duration+" seconds.",
-        "LIVE CINEMATOGRAPHY VAULT DATA (Master Prompts excluded):\n"+dataText
-      ].join("\n\n");
-      generateBtn.disabled=true;generateBtn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Designing shots...';status.textContent="Analyzing story and "+vault.length+" Vault entries (Master Prompts excluded)...";output.textContent="Creative Director is designing the sequence...";
+      const vault=getVaultData(),duration=Math.max(1,Math.min(300,Number(durationInput.value)||10));
+      const hasVideo=referenceFiles.some(f=>f.type.startsWith("video/"));
+      const toolIds=detectTools(story,hasVideo),vfxIds=detectVfx(story);
+      renderSpecialists(toolIds,vfxIds);
+      generateBtn.disabled=true;generateBtn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Designing shots...';
+      status.textContent="Gemini is analyzing the brief, "+toolIds.length+" specialist perspectives, "+vfxIds.length+" VFX routes and "+vault.length+" Vault entries.";
+      output.textContent="Director is analyzing the story and references...";
       try{
-        const result=await model.generateContent(engineInstruction);
-        const response=await result.response;
-        const textResult=response&&response.text?response.text():"";
-        if(!textResult.trim())throw new Error("Gemini returned an empty response.");
-        output.textContent=textResult;status.textContent="Done. Source: "+vault.length+" live Vault entries. Master Prompts excluded.";
+        const instruction=buildInstruction(story,duration,vault,toolIds,vfxIds,referenceFiles);
+        const parts=[{text:instruction}];
+        for(const file of referenceFiles){parts.push({inlineData:{data:await fileToBase64(file),mimeType:file.type||(file.name.toLowerCase().endsWith(".mp4")?"video/mp4":"application/octet-stream")}})}
+        const payload=parts.length===1?instruction:parts;
+        const first=await model.generateContent(payload);
+        const firstResponse=await first.response;
+        const draft=firstResponse&&firstResponse.text?firstResponse.text():"";
+        if(!draft.trim())throw new Error("Gemini returned an empty response.");
+        status.textContent="First draft complete. Running prompt quality and constraint audit...";
+        output.textContent=draft+"\n\n[Quality audit in progress]";
+        const qualityInstruction=[
+          "You are CINEMOTION's final Prompt Quality Checker and Prompt Fidelity Auditor. Audit the following generated cinematic design against the user's original brief and explicit constraints. Score 0-100 across story/action clarity, camera/framing, camera movement, motion, lighting, composition/focus, continuity/constraints, timing/feasibility and model-ready clarity. Identify concrete errors, contradictions, missing critical requirements, unsupported additions and what should be fixed. If the draft is already strong, preserve it and do not rewrite needlessly. If below 90 or a critical issue exists, return a corrected complete output maintaining its sections and copy-ready prompt. Do not add new story content. Keep the final CONSTRAINTS then NEGATIVE PROMPT at the end. Return the corrected/final output only, with concise audit findings.",
+          "Original brief:\n"+story,
+          "Duration:\n"+duration+" seconds",
+          "Draft to audit:\n"+draft
+        ].join("\n\n");
+        try{
+          const audit=await model.generateContent(qualityInstruction);
+          const auditResponse=await audit.response;
+          const auditedText=auditResponse&&auditResponse.text?auditResponse.text():"";
+          if(auditedText.trim()){output.textContent=auditedText;status.textContent="Complete. "+toolIds.length+" AI specialists + "+vfxIds.length+" VFX routes selected; final quality audit completed. Vault: "+vault.length+" entries (Master Prompts excluded)."}
+          else{output.textContent=draft;status.textContent="Complete. Quality audit returned empty; original draft retained. Vault: "+vault.length+" entries."}
+        }catch(auditErr){console.warn("Prompt Engine quality audit failed; keeping first draft.",auditErr);output.textContent=draft;status.textContent="Draft complete, but quality audit failed. Original draft retained. "+(auditErr.message||"")}
       }catch(err){console.error("Prompt Engine generation error:",err);output.textContent="Generation failed.\n\n"+(err&&err.message||String(err));status.textContent="Generation failed. Please try again."}
       finally{generateBtn.disabled=false;generateBtn.innerHTML='<i class="fa-solid fa-wand-magic-sparkles"></i> Design Cinematic Shots'}
     });
@@ -7170,5 +7312,5 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
 #promptEngineCopy{border:1px solid rgba(0,217,255,.3);background:rgba(0,217,255,.07);color:#c8f6ff;border-radius:9px;padding:8px 11px;cursor:pointer;font-weight:700}
 #promptEngineOutput{white-space:pre-wrap;overflow:auto;flex:1;min-height:320px;max-height:55vh;background:#040811;border:1px solid rgba(148,163,184,.2);border-radius:13px;padding:15px;color:#e7f4ff;font:14px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}
 #promptEngineStatus{font-size:12px;color:#85a8c2;min-height:18px}
-@media(max-width:760px){.prompt-engine-launcher{padding:8px 9px;font-size:12px}.prompt-engine-launcher span{display:none}#cinemotionPromptEngineModal{padding:7px}.prompt-engine-panel{max-height:calc(100dvh - 14px);border-radius:15px}.prompt-engine-head{padding:13px 15px}.prompt-engine-body{grid-template-columns:1fr;padding:13px;gap:13px}.prompt-engine-title{font-size:16px}#promptEngineStory{min-height:150px}#promptEngineOutput{min-height:260px;max-height:45vh}}
+.prompt-engine-reference-row{display:flex;flex-direction:column;gap:8px}.prompt-engine-reference-row>button{align-self:flex-start;border:1px solid rgba(0,217,255,.28);background:rgba(0,217,255,.06);color:#c8f6ff;border-radius:9px;padding:9px 11px;cursor:pointer;font-weight:700}.prompt-engine-reference-item{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid rgba(148,163,184,.16);background:rgba(255,255,255,.03);border-radius:8px;padding:6px 9px;color:#b8d0e1;font-size:12px}.prompt-engine-reference-item button{border:0;background:transparent;color:#ff9cac;font-size:18px;cursor:pointer}.prompt-engine-specialist-wrap{display:flex;flex-direction:column;gap:7px}.prompt-engine-specialists{display:flex;flex-wrap:wrap;gap:5px}.prompt-engine-specialist-chip{display:inline-flex;border:1px solid rgba(0,217,255,.22);background:rgba(0,217,255,.055);color:#aeeeff;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:700;line-height:1.3}@media(max-width:760px){.prompt-engine-launcher{padding:8px 9px;font-size:12px}.prompt-engine-launcher span{display:none}#cinemotionPromptEngineModal{padding:7px}.prompt-engine-panel{max-height:calc(100dvh - 14px);border-radius:15px}.prompt-engine-head{padding:13px 15px}.prompt-engine-body{grid-template-columns:1fr;padding:13px;gap:13px}.prompt-engine-title{font-size:16px}#promptEngineStory{min-height:150px}#promptEngineOutput{min-height:260px;max-height:45vh}}
 </style>
