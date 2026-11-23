@@ -7018,6 +7018,7 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
 
 <!-- SINGLE CLEAN ANIMATION: GEMINI COMPOSER ONLY -->
 <!-- MATCH REFERENCE: SMALL HORIZONTAL RAINBOW GLOW UNDER GEMINI INPUT ONLY -->
+<!-- EXACT REFERENCE: CENTERED SOFT RAINBOW LIGHT UNDER INPUT, NOT A BORDER ANIMATION -->
 <style id="gemini-reference-bottom-glow">
 #geminiPanel #geminiForm{
  position:relative!important;
@@ -7025,36 +7026,37 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
  border:1px solid rgba(120,135,160,.22)!important;
  box-shadow:none!important;
 }
-#geminiPanel #geminiForm::before{
- content:none!important;
- display:none!important;
- animation:none!important;
- background:none!important;
- filter:none!important;
-}
+#geminiPanel #geminiForm::before{content:none!important;display:none!important}
 #geminiPanel #geminiForm::after{
  content:""!important;
  display:block!important;
  position:absolute!important;
- width:112px!important;
- height:5px!important;
+ width:180px!important;
+ height:8px!important;
  left:50%!important;
- bottom:-2px!important;
+ right:auto!important;
+ bottom:-3px!important;
  top:auto!important;
+ margin:0!important;
+ inset-block:auto!important;
  inset-inline:auto!important;
- transform:translateX(-50%)!important;
+ translate:-50% 0!important;
+ transform:none!important;
  border-radius:50%!important;
  z-index:0!important;
  pointer-events:none!important;
- background:linear-gradient(90deg,rgba(0,210,255,0),#32d8ff 18%,#8d78ff 38%,#ff72c8 58%,#ffb45e 76%,rgba(60,235,190,0))!important;
+ background:linear-gradient(90deg,transparent 0%,#26d9ff 20%,#8c75ff 40%,#ff72c8 55%,#ffb45e 72%,#4be7c0 84%,transparent 100%)!important;
+ background-size:220% 100%!important;
+ background-position:0% 50%!important;
  filter:blur(7px)!important;
- opacity:.9!important;
- animation:geminiBottomGlowTravel 3.4s ease-in-out infinite alternate!important;
+ opacity:.85!important;
+ animation:geminiReferenceGlow 2.8s ease-in-out infinite!important;
 }
 #geminiPanel #geminiForm>*{position:relative!important;z-index:1!important}
-@keyframes geminiBottomGlowTravel{
- from{left:28%!important;opacity:.55!important}
- to{left:72%!important;opacity:1!important}
+@keyframes geminiReferenceGlow{
+ 0%{background-position:0% 50%;opacity:.55}
+ 50%{background-position:100% 50%;opacity:1}
+ 100%{background-position:0% 50%;opacity:.65}
 }
 </style>
 </body>
