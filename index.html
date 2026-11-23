@@ -1839,29 +1839,21 @@ body::after{
 </style>
 
 <style id="cinemotion-prompt-glow">
-/* Noticeable but controlled neon glow on ALL prompt cards */
-.movement-card .prompt-wrapper,
-.movement-card .prompt-box {
-  border-color: rgba(0, 210, 255, .24) !important;
-  box-shadow: 0 0 8px rgba(0,210,255,.12), inset 0 0 10px rgba(0,210,255,.045) !important;
-  transition: box-shadow .28s ease, border-color .28s ease, text-shadow .28s ease !important;
+/* BORDER GLOW ONLY - all prompt boxes, all categories */
+.movement-card .prompt-wrapper {
+  border: 1px solid rgba(0,210,255,.32) !important;
+  box-shadow: 0 0 6px rgba(0,210,255,.16), 0 0 12px rgba(0,210,255,.08) !important;
+  animation: cinemotionPromptBorderGlow 2.8s ease-in-out infinite !important;
+  transition: border-color .25s ease, box-shadow .25s ease !important;
 }
-.movement-card .prompt-box {
-  text-shadow: 0 0 5px rgba(0,210,255,.20), 0 0 10px rgba(85,125,255,.10) !important;
+@keyframes cinemotionPromptBorderGlow {
+  0%,100% { border-color: rgba(0,210,255,.25); box-shadow: 0 0 5px rgba(0,210,255,.12), 0 0 9px rgba(0,210,255,.05); }
+  50% { border-color: rgba(0,220,255,.65); box-shadow: 0 0 10px rgba(0,210,255,.28), 0 0 20px rgba(0,210,255,.14); }
 }
-@keyframes cinemotionPromptGlow {
-  0%,100% { box-shadow: 0 0 7px rgba(0,210,255,.10), inset 0 0 8px rgba(0,210,255,.035); }
-  50% { box-shadow: 0 0 13px rgba(0,210,255,.20), inset 0 0 13px rgba(0,210,255,.065); }
-}
-.movement-card .prompt-wrapper { animation: cinemotionPromptGlow 3.2s ease-in-out infinite !important; }
 @media(hover:hover) and (pointer:fine){
-  .movement-card:hover .prompt-wrapper,
-  .movement-card:hover .prompt-box {
-    border-color: rgba(0,220,255,.48) !important;
-    box-shadow: 0 0 17px rgba(0,210,255,.24), inset 0 0 16px rgba(0,210,255,.075) !important;
-  }
-  .movement-card:hover .prompt-box {
-    text-shadow: 0 0 7px rgba(90,210,255,.32), 0 0 16px rgba(0,210,255,.20) !important;
+  .movement-card:hover .prompt-wrapper {
+    border-color: rgba(0,230,255,.78) !important;
+    box-shadow: 0 0 12px rgba(0,210,255,.36), 0 0 24px rgba(0,210,255,.18) !important;
   }
 }
 @media(prefers-reduced-motion:reduce){ .movement-card .prompt-wrapper { animation:none !important; } }
