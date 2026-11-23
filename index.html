@@ -7284,5 +7284,18 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
  #geminiPanel #geminiForm::before,#geminiPanel #geminiForm::after{animation:none!important}
 }
 </style>
+<style id="gemini-animation-conflict-final-fix">
+@property --gemini-video-angle-final{syntax:"<angle>";inherits:false;initial-value:0deg}
+#geminiPanel #geminiForm{animation:none!important;border:1px solid rgba(140,155,190,.22)!important;box-shadow:0 8px 28px rgba(0,0,0,.22)!important}
+#geminiPanel.open #geminiForm::before,#geminiPanel #geminiForm::before{
+content:""!important;display:block!important;position:absolute!important;inset:-1px!important;z-index:3!important;padding:1.35px!important;border-radius:inherit!important;pointer-events:none!important;
+background:conic-gradient(from var(--gemini-video-angle-final),transparent 0deg 250deg,rgba(40,220,255,.24) 268deg,#32dcff 282deg,#6588ff 296deg,#ad69ff 310deg,#ff6bc8 324deg,#ffb45f 338deg,rgba(65,240,190,.72) 348deg,transparent 358deg 360deg)!important;
+-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0)!important;-webkit-mask-composite:xor!important;mask-composite:exclude!important;opacity:1!important;filter:drop-shadow(0 0 3px rgba(55,215,255,.42))!important;animation:geminiVideoArcRotateFinal 2.8s linear infinite!important}
+#geminiPanel.open #geminiForm::after,#geminiPanel #geminiForm::after{
+content:""!important;position:absolute!important;inset:-4px!important;z-index:-1!important;border-radius:inherit!important;pointer-events:none!important;
+background:conic-gradient(from var(--gemini-video-angle-final),transparent 0deg 250deg,rgba(40,220,255,.30) 268deg,rgba(50,220,255,.44) 282deg,rgba(101,136,255,.40) 296deg,rgba(173,105,255,.42) 310deg,rgba(255,107,200,.36) 324deg,rgba(255,180,95,.28) 338deg,rgba(65,240,190,.24) 348deg,transparent 358deg 360deg)!important;filter:blur(8px)!important;opacity:.55!important;animation:geminiVideoArcRotateFinal 2.8s linear infinite!important}
+#geminiPanel #geminiForm>*{position:relative!important;z-index:4!important}
+@keyframes geminiVideoArcRotateFinal{from{--gemini-video-angle-final:0deg}to{--gemini-video-angle-final:360deg}}
+</style>
 </body>
 </html>
