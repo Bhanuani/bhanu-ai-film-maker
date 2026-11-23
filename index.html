@@ -1458,13 +1458,24 @@
     #geminiForm > * { position: relative; z-index: 1; }
     #geminiForm textarea {
       min-width: 0;
-      min-height: 38px;
-      max-height: 150px;
-      height: 38px;
+      width: 0;
+      flex: 1 1 auto;
+      box-sizing: border-box;
+      min-height: 38px !important;
+      max-height: calc(7 * 1.4em + 18px) !important;
+      height: auto !important;
+      field-sizing: content;
       padding: 9px 2px;
       resize: none;
-      overflow-y: auto;
+      overflow-y: hidden;
       line-height: 1.4;
+      align-self: stretch;
+    }
+    #geminiForm.composer-expanded {
+      border-radius: 22px;
+      align-items: center;
+    }
+    #geminiForm.composer-expanded textarea {
       align-self: center;
     }
     #geminiForm .gemini-upload-btn,
@@ -5772,17 +5783,31 @@
     });
     function resizeGeminiComposer() {
       if (!geminiInput) return;
+      const form = geminiForm;
       const computed = window.getComputedStyle(geminiInput);
       const lineHeight = parseFloat(computed.lineHeight) || 22;
       const paddingTop = parseFloat(computed.paddingTop) || 0;
       const paddingBottom = parseFloat(computed.paddingBottom) || 0;
-      const maxHeight = Math.ceil(lineHeight * 7 + paddingTop + paddingBottom);
-      geminiInput.style.height = "38px";
-      const nextHeight = Math.min(geminiInput.scrollHeight, maxHeight);
-      geminiInput.style.height = nextHeight + "px";
-      geminiInput.style.overflowY = geminiInput.scrollHeight > maxHeight ? "auto" : "hidden";
+      const borderTop = parseFloat(computed.borderTopWidth) || 0;
+      const borderBottom = parseFloat(computed.borderBottomWidth) || 0;
+      const maxHeight = Math.ceil(lineHeight * 7 + paddingTop + paddingBottom + borderTop + borderBottom);
+
+      // Reset to auto first so shrinking works when text is deleted.
+      geminiInput.style.setProperty("height", "auto", "important");
+      geminiInput.style.setProperty("max-height", maxHeight + "px", "important");
+      const contentHeight = geminiInput.scrollHeight;
+      const nextHeight = Math.max(38, Math.min(contentHeight, maxHeight));
+      geminiInput.style.setProperty("height", nextHeight + "px", "important");
+      const needsScroll = contentHeight > maxHeight + 1;
+      geminiInput.style.setProperty("overflow-y", needsScroll ? "auto" : "hidden", "important");
+      if (form) form.classList.toggle("composer-expanded", nextHeight > 48);
     }
     geminiInput?.addEventListener("input", resizeGeminiComposer);
+    geminiInput?.addEventListener("change", resizeGeminiComposer);
+    geminiInput?.addEventListener("paste", () => requestAnimationFrame(resizeGeminiComposer));
+    geminiInput?.addEventListener("compositionend", resizeGeminiComposer);
+    window.addEventListener("resize", resizeGeminiComposer);
+    requestAnimationFrame(resizeGeminiComposer);
     geminiInput?.addEventListener("keydown", (event) => {
       if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
