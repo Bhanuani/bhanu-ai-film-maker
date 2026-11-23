@@ -7003,5 +7003,66 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
  #cinemotionLanding .lp-hero::before{transform:translate3d(var(--hero-parallax-x,0),var(--hero-parallax-y,0),0) scale(1.035)}
 }
 </style>
+<!-- GEMINI COMPOSER ANIMATION ONLY -->
+<style id="gemini-composer-glow-animation">
+#geminiPanel #geminiForm{
+  overflow:visible!important;
+  transition:border-color .35s ease,box-shadow .35s ease!important;
+}
+#geminiPanel #geminiForm::before{
+  opacity:.72!important;
+  background:conic-gradient(
+    from var(--gemini-beam-angle),
+    transparent 0deg,
+    transparent 205deg,
+    rgba(0,210,255,.24) 250deg,
+    #00d2ff 278deg,
+    #6388ff 300deg,
+    #b76cff 318deg,
+    #ff6caa 337deg,
+    transparent 354deg,
+    transparent 360deg
+  )!important;
+  filter:drop-shadow(0 0 4px rgba(0,210,255,.35))!important;
+  animation:geminiBorderBeam 4.2s linear infinite!important;
+}
+#geminiPanel #geminiForm::after{
+  content:""!important;
+  position:absolute!important;
+  inset:3px!important;
+  z-index:0!important;
+  border-radius:inherit!important;
+  pointer-events:none!important;
+  background:linear-gradient(110deg,
+    transparent 0%,
+    rgba(0,210,255,.07) 25%,
+    rgba(99,136,255,.11) 42%,
+    rgba(183,108,255,.13) 52%,
+    rgba(255,108,170,.07) 64%,
+    transparent 82%
+  )!important;
+  background-size:240% 100%!important;
+  background-position:0% 50%!important;
+  opacity:.42!important;
+  filter:blur(8px)!important;
+  animation:geminiComposerSweep 5.8s ease-in-out infinite!important;
+}
+#geminiPanel #geminiForm:focus-within{
+  border-color:rgba(105,190,255,.48)!important;
+  box-shadow:0 8px 28px rgba(0,0,0,.22),0 0 18px rgba(0,210,255,.08)!important;
+}
+#geminiPanel #geminiForm:focus-within::before{
+  opacity:1!important;
+  filter:drop-shadow(0 0 7px rgba(0,210,255,.48))!important;
+}
+@keyframes geminiComposerSweep{
+  0%,100%{background-position:0% 50%;opacity:.22}
+  50%{background-position:100% 50%;opacity:.58}
+}
+@media(prefers-reduced-motion:reduce){
+  #geminiPanel #geminiForm::before,
+  #geminiPanel #geminiForm::after{animation:none!important}
+}
+</style>
 </body>
 </html>
