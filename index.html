@@ -7115,5 +7115,33 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
  #geminiPanel #geminiForm::before,#geminiPanel #geminiForm::after{animation:none!important}
 }
 </style>
+<!-- SIMPLE BORDER LIGHT PASS — GEMINI INPUT ONLY -->
+<style id="gemini-simple-border-light">
+#geminiPanel #geminiForm::before{
+  opacity:1!important;
+  inset:-1px!important;
+  padding:1.2px!important;
+  background:conic-gradient(from var(--gemini-beam-angle),
+    transparent 0deg,
+    transparent 300deg,
+    rgba(0,210,255,.08) 318deg,
+    #00d2ff 329deg,
+    #a58bff 337deg,
+    #ff65c8 344deg,
+    rgba(255,105,200,.05) 350deg,
+    transparent 360deg
+  )!important;
+  filter:none!important;
+  animation:geminiBorderBeam 3.6s linear infinite!important;
+}
+#geminiPanel #geminiForm::after{
+  display:none!important;
+  content:none!important;
+  animation:none!important;
+}
+#geminiPanel #geminiForm:focus-within::before{
+  filter:drop-shadow(0 0 3px rgba(0,210,255,.18))!important;
+}
+</style>
 </body>
 </html>
