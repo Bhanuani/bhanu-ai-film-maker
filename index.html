@@ -2197,6 +2197,7 @@ body::after{
         <button class="add-btn admin-only" id="addMovementBtn">
           <i class="fa-solid fa-plus"></i> Add Movement
         </button>
+        <button type="button" class="prompt-engine-launcher" id="promptEngineLauncher" title="Open Cinematic Prompt Engine"><i class="fa-solid fa-clapperboard"></i><span>Prompt Engine</span></button>
         <button type="button" class="gemini-launcher" id="geminiLauncher" aria-label="Open Gemini AI Assistant" title="Gemini AI Assistant">
           <svg class="gemini-mark" viewBox="0 0 24 24" role="img" aria-label="Gemini">
             <defs>
@@ -7024,6 +7025,66 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
 <!-- EXACT REFERENCE: CENTERED SOFT RAINBOW LIGHT UNDER INPUT, NOT A BORDER ANIMATION -->
 <!-- Dedicated DOM element to avoid conflicting pseudo-element effects -->
 
+
+  <!-- CINEMOTION CREATIVE PROMPT ENGINE -->
+  <div id="cinemotionPromptEngineModal" aria-hidden="true">
+    <section class="prompt-engine-panel" role="dialog" aria-modal="true" aria-labelledby="promptEngineTitle">
+      <header class="prompt-engine-head"><div class="prompt-engine-title" id="promptEngineTitle"><i class="fa-solid fa-clapperboard"></i> Cinematic Prompt Engine</div><button class="prompt-engine-close" id="promptEngineClose" aria-label="Close Prompt Engine">&times;</button></header>
+      <div class="prompt-engine-body">
+        <div class="prompt-engine-input-column"><label class="prompt-engine-label" for="promptEngineStory">Story / Scene Brief</label><textarea id="promptEngineStory" placeholder="Describe your story, scene, action, characters, location, mood, or constraints..."></textarea><label class="prompt-engine-duration"><span>Video duration (seconds)</span><input id="promptEngineDuration" type="number" min="1" max="300" value="10"></label><button id="promptEngineGenerate" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i> Design Cinematic Shots</button><div class="prompt-engine-data-note">Uses the live Directors Vault data, including custom categories and added entries. Master Prompts are excluded completely.</div><div id="promptEngineStatus" aria-live="polite"></div></div>
+        <div class="prompt-engine-result-column"><div class="prompt-engine-result-header"><div class="prompt-engine-label">Director's Shot Design</div><button id="promptEngineCopy" type="button"><i class="fa-solid fa-copy"></i> Copy Result</button></div><div id="promptEngineOutput">Your cinematic shot design will appear here.</div></div>
+      </div>
+    </section>
+  </div>
+  <script>
+  (function initCinemotionPromptEngine(){
+    const modal=document.getElementById("cinemotionPromptEngineModal");
+    const launcher=document.getElementById("promptEngineLauncher");
+    const closeBtn=document.getElementById("promptEngineClose");
+    const storyInput=document.getElementById("promptEngineStory");
+    const durationInput=document.getElementById("promptEngineDuration");
+    const generateBtn=document.getElementById("promptEngineGenerate");
+    const output=document.getElementById("promptEngineOutput");
+    const status=document.getElementById("promptEngineStatus");
+    const copyBtn=document.getElementById("promptEngineCopy");
+    if(!modal||!launcher||!generateBtn||!output)return;
+    function open(){modal.classList.add("open");modal.setAttribute("aria-hidden","false");setTimeout(()=>storyInput&&storyInput.focus(),80)}
+    function close(){modal.classList.remove("open");modal.setAttribute("aria-hidden","true")}
+    launcher.addEventListener("click",open);closeBtn&&closeBtn.addEventListener("click",close);
+    modal.addEventListener("click",e=>{if(e.target===modal)close()});
+    document.addEventListener("keydown",e=>{if(e.key==="Escape"&&modal.classList.contains("open"))close()});
+    function getVaultData(){
+      const items=Array.isArray(window.allVaultItems)?window.allVaultItems:[];
+      return items.filter(item=>String(item&&item.category||"").trim().toLowerCase()!=="master prompts").map(item=>({category:String(item.category||"Uncategorized"),name:String(item.name||"Unnamed"),prompt:String(item.prompt||""),description:item.description?String(item.description):""})).filter(item=>item.name||item.prompt);
+    }
+    generateBtn.addEventListener("click",async()=>{
+      const story=String(storyInput.value||"").trim();if(!story){status.textContent="First enter your story or scene brief.";storyInput.focus();return}
+      const model=window.cinemotionGeminiModel;if(!model){status.textContent="Gemini model is not ready. Please wait or reload the page.";return}
+      const vault=getVaultData();const duration=Math.max(1,Math.min(300,Number(durationInput.value)||10));
+      const dataText=JSON.stringify(vault,null,2);
+      const engineInstruction=[
+        "You are CINEMOTION STUDIO'S CREATIVE CINEMATOGRAPHER, FILM DIRECTOR, VISUAL STORYTELLER, EDITOR, LIGHTING DIRECTOR, LENS EXPERT, SOUND DESIGNER AND CONTINUITY SUPERVISOR. Transform the user's story into an exceptionally creative, emotionally effective, visually memorable, production-ready cinematic shot sequence.",
+        "SOURCE DATA RULE: Use the live Directors Vault data as a cinematography reference library. It includes built-in entries and dynamically loaded user-added entries/custom categories. The category Master Prompts is deliberately excluded and MUST NOT be used, recreated, quoted, or referenced. Select techniques that fit the story; do not dump or mechanically combine the database.",
+        "CREATIVE DIRECTING: Read the story deeply: intent, emotional arc, stakes, subtext, visual motif, action beats, reveal, pacing and audience impact. Design every shot with a distinct purpose. Seek a memorable visual hook or WOW moment earned by the story, not random spectacle. Avoid clichés, predictable shot lists, generic cinematic filler, repetitive framing/movement, unnecessary effects, or invented plot events. Respect every user constraint and maintain subject, costume, prop, geography, screen direction, lighting and action continuity. Keep movements physically possible and clearly separate subject movement, camera movement and environmental movement.",
+        "For every shot specify timecode/duration; story beat and purpose; shot size; camera angle and exact height/orientation; lens/focal length and perspective; camera rig/path/direction/speed/acceleration; composition and foreground/midground/background; subject blocking/action; focus/DOF/rack focus; lighting source/direction/quality/contrast/color temperature; color palette/grade; atmosphere and environmental interaction only if motivated; VFX only if story-relevant; sound/Foley/ambience/music/silence cues; cut/transition and continuity notes. Use Vault techniques by name and briefly explain fit. Include creative transitions when motivated, not forced. Allocate time realistically for readable action.",
+        "OUTPUT: 1) concise Director's Vision (core visual idea + emotion); 2) Story beats; 3) detailed shot-by-shot sequence covering the requested duration with timecodes that add up; 4) one unified ready-to-copy final video prompt preserving shot order, continuity, camera/lighting/action details and constraints; 5) brief continuity/negative constraints. Write in the user's language. Be specific, imaginative and technically coherent.",
+        "USER STORY/BRIEF:\n"+story,
+        "REQUESTED DURATION: "+duration+" seconds.",
+        "LIVE CINEMATOGRAPHY VAULT DATA (Master Prompts excluded):\n"+dataText
+      ].join("\n\n");
+      generateBtn.disabled=true;generateBtn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Designing shots...';status.textContent="Analyzing story and "+vault.length+" Vault entries (Master Prompts excluded)...";output.textContent="Creative Director is designing the sequence...";
+      try{
+        const result=await model.generateContent(engineInstruction);
+        const response=await result.response;
+        const textResult=response&&response.text?response.text():"";
+        if(!textResult.trim())throw new Error("Gemini returned an empty response.");
+        output.textContent=textResult;status.textContent="Done. Source: "+vault.length+" live Vault entries. Master Prompts excluded.";
+      }catch(err){console.error("Prompt Engine generation error:",err);output.textContent="Generation failed.\n\n"+(err&&err.message||String(err));status.textContent="Generation failed. Please try again."}
+      finally{generateBtn.disabled=false;generateBtn.innerHTML='<i class="fa-solid fa-wand-magic-sparkles"></i> Design Cinematic Shots'}
+    });
+    copyBtn&&copyBtn.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(output.textContent||"");status.textContent="Result copied to clipboard."}catch(err){const range=document.createRange();range.selectNodeContents(output);const sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);status.textContent="Select the result and copy it manually."}});
+  })();
+  </script>
 </body>
 </html>
 <style id="gemini-glow-final-override">
@@ -7088,4 +7149,26 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
 @media(prefers-reduced-motion:reduce){
  .movement-card .prompt-wrapper{animation:none!important;border-color:#00d9ff!important;box-shadow:0 0 12px rgba(0,217,255,.55),0 0 24px rgba(0,217,255,.3)!important}
 }
+
+/* CINEMOTION PROMPT ENGINE */
+.prompt-engine-launcher{display:inline-flex;align-items:center;gap:8px;padding:9px 13px;border:1px solid rgba(0,217,255,.55);border-radius:12px;background:linear-gradient(135deg,rgba(0,217,255,.12),rgba(124,92,255,.12));color:#eafaff;font-weight:800;cursor:pointer;white-space:nowrap;box-shadow:0 0 14px rgba(0,217,255,.12);transition:.2s}
+.prompt-engine-launcher:hover{border-color:#00e5ff;box-shadow:0 0 18px rgba(0,217,255,.3);transform:translateY(-1px)}
+#cinemotionPromptEngineModal{position:fixed;inset:0;z-index:10080;display:none;background:rgba(2,5,12,.82);backdrop-filter:blur(12px);padding:clamp(10px,2vw,24px);overflow:auto}
+#cinemotionPromptEngineModal.open{display:flex;align-items:center;justify-content:center}
+.prompt-engine-panel{width:min(1100px,100%);max-height:calc(100dvh - 28px);display:flex;flex-direction:column;background:linear-gradient(145deg,#08111f,#070a13 65%);border:1px solid rgba(0,217,255,.34);border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,.6),0 0 32px rgba(0,217,255,.08);overflow:hidden;color:#edf7ff}
+.prompt-engine-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid rgba(148,163,184,.15)}
+.prompt-engine-title{display:flex;align-items:center;gap:12px;font-size:19px;font-weight:900;letter-spacing:.02em}.prompt-engine-title i{color:#00d9ff}
+.prompt-engine-close{border:1px solid rgba(148,163,184,.25);background:rgba(255,255,255,.04);color:#eafaff;border-radius:10px;width:38px;height:38px;font-size:22px;cursor:pointer}
+.prompt-engine-body{padding:18px 22px;overflow:auto;display:grid;grid-template-columns:minmax(280px,38%) minmax(0,1fr);gap:18px;min-height:0}
+.prompt-engine-input-column{display:flex;flex-direction:column;gap:12px}.prompt-engine-label{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#9bb8ce}
+#promptEngineStory{width:100%;min-height:220px;resize:vertical;background:#060c16;border:1px solid rgba(148,163,184,.25);border-radius:13px;color:#f5fbff;padding:14px;outline:none;font:inherit;line-height:1.55}
+#promptEngineStory:focus{border-color:#00d9ff;box-shadow:0 0 0 2px rgba(0,217,255,.1)}
+.prompt-engine-duration{display:flex;align-items:center;gap:10px;color:#a9c2d5;font-size:13px}.prompt-engine-duration input{width:85px;background:#060c16;border:1px solid rgba(148,163,184,.25);border-radius:9px;color:#fff;padding:9px}
+#promptEngineGenerate{display:flex;justify-content:center;align-items:center;gap:9px;border:0;border-radius:12px;padding:13px;background:linear-gradient(100deg,#00c9ff,#7566ff);color:#06101b;font-weight:900;cursor:pointer}#promptEngineGenerate:disabled{opacity:.55;cursor:wait}
+.prompt-engine-data-note{font-size:12px;color:#7e9bb2;line-height:1.5}.prompt-engine-result-column{min-height:280px;display:flex;flex-direction:column;gap:10px}
+.prompt-engine-result-header{display:flex;align-items:center;justify-content:space-between;gap:10px}.prompt-engine-result-header .prompt-engine-label{margin:0}
+#promptEngineCopy{border:1px solid rgba(0,217,255,.3);background:rgba(0,217,255,.07);color:#c8f6ff;border-radius:9px;padding:8px 11px;cursor:pointer;font-weight:700}
+#promptEngineOutput{white-space:pre-wrap;overflow:auto;flex:1;min-height:320px;max-height:55vh;background:#040811;border:1px solid rgba(148,163,184,.2);border-radius:13px;padding:15px;color:#e7f4ff;font:14px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}
+#promptEngineStatus{font-size:12px;color:#85a8c2;min-height:18px}
+@media(max-width:760px){.prompt-engine-launcher{padding:8px 9px;font-size:12px}.prompt-engine-launcher span{display:none}#cinemotionPromptEngineModal{padding:7px}.prompt-engine-panel{max-height:calc(100dvh - 14px);border-radius:15px}.prompt-engine-head{padding:13px 15px}.prompt-engine-body{grid-template-columns:1fr;padding:13px;gap:13px}.prompt-engine-title{font-size:16px}#promptEngineStory{min-height:150px}#promptEngineOutput{min-height:260px;max-height:45vh}}
 </style>
