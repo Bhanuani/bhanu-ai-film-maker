@@ -7018,20 +7018,18 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
 
 <!-- SINGLE CLEAN ANIMATION: GEMINI COMPOSER ONLY -->
 <style id="gemini-single-clean-spectrum">
-#geminiPanel #geminiForm{position:relative!important;isolation:isolate!important;overflow:visible!important;border:1px solid rgba(140,155,190,.2)!important;box-shadow:0 8px 28px rgba(0,0,0,.22)!important}
-#geminiPanel.open #geminiForm::before,#geminiPanel #geminiForm::before{
-content:""!important;position:absolute!important;inset:-1px!important;z-index:2!important;padding:1.5px!important;border-radius:inherit!important;pointer-events:none!important;
-background:linear-gradient(110deg,#00d2ff,#5b7cff,#b46bff,#ff65bf,#ffb65b,#4fe5be,#00d2ff)!important;background-size:300% 100%!important;background-position:0% 50%!important;
+#geminiPanel #geminiForm{position:relative!important;isolation:isolate!important;overflow:visible!important;border:1px solid rgba(140,155,190,.18)!important;box-shadow:0 8px 28px rgba(0,0,0,.22)!important}
+#geminiPanel #geminiForm::before{
+content:""!important;position:absolute!important;inset:-1px!important;z-index:4!important;padding:1.8px!important;border-radius:inherit!important;pointer-events:none!important;
+background:conic-gradient(from 0deg,transparent 0deg 250deg,#00d9ff 270deg,#597bff 292deg,#b66bff 310deg,#ff66c8 326deg,#ffb55b 342deg,#54e7bd 352deg,transparent 360deg)!important;
 -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0)!important;-webkit-mask-composite:xor!important;mask-composite:exclude!important;
-animation:geminiSpectrumTravel 3.2s linear infinite!important;opacity:1!important;filter:drop-shadow(0 0 2px rgba(70,200,255,.28))!important}
-#geminiPanel.open #geminiForm::after,#geminiPanel #geminiForm::after{
-content:""!important;position:absolute!important;inset:-4px!important;z-index:-1!important;border-radius:inherit!important;pointer-events:none!important;
-background:linear-gradient(110deg,#00d2ff,#5b7cff,#b46bff,#ff65bf,#ffb65b,#4fe5be,#00d2ff)!important;background-size:300% 100%!important;background-position:0% 50%!important;
-filter:blur(8px)!important;opacity:.42!important;animation:geminiSpectrumTravel 3.2s linear infinite!important}
-#geminiPanel #geminiForm>*{position:relative!important;z-index:3!important}
-#geminiPanel #geminiForm:focus-within{border-color:rgba(140,155,190,.24)!important}
-@keyframes geminiSpectrumTravel{0%{background-position:0% 50%}100%{background-position:300% 50%}}
-@media(prefers-reduced-motion:reduce){#geminiPanel #geminiForm::before,#geminiPanel #geminiForm::after{animation:none!important}}
+animation:geminiRotatingArc 2.4s linear infinite!important;filter:drop-shadow(0 0 3px rgba(0,210,255,.55))!important;opacity:1!important}
+#geminiPanel #geminiForm::after{
+content:""!important;position:absolute!important;inset:-5px!important;z-index:-1!important;border-radius:inherit!important;pointer-events:none!important;
+background:conic-gradient(from 0deg,transparent 0deg 250deg,rgba(0,217,255,.35) 270deg,rgba(89,123,255,.32) 292deg,rgba(182,107,255,.35) 310deg,rgba(255,102,200,.30) 326deg,rgba(255,181,91,.22) 342deg,rgba(84,231,189,.22) 352deg,transparent 360deg)!important;
+filter:blur(9px)!important;animation:geminiRotatingArc 2.4s linear infinite!important;opacity:.6!important}
+#geminiPanel #geminiForm>*{position:relative!important;z-index:5!important}
+@keyframes geminiRotatingArc{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 </style>
 </body>
 </html>
