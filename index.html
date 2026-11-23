@@ -7297,5 +7297,58 @@ background:conic-gradient(from var(--gemini-video-angle-final),transparent 0deg 
 #geminiPanel #geminiForm>*{position:relative!important;z-index:4!important}
 @keyframes geminiVideoArcRotateFinal{from{--gemini-video-angle-final:0deg}to{--gemini-video-angle-final:360deg}}
 </style>
+<!-- SINGLE CLEAN ANIMATION: GEMINI COMPOSER ONLY -->
+<style id="gemini-single-clean-spectrum">
+#geminiPanel #geminiForm{
+ position:relative!important;
+ isolation:isolate!important;
+ overflow:visible!important;
+ border:1px solid rgba(140,155,190,.2)!important;
+ box-shadow:0 8px 28px rgba(0,0,0,.22)!important;
+}
+#geminiPanel.open #geminiForm::before,
+#geminiPanel #geminiForm::before{
+ content:""!important;
+ position:absolute!important;
+ inset:-1px!important;
+ z-index:2!important;
+ padding:1.5px!important;
+ border-radius:inherit!important;
+ pointer-events:none!important;
+ background:linear-gradient(110deg,#00d2ff,#5b7cff,#b46bff,#ff65bf,#ffb65b,#4fe5be,#00d2ff)!important;
+ background-size:300% 100%!important;
+ background-position:0% 50%!important;
+ -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0)!important;
+ -webkit-mask-composite:xor!important;
+ mask-composite:exclude!important;
+ animation:geminiSpectrumTravel 3.2s linear infinite!important;
+ opacity:1!important;
+ filter:drop-shadow(0 0 2px rgba(70,200,255,.28))!important;
+}
+#geminiPanel.open #geminiForm::after,
+#geminiPanel #geminiForm::after{
+ content:""!important;
+ position:absolute!important;
+ inset:-4px!important;
+ z-index:-1!important;
+ border-radius:inherit!important;
+ pointer-events:none!important;
+ background:linear-gradient(110deg,#00d2ff,#5b7cff,#b46bff,#ff65bf,#ffb65b,#4fe5be,#00d2ff)!important;
+ background-size:300% 100%!important;
+ background-position:0% 50%!important;
+ filter:blur(8px)!important;
+ opacity:.42!important;
+ animation:geminiSpectrumTravel 3.2s linear infinite!important;
+}
+#geminiPanel #geminiForm>*{position:relative!important;z-index:3!important}
+#geminiPanel #geminiForm:focus-within{border-color:rgba(140,155,190,.24)!important}
+@keyframes geminiSpectrumTravel{
+ 0%{background-position:0% 50%}
+ 100%{background-position:300% 50%}
+}
+@media(prefers-reduced-motion:reduce){
+ #geminiPanel #geminiForm::before,#geminiPanel #geminiForm::after{animation:none!important}
+}
+</style>
 </body>
 </html>
