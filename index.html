@@ -7064,5 +7064,56 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
   #geminiPanel #geminiForm::after{animation:none!important}
 }
 </style>
+<!-- REFERENCE-MATCHED GEMINI INPUT GLOW — textbox only -->
+<style id="gemini-reference-animation-fix">
+#geminiPanel #geminiForm{
+  border:1px solid rgba(150,155,190,.20)!important;
+  background:rgba(20,23,32,.96)!important;
+  box-shadow:0 8px 28px rgba(0,0,0,.22)!important;
+}
+#geminiPanel #geminiForm::before{
+  inset:-1px!important;
+  padding:1.5px!important;
+  opacity:1!important;
+  border-radius:inherit!important;
+  background:conic-gradient(from var(--gemini-beam-angle),
+    rgba(85,115,255,.02) 0deg,
+    rgba(85,115,255,.02) 30deg,
+    rgba(90,220,255,.45) 90deg,
+    rgba(150,110,255,.62) 155deg,
+    rgba(255,115,190,.50) 210deg,
+    rgba(80,235,190,.48) 265deg,
+    rgba(85,115,255,.02) 330deg,
+    rgba(85,115,255,.02) 360deg
+  )!important;
+  filter:none!important;
+  animation:geminiBorderBeam 7s linear infinite!important;
+}
+#geminiPanel #geminiForm::after{
+  content:""!important;
+  position:absolute!important;
+  inset:-5px!important;
+  z-index:-2!important;
+  border-radius:inherit!important;
+  pointer-events:none!important;
+  background:conic-gradient(from var(--gemini-beam-angle),
+    transparent 0deg,transparent 40deg,
+    rgba(75,220,255,.26) 110deg,
+    rgba(155,105,255,.30) 185deg,
+    rgba(255,100,190,.22) 245deg,
+    rgba(70,235,185,.24) 300deg,
+    transparent 360deg
+  )!important;
+  filter:blur(13px)!important;
+  opacity:.55!important;
+  animation:geminiBorderBeam 7s linear infinite!important;
+}
+#geminiPanel #geminiForm:focus-within{
+  box-shadow:0 8px 30px rgba(0,0,0,.22),0 0 15px rgba(120,150,255,.08)!important;
+}
+@media(prefers-reduced-motion:reduce){
+ #geminiPanel #geminiForm::before,#geminiPanel #geminiForm::after{animation:none!important}
+}
+</style>
 </body>
 </html>
