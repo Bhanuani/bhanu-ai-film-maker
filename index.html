@@ -7082,10 +7082,11 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
       constraintsNegativeAI:"Constraints & Negative Prompt Director"
     };
     const vfxNames={director:"VFX Auto Director",atmosphere:"Atmosphere FX",impact:"Impact FX",magic:"Magic / Energy FX",transition:"Transition Designer"};
-    function detectTools(text,hasVideo){
+    function detectTools(text,hasVideo,hasImage){
       let ids=[];
       try{if(typeof window.detectCinemotionAITools==="function")ids=window.detectCinemotionAITools(text)||[]}catch(e){console.warn("AI specialist detection unavailable",e)}
       if(hasVideo){["filmDirector","shotBreakdown","cameraDirector","compositionDirector","lightingDirector","colorMoodDirector","motionPhysicsDirector","durationPlanner","sceneConsistency","visualStyleLock","realismChecker","complexityAnalyzer","videoMotionPlanner","referenceVideoDirector"].forEach(id=>{if(!ids.includes(id))ids.push(id)})}
+      if(hasImage){["characterContinuity","compositionDirector","compositionAI","lightingDirector","visualStyleLock","sceneConsistency","realismChecker","depthFocusAI"].forEach(id=>{if(!ids.includes(id))ids.push(id)})}
       return [...new Set(ids)];
     }
     function detectVfx(text){
@@ -7192,7 +7193,8 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
       const model=window.cinemotionGeminiModel;if(!model){status.textContent="Gemini model is not ready. Please wait or reload the page.";return}
       const vault=getVaultData(),duration=Math.max(1,Math.min(300,Number(durationInput.value)||10));
       const hasVideo=referenceFiles.some(f=>f.type.startsWith("video/"));
-      const toolIds=detectTools(story,hasVideo),vfxIds=detectVfx(story);
+      const hasImage=referenceFiles.some(f=>f.type.startsWith("image/"));
+      const toolIds=detectTools(story,hasVideo,hasImage),vfxIds=detectVfx(story);
       renderSpecialists(toolIds,vfxIds);
       generateBtn.disabled=true;generateBtn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Designing shots...';
       status.textContent="Gemini is analyzing the brief, "+toolIds.length+" specialist perspectives, "+vfxIds.length+" VFX routes and "+vault.length+" Vault entries.";
