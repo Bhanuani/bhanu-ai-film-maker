@@ -7021,27 +7021,25 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
 <!-- MATCH REFERENCE: SMALL HORIZONTAL RAINBOW GLOW UNDER GEMINI INPUT ONLY -->
 <!-- EXACT REFERENCE: CENTERED SOFT RAINBOW LIGHT UNDER INPUT, NOT A BORDER ANIMATION -->
 <!-- Dedicated DOM element to avoid conflicting pseudo-element effects -->
-<style id="gemini-reference-bottom-glow">
-#geminiPanel #geminiForm{position:relative!important;isolation:isolate!important;overflow:visible!important}
-#geminiPanel #geminiForm::before,#geminiPanel #geminiForm::after{content:none!important;display:none!important;animation:none!important}
-#geminiPanel #geminiForm .gemini-reference-glow{
- display:block!important;position:absolute!important;z-index:0!important;
- width:170px!important;height:9px!important;left:0!important;bottom:-5px!important;
- margin:0!important;padding:0!important;border:0!important;border-radius:50%!important;
- pointer-events:none!important;opacity:0!important;
- background:linear-gradient(90deg,transparent 0%,#19dcff 15%,#716eff 36%,#ff5fc8 58%,#ffb94f 78%,#4df0bd 90%,transparent 100%)!important;
- filter:blur(8px)!important;
- transform:translateX(0)!important;
- animation:geminiGlowSweep 3.2s cubic-bezier(.22,.61,.36,1) infinite!important;
-}
-#geminiPanel #geminiForm>*:not(.gemini-reference-glow){position:relative!important;z-index:1!important}
-@keyframes geminiGlowSweep{
- 0%{left:0;transform:translateX(-100%);opacity:0}
- 8%{opacity:.85}
- 48%{opacity:1}
- 88%{opacity:.75}
- 100%{left:100%;transform:translateX(0);opacity:0}
-}
-</style>
+
 </body>
 </html>
+<style id="gemini-glow-final-override">
+#geminiPanel #geminiForm{position:relative!important;overflow:visible!important;isolation:isolate!important}
+#geminiPanel #geminiForm .gemini-reference-glow{
+ position:absolute!important;display:block!important;visibility:visible!important;
+ left:50%!important;bottom:-4px!important;top:auto!important;right:auto!important;
+ width:150px!important;height:9px!important;margin:0!important;padding:0!important;
+ border:0!important;border-radius:50%!important;z-index:20!important;
+ pointer-events:none!important;opacity:0!important;
+ background:linear-gradient(90deg,transparent,#18ddff 18%,#7773ff 38%,#ff62c9 58%,#ffb24e 78%,#4beec0,transparent)!important;
+ filter:blur(8px)!important;
+ animation:geminiGlowSweepFinal 2.6s linear infinite!important;
+}
+@keyframes geminiGlowSweepFinal{
+ 0%{transform:translateX(-420px);opacity:0}
+ 10%{opacity:1}
+ 80%{opacity:.9}
+ 100%{transform:translateX(420px);opacity:0}
+}
+</style>
