@@ -7143,5 +7143,78 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
   filter:drop-shadow(0 0 3px rgba(0,210,255,.18))!important;
 }
 </style>
+<!-- EXACT SEARCH-PILL STYLE MULTICOLOR EDGE GLOW — GEMINI INPUT ONLY -->
+<style id="gemini-search-pill-reference-fix">
+#geminiPanel #geminiForm{
+  position:relative!important;
+  isolation:isolate!important;
+  border:1px solid rgba(150,160,190,.16)!important;
+  background:rgba(20,22,31,.96)!important;
+  box-shadow:0 0 0 1px rgba(255,255,255,.015),0 8px 28px rgba(0,0,0,.24)!important;
+}
+#geminiPanel #geminiForm::before{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  z-index:0!important;
+  padding:1px!important;
+  border-radius:inherit!important;
+  pointer-events:none!important;
+  background:linear-gradient(115deg,
+    rgba(80,120,255,.10) 0%,
+    rgba(50,220,255,.44) 20%,
+    rgba(120,100,255,.24) 42%,
+    rgba(255,100,200,.48) 61%,
+    rgba(255,180,90,.26) 77%,
+    rgba(80,220,190,.42) 94%,
+    rgba(80,120,255,.10) 100%
+  )!important;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0)!important;
+  -webkit-mask-composite:xor!important;
+  mask-composite:exclude!important;
+  filter:none!important;
+  opacity:.88!important;
+  animation:geminiPillBorderFlow 8s ease-in-out infinite!important;
+}
+#geminiPanel #geminiForm::after{
+  content:""!important;
+  position:absolute!important;
+  left:8%!important;
+  right:8%!important;
+  bottom:-3px!important;
+  height:8px!important;
+  z-index:-1!important;
+  border-radius:0 0 999px 999px!important;
+  pointer-events:none!important;
+  background:linear-gradient(90deg,
+    rgba(40,220,255,0),
+    rgba(40,220,255,.62) 18%,
+    rgba(125,90,255,.58) 42%,
+    rgba(255,90,195,.62) 63%,
+    rgba(255,175,80,.50) 80%,
+    rgba(40,220,190,.50),
+    rgba(40,220,255,0)
+  )!important;
+  filter:blur(8px)!important;
+  opacity:.52!important;
+  animation:geminiPillGlow 4.6s ease-in-out infinite!important;
+}
+#geminiPanel #geminiForm>*{z-index:1!important}
+#geminiPanel #geminiForm:focus-within{
+  border-color:rgba(160,170,205,.22)!important;
+  box-shadow:0 8px 28px rgba(0,0,0,.24),0 0 12px rgba(110,140,255,.06)!important;
+}
+@keyframes geminiPillBorderFlow{
+  0%,100%{background-position:0% 50%;opacity:.66}
+  50%{background-position:100% 50%;opacity:1}
+}
+@keyframes geminiPillGlow{
+  0%,100%{opacity:.30;transform:scaleX(.92)}
+  50%{opacity:.62;transform:scaleX(1)}
+}
+@media(prefers-reduced-motion:reduce){
+ #geminiPanel #geminiForm::before,#geminiPanel #geminiForm::after{animation:none!important}
+}
+</style>
 </body>
 </html>
