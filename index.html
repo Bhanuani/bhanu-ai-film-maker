@@ -6949,5 +6949,59 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
 .gemini-send-flow.sent{border-color:rgba(74,222,128,.55);color:#bbf7d0}
 @media(max-width:540px){.gemini-send-flow{right:54px;padding:0 8px;font-size:10px}}
 </style>
+<!-- REAL 3D POINTER DEPTH — visual-only interaction -->
+<style id="cinemotion-real-3d">
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+ #cinemotionLanding .lp-card,#cinemotionLanding .lp-step,#cinemotionLanding .lp-vault{
+   position:relative;transform-style:preserve-3d;perspective:1000px;will-change:transform;
+ }
+ #cinemotionLanding .lp-card::after,#cinemotionLanding .lp-step::after{
+   content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;
+   background:radial-gradient(circle at var(--tilt-x,50%) var(--tilt-y,50%),rgba(105,220,255,.18),transparent 46%);
+   transition:opacity .25s;mix-blend-mode:screen;
+ }
+ #cinemotionLanding .lp-card.is-tilting::after,#cinemotionLanding .lp-step.is-tilting::after{opacity:1}
+ #cinemotionLanding .lp-card>* ,#cinemotionLanding .lp-step>*{transform:translateZ(22px)}
+ #cinemotionLanding .lp-hero-content{transition:transform .12s ease-out;will-change:transform}
+ #cinemotionLanding .lp-hero::before{transition:transform .16s ease-out;will-change:transform}
+}
+</style>
+<script id="cinemotion-real-3d-script">
+(()=> {
+ if(window.__cinemotion3DReady)return;window.__cinemotion3DReady=true;
+ const landing=document.getElementById('cinemotionLanding');if(!landing)return;
+ if(window.matchMedia('(hover:hover) and (pointer:fine)').matches &&
+    !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+   const targets=landing.querySelectorAll('.lp-card,.lp-step');
+   targets.forEach(el=>{
+     el.addEventListener('pointermove',e=>{
+       const r=el.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+       const rx=(.5-y)*9,ry=(x-.5)*11;
+       el.style.transform='perspective(900px) rotateX('+rx.toFixed(2)+'deg) rotateY('+ry.toFixed(2)+'deg) translateZ(8px)';
+       el.style.setProperty('--tilt-x',(x*100)+'%');el.style.setProperty('--tilt-y',(y*100)+'%');
+       el.classList.add('is-tilting');
+     });
+     el.addEventListener('pointerleave',()=>{
+       el.style.transform='';el.classList.remove('is-tilting');
+     });
+   });
+   const hero=landing.querySelector('.lp-hero'),content=landing.querySelector('.lp-hero-content'),bg=hero&&hero.querySelector('::before');
+   if(hero&&content){
+     hero.addEventListener('pointermove',e=>{
+       const r=hero.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+       content.style.transform='translate3d('+(x*10).toFixed(1)+'px,'+(y*7).toFixed(1)+'px,0)';
+       hero.style.setProperty('--hero-parallax-x',(x*12).toFixed(1)+'px');
+       hero.style.setProperty('--hero-parallax-y',(y*8).toFixed(1)+'px');
+     });
+     hero.addEventListener('pointerleave',()=>{content.style.transform='';hero.style.removeProperty('--hero-parallax-x');hero.style.removeProperty('--hero-parallax-y')});
+   }
+ }
+})();
+</script>
+<style id="cinemotion-hero-parallax">
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+ #cinemotionLanding .lp-hero::before{transform:translate3d(var(--hero-parallax-x,0),var(--hero-parallax-y,0),0) scale(1.035)}
+}
+</style>
 </body>
 </html>
