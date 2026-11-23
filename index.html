@@ -7216,5 +7216,73 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
  #geminiPanel #geminiForm::before,#geminiPanel #geminiForm::after{animation:none!important}
 }
 </style>
+<!-- MATCH UPLOADED VIDEO: SOFT MOVING SPECTRUM EDGE AROUND GEMINI PILL ONLY -->
+<style id="gemini-video-exact-motion">
+#geminiPanel #geminiForm{
+  position:relative!important;
+  isolation:isolate!important;
+  border:1px solid rgba(170,180,205,.13)!important;
+  background:rgba(20,22,31,.97)!important;
+  box-shadow:0 0 0 1px rgba(255,255,255,.015),0 8px 28px rgba(0,0,0,.22)!important;
+}
+#geminiPanel #geminiForm::before{
+  content:""!important;
+  position:absolute!important;
+  inset:-1px!important;
+  z-index:0!important;
+  padding:1px!important;
+  border-radius:inherit!important;
+  pointer-events:none!important;
+  background:conic-gradient(from var(--gemini-beam-angle),
+    transparent 0deg,
+    transparent 245deg,
+    rgba(50,230,205,.20) 270deg,
+    rgba(40,225,255,.75) 286deg,
+    rgba(110,125,255,.72) 302deg,
+    rgba(205,90,255,.75) 318deg,
+    rgba(255,100,190,.65) 332deg,
+    rgba(255,180,90,.34) 345deg,
+    transparent 358deg,
+    transparent 360deg
+  )!important;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0)!important;
+  -webkit-mask-composite:xor!important;
+  mask-composite:exclude!important;
+  opacity:.95!important;
+  filter:none!important;
+  animation:geminiBorderBeam 5.8s linear infinite!important;
+}
+#geminiPanel #geminiForm::after{
+  content:""!important;
+  position:absolute!important;
+  inset:-4px!important;
+  z-index:-1!important;
+  border-radius:inherit!important;
+  pointer-events:none!important;
+  background:conic-gradient(from var(--gemini-beam-angle),
+    transparent 0deg,
+    transparent 248deg,
+    rgba(50,230,205,.32) 272deg,
+    rgba(40,225,255,.48) 286deg,
+    rgba(110,125,255,.42) 302deg,
+    rgba(205,90,255,.48) 318deg,
+    rgba(255,100,190,.40) 332deg,
+    rgba(255,180,90,.18) 345deg,
+    transparent 358deg,
+    transparent 360deg
+  )!important;
+  filter:blur(7px)!important;
+  opacity:.48!important;
+  animation:geminiBorderBeam 5.8s linear infinite!important;
+}
+#geminiPanel #geminiForm>*{z-index:1!important}
+#geminiPanel #geminiForm:focus-within{
+  border-color:rgba(170,180,205,.20)!important;
+  box-shadow:0 8px 28px rgba(0,0,0,.24)!important;
+}
+@media(prefers-reduced-motion:reduce){
+ #geminiPanel #geminiForm::before,#geminiPanel #geminiForm::after{animation:none!important}
+}
+</style>
 </body>
 </html>
