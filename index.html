@@ -7080,7 +7080,8 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
     const storyInput=document.getElementById("promptEngineStory");
     const durationInput=document.getElementById("promptEngineDuration");
     const generateBtn=document.getElementById("promptEngineGenerate");
-    const output=document.getElementById("promptEngineOutput");
+    let output=document.getElementById("promptEngineOutput");
+    const conversation=document.getElementById("promptEngineConversation");
     const status=document.getElementById("promptEngineStatus");
     const copyBtn=document.getElementById("promptEngineCopy");
     const referenceButton=document.getElementById("promptEngineAddReference");
@@ -7230,28 +7231,90 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
     async function fileToBase64(file){
       return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>{const data=String(reader.result||"");resolve(data.slice(data.indexOf(",")+1))};reader.onerror=()=>reject(new Error("Could not read reference file: "+file.name));reader.readAsDataURL(file)});
     }
+    function scrollConversationToBottom(){
+      const scroller=modal.querySelector(".prompt-engine-chat-thread");
+      if(scroller)requestAnimationFrame(()=>{scroller.scrollTo({top:scroller.scrollHeight,behavior:"smooth"})});
+    }
+    function appendChatMessage(role,text){
+      const article=document.createElement("article");
+      article.className="prompt-engine-message "+(role==="user"?"user-message":"assistant-message");
+      const avatar=document.createElement("div");
+      avatar.className="prompt-engine-avatar";
+      avatar.innerHTML=role==="user"?'<i class="fa-solid fa-user"></i>':'<i class="fa-solid fa-clapperboard"></i>';
+      const body=document.createElement("div");
+      body.className="prompt-engine-message-content";
+      const heading=document.createElement("div");
+      heading.className="prompt-engine-message-heading";
+      heading.textContent=role==="user"?"You":"Cinematic Director";
+      const message=document.createElement("div");
+      message.className="prompt-engine-message-text";
+      message.textContent=text||"";
+      body.appendChild(heading);body.appendChild(message);
+      article.appendChild(avatar);article.appendChild(body);
+      conversation.appendChild(article);
+      scrollConversationToBottom();
+      return message;
+    }
+    function showTypingIndicator(node){
+      node.innerHTML='<span class="prompt-engine-typing"><span></span><span></span><span></span></span>';
+      scrollConversationToBottom();
+    }
+    async function animateFinalText(node,text){
+      node.textContent="";
+      node.classList.add("prompt-engine-stream-cursor");
+      const step=36;
+      for(let i=0;i<text.length;i+=step){
+        node.textContent+=text.slice(i,i+step);
+        scrollConversationToBottom();
+        await new Promise(resolve=>setTimeout(resolve,14));
+      }
+      node.classList.remove("prompt-engine-stream-cursor");
+    }
     generateBtn.addEventListener("click",async()=>{
-      const story=String(storyInput.value||"").trim();if(!story){status.textContent="First enter your story or scene brief.";storyInput.focus();return}
-      const model=window.cinemotionGeminiModel;if(!model){status.textContent="Gemini model is not ready. Please wait or reload the page.";return}
+      const story=String(storyInput.value||"").trim();
+      if(!story){storyInput.focus();return}
+      const model=window.cinemotionGeminiModel;
+      if(!model){status.textContent="Gemini model is not ready. Please wait or reload the page.";return}
       const vault=getVaultData(),duration=Math.max(1,Math.min(300,Number(durationInput.value)||10));
       const hasVideo=referenceFiles.some(f=>f.type.startsWith("video/"));
       const hasImage=referenceFiles.some(f=>f.type.startsWith("image/"));
       const toolIds=detectTools(story,hasVideo,hasImage),vfxIds=detectVfx(story);
       renderSpecialists(toolIds,vfxIds);
-      generateBtn.disabled=true;generateBtn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Designing shots...';
-      status.textContent="Gemini is analyzing the brief, "+toolIds.length+" specialist perspectives, "+vfxIds.length+" VFX routes and "+vault.length+" Vault entries.";
-      output.textContent="Director is analyzing the story and references...";
+      const attachedSummary=referenceFiles.length?"\n\n[Attached "+referenceFiles.length+" reference file(s)]":"";
+      appendChatMessage("user",story+attachedSummary);
+      output=appendChatMessage("assistant","");
+      storyInput.value="";
+      storyInput.style.height="auto";
+      generateBtn.disabled=true;
+      generateBtn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i>';
+      showTypingIndicator(output);
       try{
         const instruction=buildInstruction(story,duration,vault,toolIds,vfxIds,referenceFiles);
         const parts=[{text:instruction}];
         for(const file of referenceFiles){parts.push({inlineData:{data:await fileToBase64(file),mimeType:file.type||(file.name.toLowerCase().endsWith(".mp4")?"video/mp4":"application/octet-stream")}})}
         const payload=parts.length===1?instruction:parts;
-        const first=await model.generateContent(payload);
-        const firstResponse=await first.response;
-        const draft=firstResponse&&firstResponse.text?firstResponse.text():"";
+        let draft="";
+        if(typeof model.generateContentStream==="function"){
+          const streamResult=await model.generateContentStream(payload);
+          output.textContent="";
+          output.classList.add("prompt-engine-stream-cursor");
+          for await(const chunk of streamResult.stream){
+            const chunkText=chunk&&typeof chunk.text==="function"?chunk.text():"";
+            if(chunkText){draft+=chunkText;output.textContent=draft;scrollConversationToBottom()}
+          }
+          output.classList.remove("prompt-engine-stream-cursor");
+          if(!draft.trim()&&streamResult.response){
+            const streamedResponse=await streamResult.response;
+            draft=streamedResponse&&streamedResponse.text?streamedResponse.text():"";
+          }
+        }else{
+          const first=await model.generateContent(payload);
+          const firstResponse=await first.response;
+          draft=firstResponse&&firstResponse.text?firstResponse.text():"";
+          await animateFinalText(output,draft);
+        }
         if(!draft.trim())throw new Error("Gemini returned an empty response.");
-        status.textContent="First draft complete. Running prompt quality and constraint audit...";
-        output.textContent=draft+"\n\n[Quality audit in progress]";
+        status.textContent="Quality check in progress...";
         const qualityInstruction=[
           "You are CINEMOTION's final Prompt Quality Checker and Prompt Fidelity Auditor. Audit the following generated cinematic design against the user's original brief and explicit constraints. Score 0-100 across story/action clarity, camera/framing, camera movement, motion, lighting, composition/focus, continuity/constraints, timing/feasibility and model-ready clarity. Identify concrete errors, contradictions, missing critical requirements, unsupported additions and what should be fixed. If the draft is already strong, preserve it and do not rewrite needlessly. If below 90 or a critical issue exists, return a corrected complete output maintaining its sections and copy-ready prompt. Do not add new story content. Keep the final CONSTRAINTS then NEGATIVE PROMPT at the end. Return the corrected/final output only, with concise audit findings. LANGUAGE REQUIREMENT: keep the final answer in exactly the language used by the original brief, including Telugu or Romanized Telugu; preserve English filmmaking terms when useful. Do not switch Telugu requests into English.",
           "Original brief:\n"+story,
@@ -7262,11 +7325,20 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
           const audit=await model.generateContent(qualityInstruction);
           const auditResponse=await audit.response;
           const auditedText=auditResponse&&auditResponse.text?auditResponse.text():"";
-          if(auditedText.trim()){output.textContent=auditedText;status.textContent="Complete. "+toolIds.length+" AI specialists + "+vfxIds.length+" VFX routes selected; final quality audit completed. Vault: "+vault.length+" entries (Master Prompts excluded)."}
-          else{output.textContent=draft;status.textContent="Complete. Quality audit returned empty; original draft retained. Vault: "+vault.length+" entries."}
-        }catch(auditErr){console.warn("Prompt Engine quality audit failed; keeping first draft.",auditErr);output.textContent=draft;status.textContent="Draft complete, but quality audit failed. Original draft retained. "+(auditErr.message||"")}
-      }catch(err){console.error("Prompt Engine generation error:",err);output.textContent="Generation failed.\n\n"+(err&&err.message||String(err));status.textContent="Generation failed. Please try again."}
-      finally{generateBtn.disabled=false;generateBtn.innerHTML='<i class="fa-solid fa-arrow-up"></i>'}
+          if(auditedText.trim()&&auditedText!==draft)await animateFinalText(output,auditedText);
+          else if(!output.textContent.trim())output.textContent=draft;
+        }catch(auditErr){console.warn("Prompt Engine quality audit failed; keeping first draft.",auditErr)}
+        output.classList.remove("prompt-engine-stream-cursor");
+        scrollConversationToBottom();
+      }catch(err){
+        console.error("Prompt Engine generation error:",err);
+        output.classList.remove("prompt-engine-stream-cursor");
+        output.textContent="Generation failed.\n\n"+(err&&err.message||String(err));
+      }finally{
+        generateBtn.disabled=false;
+        generateBtn.innerHTML='<i class="fa-solid fa-arrow-up"></i>';
+        storyInput.focus();
+      }
     });
     copyBtn&&copyBtn.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(output.textContent||"");status.textContent="Result copied to clipboard."}catch(err){const range=document.createRange();range.selectNodeContents(output);const sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);status.textContent="Select the result and copy it manually."}});
   })();
