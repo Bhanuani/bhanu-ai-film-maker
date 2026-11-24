@@ -5782,13 +5782,13 @@ body::after{
         const doc = new DOMParser().parseFromString(html, "text/html");
         imageUrl = doc.querySelector("img[src]")?.getAttribute("src") || "";
       }
-      if (!imageUrl && /^https?:\\/\\//i.test(plain)) imageUrl = plain;
-      if (!imageUrl && /^data:image\\//i.test(plain)) imageUrl = plain;
+      if (!imageUrl && /^https?:\/\//i.test(plain)) imageUrl = plain;
+      if (!imageUrl && /^data:image\//i.test(plain)) imageUrl = plain;
       if (!imageUrl) return [];
 
       try {
         let blob;
-        if (/^data:image\\//i.test(imageUrl)) {
+        if (/^data:image\//i.test(imageUrl)) {
           const response = await fetch(imageUrl);
           blob = await response.blob();
         } else {
