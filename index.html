@@ -7129,3 +7129,38 @@ body.director-mode .search-box{display:none!important}
  .gemini-composer{width:calc(100% - 24px)!important}
 }
 </style>
+<style id="gemini-header-action-overlap-fix">
+/* Keep chat actions below the title row so they never collide with AI Director Suite. */
+#geminiPanel > .gemini-menu-drawer{
+  top:72px!important;
+  right:clamp(16px,4vw,48px)!important;
+  left:auto!important;
+  bottom:auto!important;
+  width:auto!important;
+  min-height:42px;
+  padding:5px 8px!important;
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:6px!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  border-radius:12px!important;
+  background:rgba(12,18,32,.96)!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.28)!important;
+  transform:none!important;
+  visibility:visible!important;
+  z-index:12!important;
+}
+#geminiPanel > .gemini-menu-drawer .gemini-menu-item{
+  white-space:nowrap!important;
+}
+@media(max-width:700px){
+  #geminiPanel > .gemini-menu-drawer{
+    top:68px!important;
+    right:12px!important;
+    min-height:38px;
+    padding:4px 6px!important;
+  }
+}
+</style>
