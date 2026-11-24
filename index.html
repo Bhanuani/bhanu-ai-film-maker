@@ -7035,10 +7035,34 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
   <div id="cinemotionPromptEngineModal" aria-hidden="true">
     <section class="prompt-engine-panel" role="dialog" aria-modal="true" aria-labelledby="promptEngineTitle">
       <header class="prompt-engine-head"><div class="prompt-engine-title" id="promptEngineTitle"><i class="fa-solid fa-clapperboard"></i> Cinematic Prompt Engine</div><button class="prompt-engine-close" id="promptEngineClose" aria-label="Close Prompt Engine">&times;</button></header>
-      <div class="prompt-engine-body">
-        <div class="prompt-engine-input-column"><label class="prompt-engine-label" for="promptEngineStory">Story / Scene Brief</label><textarea id="promptEngineStory" placeholder="Describe your story, scene, action, characters, location, mood, or constraints..."></textarea><div class="prompt-engine-reference-row"><button type="button" id="promptEngineAddReference"><i class="fa-solid fa-paperclip"></i> Add Image / Video Reference</button><input id="promptEngineReferenceInput" type="file" accept="image/*,video/*" multiple hidden><div id="promptEngineReferenceList" aria-live="polite"></div></div><label class="prompt-engine-duration"><span>Video duration (seconds)</span><input id="promptEngineDuration" type="number" min="1" max="300" value="10"></label><div class="prompt-engine-specialist-wrap"><div class="prompt-engine-label">Auto-selected AI specialists</div><div id="promptEngineSpecialists" class="prompt-engine-specialists">Specialists will be selected from your brief.</div></div><button id="promptEngineGenerate" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i> Design Cinematic Shots</button><div class="prompt-engine-data-note">Reuses Gemini specialist detection, VFX routing, media reference analysis, and live Directors Vault data. Master Prompts are excluded.</div><div id="promptEngineStatus" aria-live="polite"></div></div>
-        <div class="prompt-engine-result-column"><div class="prompt-engine-result-header"><div class="prompt-engine-label">Director's Shot Design</div><button id="promptEngineCopy" type="button"><i class="fa-solid fa-copy"></i> Copy Result</button></div><div id="promptEngineOutput">Your cinematic shot design will appear here.</div></div>
-      </div>
+      <main class="prompt-engine-chat">
+        <section class="prompt-engine-chat-thread" aria-label="Cinematic prompt conversation">
+          <div class="prompt-engine-chat-inner">
+            <div class="prompt-engine-result-header"><div class="prompt-engine-label">Cinematic Director</div><button id="promptEngineCopy" type="button" title="Copy response"><i class="fa-regular fa-copy"></i> Copy</button></div>
+            <div id="promptEngineOutput" aria-live="polite">What cinematic scene are we creating today?\n\nDescribe your idea below. I’ll turn it into a detailed, shot-by-shot video prompt.</div>
+          </div>
+        </section>
+        <section class="prompt-engine-composer-wrap" aria-label="Write your scene brief">
+          <div class="prompt-engine-composer">
+            <label class="prompt-engine-label" for="promptEngineStory">Message Cinematic Prompt Engine</label>
+            <textarea id="promptEngineStory" rows="3" placeholder="Describe the scene, action, characters, location, camera movement, mood, or constraints..."></textarea>
+            <div class="prompt-engine-reference-row">
+              <button type="button" id="promptEngineAddReference"><i class="fa-solid fa-paperclip"></i> Attach</button>
+              <input id="promptEngineReferenceInput" type="file" accept="image/*,video/*" multiple hidden>
+              <div id="promptEngineReferenceList" aria-live="polite"></div>
+            </div>
+            <div class="prompt-engine-composer-footer">
+              <div class="prompt-engine-composer-options">
+                <label class="prompt-engine-duration"><span>Duration</span><input id="promptEngineDuration" type="number" min="1" max="300" value="10"><span>sec</span></label>
+                <div class="prompt-engine-specialist-wrap"><span class="prompt-engine-label">AI specialists</span><div id="promptEngineSpecialists" class="prompt-engine-specialists">Auto-selected from your brief</div></div>
+              </div>
+              <button id="promptEngineGenerate" type="button" aria-label="Generate cinematic shot design"><i class="fa-solid fa-arrow-up"></i></button>
+            </div>
+          </div>
+          <div id="promptEngineStatus" aria-live="polite"></div>
+          <div class="prompt-engine-data-note">Powered by Gemini, specialist detection, VFX routing, reference analysis and Directors Vault.</div>
+        </section>
+      </main>
     </section>
   </div>
   <script>
@@ -7389,5 +7413,130 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
   #cinemotionPromptEngineModal .prompt-engine-body{padding-top:16px!important;padding-bottom:16px!important}
   #cinemotionPromptEngineModal .prompt-engine-input-column{gap:11px!important}
   #cinemotionPromptEngineModal #promptEngineStory{min-height:180px!important}
+}
+</style>
+ 
+<style id="cinemotion-prompt-engine-chatgpt-interface">
+/* ChatGPT-inspired conversation layout for Cinematic Prompt Engine */
+#cinemotionPromptEngineModal{background:#212121!important;backdrop-filter:none!important}
+#cinemotionPromptEngineModal .prompt-engine-panel{
+  background:#212121!important;color:#ececec!important;
+  display:flex!important;flex-direction:column!important;
+}
+#cinemotionPromptEngineModal .prompt-engine-head{
+  flex:0 0 60px!important;min-height:60px!important;padding:0 24px!important;
+  background:#212121!important;border-bottom:1px solid rgba(255,255,255,.07)!important;
+}
+#cinemotionPromptEngineModal .prompt-engine-title{font-size:16px!important;font-weight:650!important;letter-spacing:0!important;color:#f4f4f4!important}
+#cinemotionPromptEngineModal .prompt-engine-title i{color:#10a37f!important}
+#cinemotionPromptEngineModal .prompt-engine-close{border:0!important;background:transparent!important;color:#ddd!important;font-size:26px!important}
+#cinemotionPromptEngineModal .prompt-engine-chat{
+  flex:1 1 auto!important;min-height:0!important;display:flex!important;flex-direction:column!important;
+  overflow:hidden!important;width:100%!important;
+}
+#cinemotionPromptEngineModal .prompt-engine-chat-thread{
+  flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;
+  width:100%!important;padding:38px 22px 24px!important;scrollbar-width:thin!important;
+  scrollbar-color:#555 transparent!important;
+}
+#cinemotionPromptEngineModal .prompt-engine-chat-inner{
+  width:min(100%,820px)!important;margin:0 auto!important;min-height:100%!important;
+  display:flex!important;flex-direction:column!important;
+}
+#cinemotionPromptEngineModal .prompt-engine-result-header{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  padding:0 0 16px!important;border-bottom:1px solid rgba(255,255,255,.07)!important;
+}
+#cinemotionPromptEngineModal .prompt-engine-result-header .prompt-engine-label{
+  color:#b4b4b4!important;font-size:13px!important;letter-spacing:0!important;text-transform:none!important;
+}
+#cinemotionPromptEngineModal #promptEngineCopy{
+  border:0!important;background:transparent!important;color:#bdbdbd!important;
+  padding:7px 9px!important;font-size:13px!important;
+}
+#cinemotionPromptEngineModal #promptEngineCopy:hover{background:#303030!important;color:#fff!important;border-radius:8px!important}
+#cinemotionPromptEngineModal #promptEngineOutput{
+  flex:1 0 auto!important;min-height:180px!important;max-height:none!important;width:100%!important;
+  padding:28px 0 50px!important;overflow:visible!important;background:transparent!important;
+  border:0!important;border-radius:0!important;box-shadow:none!important;color:#ececec!important;
+  font:15px/1.85 'Plus Jakarta Sans',sans-serif!important;white-space:pre-wrap!important;
+}
+#cinemotionPromptEngineModal .prompt-engine-composer-wrap{
+  flex:0 0 auto!important;width:100%!important;padding:12px 22px 18px!important;
+  background:linear-gradient(180deg,rgba(33,33,33,0),#212121 22%)!important;
+}
+#cinemotionPromptEngineModal .prompt-engine-composer{
+  width:min(100%,820px)!important;margin:0 auto!important;padding:13px 14px 10px!important;
+  background:#303030!important;border:1px solid #454545!important;border-radius:26px!important;
+  box-shadow:0 4px 24px rgba(0,0,0,.18)!important;
+}
+#cinemotionPromptEngineModal .prompt-engine-composer:focus-within{
+  border-color:#666!important;box-shadow:0 0 0 1px rgba(255,255,255,.04)!important;
+}
+#cinemotionPromptEngineModal .prompt-engine-composer>.prompt-engine-label{
+  display:none!important;
+}
+#cinemotionPromptEngineModal #promptEngineStory{
+  display:block!important;width:100%!important;min-height:58px!important;max-height:220px!important;
+  height:auto!important;resize:none!important;overflow-y:auto!important;padding:7px 5px 12px!important;
+  border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
+  color:#f3f3f3!important;font:15px/1.65 'Plus Jakarta Sans',sans-serif!important;outline:none!important;
+}
+#cinemotionPromptEngineModal #promptEngineStory::placeholder{color:#9b9b9b!important}
+#cinemotionPromptEngineModal .prompt-engine-reference-row{
+  display:flex!important;flex-direction:row!important;align-items:center!important;flex-wrap:wrap!important;gap:8px!important;
+  padding:0 2px 9px!important;
+}
+#cinemotionPromptEngineModal .prompt-engine-reference-row>button{
+  align-self:center!important;background:transparent!important;border:1px solid #555!important;
+  border-radius:18px!important;color:#ddd!important;padding:7px 11px!important;font-size:12px!important;
+}
+#cinemotionPromptEngineModal .prompt-engine-reference-item{
+  background:#3b3b3b!important;border:1px solid #555!important;border-radius:12px!important;
+}
+#cinemotionPromptEngineModal .prompt-engine-composer-footer{
+  display:flex!important;align-items:flex-end!important;justify-content:space-between!important;gap:12px!important;
+  border-top:1px solid rgba(255,255,255,.08)!important;padding-top:9px!important;
+}
+#cinemotionPromptEngineModal .prompt-engine-composer-options{
+  display:flex!important;align-items:center!important;gap:16px!important;min-width:0!important;flex-wrap:wrap!important;
+}
+#cinemotionPromptEngineModal .prompt-engine-duration{gap:6px!important;color:#bdbdbd!important;font-size:12px!important}
+#cinemotionPromptEngineModal .prompt-engine-duration input{
+  width:48px!important;padding:5px 4px!important;text-align:center!important;
+  border:0!important;border-radius:7px!important;background:#414141!important;color:#eee!important;
+}
+#cinemotionPromptEngineModal .prompt-engine-specialist-wrap{gap:5px!important;min-width:0!important}
+#cinemotionPromptEngineModal .prompt-engine-specialist-wrap>.prompt-engine-label{
+  font-size:10px!important;letter-spacing:0!important;text-transform:none!important;color:#929292!important;
+}
+#cinemotionPromptEngineModal .prompt-engine-specialists{max-height:44px!important;overflow:auto!important;gap:4px!important}
+#cinemotionPromptEngineModal .prompt-engine-specialist-chip{
+  background:#3c3c3c!important;border:1px solid #555!important;color:#d4d4d4!important;
+  border-radius:12px!important;padding:3px 7px!important;font-size:10px!important;
+}
+#cinemotionPromptEngineModal #promptEngineGenerate{
+  flex:0 0 36px!important;width:36px!important;height:36px!important;padding:0!important;
+  border:0!important;border-radius:50%!important;background:#f4f4f4!important;color:#202020!important;
+  font-size:16px!important;box-shadow:none!important;cursor:pointer!important;
+}
+#cinemotionPromptEngineModal #promptEngineGenerate:hover{background:#fff!important;transform:scale(1.04)!important}
+#cinemotionPromptEngineModal #promptEngineGenerate:disabled{background:#777!important;color:#333!important}
+#cinemotionPromptEngineModal #promptEngineStatus{
+  width:min(100%,820px)!important;margin:8px auto 0!important;color:#aaa!important;font-size:11px!important;
+}
+#cinemotionPromptEngineModal .prompt-engine-data-note{
+  width:min(100%,820px)!important;margin:5px auto 0!important;text-align:center!important;
+  color:#777!important;font-size:10px!important;
+}
+@media(max-width:760px){
+  #cinemotionPromptEngineModal .prompt-engine-head{padding:0 15px!important}
+  #cinemotionPromptEngineModal .prompt-engine-chat-thread{padding:24px 16px 16px!important}
+  #cinemotionPromptEngineModal .prompt-engine-composer-wrap{padding:8px 10px 12px!important}
+  #cinemotionPromptEngineModal .prompt-engine-composer{border-radius:22px!important;padding:11px!important}
+  #cinemotionPromptEngineModal .prompt-engine-composer-options{gap:9px!important}
+  #cinemotionPromptEngineModal .prompt-engine-specialist-wrap{max-width:100%!important}
+  #cinemotionPromptEngineModal .prompt-engine-specialists{max-width:58vw!important}
+  #cinemotionPromptEngineModal #promptEngineOutput{font-size:14px!important;padding-top:20px!important}
 }
 </style>
