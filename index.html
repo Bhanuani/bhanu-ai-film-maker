@@ -5763,12 +5763,46 @@ body::after{
       resetGeminiConversation();
     });
     // Restore an image already sent in chat by dragging its thumbnail back into the composer or a frame slot.
-    function getGeminiDroppedImages(event) {
-      const key = event.dataTransfer?.getData("application/x-cinemotion-sent-image") ||
-        (event.dataTransfer?.getData("text/plain") || "").replace(/^CINEMOTION_IMAGE:/, "");
+    async function getGeminiDroppedImages(event) {
+      const transfer = event.dataTransfer;
+      const key = transfer?.getData("application/x-cinemotion-sent-image") ||
+        (transfer?.getData("text/plain") || "").replace(/^CINEMOTION_IMAGE:/, "");
       const stored = key ? geminiDraggedImageFiles.get(key) : null;
-      const external = Array.from(event.dataTransfer?.files || []).filter(file => file.type.startsWith("image/"));
-      return stored ? [stored] : external;
+      if (stored) return [stored];
+
+      const localFiles = Array.from(transfer?.files || []).filter(file => file.type.startsWith("image/"));
+      if (localFiles.length) return localFiles;
+
+      // Browsers often expose cross-site dragged images as URLs/HTML instead of File objects.
+      const uriList = (transfer?.getData("text/uri-list") || "").split(/\\r?\\n/).map(v => v.trim()).find(v => v && !v.startsWith("#"));
+      const plain = (transfer?.getData("text/plain") || "").trim();
+      const html = transfer?.getData("text/html") || "";
+      let imageUrl = uriList || "";
+      if (!imageUrl && html) {
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        imageUrl = doc.querySelector("img[src]")?.getAttribute("src") || "";
+      }
+      if (!imageUrl && /^https?:\\/\\//i.test(plain)) imageUrl = plain;
+      if (!imageUrl && /^data:image\\//i.test(plain)) imageUrl = plain;
+      if (!imageUrl) return [];
+
+      try {
+        let blob;
+        if (/^data:image\\//i.test(imageUrl)) {
+          const response = await fetch(imageUrl);
+          blob = await response.blob();
+        } else {
+          const response = await fetch(imageUrl, { mode: "cors", credentials: "omit" });
+          if (!response.ok) throw new Error("Image host returned HTTP " + response.status);
+          blob = await response.blob();
+        }
+        if (!blob.type.startsWith("image/")) throw new Error("The dragged link is not a directly accessible image.");
+        const extension = (blob.type.split("/")[1] || "png").replace("jpeg","jpg").split("+")[0];
+        return [new File([blob], "external-image." + extension, { type: blob.type })];
+      } catch (error) {
+        console.warn("External image drag could not be fetched:", error);
+        throw new Error("This site did not provide the image as a file, and its image URL blocks cross-site access (CORS or login protection). Save/download the image first, then drag the downloaded file here.");
+      }
     }
     function addGeminiImagesToComposer(files) {
       const valid = files.filter(file => file.type.startsWith("image/"));
@@ -5789,9 +5823,8 @@ body::after{
     function bindGeminiImageDropTarget(target, onDrop) {
       if (!target) return;
       target.addEventListener("dragover", event => {
-        if (event.dataTransfer?.types?.includes("application/x-cinemotion-sent-image") ||
-            event.dataTransfer?.types?.includes("Files") ||
-            Array.from(event.dataTransfer?.types || []).includes("text/plain")) {
+        const types = Array.from(event.dataTransfer?.types || []);
+        if (types.some(type => ["application/x-cinemotion-sent-image","Files","text/plain","text/uri-list","text/html"].includes(type))) {
           event.preventDefault();
           event.dataTransfer.dropEffect = "copy";
           target.classList.add("gemini-image-drop-active");
@@ -5800,13 +5833,21 @@ body::after{
       target.addEventListener("dragleave", event => {
         if (!target.contains(event.relatedTarget)) target.classList.remove("gemini-image-drop-active");
       });
-      target.addEventListener("drop", event => {
-        const files = getGeminiDroppedImages(event);
-        if (!files.length) return;
+      target.addEventListener("drop", async event => {
+        const types = Array.from(event.dataTransfer?.types || []);
+        if (!types.some(type => ["application/x-cinemotion-sent-image","Files","text/plain","text/uri-list","text/html"].includes(type))) return;
         event.preventDefault();
         event.stopPropagation();
-        target.classList.remove("gemini-image-drop-active");
-        onDrop(files, event);
+        target.classList.add("gemini-image-drop-active");
+        try {
+          const files = await getGeminiDroppedImages(event);
+          if (files.length) onDrop(files, event);
+          else addGeminiMessage("No image file was found in that drag. Try dragging the actual image or downloading it first.", "assistant", true);
+        } catch (error) {
+          addGeminiMessage(error.message || "Could not import the dragged image.", "assistant", true);
+        } finally {
+          target.classList.remove("gemini-image-drop-active");
+        }
       });
     }
     function renderStoryFrameSlots() {
