@@ -4855,6 +4855,8 @@ body::after{
     let geminiUploadAnalysisPromise = null;
     let geminiUploadAnalysisBubble = null;
     const geminiChatImageObjectUrls = [];
+    const geminiDraggedImageFiles = new Map();
+    let geminiDraggedImageSequence = 0;
     const GEMINI_MAX_FILE_BYTES = 15 * 1024 * 1024;
 
     function openGeminiPanel() {
@@ -4937,6 +4939,18 @@ body::after{
       imageFiles.forEach(file=>{
         const url=URL.createObjectURL(file); geminiChatImageObjectUrls.push(url);
         const card=document.createElement("div");card.className="gemini-user-image-card";
+        card.draggable = true;
+        const dragKey = "cine-image-" + (++geminiDraggedImageSequence);
+        geminiDraggedImageFiles.set(dragKey, file);
+        card.dataset.dragImageKey = dragKey;
+        card.title = "Drag this sent image into a story frame or the message box";
+        card.addEventListener("dragstart", event => {
+          event.dataTransfer.effectAllowed = "copy";
+          event.dataTransfer.setData("application/x-cinemotion-sent-image", dragKey);
+          event.dataTransfer.setData("text/plain", "CINEMOTION_IMAGE:" + dragKey);
+          card.classList.add("is-dragging");
+        });
+        card.addEventListener("dragend", () => card.classList.remove("is-dragging"));
         const img=document.createElement("img");img.src=url;img.alt=file.name;img.title=file.name;
         img.addEventListener("click",()=>openGeminiImageViewer(url));
         const copy=document.createElement("button");copy.type="button";copy.className="gemini-user-image-copy";copy.title="Copy image";copy.setAttribute("aria-label","Copy image");copy.innerHTML='<i class="fa-regular fa-copy"></i>';
@@ -5748,6 +5762,53 @@ body::after{
     geminiClearChat?.addEventListener("click", () => {
       resetGeminiConversation();
     });
+    // Restore an image already sent in chat by dragging its thumbnail back into the composer or a frame slot.
+    function getGeminiDroppedImages(event) {
+      const key = event.dataTransfer?.getData("application/x-cinemotion-sent-image") ||
+        (event.dataTransfer?.getData("text/plain") || "").replace(/^CINEMOTION_IMAGE:/, "");
+      const stored = key ? geminiDraggedImageFiles.get(key) : null;
+      const external = Array.from(event.dataTransfer?.files || []).filter(file => file.type.startsWith("image/"));
+      return stored ? [stored] : external;
+    }
+    function addGeminiImagesToComposer(files) {
+      const valid = files.filter(file => file.type.startsWith("image/"));
+      if (!valid.length) return;
+      if (valid.some(file => file.size > GEMINI_MAX_FILE_BYTES)) {
+        addGeminiMessage("Each image must be smaller than 15 MB.", "assistant", true);
+        return;
+      }
+      const combined = [...geminiSelectedFiles, ...valid];
+      if (combined.length > 7) {
+        addGeminiMessage("Maximum 7 images per message. Remove an attachment first.", "assistant", true);
+        return;
+      }
+      geminiSelectedFiles = combined;
+      showGeminiAttachments(combined);
+      startUploadImageIntelligence(combined);
+    }
+    function bindGeminiImageDropTarget(target, onDrop) {
+      if (!target) return;
+      target.addEventListener("dragover", event => {
+        if (event.dataTransfer?.types?.includes("application/x-cinemotion-sent-image") ||
+            event.dataTransfer?.types?.includes("Files") ||
+            Array.from(event.dataTransfer?.types || []).includes("text/plain")) {
+          event.preventDefault();
+          event.dataTransfer.dropEffect = "copy";
+          target.classList.add("gemini-image-drop-active");
+        }
+      });
+      target.addEventListener("dragleave", event => {
+        if (!target.contains(event.relatedTarget)) target.classList.remove("gemini-image-drop-active");
+      });
+      target.addEventListener("drop", event => {
+        const files = getGeminiDroppedImages(event);
+        if (!files.length) return;
+        event.preventDefault();
+        event.stopPropagation();
+        target.classList.remove("gemini-image-drop-active");
+        onDrop(files, event);
+      });
+    }
     function renderStoryFrameSlots() {
       if (!geminiFrameSlots) return;
       geminiFrameSlots.replaceChildren();
@@ -5757,6 +5818,23 @@ body::after{
         slot.addEventListener("pointerenter", activateSlot);
         slot.addEventListener("focusin", activateSlot);
         slot.addEventListener("click", activateSlot);
+        bindGeminiImageDropTarget(slot, files => {
+          const fileToPlace = files[0];
+          if (fileToPlace.size > GEMINI_MAX_FILE_BYTES) {
+            addGeminiMessage("Each reference image must be smaller than 15 MB.", "assistant", true);
+            return;
+          }
+          if (storyReferenceCount() >= 7 && !geminiStoryFrames[slotIndex]) {
+            addGeminiMessage("Maximum 7 reference images total. Remove one first.", "assistant", true);
+            return;
+          }
+          geminiActiveFrameSlot = slotIndex;
+          geminiStoryFrames[slotIndex] = fileToPlace;
+          renderStoryFrameSlots();
+          renderStoryIngredients();
+          updateStoryReferenceCount();
+          startUploadImageIntelligence([...geminiStoryFrames.filter(Boolean), ...geminiStoryIngredients]);
+        });
         const input = document.createElement("input"); input.type = "file"; input.accept = "image/*"; input.hidden = true;
         input.addEventListener("change", () => {
           const selected = input.files?.[0]; if (!selected) return;
@@ -5928,6 +6006,7 @@ body::after{
       showGeminiAttachments(combined);
       startUploadImageIntelligence(combined);
     });
+    bindGeminiImageDropTarget(geminiForm, files => addGeminiImagesToComposer(files));
     geminiForm?.addEventListener("submit", (event) => {
       event.preventDefault();
       const value = geminiInput?.value || "";
@@ -7163,4 +7242,9 @@ body.director-mode .search-box{display:none!important}
     padding:4px 6px!important;
   }
 }
+</style>
+<style id="gemini-sent-image-drag-drop">
+#geminiMessages .gemini-user-image-card[draggable="true"]{cursor:grab}
+#geminiMessages .gemini-user-image-card.is-dragging{opacity:.48;cursor:grabbing}
+.gemini-image-drop-active{outline:2px dashed #45d7ff!important;outline-offset:3px!important;background-color:rgba(45,190,255,.10)!important}
 </style>
