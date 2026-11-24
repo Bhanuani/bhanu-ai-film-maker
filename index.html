@@ -7043,7 +7043,7 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
                 <div class="prompt-engine-avatar"><i class="fa-solid fa-clapperboard"></i></div>
                 <div class="prompt-engine-message-content">
                   <div class="prompt-engine-message-heading">Cinematic Director <button id="promptEngineCopy" type="button" title="Copy response"><i class="fa-regular fa-copy"></i> Copy</button></div>
-                  <div id="promptEngineOutput" class="prompt-engine-message-text">What cinematic scene are we creating today?\n\nDescribe your idea below. I’ll turn it into a detailed, shot-by-shot video prompt.</div>
+                  <div id="promptEngineOutput" class="prompt-engine-message-text">What cinematic scene are we creating today?<br><br>Describe your idea below. I’ll turn it into a detailed, shot-by-shot video prompt.</div>
                 </div>
               </article>
             </div>
@@ -7294,23 +7294,29 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
         for(const file of referenceFiles){parts.push({inlineData:{data:await fileToBase64(file),mimeType:file.type||(file.name.toLowerCase().endsWith(".mp4")?"video/mp4":"application/octet-stream")}})}
         const payload=parts.length===1?instruction:parts;
         let draft="";
-        if(typeof model.generateContentStream==="function"){
-          const streamResult=await model.generateContentStream(payload);
+        const chatSession=model.startChat();
+        try{
+          const streamResult=await chatSession.sendMessageStream(payload);
           output.textContent="";
           output.classList.add("prompt-engine-stream-cursor");
-          for await(const chunk of streamResult.stream){
-            const chunkText=chunk&&typeof chunk.text==="function"?chunk.text():"";
-            if(chunkText){draft+=chunkText;output.textContent=draft;scrollConversationToBottom()}
+          if(streamResult&&streamResult.stream){
+            for await(const chunk of streamResult.stream){
+              const chunkText=chunk&&typeof chunk.text==="function"?chunk.text():"";
+              if(chunkText){draft+=chunkText;output.textContent=draft;scrollConversationToBottom()}
+            }
+          }
+          if(streamResult&&streamResult.response){
+            const finalStreamResponse=await streamResult.response;
+            if(!draft.trim()&&finalStreamResponse&&typeof finalStreamResponse.text==="function")draft=finalStreamResponse.text();
           }
           output.classList.remove("prompt-engine-stream-cursor");
-          if(!draft.trim()&&streamResult.response){
-            const streamedResponse=await streamResult.response;
-            draft=streamedResponse&&streamedResponse.text?streamedResponse.text():"";
-          }
-        }else{
-          const first=await model.generateContent(payload);
-          const firstResponse=await first.response;
-          draft=firstResponse&&firstResponse.text?firstResponse.text():"";
+        }catch(streamError){
+          console.warn("Prompt Engine streaming failed; retrying with standard chat response:",streamError);
+          output.classList.remove("prompt-engine-stream-cursor");
+          output.textContent="";
+          const fallbackResult=await chatSession.sendMessage(payload);
+          const fallbackResponse=await fallbackResult.response;
+          draft=fallbackResponse&&typeof fallbackResponse.text==="function"?fallbackResponse.text():"";
           await animateFinalText(output,draft);
         }
         if(!draft.trim())throw new Error("Gemini returned an empty response.");
