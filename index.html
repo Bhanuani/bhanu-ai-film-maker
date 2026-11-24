@@ -4129,7 +4129,7 @@ body::after{
               }]
             }
           },
-          { timeout: 90000 }
+          { timeout: 180000 }
         );
         console.info(`CINEMOTION: Firebase AI Logic initialized with ${CINEMOTION_GEMINI_MODEL_ID} (90s timeout).`);
       } catch (aiError) {
@@ -5054,6 +5054,36 @@ body::after{
       });
     }
 
+    // Reduce image payload before Gemini requests. Original files remain untouched for chat previews.
+    async function prepareGeminiImageFile(file) {
+      if (!file?.type?.startsWith("image/")) return file;
+      const maxDimension = 1600;
+      try {
+        const bitmap = await createImageBitmap(file);
+        const scale = Math.min(1, maxDimension / Math.max(bitmap.width, bitmap.height));
+        if (scale === 1 && file.size <= 1_200_000 && /image\/(jpeg|webp)/i.test(file.type)) {
+          bitmap.close?.();
+          return file;
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+        canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+        const ctx = canvas.getContext("2d", { alpha: false });
+        if (!ctx) { bitmap.close?.(); return file; }
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+        bitmap.close?.();
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.84));
+        if (!blob || blob.size >= file.size) return file;
+        const baseName = (file.name || "reference-image").replace(/\.[^.]+$/, "");
+        return new File([blob], baseName + ".jpg", { type: "image/jpeg", lastModified: file.lastModified || Date.now() });
+      } catch (error) {
+        console.warn("CINEMOTION image optimization skipped for", file?.name, error);
+        return file;
+      }
+    }
+
     function getInstantGreetingReply(text) {
       const value = String(text || "").trim().toLowerCase()
         .replace(/[.!?,;:]+$/g, "")
@@ -5196,9 +5226,10 @@ body::after{
           const mediaParts = await Promise.all(attachedFiles.map(async file => ({ inlineData: { data: await fileToBase64(file), mimeType: file.type || (file.name.toLowerCase().endsWith(".mp4") ? "video/mp4" : "application/octet-stream") } })));
           messagePayload = [{ text: messagePayload }, ...mediaParts];
         } else if (attachedFiles.length > 1) {
-          const imageParts = await Promise.all(attachedFiles.map(async file => ({
-            inlineData: { data: await fileToBase64(file), mimeType: file.type || "image/jpeg" }
-          })));
+          const imageParts = await Promise.all(attachedFiles.map(async file => {
+            const optimizedFile = await prepareGeminiImageFile(file);
+            return { inlineData: { data: await fileToBase64(optimizedFile), mimeType: optimizedFile.type || "image/jpeg" } };
+          }));
           messagePayload = [{ text: messagePayload }, ...imageParts];
         } else if (attachedFiles.length === 1) {
           attachedFile = attachedFiles[0];
@@ -5656,7 +5687,7 @@ body::after{
           let friendlyError;
 
           if (lowerError.includes("timeout") || lowerError.includes("timed out") || lowerError.includes("deadline")) {
-            friendlyError = "Gemini is taking longer than expected. The request timeout is 90 seconds. If this happens repeatedly, check Firebase AI Logic availability, your internet connection, and Firebase Console > AI monitoring.";
+            friendlyError = "Gemini is taking longer than expected. The request timeout is 180 seconds. If this happens repeatedly, check Firebase AI Logic availability, your internet connection, and Firebase Console > AI monitoring.";
           } else if (lowerError.includes("app check") || lowerError.includes("attestation") || lowerError.includes("403")) {
             friendlyError = "Firebase App Check blocked the Gemini request. Confirm that this website domain is registered for the correct Firebase web app and that the reCAPTCHA Enterprise site key matches the key registered in Firebase App Check.";
           } else if (lowerError.includes("429") || lowerError.includes("quota") || lowerError.includes("resource_exhausted")) {
