@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CINEMOTION supervised training example",
+  "type": "object",
+  "required": ["id", "language", "brief", "duration_seconds", "ideal_answer", "review"],
+  "properties": {
+    "id": {"type": "string"},
+    "language": {"enum": ["te", "romanized-te", "en", "mixed"]},
+    "brief": {"type": "string", "minLength": 2},
+    "duration_seconds": {"type": "integer", "minimum": 1, "maximum": 300},
+    "specialists": {"type": "array", "items": {"type": "string"}},
+    "vfx": {"type": "array", "items": {"type": "string"}},
+    "constraints": {"type": "array", "items": {"type": "string"}},
+    "ideal_answer": {"type": "string", "minLength": 20},
+    "review": {
+      "type": "object",
+      "required": ["status", "reviewer", "license_or_permission"],
+      "properties": {
+        "status": {"enum": ["draft", "approved", "rejected"]},
+        "reviewer": {"type": "string"},
+        "license_or_permission": {"type": "string"},
+        "notes": {"type": "string"}
+      }
+    }
+  }
+}
