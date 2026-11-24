@@ -7083,6 +7083,16 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
     if(!modal||!launcher||!generateBtn||!output)return;
     let referenceFiles=[];
     const MAX_BYTES=15*1024*1024;
+    if(storyInput){
+      const resizeStory=()=>{storyInput.style.height="auto";storyInput.style.height=Math.min(storyInput.scrollHeight,220)+"px";};
+      storyInput.addEventListener("input",resizeStory);
+      storyInput.addEventListener("keydown",event=>{
+        if(event.key==="Enter"&&!event.shiftKey&&!event.isComposing){
+          event.preventDefault();
+          if(!generateBtn.disabled)generateBtn.click();
+        }
+      });
+    }
     function open(){modal.classList.add("open");modal.setAttribute("aria-hidden","false");setTimeout(()=>storyInput&&storyInput.focus(),80)}
     function close(){modal.classList.remove("open");modal.setAttribute("aria-hidden","true")}
     launcher.addEventListener("click",open);closeBtn&&closeBtn.addEventListener("click",close);
