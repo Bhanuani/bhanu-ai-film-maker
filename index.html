@@ -4131,7 +4131,7 @@ body::after{
           },
           { timeout: 180000 }
         );
-        console.info(`CINEMOTION: Firebase AI Logic initialized with ${CINEMOTION_GEMINI_MODEL_ID} (90s timeout).`);
+        console.info(`CINEMOTION: Firebase AI Logic initialized with ${CINEMOTION_GEMINI_MODEL_ID} (180s timeout).`);
       } catch (aiError) {
         window.cinemotionGeminiModel = null;
         console.error("Firebase AI Logic initialization failed:", aiError);
@@ -5057,26 +5057,29 @@ body::after{
     // Reduce image payload before Gemini requests. Original files remain untouched for chat previews.
     async function prepareGeminiImageFile(file) {
       if (!file?.type?.startsWith("image/")) return file;
-      const maxDimension = 1600;
       try {
         const bitmap = await createImageBitmap(file);
-        const scale = Math.min(1, maxDimension / Math.max(bitmap.width, bitmap.height));
-        if (scale === 1 && file.size <= 1_200_000 && /image\/(jpeg|webp)/i.test(file.type)) {
-          bitmap.close?.();
-          return file;
-        }
-        const canvas = document.createElement("canvas");
-        canvas.width = Math.max(1, Math.round(bitmap.width * scale));
-        canvas.height = Math.max(1, Math.round(bitmap.height * scale));
-        const ctx = canvas.getContext("2d", { alpha: false });
-        if (!ctx) { bitmap.close?.(); return file; }
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+        const originalWidth = bitmap.width;
+        const originalHeight = bitmap.height;
+        const baseName = (file.name || "reference-image").replace(/\\.[^.]+$/, "");
+        const encode = async (maxDimension, quality) => {
+          const scale = Math.min(1, maxDimension / Math.max(originalWidth, originalHeight));
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.max(1, Math.round(originalWidth * scale));
+          canvas.height = Math.max(1, Math.round(originalHeight * scale));
+          const ctx = canvas.getContext("2d", { alpha: false });
+          if (!ctx) return null;
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+          return await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", quality));
+        };
+        // Storyboard analysis needs detail, but sending six original PNGs creates oversized requests.
+        let blob = await encode(1280, 0.76);
+        if (blob && blob.size > 550 * 1024) blob = await encode(1024, 0.68);
         bitmap.close?.();
-        const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.84));
         if (!blob || blob.size >= file.size) return file;
-        const baseName = (file.name || "reference-image").replace(/\.[^.]+$/, "");
+        console.info("CINEMOTION image optimized:", file.name, file.size, "->", blob.size, "bytes");
         return new File([blob], baseName + ".jpg", { type: "image/jpeg", lastModified: file.lastModified || Date.now() });
       } catch (error) {
         console.warn("CINEMOTION image optimization skipped for", file?.name, error);
