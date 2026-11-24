@@ -7677,3 +7677,20 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
  #cinemotionPromptEngineModal .prompt-engine-message-text{font-size:14px!important}
 }
 </style>
+
+<style id="cinemotion-prompt-engine-user-right-align">
+/* Align submitted user briefs to the right, like a ChatGPT user turn. */
+#cinemotionPromptEngineModal .prompt-engine-message.user-message{justify-content:flex-end!important;align-self:stretch!important}
+#cinemotionPromptEngineModal .prompt-engine-message.user-message .prompt-engine-avatar{display:none!important}
+#cinemotionPromptEngineModal .prompt-engine-message.user-message .prompt-engine-message-content{
+  flex:0 1 auto!important;width:auto!important;max-width:min(78%,680px)!important;
+  display:flex!important;justify-content:flex-end!important;
+}
+#cinemotionPromptEngineModal .prompt-engine-message.user-message .prompt-engine-message-text{
+  display:block!important;width:fit-content!important;max-width:100%!important;text-align:left!important;
+  border-radius:20px!important;padding:12px 18px!important;background:#303030!important;color:#f2f2f2!important;
+}
+@media(max-width:760px){
+  #cinemotionPromptEngineModal .prompt-engine-message.user-message .prompt-engine-message-content{max-width:88%!important}
+}
+</style>
