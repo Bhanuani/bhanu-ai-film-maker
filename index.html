@@ -7375,6 +7375,54 @@ import { RoomEnvironment } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/exam
     });
   }
 
+  function buildFallbackBee() {
+    const black = new THREE.MeshStandardMaterial({color:0x17120d,roughness:.62});
+    const gold = new THREE.MeshStandardMaterial({color:0xf4b82e,roughness:.48});
+    const darkGold = new THREE.MeshStandardMaterial({color:0xc98618,roughness:.55});
+    const eye = new THREE.MeshStandardMaterial({color:0x08090c,roughness:.18});
+    function oval(material, position, scale) {
+      const mesh = new THREE.Mesh(new THREE.SphereGeometry(1,24,18),material);
+      mesh.position.set(...position); mesh.scale.set(...scale); holder.add(mesh); return mesh;
+    }
+    oval(black,[.30,0,0],[.34,.29,.29]);
+    oval(gold,[0,-.015,0],[.39,.34,.34]);
+    oval(black,[-.24,-.02,0],[.18,.19,.20]);
+    oval(gold,[-.48,.045,0],[.22,.22,.22]);
+    oval(eye,[-.53,.11,.17],[.055,.065,.055]);
+    oval(eye,[-.53,.11,-.17],[.055,.065,.055]);
+    oval(black,[-.60,-.02,0],[.075,.045,.07]);
+    const antennaMat = new THREE.MeshStandardMaterial({color:0x17120d});
+    [-1,1].forEach(side=>{
+      const curve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(-.56,.20,side*.08),
+        new THREE.Vector3(-.62,.34,side*.12),
+        new THREE.Vector3(-.70,.36,side*.15)
+      ]);
+      const antenna = new THREE.Mesh(new THREE.TubeGeometry(curve,10,.012,6,false),antennaMat);
+      holder.add(antenna);
+    });
+  }
+
+  function makeFallbackWingTexture() {
+    const c=document.createElement('canvas');c.width=1024;c.height=576;
+    const ctx=c.getContext('2d');
+    ctx.clearRect(0,0,c.width,c.height);
+    const grad=ctx.createLinearGradient(0,0,1024,576);
+    grad.addColorStop(0,'rgba(210,244,255,.8)');
+    grad.addColorStop(.45,'rgba(153,190,255,.48)');
+    grad.addColorStop(1,'rgba(226,207,255,.16)');
+    ctx.fillStyle=grad;ctx.beginPath();ctx.moveTo(0,288);
+    ctx.bezierCurveTo(220,20,720,35,1020,280);
+    ctx.bezierCurveTo(740,570,240,550,0,288);ctx.fill();
+    ctx.strokeStyle='rgba(235,247,255,.8)';ctx.lineWidth=5;
+    ctx.beginPath();ctx.moveTo(0,288);ctx.quadraticCurveTo(470,260,1010,280);ctx.stroke();
+    for(let i=1;i<9;i++){
+      ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(20,288);
+      ctx.quadraticCurveTo(360,288+(i-5)*35,1010,280+(i-5)*24);ctx.stroke();
+    }
+    const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;return tex;
+  }
+
   function addWingSide(anchor, texture, mirror) {
     const side = new THREE.Group();
     side.position.copy(anchor);
@@ -7427,7 +7475,7 @@ import { RoomEnvironment } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/exam
         bounds.max.y*.86,
         (bounds.max.z-bounds.min.z)*.05
       );
-      const wingTexture = await makeWingTexture();
+      let wingTexture;\n      try { wingTexture = await makeWingTexture(); } catch (wingError) { console.warn('CINEMOTION wing texture fallback:',wingError); wingTexture=makeFallbackWingTexture(); }
       addWingSide(anchor,wingTexture,false);
       addWingSide(anchor,wingTexture,true);
       canvas.dataset.ready = 'true';
