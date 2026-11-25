@@ -7305,6 +7305,14 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
   }
 </style>
 <canvas id="cinemotion-scroll-bee-canvas" aria-hidden="true"></canvas>
+<script type="importmap" id="cinemotion-scroll-bee-importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
 <script type="module" id="cinemotion-scroll-bee-script">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
