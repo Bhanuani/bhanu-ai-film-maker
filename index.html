@@ -7305,9 +7305,6 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
     transition: opacity .7s ease; display: block;
   }
   #cinemotion-scroll-bee-canvas.is-active { opacity: 1; }
-  @media (max-width: 760px) {
-    #cinemotion-scroll-bee-canvas { display: none !important; }
-  }
   @media (prefers-reduced-motion: reduce) {
     #cinemotion-scroll-bee-canvas { transition: none; }
   }
@@ -7322,7 +7319,7 @@ import { RoomEnvironment } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/exam
 (() => {
   const canvas = document.getElementById('cinemotion-scroll-bee-canvas');
   const landing = document.getElementById('cinemotionLandingTop');
-  if (!canvas || !landing || window.innerWidth <= 760 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!canvas || !landing || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   const MODEL_URL = 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20261017_132918_e8364d8f-7df2-4788-a725-dec28ec19af8.glb';
   const WING_URL = 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20261017_132814_3a56ac14-47d8-4e49-a163-94234dea5639.png';
@@ -7554,7 +7551,6 @@ import { RoomEnvironment } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/exam
   }
   window.addEventListener('pointermove',onPointer,{passive:true});
   window.addEventListener('resize',()=>{
-    if(window.innerWidth<=760){canvas.classList.remove('is-active');return;}
     camera.aspect=window.innerWidth/window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth,window.innerHeight,false);
