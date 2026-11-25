@@ -7280,7 +7280,8 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
         <label for="cinemotionVoiceLanguage">Voice language</label><select id="cinemotionVoiceLanguage"><option value="te-IN">తెలుగు (Telugu)</option><option value="en-IN">English</option></select>
         <button type="button" id="cinemotionVoiceStart" class="cinemotion-voice-start">🎙 Start listening</button>
         <button type="button" id="cinemotionVoiceStop" class="cinemotion-voice-stop" disabled>Stop listening</button>
-        <div id="cinemotionVoiceStatus" class="cinemotion-voice-status" aria-live="polite">Microphone is off.</div>
+        <button type="button" id="cinemotionReplayGreeting" class="cinemotion-voice-replay">🔊 Hear greeting again</button>
+        <div id="cinemotionVoiceStatus" class="cinemotion-voice-status" aria-live="polite">Assistant voice is ready. Choose Telugu or English.</div>
       </section>
       <section class="cinemotion-assistant-command-card"><span class="cinemotion-assistant-eyebrow">ASSISTANT INPUT</span><h2>What should I do?</h2><textarea id="cinemotionAssistantPrompt" rows="4" placeholder="Speak or type your instruction..."></textarea><button type="button" id="cinemotionSendToGemini" class="cinemotion-send-gemini">Continue in Gemini ↗</button><small>Instructions are passed to your existing Gemini chat. Screen frames are not sent unless you choose to share them separately.</small></section>
     </aside>
@@ -7453,11 +7454,54 @@ body.director-mode .search-box{display:none!important}
  const video=$('cinemotionScreenVideo'), placeholder=$('cinemotionScreenPlaceholder'), status=$('cinemotionShareStatus');
  const stop=$('cinemotionStopShare'), capture=$('cinemotionCaptureFrame'), prompt=$('cinemotionAssistantPrompt');
  const voiceLang=$('cinemotionVoiceLanguage'), voiceStart=$('cinemotionVoiceStart'), voiceStop=$('cinemotionVoiceStop'), voiceStatus=$('cinemotionVoiceStatus');
- let stream=null,recognition=null;
- function open(){workspace.classList.add('open');workspace.setAttribute('aria-hidden','false');document.body.style.overflow='hidden'}
- function shut(){stopVoice();stopShare();workspace.classList.remove('open');workspace.setAttribute('aria-hidden','true');document.body.style.overflow=''}
- orb?.addEventListener('click',open);close?.addEventListener('click',shut);
+ const replayGreeting=$('cinemotionReplayGreeting');
+ let stream=null,recognition=null,greetingTimer=null,replyTimer=null,lastSpokenReply='';
+ const ASSISTANT_USER_NAME='Bhanu Prasad';
+ function selectedLocale(){return voiceLang?.value==='te-IN'?'te-IN':'en-IN'}
+ function greetingText(){
+   const hour=new Date().getHours();
+   const en=hour<12?'Good morning':'Good evening';
+   return selectedLocale()==='te-IN'
+    ? 'నమస్కారం భాను ప్రసాద్ గారు. CINEMOTION Studio కి స్వాగతం. నేను మీ AI అసిస్టెంట్‌ని. నాతో తెలుగులో లేదా ఇంగ్లీష్‌లో మాట్లాడవచ్చు.'
+    : en+', '+ASSISTANT_USER_NAME+'. Welcome back to CINEMOTION Studio. I am your AI assistant. You can speak to me in Telugu or English.';
+ }
+ function speakText(text,locale=selectedLocale()){
+   if(!('speechSynthesis' in window)||!window.SpeechSynthesisUtterance){if(voiceStatus)voiceStatus.textContent='Speech output is not supported in this browser.';return false}
+   window.speechSynthesis.cancel();
+   const utterance=new SpeechSynthesisUtterance(text);
+   utterance.lang=locale;
+   utterance.rate=0.96;utterance.pitch=1.0;utterance.volume=1;
+   const voices=window.speechSynthesis.getVoices();
+   const voice=voices.find(v=>v.lang.toLowerCase()===locale.toLowerCase())||voices.find(v=>v.lang.toLowerCase().startsWith(locale.slice(0,2).toLowerCase()));
+   if(voice)utterance.voice=voice;
+   utterance.onstart=()=>{if(voiceStatus)voiceStatus.textContent='Speaking in '+(locale==='te-IN'?'Telugu':'English')+'…'};
+   utterance.onend=()=>{if(voiceStatus)voiceStatus.textContent='Voice ready. You can start speaking.'};
+   utterance.onerror=e=>{if(voiceStatus)voiceStatus.textContent='Speech output error: '+e.error+'. Check Windows/Chrome voice availability.'};
+   window.speechSynthesis.speak(utterance);
+   return true;
+ }
+ function playGreeting(){speakText(greetingText())}
+ function open(){
+   workspace.classList.add('open');workspace.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+   clearTimeout(greetingTimer);greetingTimer=setTimeout(playGreeting,250);
+ }
+ function shut(){stopVoice();stopShare();window.speechSynthesis?.cancel();workspace.classList.remove('open');workspace.setAttribute('aria-hidden','true');document.body.style.overflow=''}
+ orb?.addEventListener('click',open);close?.addEventListener('click',shut);replayGreeting?.addEventListener('click',playGreeting);
+ voiceLang?.addEventListener('change',()=>{window.speechSynthesis?.cancel();playGreeting()});
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&workspace?.classList.contains('open'))shut()});
+ const geminiMessages=$('geminiMessages');
+ if(geminiMessages&&'MutationObserver' in window){
+   const replyObserver=new MutationObserver(()=>{
+     if(!workspace?.classList.contains('open'))return;
+     clearTimeout(replyTimer);
+     replyTimer=setTimeout(()=>{
+       const latest=[...geminiMessages.querySelectorAll('.gemini-message.assistant')].at(-1);
+       const text=latest?.textContent?.trim();
+       if(text&&text!==lastSpokenReply){lastSpokenReply=text;speakText(text)}
+     },1100);
+   });
+   replyObserver.observe(geminiMessages,{childList:true,subtree:true,characterData:true});
+ }
  async function startShare(kind){
    if(!navigator.mediaDevices?.getDisplayMedia){status.textContent='Screen sharing is not supported in this browser.';return}
    try{
@@ -7495,7 +7539,7 @@ body.director-mode .search-box{display:none!important}
    if(!SR){voiceStatus.textContent='Speech recognition is unavailable. Use the latest Chrome desktop browser.';return}
    stopVoice();recognition=new SR();recognition.lang=voiceLang.value;recognition.continuous=true;recognition.interimResults=true;
    recognition.onstart=()=>{voiceStatus.textContent='Listening in '+(voiceLang.value==='te-IN'?'Telugu':'English')+'…';voiceStart.disabled=true;voiceStop.disabled=false};
-   recognition.onresult=e=>{let finalText='';for(let i=e.resultIndex;i<e.results.length;i++)if(e.results[i].isFinal)finalText+=e.results[i][0].transcript+' ';if(finalText){prompt.value=(prompt.value+' '+finalText).trim();prompt.dispatchEvent(new Event('input',{bubbles:true}))}};
+   recognition.onresult=e=>{let finalText='';for(let i=e.resultIndex;i<e.results.length;i++)if(e.results[i].isFinal)finalText+=e.results[i][0].transcript+' ';if(finalText){prompt.value=(prompt.value+' '+finalText).trim();prompt.dispatchEvent(new Event('input',{bubbles:true}));voiceStatus.textContent='Heard you. Your words are added below.'}};
    recognition.onerror=e=>{voiceStatus.textContent='Voice error: '+e.error};
    recognition.onend=()=>{if(recognition){recognition=null;voiceStart.disabled=false;voiceStop.disabled=true;if(voiceStatus.textContent.startsWith('Listening'))voiceStatus.textContent='Listening stopped.'}};
    try{recognition.start()}catch(e){voiceStatus.textContent='Could not start microphone: '+e.message}
@@ -7512,3 +7556,5 @@ body.director-mode .search-box{display:none!important}
  window.addEventListener('beforeunload',stopShare);
 })();
 </script>
+
+<style id="cinemotion-voice-output-style">.cinemotion-voice-replay{width:100%;margin-top:8px;border:1px solid #31516e;border-radius:11px;padding:10px 14px;background:#10243a;color:#ccefff;font-weight:750;font-size:12px;cursor:pointer}.cinemotion-voice-replay:hover{border-color:#54dcff;box-shadow:0 0 16px #28c8ff22}</style>
