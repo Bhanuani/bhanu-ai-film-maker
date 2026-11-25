@@ -7475,14 +7475,31 @@ import { RoomEnvironment } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/exam
         bounds.max.y*.86,
         (bounds.max.z-bounds.min.z)*.05
       );
-      let wingTexture;\n      try { wingTexture = await makeWingTexture(); } catch (wingError) { console.warn('CINEMOTION wing texture fallback:',wingError); wingTexture=makeFallbackWingTexture(); }
+      let wingTexture;
+      try { wingTexture = await makeWingTexture(); } catch (wingError) { console.warn('CINEMOTION wing texture fallback:',wingError); wingTexture=makeFallbackWingTexture(); }
       addWingSide(anchor,wingTexture,false);
       addWingSide(anchor,wingTexture,true);
       canvas.dataset.ready = 'true';
       canvas.classList.add('is-active');
       animate();
-    } catch (error) { console.error('CINEMOTION bee setup failed:',error); }
-  }, undefined, error => console.error('CINEMOTION bee model failed to load:',error));
+    } catch (error) {
+      console.error('CINEMOTION bee setup failed:',error);
+      holder.clear(); buildFallbackBee();
+      const fallbackTexture=makeFallbackWingTexture();
+      const fallbackAnchor=new THREE.Vector3(.1,.22,0);
+      addWingSide(fallbackAnchor,fallbackTexture,false);
+      addWingSide(fallbackAnchor,fallbackTexture,true);
+      canvas.dataset.ready='fallback'; canvas.classList.add('is-active'); animate();
+    }
+  }, undefined, error => {
+    console.error('CINEMOTION bee model failed to load:',error);
+    buildFallbackBee();
+    const fallbackTexture=makeFallbackWingTexture();
+    const fallbackAnchor=new THREE.Vector3(.1,.22,0);
+    addWingSide(fallbackAnchor,fallbackTexture,false);
+    addWingSide(fallbackAnchor,fallbackTexture,true);
+    canvas.dataset.ready='fallback'; canvas.classList.add('is-active'); animate();
+  });
 
   const sectionIds = ['landingCapabilities','landingWorkflow','landingVault','landingFaq'];
   const anchors = [landing, ...sectionIds.map(id=>document.getElementById(id)), landing.querySelector('.lp-final')].filter(Boolean);
