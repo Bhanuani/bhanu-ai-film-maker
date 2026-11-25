@@ -7271,7 +7271,7 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
         <div class="cinemotion-screen-placeholder" id="cinemotionScreenPlaceholder"><span>◉</span><strong>Your shared screen will appear here</strong><small>Sharing starts only after you approve it in the browser dialog.</small></div>
         <video id="cinemotionScreenVideo" autoplay muted playsinline hidden></video>
       </div>
-      <div class="cinemotion-screen-controls"><button type="button" id="cinemotionStopShare" class="cinemotion-stop-share" disabled>Stop sharing</button><button type="button" id="cinemotionCaptureFrame" class="cinemotion-capture-frame" disabled>Capture frame</button></div>
+      <div class="cinemotion-screen-controls"><button type="button" id="cinemotionStopShare" class="cinemotion-stop-share" disabled>Stop sharing</button><button type="button" id="cinemotionCaptureFrame" class="cinemotion-capture-frame" disabled>Capture frame</button><button type="button" id="cinemotionAnalyzeScreen" class="cinemotion-capture-frame" disabled>✨ Analyze with Gemini</button></div><div id="cinemotionScreenAnalysisStatus" class="cinemotion-voice-status" aria-live="polite">Share a screen, then click Analyze with Gemini.</div>
       <p class="cinemotion-assistant-note">The browser controls screen permissions. Choose the exact display/window in its native picker. Screen video stays in this browser session; it is not uploaded automatically.</p>
     </section>
     <aside class="cinemotion-assistant-side">
@@ -7452,7 +7452,7 @@ body.director-mode .search-box{display:none!important}
  const $=id=>document.getElementById(id);
  const orb=$('cinemotionAssistantOrb'), workspace=$('cinemotionAssistantWorkspace'), close=$('cinemotionAssistantClose');
  const video=$('cinemotionScreenVideo'), placeholder=$('cinemotionScreenPlaceholder'), status=$('cinemotionShareStatus');
- const stop=$('cinemotionStopShare'), capture=$('cinemotionCaptureFrame'), prompt=$('cinemotionAssistantPrompt');
+ const stop=$('cinemotionStopShare'), capture=$('cinemotionCaptureFrame'), analyzeScreen=$('cinemotionAnalyzeScreen'), analysisStatus=$('cinemotionScreenAnalysisStatus'), prompt=$('cinemotionAssistantPrompt');
  const voiceLang=$('cinemotionVoiceLanguage'), voiceStart=$('cinemotionVoiceStart'), voiceStop=$('cinemotionVoiceStop'), voiceStatus=$('cinemotionVoiceStatus');
  const replayGreeting=$('cinemotionReplayGreeting');
  // Telugu is the fixed first-load default; English is used only after an explicit user selection.
@@ -7512,7 +7512,8 @@ body.director-mode .search-box{display:none!important}
      stream=await navigator.mediaDevices.getDisplayMedia({video:{displaySurface:hint},audio:false});
      video.srcObject=stream;video.hidden=false;placeholder.hidden=true;
      status.textContent=kind==='monitor'?'Entire screen connected':'Window share connected';
-     stop.disabled=false;capture.disabled=false;
+     stop.disabled=false;capture.disabled=false;if(analyzeScreen)analyzeScreen.disabled=false;
+     if(analysisStatus)analysisStatus.textContent='Screen connected. Click Analyze with Gemini when you want it inspected.';
      stream.getVideoTracks()[0]?.addEventListener('ended',stopShare,{once:true});
    }catch(err){
      if(err?.name==='NotAllowedError')status.textContent='Screen sharing cancelled. Allow it in the browser picker to continue.';
@@ -7523,9 +7524,37 @@ body.director-mode .search-box{display:none!important}
    if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
    if(video){video.srcObject=null;video.hidden=true}
    if(placeholder)placeholder.hidden=false;
-   if(stop)stop.disabled=true;if(capture)capture.disabled=true;
+   if(stop)stop.disabled=true;if(capture)capture.disabled=true;if(analyzeScreen)analyzeScreen.disabled=true;
+   if(analysisStatus)analysisStatus.textContent='Share a screen, then click Analyze with Gemini.';
    if(status)status.textContent='Not sharing';
  }
+ async function analyzeSharedScreen(){
+   if(!stream||!video.videoWidth){if(analysisStatus)analysisStatus.textContent='No active screen stream. Start sharing first.';return}
+   if(!window.cinemotionGeminiModel){if(analysisStatus)analysisStatus.textContent='Gemini is not initialized. Open the Gemini panel once and sign in.';return}
+   if(analyzeScreen)analyzeScreen.disabled=true;
+   if(analysisStatus)analysisStatus.textContent='Capturing the shared screen and asking Gemini to inspect it…';
+   try{
+     const canvas=document.createElement('canvas');canvas.width=Math.min(video.videoWidth,1600);canvas.height=Math.round(video.videoHeight*(canvas.width/video.videoWidth));
+     const ctx=canvas.getContext('2d');ctx.drawImage(video,0,0,canvas.width,canvas.height);
+     const dataUrl=canvas.toDataURL('image/jpeg',0.82);const base64=dataUrl.split(',')[1];
+     const model=window.cinemotionGeminiModel;
+     const result=await model.generateContent([
+       {text:'You are the visual screen assistant for CINEMOTION Studio. Inspect this current screenshot carefully. Describe what is visible, identify any error or problem, and give the next practical steps. Do not claim to see anything outside this screenshot. If text is too small or unclear, say so. Reply in the selected language: '+(selectedLocale()==='te-IN'?'Telugu':'English')+'.'},
+       {inlineData:{data:base64,mimeType:'image/jpeg'}}
+     ]);
+     const response=result.response;const answer=response?.text?.()||'Gemini returned no readable analysis.';
+     const messages=$('geminiMessages');
+     if(messages){
+       const bubble=document.createElement('div');bubble.className='gemini-message assistant cinemotion-chat-glow';bubble.textContent='SCREEN ANALYSIS\n'+answer;messages.appendChild(bubble);messages.scrollTop=messages.scrollHeight;
+     }
+     if(analysisStatus)analysisStatus.textContent='Screen analyzed. Gemini response added to chat.';
+     if(assistantVoiceSession)speakText(answer);
+   }catch(err){
+     console.error('CINEMOTION screen analysis failed:',err);
+     if(analysisStatus)analysisStatus.textContent='Screen analysis failed: '+(err?.message||String(err));
+   }finally{if(analyzeScreen)analyzeScreen.disabled=!stream}
+ }
+ analyzeScreen?.addEventListener('click',analyzeSharedScreen);
  $('cinemotionShareEntire')?.addEventListener('click',()=>startShare('monitor'));
  $('cinemotionShareWindow')?.addEventListener('click',()=>startShare('window'));
  stop?.addEventListener('click',stopShare);
@@ -7559,4 +7588,4 @@ body.director-mode .search-box{display:none!important}
 })();
 </script>
 
-<style id="cinemotion-voice-output-style">.cinemotion-voice-replay{width:100%;margin-top:8px;border:1px solid #31516e;border-radius:11px;padding:10px 14px;background:#10243a;color:#ccefff;font-weight:750;font-size:12px;cursor:pointer}.cinemotion-voice-replay:hover{border-color:#54dcff;box-shadow:0 0 16px #28c8ff22}</style>
+<style id="cinemotion-voice-output-style">.cinemotion-voice-replay{width:100%;margin-top:8px;border:1px solid #31516e;border-radius:11px;padding:10px 14px;background:#10243a;color:#ccefff;font-weight:750;font-size:12px;cursor:pointer}.cinemotion-voice-replay:hover{border-color:#54dcff;box-shadow:0 0 16px #28c8ff22}</style>\n<style id="cinemotion-screen-analysis-style">#cinemotionAnalyzeScreen{background:linear-gradient(100deg,#0f7898,#4e60c9);color:#fff}#cinemotionAnalyzeScreen:disabled{opacity:.45;cursor:not-allowed}</style>
