@@ -2212,6 +2212,30 @@ body::after{
           <span>Gemini</span>
         </button>
         
+      <div class="cinemotion-assistant-orb-wrap" role="img" aria-label="CINEMOTION desktop assistant, animated voice orb">
+        <span class="cinemotion-assistant-orb">
+          <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+            <defs>
+              <radialGradient id="cinemotionOrbCore" cx="35%" cy="28%" r="72%">
+                <stop offset="0%" stop-color="#e8ffff"/>
+                <stop offset="28%" stop-color="#75eaff"/>
+                <stop offset="62%" stop-color="#278dff"/>
+                <stop offset="100%" stop-color="#6545db"/>
+              </radialGradient>
+              <linearGradient id="cinemotionOrbRing" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#8ffaff"/>
+                <stop offset="52%" stop-color="#438dff"/>
+                <stop offset="100%" stop-color="#bd83ff"/>
+              </linearGradient>
+            </defs>
+            <circle class="cinemotion-orb-halo" cx="32" cy="32" r="29" fill="none" stroke="url(#cinemotionOrbRing)" stroke-width="1.5"/>
+            <ellipse class="cinemotion-orb-ring" cx="32" cy="32" rx="25" ry="11" fill="none" stroke="url(#cinemotionOrbRing)" stroke-width="2.2"/>
+            <circle class="cinemotion-orb-core" cx="32" cy="32" r="17" fill="url(#cinemotionOrbCore)"/>
+            <path class="cinemotion-orb-shine" d="M20 27c2-8 10-12 17-9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".8"/>
+          </svg>
+        </span>
+        <span class="cinemotion-assistant-orb-label">Assistant</span>
+      </div>
         <div class="profile-pill" id="profilePillBtn">
           <div class="avatar" id="headerUserAvatar">BP</div>
           <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; color: #94a3b8;"></i>
@@ -3787,30 +3811,6 @@ body::after{
           <path fill="url(#geminiPanelGradient)" d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/>
         </svg>
         <div><strong>Gemini</strong><small>Powered by Gemini 3.5 Flash-Lite · Fast</small></div>
-      </div>
-      <div class="cinemotion-assistant-orb-wrap" role="img" aria-label="CINEMOTION desktop assistant, animated voice orb">
-        <span class="cinemotion-assistant-orb">
-          <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
-            <defs>
-              <radialGradient id="cinemotionOrbCore" cx="35%" cy="28%" r="72%">
-                <stop offset="0%" stop-color="#e8ffff"/>
-                <stop offset="28%" stop-color="#75eaff"/>
-                <stop offset="62%" stop-color="#278dff"/>
-                <stop offset="100%" stop-color="#6545db"/>
-              </radialGradient>
-              <linearGradient id="cinemotionOrbRing" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#8ffaff"/>
-                <stop offset="52%" stop-color="#438dff"/>
-                <stop offset="100%" stop-color="#bd83ff"/>
-              </linearGradient>
-            </defs>
-            <circle class="cinemotion-orb-halo" cx="32" cy="32" r="29" fill="none" stroke="url(#cinemotionOrbRing)" stroke-width="1.5"/>
-            <ellipse class="cinemotion-orb-ring" cx="32" cy="32" rx="25" ry="11" fill="none" stroke="url(#cinemotionOrbRing)" stroke-width="2.2"/>
-            <circle class="cinemotion-orb-core" cx="32" cy="32" r="17" fill="url(#cinemotionOrbCore)"/>
-            <path class="cinemotion-orb-shine" d="M20 27c2-8 10-12 17-9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".8"/>
-          </svg>
-        </span>
-        <span class="cinemotion-assistant-orb-label">Assistant</span>
       </div>
       <button type="button" class="gemini-director-suite-btn" id="geminiDirectorSuiteBtn" title="Open AI Director Suite"><i class="fa-solid fa-wand-magic-sparkles"></i><span>AI Director Suite</span></button>
       <button type="button" class="gemini-close" id="geminiClose" aria-label="Close Gemini">&times;</button>
