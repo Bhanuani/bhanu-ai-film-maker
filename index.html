@@ -7453,6 +7453,9 @@ import { RoomEnvironment } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/exam
   const loader = new GLTFLoader();
   loader.load(MODEL_URL, async gltf => {
     try {
+      holder.clear();
+      [...beeRoot.children].forEach(child => { if (child !== holder) beeRoot.remove(child); });
+      wingGroups.length = 0;
       const model = gltf.scene;
       model.traverse(obj => {
         if (obj.isMesh) {
@@ -7583,6 +7586,16 @@ import { RoomEnvironment } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/exam
     });
     if(activeRange) renderer.render(scene,camera);
   }
+
+  // Render a local procedural bee immediately; the photoreal GLB replaces it when available.
+  buildFallbackBee();
+  const instantFallbackWing = makeFallbackWingTexture();
+  const instantFallbackAnchor = new THREE.Vector3(.1,.22,0);
+  addWingSide(instantFallbackAnchor,instantFallbackWing,false);
+  addWingSide(instantFallbackAnchor,instantFallbackWing,true);
+  canvas.dataset.ready = 'fallback';
+  canvas.classList.add('is-active');
+  animate();
 })();
 </script>
 
