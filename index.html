@@ -2212,7 +2212,7 @@ body::after{
           <span>Gemini</span>
         </button>
         
-      <div class="cinemotion-assistant-orb-wrap" role="img" aria-label="CINEMOTION desktop assistant, animated voice orb">
+      <button type="button" class="cinemotion-assistant-orb-wrap" id="cinemotionAssistantOrb" aria-label="Open CINEMOTION AI Assistant" title="Open CINEMOTION AI Assistant">
         <span class="cinemotion-assistant-orb">
           <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
             <defs>
@@ -2235,7 +2235,7 @@ body::after{
           </svg>
         </span>
         <span class="cinemotion-assistant-orb-label">Assistant</span>
-      </div>
+      </button>
         <div class="profile-pill" id="profilePillBtn">
           <div class="avatar" id="headerUserAvatar">BP</div>
           <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; color: #94a3b8;"></i>
@@ -7254,6 +7254,39 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
 }
 </style>
 
+
+<section id="cinemotionAssistantWorkspace" class="cinemotion-assistant-workspace" aria-hidden="true">
+  <header class="cinemotion-assistant-topbar">
+    <div class="cinemotion-assistant-brand"><span class="cinemotion-assistant-mini-orb">✦</span><div><strong>CINEMOTION Assistant</strong><small>Screen & voice workspace</small></div></div>
+    <button type="button" id="cinemotionAssistantClose" class="cinemotion-assistant-close" aria-label="Close assistant">×</button>
+  </header>
+  <main class="cinemotion-assistant-main">
+    <section class="cinemotion-assistant-screen-card">
+      <div class="cinemotion-assistant-section-head"><div><span class="cinemotion-assistant-eyebrow">LIVE WORKSPACE</span><h2>Screen sharing</h2><p>Choose what you want the assistant workspace to view.</p></div><span id="cinemotionShareStatus" class="cinemotion-share-status">Not sharing</span></div>
+      <div class="cinemotion-share-options">
+        <button type="button" class="cinemotion-share-option" id="cinemotionShareEntire"><span class="cinemotion-share-icon">▣</span><strong>Entire Screen</strong><small>Share your full desktop and all visible apps</small></button>
+        <button type="button" class="cinemotion-share-option" id="cinemotionShareWindow"><span class="cinemotion-share-icon">▢</span><strong>Current Window</strong><small>Share one application window you select</small></button>
+      </div>
+      <div class="cinemotion-screen-preview" id="cinemotionScreenPreview">
+        <div class="cinemotion-screen-placeholder" id="cinemotionScreenPlaceholder"><span>◉</span><strong>Your shared screen will appear here</strong><small>Sharing starts only after you approve it in the browser dialog.</small></div>
+        <video id="cinemotionScreenVideo" autoplay muted playsinline hidden></video>
+      </div>
+      <div class="cinemotion-screen-controls"><button type="button" id="cinemotionStopShare" class="cinemotion-stop-share" disabled>Stop sharing</button><button type="button" id="cinemotionCaptureFrame" class="cinemotion-capture-frame" disabled>Capture frame</button></div>
+      <p class="cinemotion-assistant-note">The browser controls screen permissions. Choose the exact display/window in its native picker. Screen video stays in this browser session; it is not uploaded automatically.</p>
+    </section>
+    <aside class="cinemotion-assistant-side">
+      <section class="cinemotion-assistant-voice-card">
+        <span class="cinemotion-assistant-eyebrow">VOICE CONTROL</span><h2>Talk to Assistant</h2><p>Voice recognition and spoken replies are limited to these two languages.</p>
+        <label for="cinemotionVoiceLanguage">Voice language</label><select id="cinemotionVoiceLanguage"><option value="te-IN">తెలుగు (Telugu)</option><option value="en-IN">English</option></select>
+        <button type="button" id="cinemotionVoiceStart" class="cinemotion-voice-start">🎙 Start listening</button>
+        <button type="button" id="cinemotionVoiceStop" class="cinemotion-voice-stop" disabled>Stop listening</button>
+        <div id="cinemotionVoiceStatus" class="cinemotion-voice-status" aria-live="polite">Microphone is off.</div>
+      </section>
+      <section class="cinemotion-assistant-command-card"><span class="cinemotion-assistant-eyebrow">ASSISTANT INPUT</span><h2>What should I do?</h2><textarea id="cinemotionAssistantPrompt" rows="4" placeholder="Speak or type your instruction..."></textarea><button type="button" id="cinemotionSendToGemini" class="cinemotion-send-gemini">Continue in Gemini ↗</button><small>Instructions are passed to your existing Gemini chat. Screen frames are not sent unless you choose to share them separately.</small></section>
+    </aside>
+  </main>
+</section>
+
 </body>
 </html>
 <style id="gemini-glow-final-override">
@@ -7391,3 +7424,91 @@ body.director-mode .search-box{display:none!important}
 #geminiMessages .gemini-user-image-card.is-dragging{opacity:.48;cursor:grabbing}
 .gemini-image-drop-active{outline:2px dashed #45d7ff!important;outline-offset:3px!important;background-color:rgba(45,190,255,.10)!important}
 </style>
+
+
+<style id="cinemotion-assistant-workspace-style">
+.cinemotion-assistant-orb-wrap{border:0;background:transparent;padding:0;cursor:pointer;font:inherit}
+.cinemotion-assistant-orb-wrap:focus-visible{outline:2px solid #63e6ff;outline-offset:5px;border-radius:30px}
+.cinemotion-assistant-workspace{position:fixed;inset:0;z-index:1000005;display:none;flex-direction:column;background:radial-gradient(ellipse at 15% 0%,rgba(26,95,145,.22),transparent 42%),#070b14;color:#edf5ff;font-family:'Plus Jakarta Sans',sans-serif}
+.cinemotion-assistant-workspace.open{display:flex}
+.cinemotion-assistant-topbar{height:72px;flex:0 0 72px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(18px,4vw,54px);border-bottom:1px solid rgba(135,190,255,.14);background:rgba(8,14,26,.88)}
+.cinemotion-assistant-brand{display:flex;align-items:center;gap:12px}.cinemotion-assistant-brand strong{display:block;font-size:15px}.cinemotion-assistant-brand small{display:block;color:#8193ad;font-size:11px;margin-top:3px}
+.cinemotion-assistant-mini-orb{width:38px;height:38px;display:grid;place-items:center;border-radius:50%;font-size:23px;color:#c7f8ff;background:radial-gradient(circle at 35% 25%,#eaffff,#2b9cff 45%,#6844d8 78%);box-shadow:0 0 22px #238eff88}
+.cinemotion-assistant-close{width:40px;height:40px;border:1px solid #2a3c59;border-radius:12px;background:#111b2b;color:white;font-size:27px;cursor:pointer}
+.cinemotion-assistant-main{width:min(1440px,100%);margin:0 auto;padding:clamp(16px,3vw,38px);display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,.8fr);gap:20px;flex:1;min-height:0;overflow:auto;box-sizing:border-box}
+.cinemotion-assistant-screen-card,.cinemotion-assistant-voice-card,.cinemotion-assistant-command-card{background:linear-gradient(145deg,rgba(20,32,52,.92),rgba(9,15,27,.96));border:1px solid rgba(105,171,230,.2);border-radius:20px;padding:22px;box-shadow:0 18px 50px rgba(0,0,0,.2)}
+.cinemotion-assistant-section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.cinemotion-assistant-eyebrow{font-size:10px;letter-spacing:.16em;font-weight:800;color:#58d8f7}.cinemotion-assistant-main h2{font-size:21px;margin:8px 0 6px}.cinemotion-assistant-main p{font-size:12px;line-height:1.6;color:#9aabc2;margin:0}
+.cinemotion-share-status{font-size:11px;color:#a8b8cb;border:1px solid #34445b;border-radius:30px;padding:7px 10px;white-space:nowrap}
+.cinemotion-share-options{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0 14px}.cinemotion-share-option{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:8px;min-height:116px;padding:17px;border-radius:15px;border:1px solid rgba(85,175,235,.25);background:rgba(19,37,60,.75);color:#eef8ff;cursor:pointer;transition:.2s}.cinemotion-share-option:hover{border-color:#46d8ff;box-shadow:0 0 20px #27bfff22;transform:translateY(-2px)}.cinemotion-share-icon{font-size:23px;color:#5be3ff}.cinemotion-share-option strong{font-size:13px}.cinemotion-share-option small{font-size:11px;line-height:1.5;color:#92a8c2}
+.cinemotion-screen-preview{height:clamp(220px,42vh,470px);background:#03060b;border:1px solid rgba(117,175,230,.18);border-radius:15px;overflow:hidden;display:grid;place-items:center}.cinemotion-screen-preview video{width:100%;height:100%;object-fit:contain;background:#03060b}.cinemotion-screen-placeholder{display:flex;flex-direction:column;align-items:center;gap:9px;text-align:center;padding:20px;color:#8ca2bd}.cinemotion-screen-placeholder span{font-size:30px;color:#50d8ff}.cinemotion-screen-placeholder strong{font-size:13px;color:#dceaff}.cinemotion-screen-placeholder small{font-size:11px}
+.cinemotion-screen-controls{display:flex;gap:9px;margin-top:12px}.cinemotion-screen-controls button,.cinemotion-voice-start,.cinemotion-voice-stop,.cinemotion-send-gemini{border:0;border-radius:11px;padding:11px 15px;font-weight:800;font-size:12px;cursor:pointer}.cinemotion-stop-share{background:#54232d;color:#ffdce1}.cinemotion-capture-frame{background:#163b58;color:#c7f4ff}.cinemotion-screen-controls button:disabled,.cinemotion-voice-stop:disabled{opacity:.4;cursor:not-allowed}.cinemotion-assistant-note{font-size:10px!important;margin-top:12px!important;color:#8296b0!important}
+.cinemotion-assistant-side{display:flex;flex-direction:column;gap:16px}.cinemotion-assistant-voice-card label{display:block;font-size:11px;color:#a9bdd4;margin:18px 0 7px}.cinemotion-assistant-voice-card select,.cinemotion-assistant-command-card textarea{width:100%;box-sizing:border-box;border:1px solid #314763;border-radius:11px;background:#091321;color:#edf7ff;padding:11px;font:inherit;font-size:12px}.cinemotion-voice-start{width:100%;margin-top:12px;background:linear-gradient(100deg,#16c9e8,#6b7cff);color:#07111f}.cinemotion-voice-stop{width:100%;margin-top:8px;background:#26364d;color:#dceaff}.cinemotion-voice-status{font-size:11px;color:#9bb2cc;margin-top:10px;min-height:18px}.cinemotion-assistant-command-card textarea{resize:vertical;margin:14px 0 10px;line-height:1.5}.cinemotion-send-gemini{width:100%;background:#dff8ff;color:#07111c}.cinemotion-assistant-command-card>small{display:block;font-size:10px;line-height:1.5;color:#8296b0;margin-top:10px}
+@media(max-width:850px){.cinemotion-assistant-main{grid-template-columns:1fr}.cinemotion-screen-preview{height:34vh}}
+@media(max-width:520px){.cinemotion-assistant-topbar{height:60px;flex-basis:60px}.cinemotion-assistant-main{padding:12px;gap:12px}.cinemotion-assistant-screen-card,.cinemotion-assistant-voice-card,.cinemotion-assistant-command-card{padding:15px}.cinemotion-share-options{grid-template-columns:1fr}.cinemotion-share-option{min-height:90px}.cinemotion-assistant-section-head{flex-direction:column}}
+</style>
+<script id="cinemotion-assistant-workspace-script">
+(()=> {
+ const $=id=>document.getElementById(id);
+ const orb=$('cinemotionAssistantOrb'), workspace=$('cinemotionAssistantWorkspace'), close=$('cinemotionAssistantClose');
+ const video=$('cinemotionScreenVideo'), placeholder=$('cinemotionScreenPlaceholder'), status=$('cinemotionShareStatus');
+ const stop=$('cinemotionStopShare'), capture=$('cinemotionCaptureFrame'), prompt=$('cinemotionAssistantPrompt');
+ const voiceLang=$('cinemotionVoiceLanguage'), voiceStart=$('cinemotionVoiceStart'), voiceStop=$('cinemotionVoiceStop'), voiceStatus=$('cinemotionVoiceStatus');
+ let stream=null,recognition=null;
+ function open(){workspace.classList.add('open');workspace.setAttribute('aria-hidden','false');document.body.style.overflow='hidden'}
+ function shut(){stopVoice();stopShare();workspace.classList.remove('open');workspace.setAttribute('aria-hidden','true');document.body.style.overflow=''}
+ orb?.addEventListener('click',open);close?.addEventListener('click',shut);
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&workspace?.classList.contains('open'))shut()});
+ async function startShare(kind){
+   if(!navigator.mediaDevices?.getDisplayMedia){status.textContent='Screen sharing is not supported in this browser.';return}
+   try{
+     stopShare();
+     const hint=kind==='monitor'?'monitor':'window';
+     stream=await navigator.mediaDevices.getDisplayMedia({video:{displaySurface:hint},audio:false});
+     video.srcObject=stream;video.hidden=false;placeholder.hidden=true;
+     status.textContent=kind==='monitor'?'Entire screen connected':'Window share connected';
+     stop.disabled=false;capture.disabled=false;
+     stream.getVideoTracks()[0]?.addEventListener('ended',stopShare,{once:true});
+   }catch(err){
+     if(err?.name==='NotAllowedError')status.textContent='Screen sharing cancelled. Allow it in the browser picker to continue.';
+     else status.textContent='Could not start sharing: '+(err?.message||err);
+   }
+ }
+ function stopShare(){
+   if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
+   if(video){video.srcObject=null;video.hidden=true}
+   if(placeholder)placeholder.hidden=false;
+   if(stop)stop.disabled=true;if(capture)capture.disabled=true;
+   if(status)status.textContent='Not sharing';
+ }
+ $('cinemotionShareEntire')?.addEventListener('click',()=>startShare('monitor'));
+ $('cinemotionShareWindow')?.addEventListener('click',()=>startShare('window'));
+ stop?.addEventListener('click',stopShare);
+ capture?.addEventListener('click',()=>{
+   if(!stream||!video.videoWidth)return;
+   const canvas=document.createElement('canvas');canvas.width=video.videoWidth;canvas.height=video.videoHeight;
+   canvas.getContext('2d').drawImage(video,0,0);
+   const a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download='cinemotion-screen-frame.png';a.click();
+ });
+ function stopVoice(){if(recognition){try{recognition.stop()}catch(e){}recognition=null}if(voiceStart)voiceStart.disabled=false;if(voiceStop)voiceStop.disabled=true;if(voiceStatus)voiceStatus.textContent='Microphone is off.'}
+ voiceStart?.addEventListener('click',()=>{
+   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+   if(!SR){voiceStatus.textContent='Speech recognition is unavailable. Use the latest Chrome desktop browser.';return}
+   stopVoice();recognition=new SR();recognition.lang=voiceLang.value;recognition.continuous=true;recognition.interimResults=true;
+   recognition.onstart=()=>{voiceStatus.textContent='Listening in '+(voiceLang.value==='te-IN'?'Telugu':'English')+'…';voiceStart.disabled=true;voiceStop.disabled=false};
+   recognition.onresult=e=>{let finalText='';for(let i=e.resultIndex;i<e.results.length;i++)if(e.results[i].isFinal)finalText+=e.results[i][0].transcript+' ';if(finalText){prompt.value=(prompt.value+' '+finalText).trim();prompt.dispatchEvent(new Event('input',{bubbles:true}))}};
+   recognition.onerror=e=>{voiceStatus.textContent='Voice error: '+e.error};
+   recognition.onend=()=>{if(recognition){recognition=null;voiceStart.disabled=false;voiceStop.disabled=true;if(voiceStatus.textContent.startsWith('Listening'))voiceStatus.textContent='Listening stopped.'}};
+   try{recognition.start()}catch(e){voiceStatus.textContent='Could not start microphone: '+e.message}
+ });
+ voiceStop?.addEventListener('click',stopVoice);
+ $('cinemotionSendToGemini')?.addEventListener('click',()=>{
+   const text=prompt.value.trim();if(!text)return;
+   const input=$('geminiInput'),form=$('geminiForm');
+   if(!input||!form){alert('Gemini chat is not available right now.');return}
+   input.value=text;input.dispatchEvent(new Event('input',{bubbles:true}));workspace.classList.remove('open');workspace.setAttribute('aria-hidden','true');document.body.style.overflow='';
+   if(typeof window.openGeminiPanel==='function')window.openGeminiPanel();
+   form.requestSubmit();
+ });
+ window.addEventListener('beforeunload',stopShare);
+})();
+</script>
