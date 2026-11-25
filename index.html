@@ -7455,7 +7455,7 @@ body.director-mode .search-box{display:none!important}
  const stop=$('cinemotionStopShare'), capture=$('cinemotionCaptureFrame'), prompt=$('cinemotionAssistantPrompt');
  const voiceLang=$('cinemotionVoiceLanguage'), voiceStart=$('cinemotionVoiceStart'), voiceStop=$('cinemotionVoiceStop'), voiceStatus=$('cinemotionVoiceStatus');
  const replayGreeting=$('cinemotionReplayGreeting');
- let stream=null,recognition=null,greetingTimer=null,replyTimer=null,lastSpokenReply='';
+ let stream=null,recognition=null,greetingTimer=null,replyTimer=null,lastSpokenReply='',assistantVoiceSession=false;
  const ASSISTANT_USER_NAME='Bhanu Prasad';
  function selectedLocale(){return voiceLang?.value==='te-IN'?'te-IN':'en-IN'}
  function greetingText(){
@@ -7482,17 +7482,17 @@ body.director-mode .search-box{display:none!important}
  }
  function playGreeting(){speakText(greetingText())}
  function open(){
-   workspace.classList.add('open');workspace.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+   assistantVoiceSession=true;workspace.classList.add('open');workspace.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
    clearTimeout(greetingTimer);greetingTimer=setTimeout(playGreeting,250);
  }
- function shut(){stopVoice();stopShare();window.speechSynthesis?.cancel();workspace.classList.remove('open');workspace.setAttribute('aria-hidden','true');document.body.style.overflow=''}
+ function shut(){assistantVoiceSession=false;stopVoice();stopShare();window.speechSynthesis?.cancel();workspace.classList.remove('open');workspace.setAttribute('aria-hidden','true');document.body.style.overflow=''}
  orb?.addEventListener('click',open);close?.addEventListener('click',shut);replayGreeting?.addEventListener('click',playGreeting);
  voiceLang?.addEventListener('change',()=>{window.speechSynthesis?.cancel();playGreeting()});
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&workspace?.classList.contains('open'))shut()});
  const geminiMessages=$('geminiMessages');
  if(geminiMessages&&'MutationObserver' in window){
    const replyObserver=new MutationObserver(()=>{
-     if(!workspace?.classList.contains('open'))return;
+     if(!assistantVoiceSession)return;
      clearTimeout(replyTimer);
      replyTimer=setTimeout(()=>{
        const latest=[...geminiMessages.querySelectorAll('.gemini-message.assistant')].at(-1);
