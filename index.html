@@ -7277,7 +7277,7 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
     <aside class="cinemotion-assistant-side">
       <section class="cinemotion-assistant-voice-card">
         <span class="cinemotion-assistant-eyebrow">VOICE CONTROL</span><h2>Talk to Assistant</h2><p>Voice recognition and spoken replies are limited to these two languages.</p>
-        <label for="cinemotionVoiceLanguage">Voice language</label><select id="cinemotionVoiceLanguage"><option value="te-IN">తెలుగు (Telugu)</option><option value="en-IN">English</option></select>
+        <label for="cinemotionVoiceLanguage">Voice language</label><select id="cinemotionVoiceLanguage"><option value="te-IN" selected>తెలుగు (Telugu)</option><option value="en-IN">English</option></select>
         <button type="button" id="cinemotionVoiceStart" class="cinemotion-voice-start">🎙 Start listening</button>
         <button type="button" id="cinemotionVoiceStop" class="cinemotion-voice-stop" disabled>Stop listening</button>
         <button type="button" id="cinemotionReplayGreeting" class="cinemotion-voice-replay">🔊 Hear greeting again</button>
@@ -7455,6 +7455,8 @@ body.director-mode .search-box{display:none!important}
  const stop=$('cinemotionStopShare'), capture=$('cinemotionCaptureFrame'), prompt=$('cinemotionAssistantPrompt');
  const voiceLang=$('cinemotionVoiceLanguage'), voiceStart=$('cinemotionVoiceStart'), voiceStop=$('cinemotionVoiceStop'), voiceStatus=$('cinemotionVoiceStatus');
  const replayGreeting=$('cinemotionReplayGreeting');
+ // Telugu is the fixed first-load default; English is used only after an explicit user selection.
+ if(voiceLang)voiceLang.value='te-IN';
  let stream=null,recognition=null,greetingTimer=null,replyTimer=null,lastSpokenReply='',assistantVoiceSession=false;
  const ASSISTANT_USER_NAME='Bhanu Prasad';
  function selectedLocale(){return voiceLang?.value==='te-IN'?'te-IN':'en-IN'}
