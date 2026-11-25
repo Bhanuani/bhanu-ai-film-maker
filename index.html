@@ -7506,7 +7506,7 @@ body.director-mode .search-box{display:none!important}
    const input=$('geminiInput'),form=$('geminiForm');
    if(!input||!form){alert('Gemini chat is not available right now.');return}
    input.value=text;input.dispatchEvent(new Event('input',{bubbles:true}));workspace.classList.remove('open');workspace.setAttribute('aria-hidden','true');document.body.style.overflow='';
-   if(typeof window.openGeminiPanel==='function')window.openGeminiPanel();
+   $('geminiLauncher')?.click();
    form.requestSubmit();
  });
  window.addEventListener('beforeunload',stopShare);
