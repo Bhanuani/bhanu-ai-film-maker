@@ -3788,6 +3788,30 @@ body::after{
         </svg>
         <div><strong>Gemini</strong><small>Powered by Gemini 3.5 Flash-Lite · Fast</small></div>
       </div>
+      <div class="cinemotion-assistant-orb-wrap" role="img" aria-label="CINEMOTION desktop assistant, animated voice orb">
+        <span class="cinemotion-assistant-orb">
+          <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+            <defs>
+              <radialGradient id="cinemotionOrbCore" cx="35%" cy="28%" r="72%">
+                <stop offset="0%" stop-color="#e8ffff"/>
+                <stop offset="28%" stop-color="#75eaff"/>
+                <stop offset="62%" stop-color="#278dff"/>
+                <stop offset="100%" stop-color="#6545db"/>
+              </radialGradient>
+              <linearGradient id="cinemotionOrbRing" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#8ffaff"/>
+                <stop offset="52%" stop-color="#438dff"/>
+                <stop offset="100%" stop-color="#bd83ff"/>
+              </linearGradient>
+            </defs>
+            <circle class="cinemotion-orb-halo" cx="32" cy="32" r="29" fill="none" stroke="url(#cinemotionOrbRing)" stroke-width="1.5"/>
+            <ellipse class="cinemotion-orb-ring" cx="32" cy="32" rx="25" ry="11" fill="none" stroke="url(#cinemotionOrbRing)" stroke-width="2.2"/>
+            <circle class="cinemotion-orb-core" cx="32" cy="32" r="17" fill="url(#cinemotionOrbCore)"/>
+            <path class="cinemotion-orb-shine" d="M20 27c2-8 10-12 17-9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".8"/>
+          </svg>
+        </span>
+        <span class="cinemotion-assistant-orb-label">Assistant</span>
+      </div>
       <button type="button" class="gemini-director-suite-btn" id="geminiDirectorSuiteBtn" title="Open AI Director Suite"><i class="fa-solid fa-wand-magic-sparkles"></i><span>AI Director Suite</span></button>
       <button type="button" class="gemini-close" id="geminiClose" aria-label="Close Gemini">&times;</button>
     </div>
@@ -7185,6 +7209,50 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
 <!-- Dedicated DOM element to avoid conflicting pseudo-element effects -->
 
 
+
+
+<style id="cinemotion-assistant-orb-style">
+/* Alexa-inspired animated assistant orb. Decorative UI only; voice control is a later integration step. */
+.cinemotion-assistant-orb-wrap{
+  display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;margin-left:12px;
+  min-width:0;color:#c9f7ff;user-select:none;
+}
+.cinemotion-assistant-orb{
+  position:relative;display:inline-grid;place-items:center;width:38px;height:38px;
+  border-radius:50%;isolation:isolate;
+  filter:drop-shadow(0 0 8px rgba(48,190,255,.42));
+  animation:cinemotionOrbFloat 3.2s ease-in-out infinite;
+}
+.cinemotion-assistant-orb::before{
+  content:"";position:absolute;inset:3px;border-radius:50%;
+  background:radial-gradient(circle,rgba(63,207,255,.22),rgba(91,82,255,.08) 58%,transparent 72%);
+  filter:blur(5px);animation:cinemotionOrbBreath 2.4s ease-in-out infinite;
+}
+.cinemotion-assistant-orb svg{position:relative;z-index:1;width:100%;height:100%;overflow:visible}
+.cinemotion-orb-halo{transform-origin:32px 32px;animation:cinemotionOrbHalo 5.5s linear infinite}
+.cinemotion-orb-ring{transform-origin:32px 32px;animation:cinemotionOrbRing 4s ease-in-out infinite}
+.cinemotion-orb-core{transform-origin:32px 32px;animation:cinemotionOrbCore 2.1s ease-in-out infinite}
+.cinemotion-orb-shine{animation:cinemotionOrbShine 3s ease-in-out infinite}
+.cinemotion-assistant-orb-label{
+  font:600 10px/1.1 'Plus Jakarta Sans',sans-serif;letter-spacing:.025em;
+  color:#b9eaff;text-shadow:0 0 10px rgba(61,177,255,.4);white-space:nowrap;
+}
+@keyframes cinemotionOrbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes cinemotionOrbBreath{0%,100%{opacity:.45;transform:scale(.88)}50%{opacity:1;transform:scale(1.12)}}
+@keyframes cinemotionOrbHalo{to{transform:rotate(360deg)}}
+@keyframes cinemotionOrbRing{0%,100%{transform:rotate(-12deg) scaleY(1)}50%{transform:rotate(12deg) scaleY(1.2)}}
+@keyframes cinemotionOrbCore{0%,100%{transform:scale(.94);filter:saturate(1)}50%{transform:scale(1.06);filter:saturate(1.3) brightness(1.12)}}
+@keyframes cinemotionOrbShine{0%,100%{opacity:.45}50%{opacity:1}}
+@media(max-width:540px){
+  .cinemotion-assistant-orb-wrap{margin-left:6px;gap:0}
+  .cinemotion-assistant-orb{width:32px;height:32px}
+  .cinemotion-assistant-orb-label{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .cinemotion-assistant-orb,.cinemotion-assistant-orb::before,.cinemotion-orb-halo,
+  .cinemotion-orb-ring,.cinemotion-orb-core,.cinemotion-orb-shine{animation:none!important}
+}
+</style>
 
 </body>
 </html>
