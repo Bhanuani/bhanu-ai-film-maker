@@ -3862,8 +3862,8 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       const target = destination === "existing" ? targetName : "_blank";
       const destinationWindow = window.open(targetUrl, target, destination === "new" ? "noopener,noreferrer" : undefined);
 
-      if (!destinationWindow) {
-        showToast("Browser blocked the tab. Allow pop-ups for this website and try again.");
+      if (destination === "existing" && !destinationWindow) {
+        showToast("Browser could not open or reuse the tab. Allow pop-ups for this website and try again.");
         return;
       }
 
