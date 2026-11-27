@@ -5189,11 +5189,8 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       }, lightweight ? 420 : 220);
     };
 
-    geminiInput?.addEventListener("input", () => {
-      if (document.body.classList.contains("director-mode")) {
-        scheduleDirectorLibrarySync(geminiInput.value, true);
-      }
-    });
+    // Keep Gemini typing isolated from the prompt-library renderer.
+    // The dedicated Library search field still supports live prompt searching.
     directorLibrarySearch?.addEventListener("input", () => {
       scheduleDirectorLibrarySync(directorLibrarySearch.value, false);
     });
@@ -8008,29 +8005,5 @@ body.director-mode .search-box{display:none!important}
 #geminiPanel #geminiForm.composer-expanded{align-items:flex-end!important}
 #geminiPanel .gemini-reference-panel{flex:0 0 auto!important;position:relative!important;z-index:1!important}
 </style>
-<script id="gemini-composer-autogrow-final-script">
-(()=> {
-  const input=document.getElementById('geminiInput');
-  const form=document.getElementById('geminiForm');
-  if(!input||!form||input.dataset.cinemotionAutogrow==='ready')return;
-  input.dataset.cinemotionAutogrow='ready';
-  const resize=()=>{
-    input.style.setProperty('height','auto','important');
-    const css=getComputedStyle(input);
-    const line=parseFloat(css.lineHeight)||22;
-    const max=Math.min(180,Math.ceil(line*7+18));
-    const target=Math.max(38,Math.min(input.scrollHeight,max));
-    input.style.setProperty('height',target+'px','important');
-    input.style.setProperty('max-height',max+'px','important');
-    input.style.setProperty('overflow-y',input.scrollHeight>max+1?'auto':'hidden','important');
-    form.classList.toggle('composer-expanded',target>48);
-    form.style.setProperty('height','auto','important');
-  };
-  input.addEventListener('input',()=>requestAnimationFrame(resize),true);
-  input.addEventListener('change',resize,true);
-  input.addEventListener('paste',()=>requestAnimationFrame(resize),true);
-  input.addEventListener('compositionend',()=>requestAnimationFrame(resize),true);
-  window.addEventListener('resize',resize);
-  requestAnimationFrame(resize);
-})();
-</script>
+<!-- Duplicate Gemini auto-grow handler removed.
+     The primary resizeGeminiComposer handler above owns textarea sizing. -->
