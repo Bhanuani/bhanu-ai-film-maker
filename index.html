@@ -7482,13 +7482,55 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
 
 
 <style id="gemini-composer-layout-hard-fix">
-/* Keep Gemini composer controls in one stable horizontal row. */
-#geminiPanel #geminiForm { display:flex !important; flex-direction:row !important; flex-wrap:nowrap !important; align-items:center !important; justify-content:flex-start !important; position:relative !important; min-height:54px !important; height:auto !important; box-sizing:border-box !important; overflow:visible !important; }
-#geminiPanel #geminiForm > #geminiUploadBtn { position:static !important; order:0 !important; flex:0 0 35px !important; width:35px !important; height:35px !important; margin:0 !important; }
-#geminiPanel #geminiForm > #geminiInput { position:static !important; order:1 !important; display:block !important; flex:1 1 0% !important; width:0 !important; min-width:0 !important; max-width:none !important; margin:0 !important; height:38px !important; }
-#geminiPanel #geminiForm > .gemini-image-options { position:static !important; order:2 !important; flex:0 0 auto !important; width:auto !important; min-width:0 !important; margin:0 !important; }
-#geminiPanel #geminiForm > #geminiSend { position:static !important; order:3 !important; flex:0 0 35px !important; width:35px !important; height:35px !important; margin:0 !important; }
-#geminiPanel #geminiForm > #geminiAttachmentPreview { position:absolute !important; left:8px !important; right:8px !important; bottom:calc(100% + 2px) !important; top:auto !important; width:auto !important; max-width:none !important; min-width:0 !important; height:auto !important; margin:0 !important; z-index:20 !important; }
+/* Responsive composer: the input grows with its content instead of being locked to one line. */
+#geminiPanel #geminiForm {
+  display:flex !important; flex-direction:row !important; flex-wrap:nowrap !important;
+  align-items:flex-end !important; justify-content:flex-start !important;
+  position:relative !important; min-height:54px !important; height:auto !important;
+  box-sizing:border-box !important; overflow:visible !important;
+}
+#geminiPanel #geminiForm > #geminiUploadBtn {
+  position:static !important; order:0 !important; flex:0 0 35px !important;
+  width:35px !important; height:35px !important; margin:0 0 1px !important;
+  align-self:flex-end !important;
+}
+#geminiPanel #geminiForm > #geminiInput {
+  position:static !important; order:1 !important; display:block !important;
+  flex:1 1 0% !important; width:0 !important; min-width:0 !important;
+  max-width:none !important; min-height:38px !important; max-height:180px !important;
+  height:38px !important; margin:0 !important; padding:8px 2px !important;
+  line-height:1.45 !important; box-sizing:border-box !important;
+  overflow-x:hidden !important; overflow-y:hidden !important; resize:none !important;
+  align-self:stretch !important; white-space:pre-wrap !important;
+}
+#geminiPanel #geminiForm > .gemini-image-options {
+  position:static !important; order:2 !important; flex:0 0 auto !important;
+  width:auto !important; min-width:0 !important; margin:0 !important;
+  align-self:flex-end !important;
+}
+#geminiPanel #geminiForm > #geminiSend {
+  position:static !important; order:3 !important; flex:0 0 35px !important;
+  width:35px !important; height:35px !important; margin:0 0 1px !important;
+  align-self:flex-end !important;
+}
+#geminiPanel #geminiForm.composer-expanded {
+  min-height:64px !important; height:auto !important; border-radius:22px !important;
+  align-items:flex-end !important;
+}
+#geminiPanel #geminiForm.composer-expanded > #geminiInput {
+  height:auto !important; min-height:38px !important; max-height:180px !important;
+  align-self:stretch !important;
+}
+#geminiPanel #geminiForm > #geminiAttachmentPreview {
+  position:absolute !important; left:8px !important; right:8px !important;
+  bottom:calc(100% + 2px) !important; top:auto !important; width:auto !important;
+  max-width:none !important; min-width:0 !important; height:auto !important;
+  margin:0 !important; z-index:20 !important;
+}
+@media(max-width:700px){
+  #geminiPanel #geminiForm{align-items:flex-end!important}
+  #geminiPanel #geminiForm > #geminiInput{max-height:160px!important}
+}
 </style>
 <style id="cinemotion-send-flow-style">
 .gemini-message.assistant:has(.gemini-send-flow){padding-bottom:58px!important}
@@ -7954,3 +7996,41 @@ body.director-mode .search-box{display:none!important}
 </script>
 
 <style id="cinemotion-voice-output-style">.cinemotion-voice-replay{width:100%;margin-top:8px;border:1px solid #31516e;border-radius:11px;padding:10px 14px;background:#10243a;color:#ccefff;font-weight:750;font-size:12px;cursor:pointer}.cinemotion-voice-replay:hover{border-color:#54dcff;box-shadow:0 0 16px #28c8ff22}</style>\n<style id="cinemotion-screen-analysis-style">#cinemotionAnalyzeScreen{background:linear-gradient(100deg,#0f7898,#4e60c9);color:#fff}#cinemotionAnalyzeScreen:disabled{opacity:.45;cursor:not-allowed}</style>
+<style id="gemini-composer-autogrow-final">
+/* Final override: prevent the chat composer from painting text outside its rounded box. */
+#geminiPanel #geminiForm{flex:0 0 auto!important;min-height:54px!important;height:auto!important;overflow:visible!important}
+#geminiPanel #geminiForm #geminiInput{
+  display:block!important;min-height:38px!important;max-height:180px!important;
+  height:38px!important;overflow-x:hidden!important;overflow-y:hidden!important;
+  box-sizing:border-box!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important;
+}
+#geminiPanel #geminiForm.composer-expanded #geminiInput{height:auto!important;align-self:stretch!important}
+#geminiPanel #geminiForm.composer-expanded{align-items:flex-end!important}
+#geminiPanel .gemini-reference-panel{flex:0 0 auto!important;position:relative!important;z-index:1!important}
+</style>
+<script id="gemini-composer-autogrow-final-script">
+(()=> {
+  const input=document.getElementById('geminiInput');
+  const form=document.getElementById('geminiForm');
+  if(!input||!form||input.dataset.cinemotionAutogrow==='ready')return;
+  input.dataset.cinemotionAutogrow='ready';
+  const resize=()=>{
+    input.style.setProperty('height','auto','important');
+    const css=getComputedStyle(input);
+    const line=parseFloat(css.lineHeight)||22;
+    const max=Math.min(180,Math.ceil(line*7+18));
+    const target=Math.max(38,Math.min(input.scrollHeight,max));
+    input.style.setProperty('height',target+'px','important');
+    input.style.setProperty('max-height',max+'px','important');
+    input.style.setProperty('overflow-y',input.scrollHeight>max+1?'auto':'hidden','important');
+    form.classList.toggle('composer-expanded',target>48);
+    form.style.setProperty('height','auto','important');
+  };
+  input.addEventListener('input',()=>requestAnimationFrame(resize),true);
+  input.addEventListener('change',resize,true);
+  input.addEventListener('paste',()=>requestAnimationFrame(resize),true);
+  input.addEventListener('compositionend',()=>requestAnimationFrame(resize),true);
+  window.addEventListener('resize',resize);
+  requestAnimationFrame(resize);
+})();
+</script>
