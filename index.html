@@ -1042,16 +1042,19 @@
 
     .prompt-send-actions {
       display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:8px;
+      width:100%; align-items:stretch;
     }
     .prompt-send-actions .copy-btn,
     .prompt-send-actions .send-chatgpt-card-btn,
     .prompt-send-actions .send-gemini-card-btn {
-      width:100%; min-width:0; min-height:42px; padding:9px 7px;
-      border-radius:8px; display:flex; align-items:center; justify-content:center;
-      gap:6px; font:700 .78rem 'Plus Jakarta Sans',sans-serif; cursor:pointer;
-      white-space:normal; line-height:1.25;
+      box-sizing:border-box; width:100%; min-width:0; min-height:46px; margin:0; padding:10px 8px;
+      border-radius:9px; display:flex; align-items:center; justify-content:center;
+      gap:7px; font:700 .78rem 'Plus Jakarta Sans',sans-serif; cursor:pointer;
+      white-space:normal; line-height:1.2; text-align:center;
     }
-    .prompt-send-actions .copy-btn { margin:0; }
+    .prompt-send-actions .copy-btn {
+      grid-column:1 / -1; min-height:48px; font-size:.84rem;
+    }
     .send-chatgpt-card-btn {
       color:#e8fff6; background:linear-gradient(135deg,rgba(16,163,127,.22),rgba(13,148,136,.13));
       border:1px solid rgba(16,185,129,.48); transition:all .2s ease;
@@ -3062,11 +3065,11 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
               <button type="button" class="copy-btn" onclick="copyCardPrompt('${item.id}')">
                 <i class="fa-solid fa-copy"></i> Copy Prompt
               </button>
-              <button type="button" class="send-chatgpt-card-btn" onclick="sendCardPromptToChatGPT('${item.id}')">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i> Send to ChatGPT
-              </button>
               <button type="button" class="send-gemini-card-btn" onclick="sendCardPromptToGemini('${item.id}')">
                 <i class="fa-brands fa-google"></i> Send to Gemini
+              </button>
+              <button type="button" class="send-chatgpt-card-btn" onclick="sendCardPromptToChatGPT('${item.id}')">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Send to ChatGPT
               </button>
             </div>
             <button type="button" class="use-gemini-btn" onclick="insertPromptIntoGemini('${item.id}')">
