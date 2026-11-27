@@ -3858,14 +3858,40 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
         targetUrl += "?q=" + encodeURIComponent(pending.promptText);
       }
 
-      // A stable window name reuses the same destination tab. _blank always creates a new tab.
-      const target = destination === "existing" ? targetName : "_blank";
-      const destinationWindow = window.open(targetUrl, target, destination === "new" ? "noopener,noreferrer" : undefined);
+      // Remember the last tab created by this website for each destination.
+      // "New tab" gets a unique name; "Existing tab" targets that remembered name.
+      const storageKey = "cinemotionLast_" + pending.service + "_tab";
+      let rememberedTabName = "";
+      try {
+        rememberedTabName = sessionStorage.getItem(storageKey) || "";
+      } catch (err) {
+        console.warn("Could not read the remembered destination tab:", err);
+      }
 
-      if (destination === "existing" && !destinationWindow) {
-        showToast("Browser could not open or reuse the tab. Allow pop-ups for this website and try again.");
+      let target;
+      if (destination === "existing") {
+        target = rememberedTabName || targetName;
+      } else {
+        target = targetName + "_" + Date.now();
+      }
+
+      // Do not use the "noopener" feature here: browsers treat noopener targets as
+      // unnamed new contexts, which prevents later reuse by their window name.
+      const destinationWindow = window.open(targetUrl, target);
+
+      if (!destinationWindow) {
+        showToast("Browser blocked the tab. Allow pop-ups for this website and try again.");
         return;
       }
+
+      try {
+        sessionStorage.setItem(storageKey, target);
+      } catch (err) {
+        console.warn("Could not remember the destination tab:", err);
+      }
+
+      // Reduce reverse-tabnabbing risk while keeping the named tab reusable.
+      try { destinationWindow.opener = null; } catch (err) { /* cross-origin window */ }
 
       if (isGemini || (!isGemini && pending.promptText.length > 12000)) {
         try {
