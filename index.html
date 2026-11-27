@@ -3919,8 +3919,8 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       // Keep the live handle and the shared tab name for reliable reuse.
       promptDestinationWindows[serviceKey] = destinationWindow;
       try {
-        if (destination === "existing" && rememberedTabName) {
-          localStorage.setItem(storageKey, rememberedTabName);
+        if (destination === "existing") {
+          localStorage.setItem(storageKey, rememberedTabName || targetName);
         }
         destinationWindow.focus();
       } catch (err) {
