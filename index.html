@@ -3816,6 +3816,9 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
 
     // Ask where to open the destination before sending any prompt.
     let pendingPromptDestination = null;
+    // Keep direct references to tabs opened during this page session.
+    // This is more reliable than relying only on a window name.
+    const promptDestinationWindows = { gemini: null, chatgpt: null };
 
     window.sendCardPromptToChatGPT = function(itemId) {
       const item = window.allVaultItems?.find(entry => String(entry.id) === String(itemId));
@@ -3871,30 +3874,51 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
         console.warn("Could not read the remembered destination tab:", err);
       }
 
-      let target;
-      if (destination === "existing") {
-        target = rememberedTabName || targetName;
-      } else {
-        target = targetName + "_" + Date.now();
-      }
+      let destinationWindow = null;
+      const serviceKey = pending.service;
 
-      // Do not use the "noopener" feature here: browsers treat noopener targets as
-      // unnamed new contexts, which prevents later reuse by their window name.
-      const destinationWindow = window.open(targetUrl, target);
+      if (destination === "existing") {
+        // First reuse the exact tab handle created earlier in this page session.
+        const rememberedWindow = promptDestinationWindows[serviceKey];
+        if (rememberedWindow && !rememberedWindow.closed) {
+          destinationWindow = rememberedWindow;
+          try {
+            destinationWindow.location.href = targetUrl;
+            destinationWindow.focus();
+          } catch (err) {
+            console.warn("Could not navigate the remembered tab; trying its window name.", err);
+            destinationWindow = null;
+          }
+        }
+
+        // If the page was refreshed and the handle was lost, fall back to its saved name.
+        if (!destinationWindow) {
+          const fallbackName = rememberedTabName || targetName;
+          destinationWindow = window.open(targetUrl, fallbackName);
+        }
+      } else {
+        // A unique name guarantees a genuinely new tab each time New tab is selected.
+        const newTabName = targetName + "_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
+        destinationWindow = window.open(targetUrl, newTabName);
+        if (destinationWindow) {
+          try {
+            sessionStorage.setItem(storageKey, newTabName);
+          } catch (err) {
+            console.warn("Could not remember the new destination tab:", err);
+          }
+        }
+      }
 
       if (!destinationWindow) {
         showToast("Browser blocked the tab. Allow pop-ups for this website and try again.");
         return;
       }
 
-      try {
-        sessionStorage.setItem(storageKey, target);
-      } catch (err) {
-        console.warn("Could not remember the destination tab:", err);
+      // Keep the live handle so Existing tab can navigate this exact tab next time.
+      promptDestinationWindows[serviceKey] = destinationWindow;
+      if (destination === "existing") {
+        try { destinationWindow.focus(); } catch (err) { /* focus may be restricted */ }
       }
-
-      // Reduce reverse-tabnabbing risk while keeping the named tab reusable.
-      try { destinationWindow.opener = null; } catch (err) { /* cross-origin window */ }
 
       if (isGemini || (!isGemini && pending.promptText.length > 12000)) {
         try {
