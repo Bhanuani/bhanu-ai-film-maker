@@ -484,6 +484,17 @@
 
     @keyframes iconFloatContinuous { 0% { transform: translateY(0px) rotate(0deg); } 100% { transform: translateY(-4px) rotate(3deg); } }
 
+    .prompt-arrange-toolbar{display:flex;align-items:center;gap:12px;margin:-1.15rem 0 1.35rem;min-height:38px}
+    .prompt-arrange-toggle{display:inline-flex;align-items:center;gap:9px;padding:9px 15px;border:1px solid rgba(0,210,255,.42);border-radius:999px;background:rgba(0,210,255,.09);color:#dffaff;font:700 .78rem 'Plus Jakarta Sans',sans-serif;cursor:pointer;transition:background .2s,border-color .2s}
+    .prompt-arrange-toggle:hover,.prompt-arrange-toggle[aria-pressed="true"]{background:rgba(0,210,255,.2);border-color:#00d2ff;color:#fff}
+    .prompt-arrange-hint{font-size:.72rem;color:#91a7bd}
+    body.prompt-arrange-mode .movement-card{cursor:grab;border-color:rgba(0,210,255,.42);touch-action:pan-y}
+    body.prompt-arrange-mode .movement-card:active{cursor:grabbing}
+    body.prompt-arrange-mode .movement-card .card-video-box,body.prompt-arrange-mode .movement-card .prompt-content{pointer-events:none}
+    body.prompt-arrange-mode .movement-card.sortable-ghost{opacity:.22}
+    body.prompt-arrange-mode .movement-card.sortable-chosen{border-color:#00d2ff;box-shadow:0 0 0 2px rgba(0,210,255,.25),0 16px 35px rgba(0,0,0,.35)}
+    @media(max-width:620px){.prompt-arrange-toolbar{flex-wrap:wrap;gap:7px;margin-top:-.8rem}.prompt-arrange-hint{font-size:.66rem}}
+
     /* CARD GRID */
     .movements-grid {
       display: grid;
@@ -2661,6 +2672,10 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
           <span class="count" id="count_Master_Prompts">5</span>
         </button>
       </div>
+      <div class="prompt-arrange-toolbar admin-only">
+        <button type="button" id="togglePromptArrange" class="prompt-arrange-toggle" aria-pressed="false"><i class="fa-solid fa-up-down-left-right"></i><span>Arrange Prompts</span></button>
+        <span class="prompt-arrange-hint" id="promptArrangeHint">Drag cards to reorder them inside their category</span>
+      </div>
     </div>
 
     <main class="movements-grid" id="movementsGrid"></main>
@@ -2789,7 +2804,8 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
   </div>
 
   <!-- SCRIPT -->
-  <script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+<script>
     const defaultMovements = [
       { id: "mov_1", name: "Slow Dolly In", category: "Camera Movement", prompt: "Slow dolly in, camera moves slowly forward toward the subject." },
       { id: "mov_2", name: "Slow Dolly Out", category: "Camera Movement", prompt: "Slow dolly out, camera moves slowly backwards away from the subject." },
@@ -3002,6 +3018,18 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
     function renderCards(list) {
       if (!grid) return;
 
+      const savedPromptOrders = readPromptOrders();
+      list = list.map((item, originalIndex) => ({ item, originalIndex }))
+        .sort((a, b) => {
+          const categoryA = String(a.item.category || "Uncategorized").trim().toLowerCase();
+          const categoryB = String(b.item.category || "Uncategorized").trim().toLowerCase();
+          if (String(currentCategory || "").trim().toLowerCase() === "all" && categoryA !== categoryB) return a.originalIndex - b.originalIndex;
+          const order = savedPromptOrders[categoryA] || [];
+          const posA = order.indexOf(String(a.item.id));
+          const posB = order.indexOf(String(b.item.id));
+          return (posA < 0 ? Number.MAX_SAFE_INTEGER : posA) - (posB < 0 ? Number.MAX_SAFE_INTEGER : posB) || a.originalIndex - b.originalIndex;
+        }).map(entry => entry.item);
+
       // In All view, show the built-in categories in the intended sequence.
       // User-created categories always follow the built-in categories.
       if (String(currentCategory || "").trim().toLowerCase() === "all") {
@@ -3026,7 +3054,7 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
 
       grid.innerHTML = list.map((item, index) => {
         return `
-        <div class="movement-card ${index < 2 ? 'beam-card' : ''}" id="card_${item.id}">
+        <div class="movement-card ${index < 2 ? 'beam-card' : ''}" id="card_${item.id}" data-prompt-id="${item.id}" data-category="${String(item.category || 'Uncategorized').replace(/&/g, '&amp;').replace(/"/g, '&quot;')}">
           <div class="card-video-box ${item.mediaURL ? 'has-media' : ''}" id="box_${item.id}"
                data-card-id="${item.id}" tabindex="0" role="group"
                aria-label="Media upload area for ${item.name}"
@@ -3141,7 +3169,52 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       }
 
       updateCounts();
+      refreshPromptSortable();
     }
+
+    // Prompt arrangement is admin-only. Orders are stored per category in this browser.
+    const PROMPT_ORDER_STORAGE_KEY = "cinemotionPromptOrder_v1";
+    let promptSortable = null;
+    function readPromptOrders() {
+      try { return JSON.parse(localStorage.getItem(PROMPT_ORDER_STORAGE_KEY) || "{}") || {}; }
+      catch (_) { return {}; }
+    }
+    function savePromptOrdersFromGrid() {
+      const orders = readPromptOrders();
+      const grouped = {};
+      grid?.querySelectorAll(".movement-card[data-prompt-id]").forEach(card => {
+        const category = String(card.dataset.category || "Uncategorized").trim().toLowerCase();
+        (grouped[category] ||= []).push(String(card.dataset.promptId));
+      });
+      Object.entries(grouped).forEach(([category, ids]) => {
+        const previous = orders[category] || [];
+        orders[category] = [...ids, ...previous.filter(id => !ids.includes(id))];
+      });
+      try { localStorage.setItem(PROMPT_ORDER_STORAGE_KEY, JSON.stringify(orders)); }
+      catch (error) { console.warn("Could not save prompt arrangement:", error); }
+    }
+    function refreshPromptSortable() {
+      if (promptSortable) { promptSortable.destroy(); promptSortable = null; }
+      if (!grid || !document.body.classList.contains("prompt-arrange-mode")) return;
+      if (!window.Sortable) { showToast("Drag arrangement library did not load. Refresh and try again."); return; }
+      promptSortable = new Sortable(grid, {
+        animation: 160, draggable: ".movement-card", handle: ".movement-card",
+        filter: "button, input, video, iframe, a", preventOnFilter: false,
+        ghostClass: "sortable-ghost", chosenClass: "sortable-chosen",
+        onMove: event => event.dragged?.dataset.category === event.related?.dataset.category,
+        onEnd: () => { savePromptOrdersFromGrid(); showToast("Prompt order saved for this category."); }
+      });
+    }
+    const promptArrangeToggle = document.getElementById("togglePromptArrange");
+    const promptArrangeHint = document.getElementById("promptArrangeHint");
+    promptArrangeToggle?.addEventListener("click", () => {
+      const enabled = !document.body.classList.contains("prompt-arrange-mode");
+      document.body.classList.toggle("prompt-arrange-mode", enabled);
+      promptArrangeToggle.setAttribute("aria-pressed", String(enabled));
+      promptArrangeToggle.querySelector("span").textContent = enabled ? "Done Arranging" : "Arrange Prompts";
+      if (promptArrangeHint) promptArrangeHint.textContent = enabled ? "Drag cards to a new position within the same category" : "Your custom prompt order is saved";
+      refreshPromptSortable();
+    });
 
     // SOCIAL MEDIA / CLOUD LINK MODAL HANDLER
     const linkModal = document.getElementById("linkModal");
