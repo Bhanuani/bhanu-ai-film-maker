@@ -5813,6 +5813,8 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
         let typingActive = false;
         let typingDrainResolver = null;
         let streamFailed = false;
+        // Batch streamed text once per animation frame instead of forcing
+        // a layout/scroll calculation after every three characters.
         const typeNext = () => {
           if (!typingBuffer.length) {
             typingActive = false;
@@ -5821,14 +5823,14 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
           }
           typingActive = true;
           if (!pending) pending = addGeminiMessage("", "assistant");
-          const nextCount = Math.min(typingBuffer.length, 3);
+          const nextCount = Math.min(typingBuffer.length, 28);
           const typed = typingBuffer.slice(0, nextCount);
           typingBuffer = typingBuffer.slice(nextCount);
+          const messagesWasNearBottom = geminiMessages &&
+            (geminiMessages.scrollHeight - geminiMessages.scrollTop - geminiMessages.clientHeight < 100);
           pending.textContent += typed;
-          geminiMessages.scrollTop = geminiMessages.scrollHeight;
-          const lastChar = typed.slice(-1);
-          const delay = /[.!?。！？]/.test(lastChar) ? 95 : /[,;:]/.test(lastChar) ? 45 : 18;
-          setTimeout(typeNext, delay);
+          if (messagesWasNearBottom) geminiMessages.scrollTop = geminiMessages.scrollHeight;
+          requestAnimationFrame(typeNext);
         };
         try {
           result = await geminiChatSession.sendMessageStream(messagePayload);
@@ -6477,6 +6479,7 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       clearStoryReferences();
       sendGeminiMessage(storyRefs.prompt, files);
     });
+    let geminiComposerResizeFrame = 0;
     function resizeGeminiComposer() {
       if (!geminiInput) return;
       const form = geminiForm;
@@ -6488,22 +6491,28 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       const borderBottom = parseFloat(computed.borderBottomWidth) || 0;
       const maxHeight = Math.ceil(lineHeight * 7 + paddingTop + paddingBottom + borderTop + borderBottom);
 
-      // Reset to auto first so shrinking works when text is deleted.
+      // One height reset/read/write cycle per animation frame keeps typing responsive
+      // while still allowing the textarea to shrink immediately after deletion.
       geminiInput.style.setProperty("height", "auto", "important");
       geminiInput.style.setProperty("max-height", maxHeight + "px", "important");
       const contentHeight = geminiInput.scrollHeight;
       const nextHeight = Math.max(38, Math.min(contentHeight, maxHeight));
       geminiInput.style.setProperty("height", nextHeight + "px", "important");
-      const needsScroll = contentHeight > maxHeight + 1;
-      geminiInput.style.setProperty("overflow-y", needsScroll ? "auto" : "hidden", "important");
+      geminiInput.style.setProperty("overflow-y", contentHeight > maxHeight + 1 ? "auto" : "hidden", "important");
       if (form) form.classList.toggle("composer-expanded", nextHeight > 48);
     }
-    geminiInput?.addEventListener("input", resizeGeminiComposer);
-    geminiInput?.addEventListener("change", resizeGeminiComposer);
-    geminiInput?.addEventListener("paste", () => requestAnimationFrame(resizeGeminiComposer));
-    geminiInput?.addEventListener("compositionend", resizeGeminiComposer);
-    window.addEventListener("resize", resizeGeminiComposer);
-    requestAnimationFrame(resizeGeminiComposer);
+    function scheduleGeminiComposerResize() {
+      if (geminiComposerResizeFrame) return;
+      geminiComposerResizeFrame = requestAnimationFrame(() => {
+        geminiComposerResizeFrame = 0;
+        resizeGeminiComposer();
+      });
+    }
+    geminiInput?.addEventListener("input", scheduleGeminiComposerResize);
+    geminiInput?.addEventListener("change", scheduleGeminiComposerResize);
+    geminiInput?.addEventListener("compositionend", scheduleGeminiComposerResize);
+    window.addEventListener("resize", scheduleGeminiComposerResize, { passive: true });
+    scheduleGeminiComposerResize();
     geminiInput?.addEventListener("keydown", (event) => {
       if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
