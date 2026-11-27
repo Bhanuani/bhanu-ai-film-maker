@@ -2045,9 +2045,12 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
 
   try {
     const renderer = new THREE.WebGLRenderer({
-      canvas, alpha: true, antialias: true, powerPreference: 'high-performance'
+      canvas, alpha: true, antialias: false, powerPreference: 'low-power'
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+    // The decorative bee is intentionally rendered at a lighter resolution;
+    // this lowers GPU load without changing the page layout or bee model.
+    const getBeePixelRatio = () => Math.min(window.devicePixelRatio || 1, window.innerWidth < 700 ? 0.9 : 1.2);
+    renderer.setPixelRatio(getBeePixelRatio());
     renderer.setSize(window.innerWidth, window.innerHeight, false);
     renderer.setClearColor(0x000000, 0);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -2189,15 +2192,48 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
 
     function resize(){
       const w=window.innerWidth,h=window.innerHeight;
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.75));
+      renderer.setPixelRatio(getBeePixelRatio());
       renderer.setSize(w,h,false);
       camera.aspect=w/h;camera.updateProjectionMatrix();
     }
     window.addEventListener('resize',resize,{passive:true});
 
-    function frame(){
-      requestAnimationFrame(frame);
-      const dt=Math.min(clock.getDelta(),.05); elapsed+=dt;
+    let animationFrameId=0;
+    let lastRenderTime=0;
+    let landingIsVisible=true;
+    let beePageActive=!document.hidden;
+    const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const visibilityObserver=new IntersectionObserver(entries=>{
+      landingIsVisible=entries.some(entry=>entry.isIntersecting);
+      if(landingIsVisible && beePageActive && !reducedMotion && !animationFrameId){
+        lastRenderTime=0;
+        animationFrameId=requestAnimationFrame(frame);
+      }
+    },{threshold:0.01});
+    visibilityObserver.observe(landing);
+    function updateBeePageVisibility(){
+      beePageActive=!document.hidden;
+      if(!beePageActive && animationFrameId){
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId=0;
+      }else if(beePageActive && landingIsVisible && !reducedMotion && !animationFrameId){
+        lastRenderTime=0;
+        animationFrameId=requestAnimationFrame(frame);
+      }
+    }
+    document.addEventListener('visibilitychange',updateBeePageVisibility,{passive:true});
+
+    function frame(timestamp=0){
+      animationFrameId=0;
+      if(!landingIsVisible || !beePageActive || reducedMotion) return;
+      // Cap the decorative 3D bee at 30 FPS to reduce continuous GPU usage.
+      if(timestamp-lastRenderTime<33){
+        animationFrameId=requestAnimationFrame(frame);
+        return;
+      }
+      const dt=Math.min((timestamp-lastRenderTime)/1000 || 1/30,.05);
+      lastRenderTime=timestamp;
+      elapsed+=dt;
       const landingTop=landing.getBoundingClientRect().top;
       const focus=landing.scrollTop+landing.clientHeight*.52;
       const positions=anchors.map(el=>el.getBoundingClientRect().top-landingTop+landing.scrollTop);
@@ -2235,10 +2271,13 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       canvas.dataset.ready='true';
       canvas.dataset.engine='three.js-procedural-honeybee';
       renderer.render(scene,camera);
+      animationFrameId=requestAnimationFrame(frame);
     }
     canvas.dataset.ready='initializing';
     canvas.dataset.engine='three.js-procedural-honeybee';
-    frame();
+    if(!reducedMotion && landingIsVisible && beePageActive){
+      animationFrameId=requestAnimationFrame(frame);
+    }
     console.info('CINEMOTION procedural 3D honeybee initialized.');
   } catch(error) {
     canvas.dataset.ready='error';
