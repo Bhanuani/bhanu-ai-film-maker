@@ -2176,6 +2176,17 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
     ];
     const clock=new THREE.Clock();
     let elapsed=0;
+
+    // Cursor-follow target in normalized viewport coordinates.
+    // The bee eases toward the pointer instead of snapping to it.
+    let cursorNX=0, cursorNY=0, cursorSeen=false;
+    window.addEventListener('pointermove', event => {
+      if (event.pointerType && event.pointerType !== 'mouse' && event.pointerType !== 'pen') return;
+      cursorNX=(event.clientX / Math.max(1, window.innerWidth))*2-1;
+      cursorNY=1-(event.clientY / Math.max(1, window.innerHeight))*2;
+      cursorSeen=true;
+    }, {passive:true});
+
     function resize(){
       const w=window.innerWidth,h=window.innerHeight;
       renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.75));
@@ -2198,7 +2209,14 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       const nx=lerp(a.x,b.x,t),ny=lerp(a.y,b.y,t);
       const halfH=Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*camera.position.z;
       const halfW=halfH*camera.aspect;
-      bee.position.set(nx*halfW,ny*halfH+Math.sin(elapsed*2.3)*.055,0);
+      const scrollX=nx*halfW;
+      const scrollY=ny*halfH+Math.sin(elapsed*2.3)*.055;
+      const targetX=cursorSeen ? cursorNX*halfW : scrollX;
+      const targetY=cursorSeen ? cursorNY*halfH : scrollY;
+      const follow=1-Math.exp(-5.5*dt);
+      bee.position.x=THREE.MathUtils.lerp(bee.position.x,targetX,follow);
+      bee.position.y=THREE.MathUtils.lerp(bee.position.y,targetY,follow);
+      bee.position.z=0;
       bee.scale.setScalar(.72+Math.sin(elapsed*1.6)*.018);
       bee.rotation.z=lerp(a.rot,b.rot,t)+Math.sin(elapsed*1.4)*.035;
       bee.rotation.y=Math.sin(elapsed*.85)*.20;
