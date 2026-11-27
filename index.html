@@ -1009,6 +1009,37 @@
       border-radius:8px; padding:8px 10px; font-weight:700; font-size:.72rem;
     }
     .director-mobile-tabs button.active { color:#04101a; background:var(--accent-cyan); }
+    .prompt-destination-modal {
+      position:fixed; inset:0; z-index:10050; display:none; align-items:center; justify-content:center;
+      padding:18px; background:rgba(2,6,18,.76); backdrop-filter:blur(8px);
+    }
+    .prompt-destination-modal.show { display:flex; }
+    .prompt-destination-card {
+      width:min(420px,100%); padding:22px; border-radius:16px;
+      background:linear-gradient(145deg,#101a2d,#090f1d); border:1px solid rgba(148,163,184,.25);
+      box-shadow:0 24px 70px rgba(0,0,0,.5); color:#f8fafc;
+    }
+    .prompt-destination-card h3 { margin:0 0 7px; font:800 1.08rem 'Plus Jakarta Sans',sans-serif; }
+    .prompt-destination-card p { margin:0 0 17px; color:#9eacc2; font-size:.84rem; }
+    .prompt-destination-options { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .prompt-destination-options button {
+      min-height:82px; display:flex; align-items:center; gap:10px; text-align:left; padding:12px;
+      border-radius:11px; border:1px solid rgba(125,150,190,.3); background:rgba(30,45,70,.55);
+      color:#f8fafc; cursor:pointer; transition:.18s ease;
+    }
+    .prompt-destination-options button:hover { border-color:#60a5fa; background:rgba(59,130,246,.16); }
+    .prompt-destination-options button>i { font-size:1.15rem; color:#93c5fd; }
+    .prompt-destination-options button span { display:flex; flex-direction:column; gap:4px; }
+    .prompt-destination-options strong { font-size:.82rem; }
+    .prompt-destination-options small { color:#9eacc2; font-size:.68rem; line-height:1.3; }
+    .prompt-destination-cancel {
+      display:block; margin:14px 0 0 auto; padding:7px 12px; border:0; background:transparent;
+      color:#aab7ca; font-size:.8rem; cursor:pointer;
+    }
+    @media(max-width:380px) {
+      .prompt-destination-options { grid-template-columns:1fr; }
+    }
+
     .prompt-send-actions {
       display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:8px;
     }
@@ -2703,6 +2734,24 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
     <span id="toastMsg">Action Successful!</span>
   </div>
 
+  <div id="promptDestinationModal" class="prompt-destination-modal" role="dialog" aria-modal="true" aria-labelledby="promptDestinationTitle">
+    <div class="prompt-destination-card">
+      <h3 id="promptDestinationTitle">Where should I open it?</h3>
+      <p>Choose how to open the prompt destination.</p>
+      <div class="prompt-destination-options">
+        <button type="button" onclick="choosePromptDestination('new')">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          <span><strong>New tab</strong><small>Open a fresh tab</small></span>
+        </button>
+        <button type="button" onclick="choosePromptDestination('existing')">
+          <i class="fa-solid fa-window-restore"></i>
+          <span><strong>Existing tab</strong><small>Reuse the same Gemini or ChatGPT tab</small></span>
+        </button>
+      </div>
+      <button type="button" class="prompt-destination-cancel" onclick="closePromptDestinationModal()">Cancel</button>
+    </div>
+  </div>
+
   <!-- SCRIPT -->
   <script>
     const defaultMovements = [
@@ -3762,8 +3811,9 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       }
     };
 
-    // Opens ChatGPT with the selected vault prompt prefilled. No API key or paid API.
-    // ChatGPT's ?q= prefill is an undocumented web feature and may change.
+    // Ask where to open the destination before sending any prompt.
+    let pendingPromptDestination = null;
+
     window.sendCardPromptToChatGPT = function(itemId) {
       const item = window.allVaultItems?.find(entry => String(entry.id) === String(itemId));
       const promptText = String(item?.prompt || "").trim();
@@ -3771,39 +3821,68 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
         showToast("This card does not contain a prompt yet.");
         return;
       }
-      const chatUrl = "https://chatgpt.com/?q=" + encodeURIComponent(promptText);
-      if (chatUrl.length > 18000) {
-        copyPromptText(promptText, itemId);
-        window.open("https://chatgpt.com/", "_blank", "noopener,noreferrer");
-        showToast("Prompt copied. Paste it into ChatGPT because this prompt is too long for a URL.");
-        return;
-      }
-      window.open(chatUrl, "_blank", "noopener,noreferrer");
-      showToast("Opening ChatGPT with your prompt. Review it and press Send if needed.");
+      pendingPromptDestination = { service: "chatgpt", itemId, promptText };
+      document.getElementById("promptDestinationModal")?.classList.add("show");
     };
 
-    // Copies the selected prompt and opens Gemini. Gemini's web app does not
-    // provide a documented external prompt-prefill URL, so paste is required.
-    window.sendCardPromptToGemini = async function(itemId) {
+    window.sendCardPromptToGemini = function(itemId) {
       const item = window.allVaultItems?.find(entry => String(entry.id) === String(itemId));
       const promptText = String(item?.prompt || "").trim();
       if (!promptText) {
         showToast("This card does not contain a prompt yet.");
         return;
       }
+      pendingPromptDestination = { service: "gemini", itemId, promptText };
+      document.getElementById("promptDestinationModal")?.classList.add("show");
+    };
 
-      // Open synchronously from the click so the browser does not block the new tab.
-      window.open("https://gemini.google.com/app", "_blank", "noopener,noreferrer");
-      try {
-        if (!navigator.clipboard || !navigator.clipboard.writeText) {
-          throw new Error("Clipboard access is unavailable.");
+    window.closePromptDestinationModal = function() {
+      document.getElementById("promptDestinationModal")?.classList.remove("show");
+      pendingPromptDestination = null;
+    };
+
+    window.choosePromptDestination = async function(destination) {
+      const pending = pendingPromptDestination;
+      if (!pending) return;
+
+      const modal = document.getElementById("promptDestinationModal");
+      modal?.classList.remove("show");
+      pendingPromptDestination = null;
+
+      const isGemini = pending.service === "gemini";
+      const baseUrl = isGemini ? "https://gemini.google.com/app" : "https://chatgpt.com/";
+      const targetName = isGemini ? "cinemotionGeminiTab" : "cinemotionChatGPTTab";
+      let targetUrl = baseUrl;
+
+      if (!isGemini && pending.promptText.length <= 12000) {
+        targetUrl += "?q=" + encodeURIComponent(pending.promptText);
+      }
+
+      // A stable window name reuses the same destination tab. _blank always creates a new tab.
+      const target = destination === "existing" ? targetName : "_blank";
+      const destinationWindow = window.open(targetUrl, target, destination === "new" ? "noopener,noreferrer" : undefined);
+
+      if (!destinationWindow) {
+        showToast("Browser blocked the tab. Allow pop-ups for this website and try again.");
+        return;
+      }
+
+      if (isGemini || (!isGemini && pending.promptText.length > 12000)) {
+        try {
+          if (!navigator.clipboard || !navigator.clipboard.writeText) {
+            throw new Error("Clipboard access is unavailable.");
+          }
+          await navigator.clipboard.writeText(pending.promptText);
+          playCopiedVideoAnimation(pending.itemId);
+          showToast(isGemini
+            ? "Prompt copied. Paste it into Gemini and press Send."
+            : "Prompt copied. Paste it into ChatGPT because this prompt is too long for a URL.");
+        } catch (err) {
+          console.error("Prompt copy failed:", err);
+          showToast("Destination opened, but clipboard copy failed. Copy the prompt manually.");
         }
-        await navigator.clipboard.writeText(promptText);
-        playCopiedVideoAnimation(itemId);
-        showToast("Prompt copied. Paste it into Gemini and press Send.");
-      } catch (err) {
-        console.error("Gemini prompt copy failed:", err);
-        showToast("Gemini opened. Copy the prompt first, then paste it into Gemini.");
+      } else {
+        showToast("ChatGPT opened with your prompt. Review it and press Send if needed.");
       }
     };
 
