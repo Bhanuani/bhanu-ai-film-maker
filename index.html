@@ -488,9 +488,12 @@
     .prompt-arrange-toggle{display:inline-flex;align-items:center;gap:9px;padding:9px 15px;border:1px solid rgba(0,210,255,.42);border-radius:999px;background:rgba(0,210,255,.09);color:#dffaff;font:700 .78rem 'Plus Jakarta Sans',sans-serif;cursor:pointer;transition:background .2s,border-color .2s}
     .prompt-arrange-toggle:hover,.prompt-arrange-toggle[aria-pressed="true"]{background:rgba(0,210,255,.2);border-color:#00d2ff;color:#fff}
     .prompt-arrange-hint{font-size:.72rem;color:#91a7bd}
-    body.prompt-arrange-mode .movement-card{cursor:grab;border-color:rgba(0,210,255,.42);touch-action:none}
-    body.prompt-arrange-mode .movement-card:active{cursor:grabbing}
-    body.prompt-arrange-mode .movement-card .card-video-box,body.prompt-arrange-mode .movement-card .prompt-content{pointer-events:none}
+    body.prompt-arrange-mode .movement-card{border-color:rgba(0,210,255,.42);touch-action:pan-y}
+    body.prompt-arrange-mode .movement-card .prompt-drag-handle{display:inline-flex}
+    .prompt-drag-handle{display:none;align-items:center;justify-content:center;width:30px;height:30px;margin-left:6px;border:1px solid rgba(0,210,255,.45);border-radius:8px;background:rgba(0,210,255,.12);color:#8beaff;cursor:grab;touch-action:none;flex:0 0 auto}
+    .prompt-drag-handle:active{cursor:grabbing}
+    body.prompt-arrange-mode .movement-card.sortable-ghost{opacity:.22}
+    body.prompt-arrange-mode .movement-card.sortable-chosen{border-color:#00d2ff;box-shadow:0 0 0 2px rgba(0,210,255,.25),0 16px 35px rgba(0,0,0,.35)}
     body.prompt-arrange-mode .movement-card.sortable-ghost{opacity:.22}
     body.prompt-arrange-mode .movement-card.sortable-chosen{border-color:#00d2ff;box-shadow:0 0 0 2px rgba(0,210,255,.25),0 16px 35px rgba(0,0,0,.35)}
     @media(max-width:620px){.prompt-arrange-toolbar{flex-wrap:wrap;gap:7px;margin-top:-.8rem}.prompt-arrange-hint{font-size:.66rem}}
@@ -3093,6 +3096,7 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
             <div>
               <div class="card-meta">
                 <span class="tag-badge">${item.category || 'Movement'}</span>
+                <button type="button" class="prompt-drag-handle" title="Drag to reorder this prompt" aria-label="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></button>
                 
                 <div class="card-meta-actions admin-only">
                   <button type="button" class="meta-action-btn edit-btn" title="Paste / Attach Link" onclick="openLinkModal('${item.id}', event)">
@@ -3203,8 +3207,8 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       if (!grid || !document.body.classList.contains("prompt-arrange-mode")) return;
       if (!window.Sortable) { showToast("Drag arrangement library did not load. Refresh and try again."); return; }
       promptSortable = new Sortable(grid, {
-        animation: 160, draggable: ".movement-card", handle: ".movement-card",
-        filter: "button, input, video, iframe, a", preventOnFilter: false,
+        animation: 160, draggable: ".movement-card", handle: ".prompt-drag-handle",
+        filter: "button, input, video, iframe, a", preventOnFilter: true, delayOnTouchOnly: true, delay: 140, touchStartThreshold: 5,
         ghostClass: "sortable-ghost", chosenClass: "sortable-chosen",
         onMove: event => event.dragged?.dataset.category === event.related?.dataset.category,
         onEnd: () => { savePromptOrdersFromGrid(); showToast("Prompt order saved for this category."); }
