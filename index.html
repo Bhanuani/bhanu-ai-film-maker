@@ -1996,6 +1996,216 @@ body::after{
         <a href="#" data-enter-cinemotion>Open existing application ↗</a>
       </div>
     </footer>
+
+
+    <!-- CINEMOTION desktop scroll-flight bee: isolated visual layer -->
+<style id="cinemotion-scroll-bee-style">
+  #cinemotion-scroll-bee-canvas {
+    position: fixed; inset: 0; width: 100%; height: 100%;
+    z-index: 10; pointer-events: none; opacity: 0;
+    transition: opacity .7s ease; display: block;
+  }
+  #cinemotion-scroll-bee-canvas.is-active { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    #cinemotion-scroll-bee-canvas { transition: none; }
+  }
+</style>
+<canvas id="cinemotion-scroll-bee-canvas" aria-hidden="true"></canvas>
+
+<script type="module" id="cinemotion-scroll-bee-script">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+(() => {
+  const canvas = document.getElementById('cinemotion-scroll-bee-canvas');
+  const landing = document.getElementById('cinemotionLandingTop');
+  if (!canvas || !landing) return;
+
+  try {
+    const renderer = new THREE.WebGLRenderer({
+      canvas, alpha: true, antialias: true, powerPreference: 'high-performance'
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+    renderer.setSize(window.innerWidth, window.innerHeight, false);
+    renderer.setClearColor(0x000000, 0);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.25;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 0, 8);
+
+    scene.add(new THREE.HemisphereLight(0xfff7e8, 0x3b4260, 2.0));
+    const key = new THREE.DirectionalLight(0xffe3a0, 3.1);
+    key.position.set(-3, 4, 6); scene.add(key);
+    const fill = new THREE.DirectionalLight(0xb9dfff, 1.8);
+    fill.position.set(4, 1, 4); scene.add(fill);
+    const rim = new THREE.PointLight(0xffa62b, 2.2, 12);
+    rim.position.set(0, 2, -2); scene.add(rim);
+
+    const bee = new THREE.Group();
+    const body = new THREE.Group();
+    bee.add(body); scene.add(bee);
+
+    const black = new THREE.MeshPhysicalMaterial({color:0x17130f, roughness:.36, metalness:.12, clearcoat:.7});
+    const amber = new THREE.MeshPhysicalMaterial({color:0xe9a51c, roughness:.32, metalness:.08, clearcoat:.85});
+    const gold = new THREE.MeshPhysicalMaterial({color:0xffc84d, roughness:.28, metalness:.1, clearcoat:1});
+    const dark = new THREE.MeshStandardMaterial({color:0x090b10, roughness:.24});
+    const eyeMat = new THREE.MeshPhysicalMaterial({color:0x07090c, roughness:.08, metalness:.18, clearcoat:1});
+    const wingMat = new THREE.MeshPhysicalMaterial({
+      color:0xc9e9ff, transparent:true, opacity:.43, roughness:.16,
+      metalness:.08, transmission:.12, side:THREE.DoubleSide, depthWrite:false
+    });
+
+    function sphere(parent, material, pos, scale, seg=32) {
+      const mesh = new THREE.Mesh(new THREE.SphereGeometry(1,seg,24),material);
+      mesh.position.set(...pos); mesh.scale.set(...scale); parent.add(mesh); return mesh;
+    }
+    function tube(parent, points, radius, material, tubular=24) {
+      const curve = new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(...p)));
+      const mesh = new THREE.Mesh(new THREE.TubeGeometry(curve,tubular,radius,8,false),material);
+      parent.add(mesh); return mesh;
+    }
+
+    // Abdomen, thorax and head form one continuous, detailed bee silhouette.
+    sphere(body, amber, [.55,0,0], [.78,.43,.42], 48);
+    sphere(body, gold, [.45,.035,.015], [.70,.39,.395], 48);
+    // Raised black abdominal bands wrap around the tapered abdomen.
+    [-.02,.28,.57,.83].forEach((x,i)=>{
+      const ring = new THREE.Mesh(
+        new THREE.TorusGeometry(i===3?.265:.345,.052,12,48),
+        black
+      );
+      ring.rotation.y=Math.PI/2;
+      ring.scale.set(1,1,i===3?.86:1);
+      ring.position.set(x,0,0);
+      body.add(ring);
+    });
+    sphere(body, black, [-.28,.015,0], [.48,.42,.41], 40);
+    sphere(body, gold, [-.32,.06,.015], [.40,.35,.35], 40);
+    sphere(body, amber, [-.83,.035,0], [.34,.32,.32], 40);
+    sphere(body, black, [-.93,-.015,.015], [.25,.25,.26], 32);
+    // Large compound eyes, glossy and dark.
+    sphere(body, eyeMat, [-.91,.12,.265], [.105,.14,.075], 24);
+    sphere(body, eyeMat, [-.91,.12,-.265], [.105,.14,.075], 24);
+    // Tiny highlights on the eyes.
+    sphere(body, new THREE.MeshBasicMaterial({color:0xffffff}), [-.945,.17,.326], [.025,.03,.012], 12);
+    sphere(body, new THREE.MeshBasicMaterial({color:0xffffff}), [-.945,.17,-.326], [.025,.03,.012], 12);
+
+    // Antennae.
+    const antennaMat = new THREE.MeshStandardMaterial({color:0x21180e, roughness:.42});
+    tube(body,[[-.91,.28,.10],[-1.02,.53,.13],[-1.20,.58,.15]],.018,antennaMat,18);
+    tube(body,[[-.91,.28,-.10],[-1.02,.53,-.13],[-1.20,.58,-.15]],.018,antennaMat,18);
+    sphere(body,amber,[-1.20,.58,.15],[.035,.035,.035],12);
+    sphere(body,amber,[-1.20,.58,-.15],[.035,.035,.035],12);
+
+    // Six fine legs, attached in three pairs below the thorax.
+    const legMat = new THREE.MeshStandardMaterial({color:0x211a12, roughness:.48});
+    [[-.35,.04],[ -.08,.02],[.18,0]].forEach(([x,z],i)=>{
+      [-1,1].forEach(side=>{
+        tube(body,[[x,-.22,z],[x+.10,-.42,side*.16],[x+.26,-.58,side*.22],[x+.42,-.57,side*.24]],.018,legMat,16);
+      });
+    });
+
+    // Four translucent wings with fine vein lines and independent flap pivots.
+    const wingPivots=[];
+    function makeWing(side, rear=false) {
+      const pivot=new THREE.Group();
+      pivot.position.set(rear?-.36:-.12,.27,side*.16);
+      pivot.rotation.z=side*(rear?-.30:.22);
+      body.add(pivot);
+      const length=rear?.64:.82, width=rear?.27:.34;
+      const shape=new THREE.Shape();
+      shape.moveTo(0,0);
+      shape.bezierCurveTo(length*.20,width*.9,length*.72,width*1.1,length,width*.18);
+      shape.bezierCurveTo(length*.86,-width*.22,length*.36,-width*.35,0,0);
+      const geometry=new THREE.ShapeGeometry(shape,24);
+      const wing=new THREE.Mesh(geometry,wingMat);
+      wing.rotation.x=side*.12;
+      wing.position.z=side*.035;
+      pivot.add(wing);
+      const veinMat=new THREE.MeshBasicMaterial({color:0xe7f5ff,transparent:true,opacity:.66});
+      [
+        [[.02,0,.006],[length*.34,width*.10,.006],[length*.68,width*.12,.006],[length*.96,width*.18,.006]],
+        [[length*.30,width*.07,.008],[length*.42,width*.36,.008],[length*.62,width*.43,.008]],
+        [[length*.50,width*.10,.008],[length*.58,-width*.12,.008],[length*.78,-width*.13,.008]]
+      ].forEach(points=>tube(pivot,points,.006,veinMat,12));
+      wingPivots.push({pivot,side,rear});
+    }
+    makeWing(-1,false); makeWing(1,false);
+    makeWing(-1,true); makeWing(1,true);
+
+    // Tiny pollen-like highlights around the body add depth without a flat sprite look.
+    const pollenMat=new THREE.MeshStandardMaterial({color:0xffd66a,emissive:0x5a3100,roughness:.5});
+    [[.12,.34,.20],[.42,.38,-.17],[.78,.25,.24],[.94,-.22,-.13]].forEach(p=>sphere(body,pollenMat,p,[.025,.025,.025],10));
+
+    const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+    const lerp=(a,b,t)=>a+(b-a)*t;
+    const smooth=t=>t*t*(3-2*t);
+    const anchors=[landing,...['landingCapabilities','landingWorkflow','landingVault','landingFaq'].map(id=>document.getElementById(id)),landing.querySelector('.lp-final')].filter(Boolean);
+    const path=[
+      {x:.48,y:.10,rot:-.08},
+      {x:-.42,y:-.12,rot:.12},
+      {x:.40,y:.22,rot:-.20},
+      {x:-.40,y:-.04,rot:.15},
+      {x:.42,y:.12,rot:-.12},
+      {x:.06,y:.08,rot:0}
+    ];
+    const clock=new THREE.Clock();
+    let elapsed=0;
+    function resize(){
+      const w=window.innerWidth,h=window.innerHeight;
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.75));
+      renderer.setSize(w,h,false);
+      camera.aspect=w/h;camera.updateProjectionMatrix();
+    }
+    window.addEventListener('resize',resize,{passive:true});
+
+    function frame(){
+      requestAnimationFrame(frame);
+      const dt=Math.min(clock.getDelta(),.05); elapsed+=dt;
+      const landingTop=landing.getBoundingClientRect().top;
+      const focus=landing.scrollTop+landing.clientHeight*.52;
+      const positions=anchors.map(el=>el.getBoundingClientRect().top-landingTop+landing.scrollTop);
+      let idx=0;
+      while(idx<positions.length-2 && focus>positions[idx+1])idx++;
+      const span=Math.max(1,positions[idx+1]-positions[idx]);
+      const t=smooth(clamp((focus-positions[idx])/span,0,1));
+      const a=path[idx]||path[0],b=path[idx+1]||path[path.length-1];
+      const nx=lerp(a.x,b.x,t),ny=lerp(a.y,b.y,t);
+      const halfH=Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*camera.position.z;
+      const halfW=halfH*camera.aspect;
+      bee.position.set(nx*halfW,ny*halfH+Math.sin(elapsed*2.3)*.055,0);
+      bee.scale.setScalar(.72+Math.sin(elapsed*1.6)*.018);
+      bee.rotation.z=lerp(a.rot,b.rot,t)+Math.sin(elapsed*1.4)*.035;
+      bee.rotation.y=Math.sin(elapsed*.85)*.20;
+      bee.rotation.x=Math.cos(elapsed*1.1)*.08;
+      // High-frequency wing beats with a slight phase offset between front and rear wings.
+      wingPivots.forEach((w,i)=>{
+        const phase=elapsed*(w.rear?78:88)+(w.side<0?0:Math.PI)+(w.rear?.8:0);
+        w.pivot.rotation.x=w.side*(.18+Math.sin(phase)*.72);
+        w.pivot.rotation.z=w.side*(w.rear?-.42:.26)+Math.cos(phase)*.10;
+      });
+      // Legs sway subtly while the bee hovers.
+      body.children.forEach((child,i)=>{
+        if(child.isMesh && i>15 && i<24) child.rotation.z=Math.sin(elapsed*8+i)*.045;
+      });
+      canvas.classList.add('is-active');
+      canvas.dataset.ready='true';
+      canvas.dataset.engine='three.js-procedural-honeybee';
+      renderer.render(scene,camera);
+    }
+    canvas.dataset.ready='initializing';
+    canvas.dataset.engine='three.js-procedural-honeybee';
+    frame();
+    console.info('CINEMOTION procedural 3D honeybee initialized.');
+  } catch(error) {
+    canvas.dataset.ready='error';
+    canvas.dataset.error=error?.message||String(error);
+    console.error('CINEMOTION procedural honeybee failed:',error);
+  }
+})();
+</script>
   </div>
 
     <!-- TAB SWITCH WELCOME BACK OVERLAY -->
@@ -7297,213 +7507,7 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
 </section>
 
 
-<!-- CINEMOTION desktop scroll-flight bee: isolated visual layer -->
-<style id="cinemotion-scroll-bee-style">
-  #cinemotion-scroll-bee-canvas {
-    position: fixed; inset: 0; width: 100%; height: 100%;
-    z-index: 35; pointer-events: none; opacity: 0;
-    transition: opacity .7s ease; display: block;
-  }
-  #cinemotion-scroll-bee-canvas.is-active { opacity: 1; }
-  @media (prefers-reduced-motion: reduce) {
-    #cinemotion-scroll-bee-canvas { transition: none; }
-  }
-</style>
-<canvas id="cinemotion-scroll-bee-canvas" aria-hidden="true"></canvas>
 
-<script type="module" id="cinemotion-scroll-bee-script">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
-
-(() => {
-  const canvas = document.getElementById('cinemotion-scroll-bee-canvas');
-  const landing = document.getElementById('cinemotionLandingTop');
-  if (!canvas || !landing) return;
-
-  try {
-    const renderer = new THREE.WebGLRenderer({
-      canvas, alpha: true, antialias: true, powerPreference: 'high-performance'
-    });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
-    renderer.setSize(window.innerWidth, window.innerHeight, false);
-    renderer.setClearColor(0x000000, 0);
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.25;
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(0, 0, 8);
-
-    scene.add(new THREE.HemisphereLight(0xfff7e8, 0x3b4260, 2.0));
-    const key = new THREE.DirectionalLight(0xffe3a0, 3.1);
-    key.position.set(-3, 4, 6); scene.add(key);
-    const fill = new THREE.DirectionalLight(0xb9dfff, 1.8);
-    fill.position.set(4, 1, 4); scene.add(fill);
-    const rim = new THREE.PointLight(0xffa62b, 2.2, 12);
-    rim.position.set(0, 2, -2); scene.add(rim);
-
-    const bee = new THREE.Group();
-    const body = new THREE.Group();
-    bee.add(body); scene.add(bee);
-
-    const black = new THREE.MeshPhysicalMaterial({color:0x17130f, roughness:.36, metalness:.12, clearcoat:.7});
-    const amber = new THREE.MeshPhysicalMaterial({color:0xe9a51c, roughness:.32, metalness:.08, clearcoat:.85});
-    const gold = new THREE.MeshPhysicalMaterial({color:0xffc84d, roughness:.28, metalness:.1, clearcoat:1});
-    const dark = new THREE.MeshStandardMaterial({color:0x090b10, roughness:.24});
-    const eyeMat = new THREE.MeshPhysicalMaterial({color:0x07090c, roughness:.08, metalness:.18, clearcoat:1});
-    const wingMat = new THREE.MeshPhysicalMaterial({
-      color:0xc9e9ff, transparent:true, opacity:.43, roughness:.16,
-      metalness:.08, transmission:.12, side:THREE.DoubleSide, depthWrite:false
-    });
-
-    function sphere(parent, material, pos, scale, seg=32) {
-      const mesh = new THREE.Mesh(new THREE.SphereGeometry(1,seg,24),material);
-      mesh.position.set(...pos); mesh.scale.set(...scale); parent.add(mesh); return mesh;
-    }
-    function tube(parent, points, radius, material, tubular=24) {
-      const curve = new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(...p)));
-      const mesh = new THREE.Mesh(new THREE.TubeGeometry(curve,tubular,radius,8,false),material);
-      parent.add(mesh); return mesh;
-    }
-
-    // Abdomen, thorax and head form one continuous, detailed bee silhouette.
-    sphere(body, amber, [.55,0,0], [.78,.43,.42], 48);
-    sphere(body, gold, [.45,.035,.015], [.70,.39,.395], 48);
-    // Raised black abdominal bands wrap around the tapered abdomen.
-    [-.02,.28,.57,.83].forEach((x,i)=>{
-      const ring = new THREE.Mesh(
-        new THREE.TorusGeometry(i===3?.265:.345,.052,12,48),
-        black
-      );
-      ring.rotation.y=Math.PI/2;
-      ring.scale.set(1,1,i===3?.86:1);
-      ring.position.set(x,0,0);
-      body.add(ring);
-    });
-    sphere(body, black, [-.28,.015,0], [.48,.42,.41], 40);
-    sphere(body, gold, [-.32,.06,.015], [.40,.35,.35], 40);
-    sphere(body, amber, [-.83,.035,0], [.34,.32,.32], 40);
-    sphere(body, black, [-.93,-.015,.015], [.25,.25,.26], 32);
-    // Large compound eyes, glossy and dark.
-    sphere(body, eyeMat, [-.91,.12,.265], [.105,.14,.075], 24);
-    sphere(body, eyeMat, [-.91,.12,-.265], [.105,.14,.075], 24);
-    // Tiny highlights on the eyes.
-    sphere(body, new THREE.MeshBasicMaterial({color:0xffffff}), [-.945,.17,.326], [.025,.03,.012], 12);
-    sphere(body, new THREE.MeshBasicMaterial({color:0xffffff}), [-.945,.17,-.326], [.025,.03,.012], 12);
-
-    // Antennae.
-    const antennaMat = new THREE.MeshStandardMaterial({color:0x21180e, roughness:.42});
-    tube(body,[[-.91,.28,.10],[-1.02,.53,.13],[-1.20,.58,.15]],.018,antennaMat,18);
-    tube(body,[[-.91,.28,-.10],[-1.02,.53,-.13],[-1.20,.58,-.15]],.018,antennaMat,18);
-    sphere(body,amber,[-1.20,.58,.15],[.035,.035,.035],12);
-    sphere(body,amber,[-1.20,.58,-.15],[.035,.035,.035],12);
-
-    // Six fine legs, attached in three pairs below the thorax.
-    const legMat = new THREE.MeshStandardMaterial({color:0x211a12, roughness:.48});
-    [[-.35,.04],[ -.08,.02],[.18,0]].forEach(([x,z],i)=>{
-      [-1,1].forEach(side=>{
-        tube(body,[[x,-.22,z],[x+.10,-.42,side*.16],[x+.26,-.58,side*.22],[x+.42,-.57,side*.24]],.018,legMat,16);
-      });
-    });
-
-    // Four translucent wings with fine vein lines and independent flap pivots.
-    const wingPivots=[];
-    function makeWing(side, rear=false) {
-      const pivot=new THREE.Group();
-      pivot.position.set(rear?-.36:-.12,.27,side*.16);
-      pivot.rotation.z=side*(rear?-.30:.22);
-      body.add(pivot);
-      const length=rear?.64:.82, width=rear?.27:.34;
-      const shape=new THREE.Shape();
-      shape.moveTo(0,0);
-      shape.bezierCurveTo(length*.20,width*.9,length*.72,width*1.1,length,width*.18);
-      shape.bezierCurveTo(length*.86,-width*.22,length*.36,-width*.35,0,0);
-      const geometry=new THREE.ShapeGeometry(shape,24);
-      const wing=new THREE.Mesh(geometry,wingMat);
-      wing.rotation.x=side*.12;
-      wing.position.z=side*.035;
-      pivot.add(wing);
-      const veinMat=new THREE.MeshBasicMaterial({color:0xe7f5ff,transparent:true,opacity:.66});
-      [
-        [[.02,0,.006],[length*.34,width*.10,.006],[length*.68,width*.12,.006],[length*.96,width*.18,.006]],
-        [[length*.30,width*.07,.008],[length*.42,width*.36,.008],[length*.62,width*.43,.008]],
-        [[length*.50,width*.10,.008],[length*.58,-width*.12,.008],[length*.78,-width*.13,.008]]
-      ].forEach(points=>tube(pivot,points,.006,veinMat,12));
-      wingPivots.push({pivot,side,rear});
-    }
-    makeWing(-1,false); makeWing(1,false);
-    makeWing(-1,true); makeWing(1,true);
-
-    // Tiny pollen-like highlights around the body add depth without a flat sprite look.
-    const pollenMat=new THREE.MeshStandardMaterial({color:0xffd66a,emissive:0x5a3100,roughness:.5});
-    [[.12,.34,.20],[.42,.38,-.17],[.78,.25,.24],[.94,-.22,-.13]].forEach(p=>sphere(body,pollenMat,p,[.025,.025,.025],10));
-
-    const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-    const lerp=(a,b,t)=>a+(b-a)*t;
-    const smooth=t=>t*t*(3-2*t);
-    const anchors=[landing,...['landingCapabilities','landingWorkflow','landingVault','landingFaq'].map(id=>document.getElementById(id)),landing.querySelector('.lp-final')].filter(Boolean);
-    const path=[
-      {x:.48,y:.10,rot:-.08},
-      {x:-.42,y:-.12,rot:.12},
-      {x:.40,y:.22,rot:-.20},
-      {x:-.40,y:-.04,rot:.15},
-      {x:.42,y:.12,rot:-.12},
-      {x:.06,y:.08,rot:0}
-    ];
-    const clock=new THREE.Clock();
-    let elapsed=0;
-    function resize(){
-      const w=window.innerWidth,h=window.innerHeight;
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.75));
-      renderer.setSize(w,h,false);
-      camera.aspect=w/h;camera.updateProjectionMatrix();
-    }
-    window.addEventListener('resize',resize,{passive:true});
-
-    function frame(){
-      requestAnimationFrame(frame);
-      const dt=Math.min(clock.getDelta(),.05); elapsed+=dt;
-      const focus=window.scrollY+window.innerHeight*.52;
-      const positions=anchors.map(el=>el.getBoundingClientRect().top+window.scrollY);
-      let idx=0;
-      while(idx<positions.length-2 && focus>positions[idx+1])idx++;
-      const span=Math.max(1,positions[idx+1]-positions[idx]);
-      const t=smooth(clamp((focus-positions[idx])/span,0,1));
-      const a=path[idx]||path[0],b=path[idx+1]||path[path.length-1];
-      const nx=lerp(a.x,b.x,t),ny=lerp(a.y,b.y,t);
-      const halfH=Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*camera.position.z;
-      const halfW=halfH*camera.aspect;
-      bee.position.set(nx*halfW,ny*halfH+Math.sin(elapsed*2.3)*.055,0);
-      bee.scale.setScalar(.72+Math.sin(elapsed*1.6)*.018);
-      bee.rotation.z=lerp(a.rot,b.rot,t)+Math.sin(elapsed*1.4)*.035;
-      bee.rotation.y=Math.sin(elapsed*.85)*.20;
-      bee.rotation.x=Math.cos(elapsed*1.1)*.08;
-      // High-frequency wing beats with a slight phase offset between front and rear wings.
-      wingPivots.forEach((w,i)=>{
-        const phase=elapsed*(w.rear?78:88)+(w.side<0?0:Math.PI)+(w.rear?.8:0);
-        w.pivot.rotation.x=w.side*(.18+Math.sin(phase)*.72);
-        w.pivot.rotation.z=w.side*(w.rear?-.42:.26)+Math.cos(phase)*.10;
-      });
-      // Legs sway subtly while the bee hovers.
-      body.children.forEach((child,i)=>{
-        if(child.isMesh && i>15 && i<24) child.rotation.z=Math.sin(elapsed*8+i)*.045;
-      });
-      canvas.classList.add('is-active');
-      canvas.dataset.ready='true';
-      canvas.dataset.engine='three.js-procedural-honeybee';
-      renderer.render(scene,camera);
-    }
-    canvas.dataset.ready='initializing';
-    canvas.dataset.engine='three.js-procedural-honeybee';
-    frame();
-    console.info('CINEMOTION procedural 3D honeybee initialized.');
-  } catch(error) {
-    canvas.dataset.ready='error';
-    canvas.dataset.error=error?.message||String(error);
-    console.error('CINEMOTION procedural honeybee failed:',error);
-  }
-})();
-</script>
 
 </body>
 </html>
