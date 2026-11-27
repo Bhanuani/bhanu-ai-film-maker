@@ -3019,16 +3019,21 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       if (!grid) return;
 
       const savedPromptOrders = readPromptOrders();
-      list = list.map((item, originalIndex) => ({ item, originalIndex }))
-        .sort((a, b) => {
-          const categoryA = String(a.item.category || "Uncategorized").trim().toLowerCase();
-          const categoryB = String(b.item.category || "Uncategorized").trim().toLowerCase();
-          if (String(currentCategory || "").trim().toLowerCase() === "all" && categoryA !== categoryB) return a.originalIndex - b.originalIndex;
-          const order = savedPromptOrders[categoryA] || [];
-          const posA = order.indexOf(String(a.item.id));
-          const posB = order.indexOf(String(b.item.id));
-          return (posA < 0 ? Number.MAX_SAFE_INTEGER : posA) - (posB < 0 ? Number.MAX_SAFE_INTEGER : posB) || a.originalIndex - b.originalIndex;
-        }).map(entry => entry.item);
+      const promptGroups = new Map();
+      list.forEach(item => {
+        const categoryKey = String(item.category || "Uncategorized").trim().toLowerCase();
+        if (!promptGroups.has(categoryKey)) promptGroups.set(categoryKey, []);
+        promptGroups.get(categoryKey).push(item);
+      });
+      list = [...promptGroups.entries()].flatMap(([categoryKey, items]) => {
+        const order = savedPromptOrders[categoryKey] || [];
+        return items.map((item, originalIndex) => ({ item, originalIndex }))
+          .sort((a, b) => {
+            const posA = order.indexOf(String(a.item.id));
+            const posB = order.indexOf(String(b.item.id));
+            return (posA < 0 ? Number.MAX_SAFE_INTEGER : posA) - (posB < 0 ? Number.MAX_SAFE_INTEGER : posB) || a.originalIndex - b.originalIndex;
+          }).map(entry => entry.item);
+      });
 
       // In All view, show the built-in categories in the intended sequence.
       // User-created categories always follow the built-in categories.
