@@ -1010,10 +1010,11 @@
     }
     .director-mobile-tabs button.active { color:#04101a; background:var(--accent-cyan); }
     .prompt-send-actions {
-      display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;
+      display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:8px;
     }
     .prompt-send-actions .copy-btn,
-    .prompt-send-actions .send-chatgpt-card-btn {
+    .prompt-send-actions .send-chatgpt-card-btn,
+    .prompt-send-actions .send-gemini-card-btn {
       width:100%; min-width:0; min-height:42px; padding:9px 7px;
       border-radius:8px; display:flex; align-items:center; justify-content:center;
       gap:6px; font:700 .78rem 'Plus Jakarta Sans',sans-serif; cursor:pointer;
@@ -1029,6 +1030,15 @@
       border-color:#10b981; box-shadow:0 0 16px rgba(16,185,129,.18);
     }
     .send-chatgpt-card-btn:focus-visible { outline:2px solid #34d399; outline-offset:3px; }
+    .send-gemini-card-btn {
+      color:#f0eaff; background:linear-gradient(135deg,rgba(124,91,220,.22),rgba(66,133,244,.13));
+      border:1px solid rgba(167,139,250,.5); transition:all .2s ease;
+    }
+    .send-gemini-card-btn:hover {
+      background:linear-gradient(135deg,rgba(124,91,220,.36),rgba(66,133,244,.24));
+      border-color:#a78bfa; box-shadow:0 0 16px rgba(139,92,246,.18);
+    }
+    .send-gemini-card-btn:focus-visible { outline:2px solid #c4b5fd; outline-offset:3px; }
     @media(max-width:380px) {
       .prompt-send-actions { grid-template-columns:1fr; }
     }
@@ -3006,6 +3016,9 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
               <button type="button" class="send-chatgpt-card-btn" onclick="sendCardPromptToChatGPT('${item.id}')">
                 <i class="fa-solid fa-arrow-up-right-from-square"></i> Send to ChatGPT
               </button>
+              <button type="button" class="send-gemini-card-btn" onclick="sendCardPromptToGemini('${item.id}')">
+                <i class="fa-brands fa-google"></i> Send to Gemini
+              </button>
             </div>
             <button type="button" class="use-gemini-btn" onclick="insertPromptIntoGemini('${item.id}')">
               <i class="fa-solid fa-wand-magic-sparkles"></i> Use in Gemini
@@ -3767,6 +3780,31 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       }
       window.open(chatUrl, "_blank", "noopener,noreferrer");
       showToast("Opening ChatGPT with your prompt. Review it and press Send if needed.");
+    };
+
+    // Copies the selected prompt and opens Gemini. Gemini's web app does not
+    // provide a documented external prompt-prefill URL, so paste is required.
+    window.sendCardPromptToGemini = async function(itemId) {
+      const item = window.allVaultItems?.find(entry => String(entry.id) === String(itemId));
+      const promptText = String(item?.prompt || "").trim();
+      if (!promptText) {
+        showToast("This card does not contain a prompt yet.");
+        return;
+      }
+
+      // Open synchronously from the click so the browser does not block the new tab.
+      window.open("https://gemini.google.com/app", "_blank", "noopener,noreferrer");
+      try {
+        if (!navigator.clipboard || !navigator.clipboard.writeText) {
+          throw new Error("Clipboard access is unavailable.");
+        }
+        await navigator.clipboard.writeText(promptText);
+        playCopiedVideoAnimation(itemId);
+        showToast("Prompt copied. Paste it into Gemini and press Send.");
+      } catch (err) {
+        console.error("Gemini prompt copy failed:", err);
+        showToast("Gemini opened. Copy the prompt first, then paste it into Gemini.");
+      }
     };
 
     function showToast(msg) {
