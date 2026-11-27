@@ -3203,6 +3203,29 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       catch (error) { console.warn("Could not save prompt arrangement:", error); }
     }
     let draggedPromptCard = null;
+    let promptDragPointerY = null;
+    let promptAutoScrollFrame = 0;
+    function stopPromptAutoScroll() {
+      if (promptAutoScrollFrame) cancelAnimationFrame(promptAutoScrollFrame);
+      promptAutoScrollFrame = 0;
+      promptDragPointerY = null;
+    }
+    function runPromptAutoScroll() {
+      if (!draggedPromptCard || promptDragPointerY === null) {
+        stopPromptAutoScroll();
+        return;
+      }
+      const edge = Math.min(140, Math.max(75, window.innerHeight * 0.16));
+      const y = promptDragPointerY;
+      if (y < edge) {
+        const strength = Math.min(1, (edge - y) / edge);
+        window.scrollBy(0, -Math.ceil(5 + strength * 18));
+      } else if (y > window.innerHeight - edge) {
+        const strength = Math.min(1, (y - (window.innerHeight - edge)) / edge);
+        window.scrollBy(0, Math.ceil(5 + strength * 18));
+      }
+      promptAutoScrollFrame = requestAnimationFrame(runPromptAutoScroll);
+    }
     function refreshPromptSortable() {
       if (!grid) return;
       const enabled = document.body.classList.contains("prompt-arrange-mode");
@@ -3222,14 +3245,18 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
         if (!draggedPromptCard) { event.preventDefault(); return; }
         event.dataTransfer.effectAllowed = "move";
         event.dataTransfer.setData("text/plain", draggedPromptCard.dataset.promptId || "");
-        requestAnimationFrame(() => draggedPromptCard?.classList.add("sortable-chosen"));
+        draggedPromptCard.classList.add("sortable-chosen");
+        promptDragPointerY = event.clientY;
+        if (!promptAutoScrollFrame) promptAutoScrollFrame = requestAnimationFrame(runPromptAutoScroll);
       });
       grid.addEventListener("dragover", event => {
         if (!draggedPromptCard) return;
+        event.preventDefault();
+        promptDragPointerY = event.clientY;
+        event.dataTransfer.dropEffect = "move";
         const target = event.target.closest(".movement-card");
         if (!target || target === draggedPromptCard ||
             target.dataset.category !== draggedPromptCard.dataset.category) return;
-        event.preventDefault();
         const rect = target.getBoundingClientRect();
         const after = event.clientY > rect.top + rect.height / 2;
         grid.insertBefore(draggedPromptCard, after ? target.nextSibling : target);
@@ -3241,11 +3268,17 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
         showToast("Prompt order saved for this category.");
       });
       grid.addEventListener("dragend", () => {
+        stopPromptAutoScroll();
         draggedPromptCard?.classList.remove("sortable-chosen");
         draggedPromptCard = null;
         savePromptOrdersFromGrid();
       });
     }
+    window.addEventListener("dragover", event => {
+      if (!draggedPromptCard) return;
+      promptDragPointerY = event.clientY;
+    });
+    window.addEventListener("drop", stopPromptAutoScroll);
     const promptArrangeToggle = document.getElementById("togglePromptArrange");
     const promptArrangeHint = document.getElementById("promptArrangeHint");
     promptArrangeToggle?.addEventListener("click", () => {
