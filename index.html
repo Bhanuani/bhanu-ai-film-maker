@@ -3869,7 +3869,8 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       const storageKey = "cinemotionLast_" + pending.service + "_tab";
       let rememberedTabName = "";
       try {
-        rememberedTabName = sessionStorage.getItem(storageKey) || "";
+        // localStorage is shared by this website's tabs; sessionStorage is not.
+        rememberedTabName = localStorage.getItem(storageKey) || "";
       } catch (err) {
         console.warn("Could not read the remembered destination tab:", err);
       }
@@ -3902,7 +3903,8 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
         destinationWindow = window.open(targetUrl, newTabName);
         if (destinationWindow) {
           try {
-            sessionStorage.setItem(storageKey, newTabName);
+            // Persist the exact named tab so Existing tab works from any CINEMOTION tab.
+            localStorage.setItem(storageKey, newTabName);
           } catch (err) {
             console.warn("Could not remember the new destination tab:", err);
           }
@@ -3914,10 +3916,15 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
         return;
       }
 
-      // Keep the live handle so Existing tab can navigate this exact tab next time.
+      // Keep the live handle and the shared tab name for reliable reuse.
       promptDestinationWindows[serviceKey] = destinationWindow;
-      if (destination === "existing") {
-        try { destinationWindow.focus(); } catch (err) { /* focus may be restricted */ }
+      try {
+        if (destination === "existing" && rememberedTabName) {
+          localStorage.setItem(storageKey, rememberedTabName);
+        }
+        destinationWindow.focus();
+      } catch (err) {
+        /* Focus may be restricted by the browser. */
       }
 
       if (isGemini || (!isGemini && pending.promptText.length > 12000)) {
