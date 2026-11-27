@@ -1802,8 +1802,10 @@ body::after{
   background:linear-gradient(145deg,rgba(16,24,40,.78),rgba(5,10,19,.88))!important;
   border:1px solid rgba(120,190,255,.16)!important;
   box-shadow:0 18px 46px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.045)!important;
-  backdrop-filter:blur(18px) saturate(130%)!important;
-  transition:transform .3s cubic-bezier(.2,.75,.25,1),border-color .3s,box-shadow .3s!important;
+  /* Lighter glass blur reduces GPU compositing cost while preserving the glass look. */
+  backdrop-filter:blur(8px) saturate(115%)!important;
+  -webkit-backdrop-filter:blur(8px) saturate(115%)!important;
+  transition:transform .22s ease,border-color .22s,box-shadow .22s!important;
 }
 @media(hover:hover) and (pointer:fine){
   #cinemotionLanding .lp-card:hover,#cinemotionLanding .lp-step:hover{
@@ -2195,8 +2197,33 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       renderer.setPixelRatio(getBeePixelRatio());
       renderer.setSize(w,h,false);
       camera.aspect=w/h;camera.updateProjectionMatrix();
+      refreshLandingScrollMetrics();
     }
     window.addEventListener('resize',resize,{passive:true});
+
+    // Cache section offsets outside the render loop. Reading layout for every
+    // section on every animation frame was competing with the user's scroll.
+    let cachedAnchorPositions=[];
+    let cachedLandingTop=0;
+    let cachedLandingHeight=1;
+    let metricsFrame=0;
+    function refreshLandingScrollMetrics(){
+      if(metricsFrame)return;
+      metricsFrame=requestAnimationFrame(()=>{
+        metricsFrame=0;
+        const scrollY=window.scrollY||window.pageYOffset||0;
+        cachedLandingTop=landing.getBoundingClientRect().top+scrollY;
+        cachedLandingHeight=Math.max(1,landing.clientHeight);
+        cachedAnchorPositions=anchors.map(el=>el.getBoundingClientRect().top+scrollY-cachedLandingTop);
+      });
+    }
+    window.addEventListener('scroll',refreshLandingScrollMetrics,{passive:true});
+    window.addEventListener('resize',refreshLandingScrollMetrics,{passive:true});
+    if('ResizeObserver' in window){
+      const landingResizeObserver=new ResizeObserver(refreshLandingScrollMetrics);
+      landingResizeObserver.observe(landing);
+    }
+    refreshLandingScrollMetrics();
 
     let animationFrameId=0;
     let lastRenderTime=0;
@@ -2234,12 +2261,12 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       const dt=Math.min((timestamp-lastRenderTime)/1000 || 1/30,.05);
       lastRenderTime=timestamp;
       elapsed+=dt;
-      const landingTop=landing.getBoundingClientRect().top;
-      const focus=landing.scrollTop+landing.clientHeight*.52;
-      const positions=anchors.map(el=>el.getBoundingClientRect().top-landingTop+landing.scrollTop);
+      const pageScroll=window.scrollY||window.pageYOffset||0;
+      const focus=pageScroll-cachedLandingTop+cachedLandingHeight*.52;
+      const positions=cachedAnchorPositions.length?cachedAnchorPositions:[0];
       let idx=0;
       while(idx<positions.length-2 && focus>positions[idx+1])idx++;
-      const span=Math.max(1,positions[idx+1]-positions[idx]);
+      const span=Math.max(1,(positions[idx+1]??positions[idx]+1)-positions[idx]);
       const t=smooth(clamp((focus-positions[idx])/span,0,1));
       const a=path[idx]||path[0],b=path[idx+1]||path[path.length-1];
       const nx=lerp(a.x,b.x,t),ny=lerp(a.y,b.y,t);
@@ -7758,6 +7785,22 @@ grid?.addEventListener('click',e=>{const b=e.target.closest('[data-focus-tool]')
 
 
 
+<style id="cinemotion-scroll-performance">
+/* Keep landing scroll responsive on mid-range GPUs and laptops. */
+#cinemotionLanding .lp-card,#cinemotionLanding .lp-step,#cinemotionLanding .lp-vault{
+  -webkit-backdrop-filter:blur(8px) saturate(115%)!important;
+  backdrop-filter:blur(8px) saturate(115%)!important;
+}
+@media(max-width:900px){
+  #cinemotionLanding .lp-card,#cinemotionLanding .lp-step,#cinemotionLanding .lp-vault{
+    -webkit-backdrop-filter:blur(4px) saturate(108%)!important;
+    backdrop-filter:blur(4px) saturate(108%)!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  #cinemotion-scroll-bee-canvas{display:none!important}
+}
+</style>
 </body>
 </html>
 <style id="gemini-glow-final-override">
