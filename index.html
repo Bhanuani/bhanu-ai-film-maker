@@ -5095,14 +5095,15 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
     const directorLibraryTab = byId("directorLibraryTab");
     const directorGeminiTab = byId("directorGeminiTab");
 
-    function syncDirectorLibrary(rawQuery) {
+    let lastDirectorRenderedQuery = "";
+    function syncDirectorLibrary(rawQuery, lightweight = false) {
       const raw = String(rawQuery || "");
       const trimmed = raw.trim();
       const librarySearch = byId("directorLibrarySearch");
       const items = Array.isArray(window.allVaultItems) ? window.allVaultItems : [];
 
-      // A space completes the current keyword. Clear only the left search field;
-      // keep the current matches visible until the next keyword is typed.
+      // A space completes the current keyword. Keep the current matches visible;
+      // do not rebuild the prompt grid while the user continues typing.
       if (/\s$/.test(raw)) {
         if (librarySearch) librarySearch.value = "";
         return;
@@ -5111,7 +5112,10 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       if (!trimmed) {
         if (librarySearch) librarySearch.value = "";
         currentCategory = "All";
-        renderCards(items);
+        if (lastDirectorRenderedQuery) {
+          lastDirectorRenderedQuery = "";
+          renderCards(items);
+        }
         if (directorLibraryStatus) {
           directorLibraryStatus.textContent =
             "Type any part of a camera or prompt term in Gemini to find matching references.";
@@ -5130,13 +5134,15 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
         "kavali","cheppu","ivvu"
       ]);
 
+      // Never redraw all 136+ cards for one-character or common words.
       if (!token || token.length < 2 || ignoredWords.has(token)) {
         if (librarySearch) librarySearch.value = "";
+        if (directorLibraryStatus) {
+          directorLibraryStatus.textContent = "Keep typing a camera or prompt keyword to see related references.";
+        }
         return;
       }
 
-      // Prefix matching is intentional: "do" finds "Dolly", "dolly zoom",
-      // "door", etc. Search only words that actually occur in prompt records.
       const hasWordPrefix = (value, prefix) => {
         const words = String(value || "").toLowerCase().match(/[a-z0-9]+/g) || [];
         return words.some(word => word.startsWith(prefix));
@@ -5163,7 +5169,7 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
 
       if (!results.length) {
         if (librarySearch) librarySearch.value = "";
-        renderCards(items);
+        // Keep the last useful result on screen instead of rebuilding every card.
         if (directorLibraryStatus) {
           directorLibraryStatus.textContent = `No prompt term starts with “${token}”. Keep typing a camera or prompt keyword.`;
         }
@@ -5171,13 +5177,17 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
       }
 
       if (librarySearch) librarySearch.value = token;
-      renderCards(results);
-      if (directorLibraryStatus) {
-        directorLibraryStatus.textContent =
-          `${results.length} matching prompt(s) for “${token}” — partial-word matches enabled`;
+      if (token !== lastDirectorRenderedQuery) {
+        lastDirectorRenderedQuery = token;
+        // Gemini typing is a suggestion experience: render only a small result set.
+        // The dedicated Library search continues to show every matching result.
+        renderCards(lightweight ? results.slice(0, 24) : results);
       }
-
-      // Avoid moving the prompt grid while the user is typing in Gemini.
+      if (directorLibraryStatus) {
+        directorLibraryStatus.textContent = lightweight
+          ? `${results.length} matching prompt(s) for “${token}” — showing up to 24 quick matches`
+          : `${results.length} matching prompt(s) for “${token}” — partial-word matches enabled`;
+      }
     }
 
     window.sendCardPromptToFlow = async function(itemId) {
@@ -5262,21 +5272,21 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
     // Debounce vault matching so keystrokes stay responsive.
     // Suggestions refresh shortly after typing pauses; Gemini submission is unchanged.
     let geminiLibrarySearchTimer = null;
-    const scheduleDirectorLibrarySync = (value) => {
+    const scheduleDirectorLibrarySync = (value, lightweight = false) => {
       if (geminiLibrarySearchTimer) clearTimeout(geminiLibrarySearchTimer);
       geminiLibrarySearchTimer = setTimeout(() => {
         geminiLibrarySearchTimer = null;
-        syncDirectorLibrary(value);
-      }, 180);
+        syncDirectorLibrary(value, lightweight);
+      }, lightweight ? 420 : 220);
     };
 
     geminiInput?.addEventListener("input", () => {
       if (document.body.classList.contains("director-mode")) {
-        scheduleDirectorLibrarySync(geminiInput.value);
+        scheduleDirectorLibrarySync(geminiInput.value, true);
       }
     });
     directorLibrarySearch?.addEventListener("input", () => {
-      scheduleDirectorLibrarySync(directorLibrarySearch.value);
+      scheduleDirectorLibrarySync(directorLibrarySearch.value, false);
     });
     directorLibraryTab?.addEventListener("click", () => {
       document.body.classList.remove("director-show-gemini");
