@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- EmailJS Library for Notifications -->
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
   <style>
     :root {
@@ -3074,8 +3074,8 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
                ondragleave="handleDragLeave(event, '${item.id}')"
                ondrop="handleFileDrop(event, '${item.id}')">
 
-            <video id="vid_${item.id}" autoplay loop muted playsinline></video>
-            <img id="img_${item.id}" alt="${item.name}">
+            <video id="vid_${item.id}" autoplay loop muted playsinline preload="none"></video>
+            <img id="img_${item.id}" alt="${item.name}" loading="lazy" decoding="async">
             <iframe id="yt_${item.id}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
             <div class="upload-overlay admin-only" id="overlay_${item.id}">
@@ -4412,7 +4412,7 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
         id="geminiIntroVideo"
         class="gemini-intro-video"
         poster="./Gemini-2-poster.jpg"
-        preload="auto"
+        preload="none"
         muted
         playsinline
         webkit-playsinline
